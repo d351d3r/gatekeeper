@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Material 3. Роли токенов разведены: фон - colorSurface и colorSurfaceContainer*,
+        текст - colorOnSurface и colorOnSurfaceVariant, акценты - colorPrimary,
+        colorSecondary и colorTertiary, у каждого своя пара colorOn*.
+        colorPrimary фоном больше не является.
+    -->
+    <style name="AppTheme.Base" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/md_primary</item>
+        <item name="colorOnPrimary">@color/md_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_onPrimaryContainer</item>
+        <item name="colorPrimaryInverse">@color/md_inversePrimary</item>
+        <item name="colorSecondary">@color/md_secondary</item>
+        <item name="colorOnSecondary">@color/md_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_onSecondaryContainer</item>
+        <item name="colorTertiary">@color/md_tertiary</item>
+        <item name="colorOnTertiary">@color/md_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/md_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/md_onTertiaryContainer</item>
+        <item name="colorError">@color/md_error</item>
+        <item name="colorOnError">@color/md_onError</item>
+        <item name="colorErrorContainer">@color/md_errorContainer</item>
+        <item name="colorOnErrorContainer">@color/md_onErrorContainer</item>
+        <item name="android:colorBackground">@color/md_background</item>
+        <item name="colorOnBackground">@color/md_onBackground</item>
+        <item name="colorSurface">@color/md_surface</item>
+        <item name="colorOnSurface">@color/md_onSurface</item>
+        <item name="colorSurfaceVariant">@color/md_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/md_onSurfaceVariant</item>
+        <item name="colorSurfaceInverse">@color/md_inverseSurface</item>
+        <item name="colorOnSurfaceInverse">@color/md_inverseOnSurface</item>
+        <item name="colorSurfaceContainerLowest">@color/md_surfaceContainerLowest</item>
+        <item name="colorSurfaceContainerLow">@color/md_surfaceContainerLow</item>
+        <item name="colorSurfaceContainer">@color/md_surfaceContainer</item>
+        <item name="colorSurfaceContainerHigh">@color/md_surfaceContainerHigh</item>
+        <item name="colorSurfaceContainerHighest">@color/md_surfaceContainerHighest</item>
+        <item name="colorSurfaceDim">@color/md_surfaceDim</item>
+        <item name="colorSurfaceBright">@color/md_surfaceBright</item>
+        <item name="elevationOverlayColor">@color/md_surfaceTint</item>
+        <item name="colorOutline">@color/md_outline</item>
+        <item name="colorOutlineVariant">@color/md_outlineVariant</item>
+        <item name="scrimBackground">@color/md_scrim</item>
+
+        <item name="windowActionModeOverlay">true</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="bottomNavigationStyle">@style/Widget.Zindan.BottomNavigation</item>
+
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="AppTheme.Override" parent="AppTheme.Base">
+        <!-- Пусто; переопределяется квалификаторами ресурсов -->
+    </style>
+
+    <style name="AppTheme" parent="AppTheme.Override">
+        <!-- Пусто; переопределяется квалификаторами ресурсов -->
+    </style>
+
+    <!--
+        Фирменная панель. Пользовательская цветовая роль Material 3: brandBar как поверхность
+        и brandBarOn / brandBarOnVariant как содержимое на ней. Накладывается на тему
+        активности, поэтому parent пустой - меняются только перечисленные атрибуты.
+    -->
+    <style name="ThemeOverlay.Zindan.BrandBar" parent="">
+        <item name="colorPrimary">@color/brandBarOn</item>
+        <item name="colorOnSurface">@color/brandBarOn</item>
+        <item name="colorOnSurfaceVariant">@color/brandBarOnVariant</item>
+        <item name="colorControlNormal">@color/brandBarOn</item>
+        <item name="colorControlActivated">@color/brandBarOn</item>
+        <item name="colorControlHighlight">@color/brandBarRipple</item>
+        <item name="android:textColorPrimary">@color/brandBarOn</item>
+        <item name="android:textColorSecondary">@color/brandBarOnVariant</item>
+        <item name="android:textColorHint">@color/brandBarOnVariant</item>
+        <item name="actionMenuTextColor">@color/brandBarOn</item>
+        <item name="actionButtonStyle">@style/Widget.Zindan.ActionButton</item>
+    </style>
+
+    <!--
+        Выпадающее меню тулбара живет на обычной поверхности приложения, а не на панели,
+        поэтому цвета текста возвращаются к токенам темы. Без этого меню наследовало бы
+        золотой текст фирменной панели и на светлом фоне было бы нечитаемым.
+    -->
+    <style name="ThemeOverlay.Zindan.PopupMenu" parent="">
+        <item name="colorSurface">@color/md_surfaceContainer</item>
+        <item name="colorOnSurface">@color/md_onSurface</item>
+        <item name="colorOnSurfaceVariant">@color/md_onSurfaceVariant</item>
+        <item name="colorControlNormal">@color/md_onSurfaceVariant</item>
+        <item name="colorPrimary">@color/md_primary</item>
+        <item name="android:colorBackground">@color/md_surfaceContainer</item>
+        <item name="android:textColorPrimary">@color/md_onSurface</item>
+        <item name="android:textColorSecondary">@color/md_onSurfaceVariant</item>
+    </style>
+
+    <style name="Widget.Zindan.ActionButton" parent="Widget.AppCompat.ActionButton">
+        <item name="android:minWidth">40dp</item>
+        <item name="android:paddingStart">2dp</item>
+        <item name="android:paddingEnd">2dp</item>
+    </style>
+
+    <style name="Widget.Zindan.BottomNavigation" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:background">@color/brandBar</item>
+        <item name="itemIconTint">@color/bottom_navigation_item</item>
+        <item name="itemTextColor">@color/bottom_navigation_item</item>
+        <item name="itemRippleColor">@color/brandBarRipple</item>
+        <item name="itemActiveIndicatorStyle">@style/Widget.Zindan.BottomNavigation.Indicator</item>
+        <item name="elevation">0dp</item>
+    </style>
+
+    <style name="Widget.Zindan.BottomNavigation.Indicator"
+        parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/brandBarIndicator</item>
+    </style>
+
+    <!--
+        DummyActivity: прозрачная активность-реле. Наследует токены приложения, чтобы
+        диалоги, которые она показывает, брали те же цвета, что и остальные экраны.
+    -->
+    <style name="Theme.Zindan.Translucent" parent="AppTheme.Base">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+</resources>

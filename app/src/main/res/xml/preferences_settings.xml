@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_appearance"
+        android:title="@string/settings_appearance">
+
+        <androidx.preference.CheckBoxPreference
+            android:key="settings_dynamic_colors"
+            android:title="@string/settings_dynamic_colors"
+            android:summary="@string/settings_dynamic_colors_desc" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:title="@string/settings_interaction">
+
+        <androidx.preference.CheckBoxPreference
+            android:key="settings_cross_profile_file_chooser"
+            android:title="@string/settings_cross_profile_file_chooser"
+            android:summary="@string/settings_cross_profile_file_chooser_desc" />
+
+        <androidx.preference.CheckBoxPreference
+            android:key="settings_block_contacts_searching"
+            android:title="@string/settings_block_contacts_searching"
+            android:summary="@string/settings_block_contacts_searching_desc" />
+
+        <androidx.preference.CheckBoxPreference
+            android:key="settings_payment_stub"
+            android:title="@string/settings_payment_stub"
+            android:summary="@string/settings_payment_stub_desc" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:title="@string/settings_services">
+
+        <androidx.preference.CheckBoxPreference
+            android:key="settings_auto_freeze_service"
+            android:title="@string/settings_auto_freeze_service"
+            android:summary="@string/settings_auto_freeze_service_desc" />
+
+        <androidx.preference.DropDownPreference
+            android:dependency="settings_auto_freeze_service"
+            android:key="settings_auto_freeze_delay"
+            android:title="@string/settings_auto_freeze_delay" />
+
+        <androidx.preference.CheckBoxPreference
+            android:dependency="settings_auto_freeze_service"
+            android:key="settings_dont_freeze_foreground"
+            android:title="@string/settings_dont_freeze_foreground"
+            android:summary="@string/settings_dont_freeze_foreground_desc" />
+
+        <androidx.preference.Preference
+            android:key="settings_unfreeze_all"
+            android:title="@string/unfreeze_all"
+            android:summary="@string/settings_unfreeze_all_desc" />
+
+        <androidx.preference.Preference
+            android:key="settings_freeze_all"
+            android:title="@string/freeze_all"
+            android:summary="@string/settings_freeze_all_desc" />
+
+        <androidx.preference.Preference
+            android:key="settings_create_unfreeze_all_shortcut"
+            android:title="@string/create_unfreeze_all_shortcut" />
+
+        <androidx.preference.Preference
+            android:key="settings_create_freeze_all_shortcut"
+            android:title="@string/create_freeze_all_shortcut" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:title="@string/settings_anti_spy">
+
+        <androidx.preference.Preference
+            android:key="settings_anti_spy_routing"
+            android:selectable="false"
+            android:title="@string/settings_anti_spy_routing" />
+
+        <androidx.preference.CheckBoxPreference
+            android:key="settings_anti_spy_enabled"
+            android:title="@string/settings_anti_spy_enabled"
+            android:summary="@string/settings_anti_spy_enabled_desc" />
+
+        <androidx.preference.CheckBoxPreference
+            android:dependency="settings_anti_spy_enabled"
+            android:key="settings_anti_spy_freeze_on_vpn"
+            android:title="@string/settings_anti_spy_freeze_on_vpn"
+            android:summary="@string/settings_anti_spy_freeze_on_vpn_desc" />
+
+        <androidx.preference.CheckBoxPreference
+            android:dependency="settings_anti_spy_enabled"
+            android:key="settings_anti_spy_freeze_on_screen_lock"
+            android:title="@string/settings_anti_spy_freeze_on_screen_lock"
+            android:summary="@string/settings_anti_spy_freeze_on_screen_lock_desc" />
+
+        <androidx.preference.DropDownPreference
+            android:dependency="settings_anti_spy_enabled"
+            android:key="settings_anti_spy_scope"
+            android:title="@string/settings_anti_spy_scope" />
+
+        <androidx.preference.CheckBoxPreference
+            android:dependency="settings_anti_spy_enabled"
+            android:key="settings_anti_spy_notify_only"
+            android:title="@string/settings_anti_spy_notify_only"
+            android:summary="@string/settings_anti_spy_notify_only_desc" />
+
+        <androidx.preference.DropDownPreference
+            android:dependency="settings_anti_spy_enabled"
+            android:key="settings_anti_spy_delay"
+            android:title="@string/settings_anti_spy_delay" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:title="@string/settings_about">
+
+        <androidx.preference.Preference
+            android:key="settings_version"
+            android:title="@string/settings_version" />
+
+        <androidx.preference.Preference
+            android:key="settings_source_code"
+            android:title="@string/settings_source_code"
+            android:summary="@string/settings_source_code_url" />
+
+    </androidx.preference.PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Тональные палитры Material 3, темная схема. Те же исходные фирменные цвета и тот же
+    генератор, что и в values/colors.xml, другие тона. Имена токенов совпадают с дневными
+    один в один: каждому токену обязана соответствовать пара.
+-->
+<resources>
+    <!-- Material 3, темная схема. Та же спокойная синяя палитра. -->
+    <color name="md_primary">#AAC7FF</color>
+    <color name="md_onPrimary">#0A305F</color>
+    <color name="md_primaryContainer">#284777</color>
+    <color name="md_onPrimaryContainer">#D6E3FF</color>
+    <color name="md_inversePrimary">#415F91</color>
+    <color name="md_secondary">#BEC6DC</color>
+    <color name="md_onSecondary">#283141</color>
+    <color name="md_secondaryContainer">#3E4759</color>
+    <color name="md_onSecondaryContainer">#DAE2F9</color>
+    <color name="md_tertiary">#DDBCE0</color>
+    <color name="md_onTertiary">#402743</color>
+    <color name="md_tertiaryContainer">#573E5B</color>
+    <color name="md_onTertiaryContainer">#FAD8FD</color>
+    <color name="md_error">#F2B8B5</color>
+    <color name="md_onError">#601410</color>
+    <color name="md_errorContainer">#8C1D18</color>
+    <color name="md_onErrorContainer">#F9DEDC</color>
+    <color name="md_background">#111318</color>
+    <color name="md_onBackground">#E2E2E9</color>
+    <color name="md_surface">#111318</color>
+    <color name="md_onSurface">#E2E2E9</color>
+    <color name="md_surfaceVariant">#43474E</color>
+    <color name="md_onSurfaceVariant">#C3C6CF</color>
+    <color name="md_surfaceContainerLowest">#0C0E13</color>
+    <color name="md_surfaceContainerLow">#1A1B20</color>
+    <color name="md_surfaceContainer">#1E2025</color>
+    <color name="md_surfaceContainerHigh">#282A2F</color>
+    <color name="md_surfaceContainerHighest">#33353A</color>
+    <color name="md_surfaceDim">#111318</color>
+    <color name="md_surfaceBright">#37393E</color>
+    <color name="md_outline">#8D9199</color>
+    <color name="md_outlineVariant">#43474E</color>
+    <color name="md_inverseSurface">#E2E2E9</color>
+    <color name="md_inverseOnSurface">#2F3036</color>
+    <color name="md_scrim">#000000</color>
+    <color name="md_surfaceTint">#AAC7FF</color>
+
+    <color name="brandBar">@color/md_surfaceContainer</color>
+    <color name="brandBarOn">@color/md_onSurface</color>
+    <color name="brandBarOnVariant">@color/md_onSurfaceVariant</color>
+    <color name="brandBarIndicator">@color/md_secondaryContainer</color>
+    <color name="brandBarRipple">#1FAAC7FF</color>
+
+    <!-- Мастер настройки. Белый прямоугольник в темной теме устранен здесь. -->
+    <color name="setupWizardHeaderBackground">@color/md_primaryContainer</color>
+    <color name="setupWizardHeaderText">@color/md_onPrimaryContainer</color>
+    <color name="setupWizardHeaderProgress">@color/md_primary</color>
+    <color name="setupWizardContentBackground">@color/md_surface</color>
+    <color name="setupWizardContentText">@color/md_onSurface</color>
+    <color name="setupWizardNavText">@color/md_primary</color>
+
+    <!-- Состояния строки списка приложений -->
+    <color name="selectedAppBackground">@color/md_secondaryContainer</color>
+    <color name="selectedAndDisabledAppBackground">@color/md_tertiaryContainer</color>
+    <color name="disabledAppBackground">@color/md_surfaceContainerHighest</color>
+</resources>

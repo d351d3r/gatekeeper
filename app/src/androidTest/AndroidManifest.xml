@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <!--
+            Второе приложение с теми же строками действий. Тестовый APK это отдельный пакет
+            (net.typeblog.shelter.test), и его достаточно, чтобы воспроизвести перехват
+            кросс-профильного реле (D4a), ничего больше на стенд ставить не надо.
+
+            Приоритет не задан намеренно: положительный приоритет локального кандидата
+            вытесняет системный форвардер из резолва целиком, и сцена получилась бы другой,
+            не перехват, а отсутствие реле.
+
+            Перехватывается только START_SERVICE. TRY_START_SERVICE оставлен настоящему
+            реле специально: так на стенде воспроизводится ровно D3, когда проверка профиля
+            проходит, а привязка возвращается без результата.
+        -->
+        <activity
+            android:name="io.gatekeeper.ImpostorRelayActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="net.typeblog.gatekeeper.action.START_SERVICE" />
+                <action android:name="net.typeblog.shelter.action.START_SERVICE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <!--
+                Приложение под тестом видит чужие пакеты по своему queries с
+                android.intent.action.MAIN; без этого фильтра тестовый APK для него невидим
+                и перехват не воспроизводится.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
