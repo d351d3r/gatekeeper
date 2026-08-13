@@ -2,9 +2,12 @@ name: Android CI
 
 on:
   push:
-    branches: [main, master, v1.5.2]
+    branches: [main]
   pull_request:
-    branches: [main, master, v1.5.2]
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   assemble:
@@ -25,11 +28,20 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Assemble debug APK
-        run: ./gradlew :app:assembleDebug --stacktrace
+      - name: Test and assemble universal APK
+        run: ./gradlew :app:testDebugUnitTest :app:assembleDebug --stacktrace --no-daemon
 
-      - name: Upload debug APK
+      - name: Write APK checksum
+        run: |
+          cd app/build/outputs/apk/debug
+          sha256sum Gatekeeper-*.apk > SHA256SUMS.txt
+
+      - name: Upload universal Android APK
         uses: actions/upload-artifact@v4
         with:
-          name: gatekeeper-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: gatekeeper-universal-debug-apk
+          path: |
+            app/build/outputs/apk/debug/Gatekeeper-*.apk
+            app/build/outputs/apk/debug/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
