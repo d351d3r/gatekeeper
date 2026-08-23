@@ -267,3 +267,21 @@
 
 ---
 
+
+## Регрессия Фазы 14 -- эмулятор Android 16 (август 2026)
+
+**APK:** `Gatekeeper-1.5.3-(317)-debug.apk`  
+**Устройство:** AVD `gatekeeper_a16` (AOSP 16, google_apis), чистый вайп, профиль поднят testbench  
+**Git:** `530b5e6`
+
+| Область | Статус | Комментарий |
+|---------|--------|-------------|
+| `WorkProfilePackageAddedReceiver` не срабатывает | ❌ воспроизведено | Установка MAX (`ru.oneme.app`) и RuStore (`ru.vk.store`) в рабочий профиль: ресивер не вызывается ни при мертвом процессе, ни при живом. Система скипает доставку на этапе enqueue: `dumpsys activity broadcasts`: "skipped by policy at enqueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED ... } to io.gatekeeper/.receivers.WorkProfilePackageAddedReceiver". Причина: implicit broadcast restrictions для targetSdk 35; манифест-ресивер не получает ACTION_PACKAGE_ADDED вовсе |
+| Автозаморозка сторовых установок: фоллбек | частично | Диффинг против базлайна делает только `applyDefaultsForNewPackages` (AppListFragment.kt:465) -- то есть реакция происходит при следующем открытии списка приложений в Gatekeeper, не в фоне |
+| Базлайн до первого открытия списка | ⚠️ | Пакеты, установленные в профиль ДО первого открытия списка приложений, попадают в `PREF_KNOWN_WORK_PROFILE_PACKAGES` как базлайн без заморозки (AutoFreezeDefaults.kt:156-160) -- они никогда не будут автозаморожены |
+
+На Samsung (builds 231/235) сценарий проходил: вероятно, Gatekeeper был открыт во время
+установки из RuStore (сработал путь обновления списка), плюс отличия OEM-политик.
+Фоллбек через JobScheduler-поллинг набора пакетов рабочего профиля -- кандидат в доработку
+(см. план, Фаза 17+).
+
