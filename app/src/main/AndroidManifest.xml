@@ -163,6 +163,13 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".receivers.WorkPackageReportReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="io.gatekeeper.action.WORK_PACKAGES_REPORT" />
+            </intent-filter>
+        </receiver>
+
         <receiver android:name=".receivers.WorkProfilePackageAddedReceiver"
             android:exported="true"
             android:enabled="true">
@@ -171,6 +178,9 @@
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
+
+        <service android:name=".services.WorkPackageScanJobService"
+                android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <!-- Implementation of the device policy controller -->
         <receiver android:name=".receivers.GatekeeperDeviceAdminReceiver"

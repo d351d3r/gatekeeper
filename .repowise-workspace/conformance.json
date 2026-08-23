@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "generated_at": "2026-08-23T12:43:54.991396+00:00",
+  "rules_evaluated": 0,
+  "violations": [],
+  "cycles": [],
+  "violation_count": 0,
+  "cycle_count": 0,
+  "total_cycles": 0,
+  "violating_repos": []
+}

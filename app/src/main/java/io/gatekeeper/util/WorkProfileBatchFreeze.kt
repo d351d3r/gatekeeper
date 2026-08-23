@@ -154,11 +154,14 @@ object WorkProfileBatchFreeze {
 
     private fun thirdPartyPackages(context: Context): Array<String> {
         return try {
-            context.packageManager.getInstalledApplications(0)
-                .filter { it.packageName != context.packageName }
-                .filter { it.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
-                .map { it.packageName }
-                .toTypedArray()
+            val entries = context.packageManager.getInstalledApplications(0).map {
+                PackageEntry(
+                    packageName = it.packageName,
+                    isSystem = it.flags and ApplicationInfo.FLAG_SYSTEM != 0,
+                    isInstalled = true,
+                )
+            }
+            PackageScanFilter.selectScannedPackages(context.packageName, entries)
         } catch (e: Exception) {
             Log.w(TAG, "installed applications query failed", e)
             emptyArray()

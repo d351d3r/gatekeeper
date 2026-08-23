@@ -45,6 +45,7 @@ import io.gatekeeper.R
 import io.gatekeeper.receivers.AntiSpyVpnFreezeReceiver
 import io.gatekeeper.receivers.AppListRefreshReceiver
 import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
+import io.gatekeeper.receivers.WorkPackageReportReceiver
 import io.gatekeeper.services.BatchFreezeService
 import io.gatekeeper.services.IGatekeeperService
 import io.gatekeeper.ui.AppListFragment
@@ -57,6 +58,7 @@ import java.io.OutputStream
 
 object Utility {
     private const val TAG = "Utility"
+    const val ACTION_WORK_PACKAGES_REPORT = "io.gatekeeper.action.WORK_PACKAGES_REPORT"
     private const val APP_LIST_REFRESH_DELAY_MS = 700L
     private val APP_LIST_REFRESH_FOLLOWUP_DELAYS_MS = longArrayOf(700L, 2000L, 4500L)
     private val APP_LIST_REFRESH_DELIVERY_DELAYS_MS = longArrayOf(50L, 700L, 2000L, 4500L)
@@ -470,6 +472,39 @@ object Utility {
         }
     }
 
+    /** Work profile → personal: run [WorkPackageReportReceiver] in the default app process. */
+    fun scheduleWorkPackageReportOnMainProfile(context: Context, packages: Array<String>) {
+        try {
+            val intent = Intent(ACTION_WORK_PACKAGES_REPORT).apply {
+                setPackage(context.packageName)
+                component = ComponentName(context, WorkPackageReportReceiver::class.java)
+                putExtra("work_packages", packages)
+            }
+            if (!tryTransferIntentToProfileUnsigned(context, intent)) {
+                Log.w(TAG, "no forwarder for work packages report")
+                return
+            }
+            AuthenticationUtility.signIntent(intent)
+            val pi = PendingIntent.getBroadcast(
+                context,
+                0xE49EA xor packages.contentHashCode(),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+            val am = context.getSystemService(AlarmManager::class.java)
+            if (am != null) {
+                am.set(
+                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime() + 50,
+                    pi,
+                )
+                Log.i(TAG, "scheduled work packages report (${packages.size} pkgs)")
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "scheduleWorkPackageReportOnMainProfile failed", e)
+        }
+    }
+
     /**
      * Deliver app-list refresh to the personal profile UI.
      * From the work profile / {@code :vpnwatch}: cross-profile [DummyActivity.REFRESH_MAIN_APP_LIST].
@@ -770,11 +805,16 @@ object Utility {
         manager.addCrossProfileIntentFilter(
             adminComponent,
             IntentFilter(AppListRefreshReceiver.ACTION),
+            DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT
+        )
+        manager.addCrossProfileIntentFilter(
+            adminComponent,
+            IntentFilter(ACTION_WORK_PACKAGES_REPORT),
             DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED
         )
         manager.addCrossProfileIntentFilter(
             adminComponent,
-            IntentFilter(AppListRefreshReceiver.ACTION),
+            IntentFilter(ACTION_WORK_PACKAGES_REPORT),
             DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT
         )
 

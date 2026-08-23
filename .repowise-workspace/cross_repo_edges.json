@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "generated_at": "2026-08-23T12:43:54.929243+00:00",
+  "co_changes": [],
+  "package_deps": [],
+  "repo_summaries": {
+    "gatekeeper": {
+      "cross_repo_edge_count": 0
+    },
+    "rknhardering": {
+      "cross_repo_edge_count": 0
+    }
+  },
+  "total_co_changes": 0
+}

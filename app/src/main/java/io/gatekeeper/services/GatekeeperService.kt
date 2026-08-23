@@ -4,8 +4,11 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.app.Service
 import android.app.admin.DevicePolicyManager
+import android.content.BroadcastReceiver
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -15,12 +18,15 @@ import android.os.Bundle
 import android.os.IBinder
 import android.os.PowerManager
 import android.os.RemoteException
+import android.util.Log
 import io.gatekeeper.R
 import io.gatekeeper.GatekeeperApplication
 import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.FileProviderProxy
+import io.gatekeeper.util.PackageEntry
+import io.gatekeeper.util.PackageScanFilter
 import io.gatekeeper.util.UriForwardProxy
 import io.gatekeeper.util.Utility
 import io.gatekeeper.util.VpnTunnelDetector
@@ -31,6 +37,7 @@ class GatekeeperService : Service() {
     private var packageManager: PackageManager? = null
     private var adminComponent: ComponentName? = null
     private var startActivityProxy: IStartActivityProxy? = null
+    private var installListener: BroadcastReceiver? = null
 
     private val binder = object : IGatekeeperService.Stub() {
         override fun ping() {
@@ -251,6 +258,67 @@ class GatekeeperService : Service() {
         packageManager = getPackageManager()
         isProfileOwner = policyManager!!.isProfileOwnerApp(packageName)
         adminComponent = ComponentName(applicationContext, GatekeeperDeviceAdminReceiver::class.java)
+        if (isProfileOwner) {
+            WorkPackageScanJobService.ensureScheduled(this)
+            registerInstallListener()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        installListener?.let {
+            try {
+                unregisterReceiver(it)
+            } catch (_: Exception) {
+            }
+            installListener = null
+        }
+    }
+
+    /**
+     * Manifest-registered ACTION_PACKAGE_ADDED receivers are skipped by broadcast policy at
+     * targetSdk 35; a runtime receiver inside the live work-profile process is the instant
+     * signal complementing the periodic [WorkPackageScanJobService].
+     */
+    private fun registerInstallListener() {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                val replacing = intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)
+                val added = intent.data?.schemeSpecificPart
+                if (!PackageScanFilter.shouldProcessInstallEvent(
+                        intent.action, replacing, added == packageName
+                    )
+                ) {
+                    return
+                }
+                val pm = packageManager ?: return
+                try {
+                    val entries = pm.getInstalledApplications(0).map {
+                        PackageEntry(
+                            packageName = it.packageName,
+                            isSystem = it.flags and ApplicationInfo.FLAG_SYSTEM != 0,
+                            isInstalled = true,
+                        )
+                    }
+                    Utility.scheduleWorkPackageReportOnMainProfile(
+                        applicationContext,
+                        PackageScanFilter.selectScannedPackages(packageName, entries)
+                    )
+                } catch (e: Exception) {
+                    Log.w(TAG, "install event scan failed", e)
+                }
+            }
+        }
+        val filter = IntentFilter(Intent.ACTION_PACKAGE_ADDED).apply {
+            addDataScheme("package")
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            @Suppress("UnspecifiedRegisterReceiverFlag")
+            registerReceiver(receiver, filter)
+        }
+        installListener = receiver
     }
 
     override fun onBind(intent: Intent?): IBinder {
@@ -287,6 +355,7 @@ class GatekeeperService : Service() {
     }
 
     companion object {
+        private const val TAG = "GatekeeperService"
         const val RESULT_CANNOT_INSTALL_SYSTEM_APP = 100001
         private const val NOTIFICATION_ID = 0x49a11
         private const val LIST_ICON_MAX_PX = 128
