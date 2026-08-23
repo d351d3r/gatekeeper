@@ -17,7 +17,6 @@
     <string name="freeze_app">Congela</string>
     <string name="unfreeze_app">Scongela</string>
     <string name="launch">Avvia</string>
-    <string name="unfreeze_and_launch">Scongela e avvia</string>
     <string name="auto_freeze">Auto-congela</string>
     <string name="allow_cross_profile_widgets">Permetti i widget nel profilo principale</string>
     <string name="search">Cerca</string>
@@ -50,7 +49,6 @@
     <string name="miui_cannot_clone">La clonazione di app non di sistema su un altro profilo attualmente non è possibile su MIUI. Si prega di clonare il negozio delle app (es. <b>Play Store</b>) nell\'altro profilo e poi installarle da lì.</string>
     <string name="service_auto_freeze_desc">Gatekeeper congelerà automaticamente le app avviate da \"Scongela e avvia\" al prossimo blocco schermo.</string>
     <string name="settings_cross_profile_file_chooser_desc">Quando attivo, potrai sfogliare / vedere / selezionare / copiare i file in Gatekeeper dal profilo principale e viceversa, SOLO tramite l\'interfaccia dei documenti (chiamata File o Documenti nel tuo launcher) o tramite le app con il supporto all\'interfaccia dei documenti (ottengono accesso solo temporaneo ai file che scegli), mantenendo al contempo l\'isolamento del filesystem.</string>
-    <string name="work_mode_disabled">Sembra che tu abbia disattivato la modalità lavorativa mentre avviavi Gatekeeper. Se la attivi adesso, riavvia Gatekeeper.</string>
     <string name="list_item_disabled">[Congelata] %s</string>
     <string name="uninstall_fail_system_app">Non è possibile disinstallare le app di sistema in un profilo di cui Gatekeeper non ha controllo.</string>
     <string name="batch_operation">Operazione in massa</string>

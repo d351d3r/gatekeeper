@@ -53,7 +53,6 @@
     <string name="unfreeze_app">Activar</string>
     <string name="launch">Llanzar</string>
     <string name="create_unfreeze_shortcut">Crear l\'atayu d\'activar y/o llanzar</string>
-    <string name="unfreeze_and_launch">Activar y llanzar</string>
     <string name="auto_freeze">Desactivación automática</string>
     <string name="allow_cross_profile_widgets">Widgets nel perfil principal</string>
     <string name="search">Buscar</string>
@@ -79,7 +78,7 @@
     <string name="settings_dont_freeze_foreground_desc">NUN desactiva les aplicaciones en primer planu (con actividá visible) al bloquiar la pantalla. Esto pue ser útil p\'aplicaciones como reproductores multimedia, mas dempués vas tener de desactivales pente l\'atayu de «Desactivación per llotes».</string>
     <string name="settings_about">Tocante a</string>
     <string name="settings_version">Versión</string>
-    <string name="settings_source_code">Códigu fonte</string><string name="work_mode_disabled">Paez que desactivesti\'l perfil de trabayu mentanto s\'aniciaba Gatekeeper. Si actives el perfil agora, volvi aniciar Gatekeeper.</string>
+    <string name="settings_source_code">Códigu fonte</string>
     <string name="clone_success">L\'aplicación «%s» clonóse con ésitu</string>
     <string name="uninstall_success">L\'aplicación «%s» desinstalóse con ésitu</string>
     <string name="freeze_success">L\'aplicación «%s» desactivóse con ésitu</string>

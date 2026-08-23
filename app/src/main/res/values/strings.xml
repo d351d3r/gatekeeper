@@ -47,7 +47,6 @@
     <string name="unfreeze_app">Unfreeze</string>
     <string name="launch">Launch</string>
     <string name="create_unfreeze_shortcut">Create Launch Shortcut</string>
-    <string name="unfreeze_and_launch">Launch</string>
     <string name="auto_freeze">Auto Freeze</string>
     <string name="app_menu_check_off" translatable="false">\u2610\u0020</string>
     <string name="app_menu_check_on" translatable="false">\u2612\u0020</string>
@@ -60,7 +59,6 @@
     <string name="anti_spy_monitor_notification_text">Watching for VPN connections</string>
     <string name="anti_spy_vpn_alert_connected_text">VPN connected</string>
     <string name="anti_spy_vpn_alert_disconnected_text">VPN disconnected</string>
-    <string name="anti_spy_service_started_text">Anti Spy monitoring started</string>
     <string name="anti_spy_dummy_vpn_session">Gatekeeper Anti Spy</string>
     <string name="anti_spy_vpn_prompt_title">VPN connection detected</string>
     <string name="anti_spy_vpn_prompt_text">A VPN was turned on. Close the running app in the work profile, then tap Yes to batch-freeze auto-freeze apps. Tap No to leave apps running (Gatekeeper will not turn VPN back on).</string>
@@ -150,7 +148,6 @@
     <!-- Toast Long Texts -->
     <string name="provision_finished">Gatekeeper setup complete. Now restarting Gatekeeper. If Gatekeeper didn\'t start automatically, you may launch it again from your launcher.</string>
     <string name="work_profile_not_found">Work profile not found. Please restart the app to re-provision the profile.</string>
-    <string name="work_mode_disabled">It looks like you have disabled Work Mode while starting Gatekeeper. If you have enabled it now, please start Gatekeeper again.</string>
     <string name="clone_success">Application \"%s\" cloned successfully</string>
     <string name="uninstall_success">Application \"%s\" uninstalled successfully</string>
     <string name="freeze_success">Application \"%s\" frozen successfully</string>

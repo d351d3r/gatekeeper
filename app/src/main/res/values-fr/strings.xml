@@ -21,7 +21,6 @@
     <string name="freeze_app">Geler</string>
     <string name="unfreeze_app">Dégeler</string>
     <string name="launch">Lancer</string>
-    <string name="unfreeze_and_launch">Dégeler et Lancer</string>
     <string name="auto_freeze">Gel Automatique</string>
     <string name="allow_cross_profile_widgets">Autoriser les Widgets dans le Profil Principal</string>
     <string name="search">Chercher</string>
@@ -33,7 +32,6 @@
     <string name="settings_cross_profile_file_chooser_desc">Si activé, vous pourrez parcourir / afficher / sélectionner / copier des fichiers dans Gatekeeper depuis le Profil Principal et vice-versa. UNIQUEMENT via l\'application Documents (nommée Fichiers ou Documents dans votre lanceur d\'applications) ou via des applications supportant la gestion de Documents (elles n\'obtiennent qu\'un accès temporaire aux fichiers à choisir), tout en concervant l\'isolation du système de fichiers.</string>
     <string name="settings_dont_freeze_foreground_desc">Ne PAS geler les applications en premier plan (avec une activité visible) quand l\'écran est verrouillé. Cela peut être utile pour des applications telles que des lecteurs de musique, mais vous devrez ensuite les geler depuis \"Raccourci de Gel par Lots\".</string>
     <string name="provision_finished">Configuration de Gatekeeper complète. L\'application redémarre. Si Gatekeeper ne redémarre pas automatiquement, vous pouvez le lancer depuis votre Lanceur d\'Applications.</string>
-    <string name="work_mode_disabled">Il semble que vous ayez désactivé le Mode de Travail en démarrant Gatekeeper. Si vous l\'avez activé maintenant, veuillez redémarrer Gatekeeper.</string>
     <string name="list_item_disabled">[Gelé] %s</string>
     <string name="show_all">Afficher Toutes les Applications</string>
     <string name="settings">Paramètres</string>

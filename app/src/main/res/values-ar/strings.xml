@@ -13,7 +13,6 @@
     <string name="unfreeze_app">إلغاء التجميد</string>
     <string name="launch">بدأ</string>
     <string name="create_unfreeze_shortcut">إنشاء اختصار لإلغاء التجميد والبدء</string>
-    <string name="unfreeze_and_launch">إلغاء التجميد والبدء</string>
     <string name="auto_freeze">تجميد تلقائي</string>
     <string name="freeze_all">تجميد الكل</string>
     <string name="create_freeze_all_shortcut">إنشاء اختصار لتجميد دفعة</string>
@@ -21,7 +20,7 @@
     <string name="settings">الإعدادات</string>
     <string name="settings_about">حول</string>
     <string name="settings_version">النسخة</string>
-    <string name="settings_source_code">كود المصدر</string><string name="provision_finished">اكتمل إعداد العازل. جاري إعادة تشغيل العازل الآن. إذا لم يبدأ العازل تلقائيًا، يمكنك بدءه مرة أخرى من مشغّلك.</string><string name="work_profile_not_found">لم يتم العثور على ملف العمل. يرجى إعادة تشغيل التطبيق لإعادة توفير الملف الشخصي.</string><string name="work_mode_disabled">يبدو أنك قمت بتعطيل وضع العمل أثناء تشغيل العازل. إذا قمت بتفعيله الآن، يرجى بدء العازل مرة أخرى.</string>
+    <string name="settings_source_code">كود المصدر</string><string name="provision_finished">اكتمل إعداد العازل. جاري إعادة تشغيل العازل الآن. إذا لم يبدأ العازل تلقائيًا، يمكنك بدءه مرة أخرى من مشغّلك.</string><string name="work_profile_not_found">لم يتم العثور على ملف العمل. يرجى إعادة تشغيل التطبيق لإعادة توفير الملف الشخصي.</string>
     <string name="clone_success">تم نسخ التطبيق \"%s\" بنجاح</string>
     <string name="uninstall_success">تم إلغاء تثبيت التطبيق \"%s\" بنجاح</string>
     <string name="freeze_success">تم تجميد التطبيق \"%s\" بنجاح</string>

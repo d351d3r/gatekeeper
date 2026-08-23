@@ -25,7 +25,6 @@
     <string name="freeze_app">Dondur</string>
     <string name="unfreeze_app">Aktifleştir</string>
     <string name="create_unfreeze_shortcut">Aktifleştir ve/veya Çalıştır Kısayolu Oluştur</string>
-    <string name="unfreeze_and_launch">Aktifleştir ve Çalıştır</string>
     <string name="auto_freeze">Otomatik Dondur</string>
     <string name="show_all">Tüm Uygulamaları Göster</string>
     <string name="launch">Çalıştır</string>
@@ -98,7 +97,6 @@
     <string name="settings_dont_freeze_foreground">Önplandaki Uygulamalar Dondurulmasın</string>
     <string name="provision_finished">Kurulum tamamlandı. Gatekeeper yeniden başlatılıyor. Eğer otomatik başlatma gerçekleşmezse, lütfen Gatekeeper\'ı ana ekran uygulamanız üzerinden tekrar başlatın.</string>
     <string name="settings_dont_freeze_foreground_desc">Ekranınızı kilitlediğinizde önplanda çalışan ve görünür etkinliğe sahip olan uygulamalar dondurulmaz. Bu özellik sayesinde müzik çalar gibi uygulamaları daha rahat bir şekilde kullanabilirsiniz ancak sonrasında bu uygulamaları \"Çoklu Dondurma Kısayolu\" üzerinden dondurmanız gerekir.</string>
-    <string name="work_mode_disabled">Uygulama başlatılırken İş Profilinin devre dışı bırakıldığı tespit edildi. İş Profilini etkinleştirdiyseniz, değişikliklerin uygulanması için lütfen Gatekeeper\'ı yeniden başlatın.</string>
     <string name="settings_cross_profile_file_chooser_desc">Etkinleştirildiğinde iki profil arasında dosya göz atma, görüntüleme, seçme ve kopyalama işlemleri yapılabilir hale gelir. Bu işlemler, dosya sistemi izolasyonunu bozmadan, YALNIZCA Dosya Gezgini (sisteminizde Dosyalar veya Belgeler olarak adlandırılır) veya Dosya Gezgini özelliğine sahip uygulamalar üzerinden yapılır (bu özelliğe sahip uygulamaların seçtiğiniz dosyalara erişimi geçicidir).</string>
     <string name="request_storage_manager">Dosya Köprüsü özelliğini kullanmak için Gatekeeper\'ın <b>Tüm Dosyalara</b> erişmesi gerekiyor. Lütfen \"Tamam\" seçeneğine tıkladıktan sonra <b>İKİ Gatekeeper UYGULAMASINA DA</b> (Kişisel / İş) bu izni verin.</string>
     <string name="request_usage_stats">Bu özelliği kullanmak için Gatekeeper\'ın <b>Kullanım Erişimi</b> iznine ihtiyacı var. Lütfen \"Tamam\" seçeneğine tıkladıktan sonra <b>İKİ Gatekeeper UYGULAMASINA DA</b> (Kişisel / İş) bu izni verin, aksi takdirde söz konusu özellik düzgün bir şekilde çalışmayabilir.</string>

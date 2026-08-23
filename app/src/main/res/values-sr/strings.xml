@@ -50,7 +50,6 @@
     <string name="freeze_app">Замрзни</string>
     <string name="unfreeze_app">Одмрзни</string>
     <string name="launch">Покрени</string>
-    <string name="unfreeze_and_launch">Одмрзни и покрени</string>
     <string name="allow_cross_profile_widgets">Дозволи виџете у главном профилу</string>
     <string name="allow_cross_profile_interaction">Дозволи међупрофилну интеракцију</string>
     <string name="search">Претрага</string>
@@ -71,7 +70,7 @@
     <string name="settings_dont_freeze_foreground_desc">НЕМОЈТЕ да замрзавате апликације у првом плану (са видљивом активношћу) када закључате екран. Ово може бити корисно за апликације као што су музички плејери, али ћете након тога морати ручно да их замрзнете преко „Пречица за групно замрзавање“.</string>
     <string name="settings_about">О апликацији</string>
     <string name="settings_version">Верзија</string>
-    <string name="settings_source_code">Изворни код</string><string name="provision_finished">Подешавање Шелтера је завршено. Сада поново покрећемо Шелтер. Ако се Шелтер није покренуо аутоматски, можете га поново покренути из покретача.</string><string name="work_profile_not_found">Радни профил није пронађен. Поново покрените апликацију да бисте поново обезбедили профил.</string><string name="work_mode_disabled">Изгледа да сте онемогућили радни режим док сте покретали Шелтер. Ако сте га сада омогућили, покрените Шелтер поново.</string>
+    <string name="settings_source_code">Изворни код</string><string name="provision_finished">Подешавање Шелтера је завршено. Сада поново покрећемо Шелтер. Ако се Шелтер није покренуо аутоматски, можете га поново покренути из покретача.</string><string name="work_profile_not_found">Радни профил није пронађен. Поново покрените апликацију да бисте поново обезбедили профил.</string>
     <string name="clone_success">Апликација \"%s\" је успешно клонирана</string>
     <string name="freeze_success">Апликација \"%s\" је успешно замрзнута</string>
     <string name="unfreeze_success">Апликација \"%s\" је успешно одмрзнута</string>

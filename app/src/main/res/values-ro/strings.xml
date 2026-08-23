@@ -28,7 +28,6 @@
     <string name="freeze_app">Îngheaţa</string>
     <string name="unfreeze_app">Dezghețați</string>
     <string name="launch">Porneste</string>
-    <string name="unfreeze_and_launch">Dezgheața și Porniti</string>
     <string name="search">Cauta</string>
     <string name="freeze_all_shortcut">Îngheaţa</string>
     <string name="install_app_to_profile">Instalați APK în Gatekeeper</string>
@@ -42,7 +41,6 @@
     <string name="install_app_to_profile_success">Instalarea aplicației a fost finalizată în Profilul de Lucru.</string>
     <string name="show_all">Afișați toate Aplicațiile</string>
     <string name="documents_ui">Deschideți Interfața de Utilizare a Documentelor</string>
-    <string name="work_mode_disabled">Se pare că ați dezactivat Profilul de Lucru în timp ce porniți Gatekeeper. Dacă l-ați activat acum, porniți din nou Gatekeeper.</string>
     <string name="request_storage_manager">Gatekeeper are nevoie de acces la <b> Toate fișierele </b> pentru File Shuttle. Vă rugăm să activați permisiunea pentru <b> AMBELE </b> (Principal/ Lucru) aplicații Gatekeeper afișate în caseta de dialog după ce apăsați „Ok”.</string>
     <string name="settings_block_contacts_searching">Blocați Căutarea Contactelor</string>
     <string name="settings_services">Servicii</string>

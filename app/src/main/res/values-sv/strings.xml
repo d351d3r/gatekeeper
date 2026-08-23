@@ -44,7 +44,6 @@
     <string name="unfreeze_app">Tina upp</string>
     <string name="launch">Starta</string>
     <string name="create_unfreeze_shortcut">Skapa \"Tina upp och/eller Starta\"-genväg</string>
-    <string name="unfreeze_and_launch">Tina upp och Starta</string>
     <string name="allow_cross_profile_widgets">Tillåt widgetar i primära profilen</string>
     <string name="search">Sök</string>
     <string name="auto_freeze">Frysa automatiskt</string>
@@ -64,7 +63,7 @@
     <string name="settings_services">Tjänster</string><string name="provision_finished">Installationen av Gatekeeper är klar. Nu startar Gatekeeper om. Om Gatekeeper inte startade om automatiskt kan du göra det från din launcher.</string>
     <string name="settings_cross_profile_file_chooser_desc">När det är aktiverat kommer du att kunna bläddra / visa / välja / kopiera filer i Gatekeeper från huvudprofilen och vice versa, ENDAST via funktionen \"Documents UI\" (som heter Files eller Documents på din launcher) eller via appar med \"Documents UI\"-stöd (de får bara tillfällig åtkomst till filer du väljer i Documents UI), medan filsystemets isolering fortsätter att gälla.</string>
     <string name="setup_wizard_permissions">Några ord om behörigheter</string>
-    <string name="work_profile_not_found">Det gick inte att hitta arbetsprofilen. Starta om appen för att omregistrera profilen.</string><string name="work_mode_disabled">Det verkar som att arbetsprofilen var inaktiverad när Gatekeeper startades. Om du nu har aktiverat det, starta om Gatekeeper.</string>
+    <string name="work_profile_not_found">Det gick inte att hitta arbetsprofilen. Starta om appen för att omregistrera profilen.</string>
     <string name="clone_fail_system_app">Det går inte att klona systemappar till en profil som Gatekeeper inte har kontroll över.</string>
     <string name="setup_wizard_ready">Redo?</string>
     <string name="setup_wizard_please_wait">Vänta…</string>

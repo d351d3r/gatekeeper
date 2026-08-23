@@ -24,7 +24,6 @@
     <string name="unfreeze_app">解除冻结</string>
     <string name="launch">运行</string>
     <string name="create_unfreeze_shortcut">创建解冻并运行快捷方式</string>
-    <string name="unfreeze_and_launch">解冻并运行</string>
     <string name="auto_freeze">自动冻结</string>
     <string name="allow_cross_profile_widgets">允许在主用户中创建小工具</string>
     <!-- Action Bar Options Menu -->
@@ -49,7 +48,7 @@
     <string name="settings_dont_freeze_foreground_desc">在您锁屏的时候，不要冻结前台应用 (锁屏时仍有可见窗口的应用)。这主要用于音乐播放器等 App，但您将需要在使用完成后手动使用 \"批量冻结\" 快捷方式冻结它们。</string>
     <string name="settings_about">关于</string>
     <string name="settings_version">版本</string>
-    <string name="settings_source_code">源代码</string><!-- Toast Long Texts --><string name="provision_finished">Gatekeeper 已初始化完成，正在启动 Gatekeeper。如果 Gatekeeper 没有自动启动，请您从启动器手动启动它。</string><string name="work_profile_not_found">工作用户不可用，请重新启动 Gatekeeper 以重新初始化。</string><string name="work_mode_disabled">工作模式 (Work Mode) 已被您关闭，请开启后再启动 Gatekeeper。</string>
+    <string name="settings_source_code">源代码</string><!-- Toast Long Texts --><string name="provision_finished">Gatekeeper 已初始化完成，正在启动 Gatekeeper。如果 Gatekeeper 没有自动启动，请您从启动器手动启动它。</string><string name="work_profile_not_found">工作用户不可用，请重新启动 Gatekeeper 以重新初始化。</string>
     <string name="clone_success">应用 \"%s\" 克隆成功</string>
     <string name="uninstall_success">应用 \"%s\" 卸载成功</string>
     <string name="freeze_success">应用 \"%s\" 冻结成功</string>

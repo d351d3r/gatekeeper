@@ -21,7 +21,6 @@
     <string name="unfreeze_app">Reativar</string>
     <string name="launch">Iniciar</string>
     <string name="create_unfreeze_shortcut">Criar um atalho de Reativar e/ou Iniciar</string>
-    <string name="unfreeze_and_launch">Reativar e Iniciar</string>
     <string name="auto_freeze">Auto-Suspender</string>
     <string name="allow_cross_profile_widgets">Permitir os widgets no Perfil Principal</string>
     <string name="search">Pesquisar</string>
@@ -43,7 +42,7 @@
     <string name="settings_dont_freeze_foreground_desc">NÃO suspenda os apps em primeiro plano (com atividade visível) quando a tela for bloqueada. Isto pode ser útil para os apps como reprodutor de música, mas será necessário suspendê-los manualmente através do \"Atalho de suspensão em grupo\".</string>
     <string name="settings_about">Sobre</string>
     <string name="settings_version">Versão</string>
-    <string name="settings_source_code">Código-fonte</string><string name="provision_finished">Configuração do Gatekeeper concluída. Reiniciando o Gatekeeper. Se o Gatekeeper não iniciar automaticamente, você pode executá-lo novamente do seu lançador.</string><string name="work_profile_not_found">Perfil de trabalho não foi encontrado. Por favor reinicie o app para verificar o perfil de novo.</string><string name="work_mode_disabled">Parece que você desativou o Perfil de Trabalho ao iniciar o Gatekeeper. Se você tiver ativado agora, por favor, reinicie o Gatekeeper.</string>
+    <string name="settings_source_code">Código-fonte</string><string name="provision_finished">Configuração do Gatekeeper concluída. Reiniciando o Gatekeeper. Se o Gatekeeper não iniciar automaticamente, você pode executá-lo novamente do seu lançador.</string><string name="work_profile_not_found">Perfil de trabalho não foi encontrado. Por favor reinicie o app para verificar o perfil de novo.</string>
     <string name="uninstall_success">O app \"%s\" foi desinstalado com sucesso</string>
     <string name="freeze_success">O app \"%s\" foi suspenso com sucesso</string>
     <string name="unfreeze_success">O app \"%s\" foi reativado com sucesso</string>

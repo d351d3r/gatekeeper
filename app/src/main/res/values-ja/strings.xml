@@ -20,7 +20,6 @@
     <string name="freeze_app">凍結</string>
     <string name="unfreeze_app">凍結解除</string>
     <string name="launch">起動</string>
-    <string name="unfreeze_and_launch">凍結解除して起動</string>
     <string name="auto_freeze">自動凍結</string>
     <string name="allow_cross_profile_widgets">メインプロファイル内でウィジェットの作成を許可する</string>
     <string name="search">検索</string>
@@ -41,7 +40,7 @@
     <string name="settings_auto_freeze_delay">自動凍結する時間</string>
     <string name="show_all_warning">リストから非表示になっているアプリを操作すると、クラッシュや予期せぬ動作を引き起こす可能性があります。この機能は、ベンダーによって欠陥のあるカスタマイズされたROMがデフォルトで作業プロファイルで必要なシステムアプリをすべて有効にしていない場合に便利です。自己責任で続行してください。</string>
     <string name="settings_auto_freeze_service_desc">画面ロック中に「凍結解除＆起動」のショートカットから実行されたアプリを自動的に凍結します。</string><string name="provision_finished">Gatekeeperのセットアップが完了しました。Gatekeeperを再起動しています。Gatekeeperが自動的に再度立ち上がらない場合ランチャーから手動で起動してください。</string><string name="continue_anyway">無視して続行</string>
-    <string name="work_profile_not_found">仕事用プロファイルが見つかりません。プロファイルを再生成するためにアプリを再起動してください。</string><string name="work_mode_disabled">Gatekeeperの実行中に仕事用プロファイルが無効になりました。再度有効にした後Gatekeeperを再起動してください。</string>
+    <string name="work_profile_not_found">仕事用プロファイルが見つかりません。プロファイルを再生成するためにアプリを再起動してください。</string>
     <string name="clone_success">アプリ「%s」は正常に複製されました</string>
     <string name="uninstall_success">アプリ「%s」は正常にアンインストールされました</string>
     <string name="freeze_success">アプリ「%s」は正常に凍結されました</string>

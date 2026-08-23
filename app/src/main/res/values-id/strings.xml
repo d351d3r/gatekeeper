@@ -54,7 +54,6 @@
     <string name="unfreeze_app">Cairkan</string>
     <string name="launch">Jalankan</string>
     <string name="create_unfreeze_shortcut">Buat Pencairan dan/atau Luncurkan Pintasan</string>
-    <string name="unfreeze_and_launch">Cairkan dan Luncurkan</string>
     <string name="settings_block_contacts_searching">Blokir Pencarian Kontak</string>
     <string name="settings_block_contacts_searching_desc">Tolak akses dari profil utama ke kontak di dalam profil kerja.</string>
     <string name="settings_services">Layanan</string>
@@ -98,7 +97,6 @@
     <string name="show_all_warning">Memanipulasi aplikasi yang disembunyikan dari daftar dapat menyebabkan crash dan segala macam perilaku tak terduga. Namun, fitur ini dapat berguna saat ROM yang disesuaikan dengan vendor tidak mengaktifkan semua aplikasi sistem yang diperlukan di profil kerja secara default. Jika Anda melanjutkan, Anda sendirian.</string>
     <string name="settings_cross_profile_file_chooser_desc">Saat diaktifkan, Anda akan dapat menelusuri/melihat/memilih/menyalin file di Gatekeeper dari profil utama dan sebaliknya, HANYA melalui UI Dokumen (bernama File atau Dokumen di peluncur Anda) atau aplikasi dengan dukungan UI Dokumen (mereka hanya mendapatkan akses sementara ke file yang Anda pilih di Documents UI), sementara masih berkaitan dengan isolasi sistem file.</string>
     <string name="settings_dont_freeze_foreground_desc">JANGAN membekukan aplikasi latar depan (dengan aktivitas yang terlihat) saat Anda mengunci layar. Ini dapat berguna untuk aplikasi seperti pemutar musik, tetapi Anda harus membekukannya secara manual melalui \"Pintasan Pembekuan Batch\" setelahnya.</string>
-    <string name="work_mode_disabled">Sepertinya Anda telah menonaktifkan Mode Kerja saat memulai Gatekeeper. Jika Anda telah mengaktifkannya sekarang, harap mulai kembali Gatekeeper.</string>
     <string name="request_usage_stats">Gatekeeper memerlukan izin <b>Statistik Penggunaan</b> untuk melakukan ini. Harap aktifkan izin untuk <b>KESELURUHAN</b> aplikasi Gatekeeper yang ditampilkan di dialog setelah Anda menekan \"Ok\". Gagal melakukannya akan menyebabkan fitur ini tidak berfungsi dengan baik.</string>
     <string name="request_storage_manager">Gatekeeper memerlukan akses ke <b>Semua File</b> untuk File Shuttle. Harap aktifkan izin untuk <b>KESELURUHAN </b> (Pribadi / Kantor) aplikasi Gatekeeper yang ditampilkan dalam dialog setelah Anda menekan \"Ok\".</string>
     <string name="miui_cannot_clone">Mengkloning aplikasi non-sistem ke profil lain saat ini tidak dimungkinkan di MIUI. Harap gandakan toko aplikasi sistem Anda (mis. <b>Play Store</b>) ke profil lain, lalu instal aplikasi dari sana.</string>

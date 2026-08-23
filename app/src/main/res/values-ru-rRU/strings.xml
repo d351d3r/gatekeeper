@@ -12,7 +12,6 @@
     <string name="freeze_app">Заморозить</string><string name="unfreeze_app">Разморозить</string>
     <string name="launch">Запустить</string>
     <string name="create_unfreeze_shortcut">Ярлык запуска</string>
-    <string name="unfreeze_and_launch">Запустить</string>
     <string name="auto_freeze">Автозаморозка</string>
     <string name="freeze_all">Групповая заморозка</string>
     <string name="create_freeze_all_shortcut">Ярлык групповой заморозки</string>
@@ -29,8 +28,7 @@
     <string name="anti_spy_monitor_notification_title">Anti Spy</string>
     <string name="anti_spy_monitor_notification_text">Контроль VPN</string>
     <string name="anti_spy_vpn_alert_connected_text">VPN подключен</string>
-    <string name="anti_spy_vpn_alert_disconnected_text">VPN отключен</string>
-    <string name="anti_spy_service_started_text">Мониторинг Anti Spy запущен</string><string name="anti_spy_dummy_vpn_session">Gatekeeper Anti Spy</string><string name="anti_spy_vpn_prompt_title">Обнаружено подключение VPN</string>
+    <string name="anti_spy_vpn_alert_disconnected_text">VPN отключен</string><string name="anti_spy_dummy_vpn_session">Gatekeeper Anti Spy</string><string name="anti_spy_vpn_prompt_title">Обнаружено подключение VPN</string>
     <string name="anti_spy_vpn_prompt_text">Включён VPN. Закройте работающее приложение из рабочего профиля, затем нажмите «Да» для групповой заморозки. «Нет» — приложения продолжат работу (Gatekeeper VPN не включает).</string>
     <string name="anti_spy_vpn_prompt_yes">Да, заморозить всё</string>
     <string name="anti_spy_vpn_prompt_no">Нет</string>
@@ -42,7 +40,7 @@
     <string name="settings">Настройки</string>
     <string name="settings_about">О программе</string>
     <string name="settings_version">Версия</string>
-    <string name="settings_source_code">Исходный код</string><string name="provision_finished">Настройка Gatekeeper завершена. Перезапускам Gatekeeper. Если Gatekeeper не откроется сам, запустите его из вашего лаучнера.</string><string name="work_profile_not_found">Рабочий профиль не найден. Перезапустите приложение, чтобы пересоздать профиль.</string><string name="work_mode_disabled">Похоже, что вы отключили рабочий режим, пока Gatekeeper запускался. Если вы включили его сейчас, то перезапустите Gatekeeper.</string>
+    <string name="settings_source_code">Исходный код</string><string name="provision_finished">Настройка Gatekeeper завершена. Перезапускам Gatekeeper. Если Gatekeeper не откроется сам, запустите его из вашего лаучнера.</string><string name="work_profile_not_found">Рабочий профиль не найден. Перезапустите приложение, чтобы пересоздать профиль.</string>
     <string name="clone_success">Приложение \"%s\" успешно клонировано</string>
     <string name="uninstall_success">Приложение \"%s\" успешно удалено</string>
     <string name="freeze_success">Приложение \"%s\" успешно заморожено</string>

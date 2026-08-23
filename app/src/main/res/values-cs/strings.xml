@@ -28,7 +28,6 @@
     <string name="setup_wizard_ready_text">Nyní jsme připraveni pro Vás nastavit Gatekeeper. Nejdříve se prosím ujistěte, že Vaše zařízení <b>není</b> v režimu Nerušit, protože budete muset později <b>kliknout na oznámení</b> k dokonční nastavení.
 \n
 \nPokud jste připraveni, klikněte na \"Další\" pro zahájení procesu nastavení.</string>
-    <string name="unfreeze_and_launch">Rozmrazit a spustit</string>
     <string name="auto_freeze">Automatické zamrznutí</string>
     <string name="allow_cross_profile_widgets">Povolit widgety v hlavním profilu</string>
     <string name="setup_wizard_action_required">Je vyžadována akce</string>
@@ -82,7 +81,7 @@
     <string name="settings">Nastavení</string>
     <string name="settings_payment_stub_desc">Povolte v hlavním profilu falešnou platební službu NFC, aby byla v části Nastavení - NFC povolena. Tato možnost vám umožní vybrat platební aplikaci v pracovním profilu. Tím se obejde chyba systému Android, která znemožňuje výběr platební aplikace uvnitř pracovního profilu, pokud v hlavním profilu není žádná dostupná.</string>
     <string name="settings_auto_freeze_service">Služba automatického zmrazení</string>
-    <string name="settings_auto_freeze_delay">Prodleva automatického zamrznutí</string><string name="provision_finished">Nastavení Gatekeeperu je kompletní. Nyní se Gatekeeper restartuje. Pokud se nespustí automaticky, budete jej muset znova spustit z Vašeho spouštěče.</string><string name="work_mode_disabled">Vypadá to, že jste vypnuli Pracovní režim během zapínání Gatekeeperu. Pokud jste ho nyní povolili, prosím restartujte Gatekeeper.</string>
+    <string name="settings_auto_freeze_delay">Prodleva automatického zamrznutí</string><string name="provision_finished">Nastavení Gatekeeperu je kompletní. Nyní se Gatekeeper restartuje. Pokud se nespustí automaticky, budete jej muset znova spustit z Vašeho spouštěče.</string>
     <string name="clone_success">Aplikace \"%s\" úspěšně naklonována</string>
     <string name="settings_auto_freeze_service_desc">Pokud je obrazovka uzamčena, automaticky zamrazit aplikace spuštěné ze zkratky \"Rozmrazit a Spustit\".</string>
     <string name="settings_cross_profile_file_chooser">Výměna souborů</string>

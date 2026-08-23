@@ -21,7 +21,6 @@
     <string name="unfreeze_app">Auftauen</string>
     <string name="launch">Starten</string>
     <string name="create_unfreeze_shortcut">Erzeuge eine Verknüpfung für Auftauen und/oder Starten</string>
-    <string name="unfreeze_and_launch">Auftauen und starten</string>
     <string name="auto_freeze">Auto-Frost</string>
     <string name="allow_cross_profile_widgets">Erlaube Widgets im persönlichen Profil</string>
     <string name="search">Suche</string>
@@ -44,7 +43,7 @@
     <string name="settings_dont_freeze_foreground_desc">Apps, die im Vordergrund mit sichtbarer Aktivität laufen, NICHT bei Bildschirmsperre einfrosten. Dies kann für Apps wie Music-Player nützlich sein. Nachträglich können diese über die Verknüpfung \"Batch Freeze Shortcut\" manuell eingefrostet werden.</string>
     <string name="settings_about">Über das Programm</string>
     <string name="settings_version">Version</string>
-    <string name="settings_source_code">Quelltext</string><string name="provision_finished">Die Einrichtung von Gatekeeper ist abgeschlossen. Das Programm wird jetzt neu gestartet. Sollte Gatekeeper nicht automatisch starten, rufen Sie das Programm erneut manuell über das Gatekeeper-Symbol auf.</string><string name="work_profile_not_found">Das Arbeits-Profil wurde nicht gefunden. Bitte starten Sie die App nochmals, um das Profil erneut bereitzustellen.</string><string name="work_mode_disabled">Anscheinend haben Sie das Arbeits-Profil vor dem Starten von Gatekeeper abgeschaltet. Sofern Sie es jetzt eingeschaltet haben, starten Sie Gatekeeper erneut.</string>
+    <string name="settings_source_code">Quelltext</string><string name="provision_finished">Die Einrichtung von Gatekeeper ist abgeschlossen. Das Programm wird jetzt neu gestartet. Sollte Gatekeeper nicht automatisch starten, rufen Sie das Programm erneut manuell über das Gatekeeper-Symbol auf.</string><string name="work_profile_not_found">Das Arbeits-Profil wurde nicht gefunden. Bitte starten Sie die App nochmals, um das Profil erneut bereitzustellen.</string>
     <string name="clone_success">Die Anwendung \"%s\" wurde erfolgreich geklont</string>
     <string name="uninstall_success">Die Anwendung \"%s\" wurde erfolgreich deinstalliert</string>
     <string name="freeze_success">Die Anwendung \"%s\" wurde erfolgreich eingefrostet</string>

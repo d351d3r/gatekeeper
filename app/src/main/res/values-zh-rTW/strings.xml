@@ -21,7 +21,6 @@
     <string name="provision_finished">Gatekeeper 已初始化完成，正在啓動 Gatekeeper。如果 Gatekeeper 沒有自動啓動，請您從啓動器手動啓動它。</string>
     <string name="settings_dont_freeze_foreground">跳過前臺應用</string><string name="settings_cross_profile_file_chooser_desc">打開以後，您將可以且僅可以從系統的 Documents UI (啓動器上的名稱爲 文件 或 下載) 或支持 Documents UI 的 APP 中 瀏覽 / 查看 / 選擇 / 複製 Gatekeeper 內的文件到主用戶，反之亦然。這不會影響對文件系統的隔離。即使是支持 Documents UI 的 App 也只能臨時獲取您選擇的文件的訪問權限。</string>
     <string name="settings_dont_freeze_foreground_desc">在您鎖屏的時候，不要凍結前臺應用 (鎖屏時仍有可見窗口的應用)。這主要用於音樂播放器等 App，但您將需要在使用完成後手動使用 \"批量凍結\" 快捷方式凍結它們。</string>
-    <string name="work_mode_disabled">工作模式 (Work Mode) 已被您關閉，請開啓後再啓動 Gatekeeper。</string>
     <string name="shortcut_create_success">快捷方式已創建。</string>
     <string name="request_usage_stats">Gatekeeper 需要 <b>使用情況數據</b> 來做這件事。請在按 \"確定\" 後出現的窗口中，對 <b>兩個</b> Gatekeeper都打開此權限。如果沒有全部打開，該功能將無法正確運作。</string>
     <string name="request_storage_manager">File Shuttle 需要訪問 <b>全部文件</b> 的權限。請在接下來的對話框中對 <b>兩個 Gatekeeper</b> (工作用戶內 / 外) 都啓用該權限。</string>
@@ -48,7 +47,6 @@
     <string name="unfreeze_app">解除凍結</string>
     <string name="launch">運行</string>
     <string name="create_unfreeze_shortcut">創建解凍並運行快捷方式</string>
-    <string name="unfreeze_and_launch">解凍並運行</string>
     <string name="auto_freeze">自動凍結</string>
     <string name="allow_cross_profile_widgets">允許在主用戶中創建小工具</string>
     <string name="search">搜索</string>

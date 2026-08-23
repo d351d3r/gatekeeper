@@ -22,7 +22,6 @@
 \nGatekeeper is slechts een interface naar de functie Werkprofiel die door het systeem wordt geleverd. Als het Werkprofiel dat door het systeem wordt geleverd kapot of niet standaard is, kan <b>Gatekeeper het probleem niet op magische wijze zelf oplossen</b>. Als je momenteel een Android-versie gebruikt die door de leverancier is aangepast, waarvan bekend is dat deze werkprofielen stuk maakt, dan <b>ben je gewaarschuwd</b>. Je kunt toch doorgaan, maar er is geen garantie dat Gatekeeper zich onder deze omstandigheden correct zou gedragen.</string>
     <string name="service_auto_freeze_desc">Gatekeeper zal automatisch apps invriezen die zijn gestart vanuit \"Ontdooien &amp; Start\" bij de volgende schermvergrendelingsgebeurtenis.</string>
     <string name="create_unfreeze_shortcut">Snelkoppeling voor ontdooien en/of starten maken</string>
-    <string name="unfreeze_and_launch">Ontdooien en starten</string>
     <string name="setup_wizard_welcome">Welkom bij Gatekeeper</string>
     <string name="setup_wizard_welcome_text">Gatekeeper is een applicatie om je te helpen andere applicaties te draaien in een geïsoleerd profiel. Het doet dit door gebruik te maken van de functie <b>Werkprofiel</b> van Android.
 \n

@@ -13,7 +13,7 @@
     <string name="settings_interaction">Interacción</string>
     <string name="settings_cross_profile_file_chooser">Pasarela de archivos</string>
     <string name="finish_provision_desc">Felicitaciones! Se encuentra a un click de terminar la configuración de Gatekeeper.</string>
-    <string name="provision_finished">Configuración de Gatekeeper completa. Reiniciando Gatekeeper a continuación. Si Gatekeeper no se inicia de manera automática puedes iniciarlo nuevamente desde tu lanzador de aplicaciones.</string><string name="work_profile_not_found">Perfil de trabajo no encontrado. Por favor reinicia la aplicación para aprovisionar el perfil.</string><string name="work_mode_disabled">Parece que has deshabilitado el modo de trabajo mientras Gatekeeper se reiniciaba. Si lo has habilitado ahora, por favor reinicia Gatekeeper de nuevo.</string>
+    <string name="provision_finished">Configuración de Gatekeeper completa. Reiniciando Gatekeeper a continuación. Si Gatekeeper no se inicia de manera automática puedes iniciarlo nuevamente desde tu lanzador de aplicaciones.</string><string name="work_profile_not_found">Perfil de trabajo no encontrado. Por favor reinicia la aplicación para aprovisionar el perfil.</string>
     <string name="clone_success">Aplicación \"%s\" clonada exitosamente</string>
     <string name="uninstall_success">Aplicación \"%s\" desinstalada exitosamente</string>
     <string name="freeze_success">Aplicación \"%s\" suspendida exitosamente</string>
@@ -67,7 +67,6 @@
     <string name="unfreeze_app">Reanudar</string>
     <string name="launch">Iniciar</string>
     <string name="create_unfreeze_shortcut">Crear un acceso directo para suspender y/o iniciar</string>
-    <string name="unfreeze_and_launch">Reanudar e iniciar</string>
     <string name="auto_freeze">Auto suspender</string>
     <string name="allow_cross_profile_widgets">Permitir Widgets en el perfil principal</string>
     <string name="settings_cross_profile_file_chooser_desc">Cuando esta habilitado, seras capaz de buscar / ver / seleccionar / copiar archivos dentro de Gatekeeper del perfil principal y viceversa. Únicamente a través de la interfaz de documentos (llamada Archivos o Documentos en tu lanzador de aplicaciones) o aplicaciones con soporte para interfaz de archivos (únicamente obtienen acceso temporal a los archivos que escogiste en la interfaz de documentos), mientras aun pertenecen al sistema de archivos aislado.</string>

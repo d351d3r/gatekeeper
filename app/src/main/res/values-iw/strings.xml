@@ -45,7 +45,6 @@
     <string name="launch">הרץ</string>
     <string name="unfreeze_app">להפשיר</string>
     <string name="create_unfreeze_shortcut">צור בטל הקפאה ו/או הפעל קיצור דרך</string>
-    <string name="unfreeze_and_launch">בטל את ההקפאה והפעל</string>
     <string name="auto_freeze">הקפאה אוטומטית</string>
     <string name="freeze_all">הקפאת אצווה</string>
     <string name="search">חיפוש</string>
@@ -90,7 +89,6 @@
     <string name="miui_cannot_clone">שכפול אפליקציות שאינן מערכתיות לפרופיל אחר אינו אפשרי כרגע ב-MIUI. נא לשכפל את חנות האפליקציות של המערכת שלך (למשל <b>חנות Play</b>) לפרופיל האחר ולאחר מכן התקן אפליקציות משם.</string>
     <string name="continue_anyway">המשך בכל זאת</string>
     <string name="freeze_all_success">כל האפליקציות ברשימת \"הקפאה אוטומטית\" הוקפאו בהצלחה.</string>
-    <string name="work_mode_disabled">נראה שהשבתת את מצב עבודה בזמן הפעלת Gatekeeper. אם הפעלת את זה עכשיו, הפעל שוב את Gatekeeper.</string>
     <string name="provision_finished">הגדרת המקלט הושלמה. כעת מפעיל מחדש את Gatekeeper. אם Gatekeeper לא הופעל אוטומטית, תוכל להפעיל אותו שוב מהמפעיל שלך.</string><string name="clone_success">היישום \"%s\" שוכפל בהצלחה</string>
     <string name="work_profile_not_found">פרופיל עבודה לא נמצא. אנא הפעל מחדש את האפליקציה כדי להקצות מחדש את הפרופיל.</string>
     <string name="settings_dont_freeze_foreground_desc">אל תקפיא אפליקציות בחזית (עם פעילות גלויה) כאשר אתה נועל את המסך. זה יכול להיות שימושי עבור אפליקציות כמו נגני מוזיקה, אבל תצטרך להקפיא אותן באופן ידני באמצעות \"קיצור דרך להקפאת אצווה\" לאחר מכן.</string>

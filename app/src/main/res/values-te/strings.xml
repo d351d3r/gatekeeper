@@ -44,7 +44,6 @@
 \n
 \nమీరైతే \"తదుపరి\"పై క్లిక్ చేసి బయటకు వెళ్ళండి.</string>
     <string name="miui_cannot_clone">MIUIలో మరో ప్రొఫైలుకు నాన్-సిస్టమ్ యాప్‌లను క్లోన్ చేయడం ప్రస్తుతం సాధ్యం కాదు. దయచేసి మీ సిస్టమ్ యొక్క యాప్ స్టోర్ (ఉదాహరణకు, <b>ప్లే స్టోర్</b>)ని ఇతర ప్రొఫైలుకు క్లోన్ చేసి, అక్కడ నుండి యాప్‌లను ఇన్‌స్టాల్ చేయండి.</string><string name="batch_operation">బ్యాచ్ ఆపరేషన్</string>
-    <string name="unfreeze_and_launch">అన్‌ఫ్రీజ్ చేసి ప్రారంభించండి</string>
     <string name="settings_services">సేవలు</string>
     <string name="settings_auto_freeze_service">ఆటో ఫ్రిజ్ సేవ</string><string name="service_auto_freeze_desc">షెల్టర్ తదుపరి స్క్రీన్ లాక్ ఈవెంట్‌లో \"అన్‌ఫ్రీజ్ &amp; లాంచ్\" నుండి ప్రారంభించబడిన యాప్‌లను ఆటో-ఫ్రీజ్ చేస్తుంది.</string>
     <string name="uninstall_success">అనువర్తనం \"%s\" విజయవంతంగా అన్‌ఇన్‌స్టాల్ చేయబడింది</string>
@@ -66,8 +65,7 @@
 \nషెల్టర్ యొక్క కొన్ని అధునాతన ఫీచర్లు వర్క్ ప్రొఫైల్ <b>బయట</b> మరిన్ని అనుమతులను అవసరం కావచ్చు. అవసరమైనప్పుడు, మీరు సంబంధిత ఫీచర్‌లను ప్రారంభించినప్పుడు, షెల్టర్ ఆ అనుమతులను వేరుగా అడుగుతుంది.</string>
     <string name="fragment_profile_work">షెల్టర్</string>
     <string name="install_app_to_profile">షెల్టర్‌లో APK ఇన్‌స్టాల్ చేయండి</string>
-    <string name="clone_success">అనువర్తనం \"%s\" విజయవంతంగా క్లోన్ చేయబడింది</string>
-    <string name="work_mode_disabled">మీరు షెల్టర్‌ను ప్రారంభించే సమయానికి వర్క్ మోడ్‌ను అడ్డించారు అనిపిస్తోంది. మీరు ఇప్పుడు దీన్ని ఎనేబుల్ చేసినట్లయితే, దయచేసి షెల్టర్‌ను మళ్లీ ప్రారంభించండి.</string><string name="search">శోధించండి</string>
+    <string name="clone_success">అనువర్తనం \"%s\" విజయవంతంగా క్లోన్ చేయబడింది</string><string name="search">శోధించండి</string>
     <string name="unsupported_launcher">మీ లాంచర్‌కు షార్ట్‌కట్స్‌ను జోడించలేరు. మరింత సమాచారం కోసం దయచేసి డెవలపర్‌ను సంప్రదించండి.</string>
     <string name="auto_freeze">ఆటో ఫ్రీజ్</string>
     <string name="service_desc">షెల్టర్ ఇప్పుడు నడుస్తోంది…</string>
