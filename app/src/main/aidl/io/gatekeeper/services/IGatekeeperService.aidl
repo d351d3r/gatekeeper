@@ -1,4 +1,4 @@
-// IShelterService.aidl
+// IGatekeeperService.aidl
 package io.gatekeeper.services;
 
 import android.content.pm.ApplicationInfo;
@@ -10,9 +10,9 @@ import io.gatekeeper.services.IStartActivityProxy;
 import io.gatekeeper.util.ApplicationInfoWrapper;
 import io.gatekeeper.util.UriForwardProxy;
 
-interface IShelterService {
+interface IGatekeeperService {
     void ping();
-    void stopShelterService(boolean kill);
+    void stopGatekeeperService(boolean kill);
     void getApps(IGetAppsCallback callback, boolean showAll);
     void loadIcon(in ApplicationInfoWrapper info, ILoadIconCallback callback);
     void installApp(in ApplicationInfoWrapper app, IAppInstallCallback callback);

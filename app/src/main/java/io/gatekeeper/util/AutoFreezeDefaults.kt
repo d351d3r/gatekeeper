@@ -8,7 +8,7 @@ import io.gatekeeper.ui.DummyActivity
 
 /**
  * Auto-freeze list for the work profile (stored in main-profile [LocalStorageManager]).
- * Store installs and Zindan clones are added by default; user opt-out is persistent.
+ * Store installs and Gatekeeper clones are added by default; user opt-out is persistent.
  */
 object AutoFreezeDefaults {
     fun enableForWorkProfile(packageName: String?, clearOptOut: Boolean = false) {
@@ -113,7 +113,7 @@ object AutoFreezeDefaults {
     /**
      * Consume packages queued by an explicit install event (store receiver or work-profile
      * installer). Also picks up new packages vs the persisted baseline when cross-profile
-     * delivery failed (e.g. RuStore install with Zindan closed).
+     * delivery failed (e.g. RuStore install with Gatekeeper closed).
      */
     fun applyDefaultsForNewPackages(
         context: Context?,

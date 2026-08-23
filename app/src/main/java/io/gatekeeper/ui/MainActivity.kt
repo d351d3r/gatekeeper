@@ -26,7 +26,7 @@ import android.text.TextUtils
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
-import io.gatekeeper.util.ZindanToast
+import io.gatekeeper.util.GatekeeperToast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -41,10 +41,10 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.gatekeeper.BuildConfig
 import io.gatekeeper.R
-import io.gatekeeper.ShelterApplication
+import io.gatekeeper.GatekeeperApplication
 import io.gatekeeper.services.IAppInstallCallback
 import io.gatekeeper.services.IGetAppsCallback
-import io.gatekeeper.services.IShelterService
+import io.gatekeeper.services.IGatekeeperService
 import io.gatekeeper.services.IStartActivityProxy
 import io.gatekeeper.services.KillerService
 import io.gatekeeper.util.AntiSpyLaunchGate
@@ -96,8 +96,8 @@ class MainActivity : AppCompatActivity() {
 
     private var storage: LocalStorageManager? = null
     private var restarting = false
-    private var serviceMain: IShelterService? = null
-    private var serviceWork: IShelterService? = null
+    private var serviceMain: IGatekeeperService? = null
+    private var serviceWork: IGatekeeperService? = null
     var showAll = false
     private var pendingVpnBlockReason = 0
     private var pendingLaunchPackageName: String? = null
@@ -205,7 +205,7 @@ class MainActivity : AppCompatActivity() {
             ACTION_SHOW_BATCH_TOAST -> {
                 val resId = intent.getIntExtra(EXTRA_TOAST_RES_ID, 0)
                 if (resId != 0) {
-                    ZindanToast.show(this, resId)
+                    GatekeeperToast.show(this, resId)
                 }
                 refreshAppLists()
             }
@@ -248,9 +248,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun bindServices() {
-        (application as ShelterApplication).bindShelterService(object : ServiceConnection {
+        (application as GatekeeperApplication).bindMainService(object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName, service: IBinder) {
-                serviceMain = IShelterService.Stub.asInterface(service)
+                serviceMain = IGatekeeperService.Stub.asInterface(service)
                 tryStartWorkService()
             }
 
@@ -278,7 +278,7 @@ class MainActivity : AppCompatActivity() {
                 )
             } else {
                 storage!!.setBoolean(LocalStorageManager.PREF_HAS_SETUP, false)
-                ZindanToast.show(this, getString(R.string.work_profile_not_found), android.widget.Toast.LENGTH_LONG)
+                GatekeeperToast.show(this, getString(R.string.work_profile_not_found), android.widget.Toast.LENGTH_LONG)
                 finish()
             }
             return
@@ -333,7 +333,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         workBindAttempts = 0
-        serviceWork = IShelterService.Stub.asInterface(binder)
+        serviceWork = IGatekeeperService.Stub.asInterface(binder)
         registerStartActivityProxies()
         startKiller()
         window.decorView.post {
@@ -459,7 +459,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /** Пункты меню, которым нужен сервис профиля: без него объясняем, а не разыменовываем null. */
-    private fun requireWorkService(): IShelterService? {
+    private fun requireWorkService(): IGatekeeperService? {
         val service = serviceWork
         if (service == null) {
             showWorkServiceBindFailed(WorkServiceBindFailure.NO_BINDER)
@@ -499,7 +499,7 @@ class MainActivity : AppCompatActivity() {
             ACTION_SHOW_BATCH_TOAST -> {
                 val resId = intent.getIntExtra(EXTRA_TOAST_RES_ID, 0)
                 if (resId != 0) {
-                    ZindanToast.show(this, resId)
+                    GatekeeperToast.show(this, resId)
                 }
                 return true
             }
@@ -589,7 +589,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun getOtherService(isRemote: Boolean): IShelterService =
+    fun getOtherService(isRemote: Boolean): IGatekeeperService =
         if (isRemote) serviceMain!! else serviceWork!!
 
     fun servicesAlive(): Boolean =
@@ -688,11 +688,11 @@ class MainActivity : AppCompatActivity() {
     private fun doOnDestroy() {
         stopService(Intent(this, KillerService::class.java))
         try {
-            serviceWork?.stopShelterService(true)
+            serviceWork?.stopGatekeeperService(true)
         } catch (_: Exception) {
         }
         try {
-            serviceMain?.stopShelterService(false)
+            serviceMain?.stopGatekeeperService(false)
         } catch (_: Exception) {
         }
         AntiSpyManager.syncVpnWatchEverywhere(applicationContext)
@@ -1026,7 +1026,7 @@ class MainActivity : AppCompatActivity() {
                 override fun callback(result: Int) {
                     runOnUiThread {
                         if (result == RESULT_OK) {
-                            ZindanToast.show(
+                            GatekeeperToast.show(
                                 this@MainActivity,
                                 R.string.install_app_to_profile_success,
                                 android.widget.Toast.LENGTH_LONG,

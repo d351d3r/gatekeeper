@@ -16,8 +16,8 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.os.RemoteException
 import io.gatekeeper.R
-import io.gatekeeper.ShelterApplication
-import io.gatekeeper.receivers.ShelterDeviceAdminReceiver
+import io.gatekeeper.GatekeeperApplication
+import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.FileProviderProxy
@@ -25,25 +25,25 @@ import io.gatekeeper.util.UriForwardProxy
 import io.gatekeeper.util.Utility
 import io.gatekeeper.util.VpnTunnelDetector
 
-class ShelterService : Service() {
+class GatekeeperService : Service() {
     private var policyManager: DevicePolicyManager? = null
     private var isProfileOwner = false
     private var packageManager: PackageManager? = null
     private var adminComponent: ComponentName? = null
     private var startActivityProxy: IStartActivityProxy? = null
 
-    private val binder = object : IShelterService.Stub() {
+    private val binder = object : IGatekeeperService.Stub() {
         override fun ping() {
         }
 
-        override fun stopShelterService(kill: Boolean) {
+        override fun stopGatekeeperService(kill: Boolean) {
             Thread {
                 try {
                     Thread.sleep(1)
                 } catch (_: Exception) {
                 }
 
-                (application as ShelterApplication).unbindShelterService()
+                (application as GatekeeperApplication).unbindMainService()
 
                 if (kill && !(isProfileOwner && FreezeService.hasPendingAppToFreeze())) {
                     if (isProfileOwner) {
@@ -103,7 +103,7 @@ class ShelterService : Service() {
         override fun installApp(app: ApplicationInfoWrapper, callback: IAppInstallCallback) {
             if (!app.isSystem()) {
                 val intent = Intent(DummyActivity.INSTALL_PACKAGE)
-                intent.component = ComponentName(this@ShelterService, DummyActivity::class.java)
+                intent.component = ComponentName(this@GatekeeperService, DummyActivity::class.java)
                 intent.putExtra("package", app.getPackageName())
                 intent.putExtra("apk", app.getSourceDir())
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -129,7 +129,7 @@ class ShelterService : Service() {
 
         override fun installApk(uriForwarder: UriForwardProxy, callback: IAppInstallCallback) {
             val intent = Intent(DummyActivity.INSTALL_PACKAGE)
-            intent.component = ComponentName(this@ShelterService, DummyActivity::class.java)
+            intent.component = ComponentName(this@GatekeeperService, DummyActivity::class.java)
             val uri: Uri = FileProviderProxy.setUriForwardProxy(uriForwarder, "apk")
             intent.putExtra("direct_install_apk", uri)
 
@@ -145,7 +145,7 @@ class ShelterService : Service() {
         override fun uninstallApp(app: ApplicationInfoWrapper, callback: IAppInstallCallback) {
             if (!app.isSystem()) {
                 val intent = Intent(DummyActivity.UNINSTALL_PACKAGE)
-                intent.component = ComponentName(this@ShelterService, DummyActivity::class.java)
+                intent.component = ComponentName(this@GatekeeperService, DummyActivity::class.java)
                 intent.putExtra("package", app.getPackageName())
 
                 val callbackExtra = Bundle()
@@ -175,10 +175,10 @@ class ShelterService : Service() {
         }
 
         override fun hasUsageStatsPermission(): Boolean =
-            Utility.checkUsageStatsPermission(this@ShelterService)
+            Utility.checkUsageStatsPermission(this@GatekeeperService)
 
         override fun hasSystemAlertPermission(): Boolean =
-            Utility.checkSystemAlertPermission(this@ShelterService)
+            Utility.checkSystemAlertPermission(this@GatekeeperService)
 
         override fun hasAllFileAccessPermission(): Boolean =
             Utility.checkAllFileAccessPermission()
@@ -235,7 +235,7 @@ class ShelterService : Service() {
          * из обоих и ответа не дает.
          */
         override fun isDefaultNetworkTunneled(): Boolean =
-            VpnTunnelDetector.isDefaultNetworkTunneled(this@ShelterService)
+            VpnTunnelDetector.isDefaultNetworkTunneled(this@GatekeeperService)
 
         override fun isIgnoringBatteryOptimizations(): Boolean =
             getSystemService(PowerManager::class.java)
@@ -250,7 +250,7 @@ class ShelterService : Service() {
         policyManager = getSystemService(DevicePolicyManager::class.java)
         packageManager = getPackageManager()
         isProfileOwner = policyManager!!.isProfileOwnerApp(packageName)
-        adminComponent = ComponentName(applicationContext, ShelterDeviceAdminReceiver::class.java)
+        adminComponent = ComponentName(applicationContext, GatekeeperDeviceAdminReceiver::class.java)
     }
 
     override fun onBind(intent: Intent?): IBinder {

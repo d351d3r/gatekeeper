@@ -4,7 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import io.gatekeeper.R
 import io.gatekeeper.util.FileShuttleConnection
-import io.gatekeeper.util.ZindanToast
+import io.gatekeeper.util.GatekeeperToast
 
 /**
  * Точка входа для действия, которое клиент SAF показывает пользователю, когда связи с
@@ -25,7 +25,7 @@ class FileShuttleAuthActivity : Activity() {
             return
         }
         if (!FileShuttleConnection.requestBind(this)) {
-            ZindanToast.show(this, R.string.file_shuttle_unavailable)
+            GatekeeperToast.show(this, R.string.file_shuttle_unavailable)
             done(false)
             return
         }
@@ -34,7 +34,7 @@ class FileShuttleAuthActivity : Activity() {
             val bound = FileShuttleConnection.awaitBinder(FileShuttleConnection.BIND_TIMEOUT_MS) != null
             runOnUiThread {
                 if (!bound) {
-                    ZindanToast.show(this, R.string.file_shuttle_unavailable)
+                    GatekeeperToast.show(this, R.string.file_shuttle_unavailable)
                 }
                 done(bound)
             }

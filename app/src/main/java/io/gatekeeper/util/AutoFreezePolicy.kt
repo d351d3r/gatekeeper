@@ -1,6 +1,6 @@
 package io.gatekeeper.util
 
-import io.gatekeeper.services.IShelterService
+import io.gatekeeper.services.IGatekeeperService
 import io.gatekeeper.util.ApplicationInfoWrapper
 
 object AutoFreezePolicy {
@@ -21,7 +21,7 @@ object AutoFreezePolicy {
     }
 
     fun migrateLegacyFrozenWithoutAutoFreeze(
-        service: IShelterService,
+        service: IGatekeeperService,
         apps: List<ApplicationInfoWrapper>
     ) {
         val storage = LocalStorageManager.getInstance()

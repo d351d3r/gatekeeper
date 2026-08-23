@@ -19,12 +19,12 @@ import android.os.RemoteException
 import android.os.StrictMode
 import android.provider.Settings
 import android.util.Log
-import io.gatekeeper.util.ZindanToast
+import io.gatekeeper.util.GatekeeperToast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import io.gatekeeper.R
-import io.gatekeeper.ShelterApplication
-import io.gatekeeper.receivers.ShelterDeviceAdminReceiver
+import io.gatekeeper.GatekeeperApplication
+import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.services.AntiSpyVpnWatchService
 import io.gatekeeper.services.FreezeService
 import io.gatekeeper.services.IAppInstallCallback
@@ -151,7 +151,7 @@ class DummyActivity : Activity() {
             try {
                 startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
             } catch (_: ActivityNotFoundException) {
-                ZindanToast.show(this, R.string.power_diagnostics_settings_unavailable)
+                GatekeeperToast.show(this, R.string.power_diagnostics_settings_unavailable)
             }
         }
         finish()
@@ -222,13 +222,13 @@ class DummyActivity : Activity() {
                 component = ComponentName(this@DummyActivity, SetupWizardActivity::class.java)
             }
             startActivity(intent)
-            ZindanToast.show(this, getString(R.string.provision_finished), android.widget.Toast.LENGTH_LONG)
+            GatekeeperToast.show(this, getString(R.string.provision_finished), android.widget.Toast.LENGTH_LONG)
             finish()
         }
     }
 
     private fun actionStartService() {
-        (application as ShelterApplication).bindShelterService(object : ServiceConnection {
+        (application as GatekeeperApplication).bindMainService(object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName, service: IBinder) {
                 val data = Intent()
                 val bundle = Bundle().apply {
@@ -478,7 +478,7 @@ class DummyActivity : Activity() {
 
             for (i in packages.indices) {
                 policyManager!!.setApplicationHidden(
-                    ComponentName(this, ShelterDeviceAdminReceiver::class.java),
+                    ComponentName(this, GatekeeperDeviceAdminReceiver::class.java),
                     packages[i], false
                 )
                 if (packagesShouldFreeze[i]) {
@@ -490,7 +490,7 @@ class DummyActivity : Activity() {
         val packageName = intent.getStringExtra("packageName")!!
 
         policyManager!!.setApplicationHidden(
-            ComponentName(this, ShelterDeviceAdminReceiver::class.java),
+            ComponentName(this, GatekeeperDeviceAdminReceiver::class.java),
             packageName, false
         )
 
@@ -502,7 +502,7 @@ class DummyActivity : Activity() {
             }
             startActivity(launchIntent)
         } else {
-            ZindanToast.show(this, getString(R.string.launch_app_fail, packageName))
+            GatekeeperToast.show(this, getString(R.string.launch_app_fail, packageName))
         }
 
         finish()
@@ -628,7 +628,7 @@ class DummyActivity : Activity() {
     private fun actionShowToast() {
         val resId = intent.getIntExtra(MainActivity.EXTRA_TOAST_RES_ID, 0)
         if (resId != 0) {
-            ZindanToast.show(this, resId)
+            GatekeeperToast.show(this, resId)
         }
         if (!isProfileOwner) {
             Utility.deliverAppListRefreshInMainProcess(this)
@@ -694,7 +694,7 @@ class DummyActivity : Activity() {
             return
         }
         policyManager!!.setApplicationHidden(
-            ComponentName(this, ShelterDeviceAdminReceiver::class.java),
+            ComponentName(this, GatekeeperDeviceAdminReceiver::class.java),
             packageName, false
         )
         Utility.scheduleAppListRefresh(this)
@@ -772,7 +772,7 @@ class DummyActivity : Activity() {
         if (isProfileOwner) {
             val list = intent.getStringArrayExtra("list")
             if (list != null) {
-                val admin = ComponentName(this, ShelterDeviceAdminReceiver::class.java)
+                val admin = ComponentName(this, GatekeeperDeviceAdminReceiver::class.java)
                 for (pkg in list) {
                     if (pkg.isNullOrEmpty()) continue
                     policyManager!!.setApplicationHidden(admin, pkg, false)
@@ -811,7 +811,7 @@ class DummyActivity : Activity() {
     }
 
     private fun doStartFileShuttle() {
-        (application as ShelterApplication).bindFileShuttleService(object : ServiceConnection {
+        (application as GatekeeperApplication).bindFileShuttleService(object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName, service: IBinder) {
                 val shuttle = IFileShuttleService.Stub.asInterface(service)
                 val callback = IFileShuttleServiceCallback.Stub.asInterface(

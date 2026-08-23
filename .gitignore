@@ -89,6 +89,13 @@ repackage/*
 /Zindan-*.apk
 /Gatekeeper-*.apk
 
+# Test APKs kept on disk for manual emulator installs, never committed
+/apk/
+
+# Workspace meta-docs, local only
+/status.md
+/context.md
+
 # Gradle user home when redirected into the repo (optional local setup)
 .gradle-user-home/
 

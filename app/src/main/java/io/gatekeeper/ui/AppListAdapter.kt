@@ -15,11 +15,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import io.gatekeeper.R
 import io.gatekeeper.services.ILoadIconCallback
-import io.gatekeeper.services.IShelterService
+import io.gatekeeper.services.IGatekeeperService
 import io.gatekeeper.util.ApplicationInfoWrapper
 
 class AppListAdapter(
-    private val service: IShelterService,
+    private val service: IGatekeeperService,
     private val defaultIcon: Drawable
 ) : RecyclerView.Adapter<AppListAdapter.ViewHolder>() {
 

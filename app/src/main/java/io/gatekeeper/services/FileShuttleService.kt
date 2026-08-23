@@ -18,7 +18,7 @@ import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import io.gatekeeper.R
-import io.gatekeeper.ShelterApplication
+import io.gatekeeper.GatekeeperApplication
 import io.gatekeeper.util.CrossProfileDocumentsProvider
 import io.gatekeeper.util.Utility
 import java.io.File
@@ -263,7 +263,7 @@ class FileShuttleService : Service() {
 
     private fun suicide() {
         handler.removeCallbacks(suicideTask)
-        (application as ShelterApplication).unbindFileShuttleService()
+        (application as GatekeeperApplication).unbindFileShuttleService()
         stopSelf()
     }
 

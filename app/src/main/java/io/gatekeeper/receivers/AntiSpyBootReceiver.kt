@@ -8,7 +8,7 @@ import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.Utility
 
 /**
- * After device reboot, schedule a one-time batch freeze when Zindan starts with Anti Spy on.
+ * After device reboot, schedule a one-time batch freeze when Gatekeeper starts with Anti Spy on.
  */
 class AntiSpyBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

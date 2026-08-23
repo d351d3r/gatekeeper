@@ -20,7 +20,7 @@ class ApplicationInfoWrapper private constructor() : Parcelable {
         return this
     }
 
-    // Only used from ShelterService
+    // Only used from GatekeeperService
     fun setHidden(hidden: Boolean): ApplicationInfoWrapper {
         isHidden = hidden
         return this
@@ -34,7 +34,7 @@ class ApplicationInfoWrapper private constructor() : Parcelable {
 
     fun getSplitApks(): Array<String>? = info!!.splitSourceDirs
 
-    // NOTE: This does not relate to the "freezing" feature in Shelter
+    // NOTE: This does not relate to the app-wide "freezing" feature
     fun getEnabled(): Boolean = info!!.enabled
 
     fun isHidden(): Boolean = isHidden

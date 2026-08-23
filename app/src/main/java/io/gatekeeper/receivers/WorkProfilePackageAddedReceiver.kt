@@ -9,7 +9,7 @@ import io.gatekeeper.util.AutoFreezeDefaults
 import io.gatekeeper.util.Utility
 
 /**
- * Work profile only: assign auto-freeze to apps installed outside Zindan (e.g. RuStore).
+ * Work profile only: assign auto-freeze to apps installed outside Gatekeeper (e.g. RuStore).
  */
 class WorkProfilePackageAddedReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

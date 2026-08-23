@@ -26,7 +26,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.color.DynamicColors
 import io.gatekeeper.BuildConfig
 import io.gatekeeper.R
-import io.gatekeeper.services.IShelterService
+import io.gatekeeper.services.IGatekeeperService
 import io.gatekeeper.util.AntiSpyFreezeScope
 import io.gatekeeper.util.AntiSpyWatchConfig
 import io.gatekeeper.util.LocalStorageManager
@@ -35,11 +35,11 @@ import io.gatekeeper.util.SettingsManager
 import io.gatekeeper.util.Utility
 import io.gatekeeper.util.VpnRoutingAdvice
 import io.gatekeeper.util.VpnTunnelDetector
-import io.gatekeeper.util.ZindanToast
+import io.gatekeeper.util.GatekeeperToast
 
 class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
     private val manager = SettingsManager.getInstance()
-    private var serviceWork: IShelterService? = null
+    private var serviceWork: IGatekeeperService? = null
 
     private var prefCrossProfileFileChooser: CheckBoxPreference? = null
     private var prefBlockContactsSearching: CheckBoxPreference? = null
@@ -68,7 +68,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
 
     override fun onCreatePreferences(bundle: Bundle?, s: String?) {
         addPreferencesFromResource(R.xml.preferences_settings)
-        serviceWork = IShelterService.Stub.asInterface(
+        serviceWork = IGatekeeperService.Stub.asInterface(
             IntentCompat.getParcelableExtra(
                 requireActivity().intent, "extras", Bundle::class.java
             )?.getBinder("profile_service")
@@ -338,7 +338,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
 
     private fun collectPowerDiagnostics(
         context: Context,
-        workService: IShelterService?,
+        workService: IGatekeeperService?,
     ): PowerDiagnostics.Snapshot {
         val local = runCatching {
             val power = context.getSystemService(PowerManager::class.java)
@@ -385,14 +385,14 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         try {
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {
-            ZindanToast.show(requireContext(), R.string.power_diagnostics_settings_unavailable)
+            GatekeeperToast.show(requireContext(), R.string.power_diagnostics_settings_unavailable)
         }
     }
 
     private fun openWorkPowerSettings() {
         val intent = Intent(DummyActivity.OPEN_POWER_SETTINGS)
         if (!Utility.tryTransferIntentToProfile(requireContext(), intent)) {
-            ZindanToast.show(requireContext(), R.string.power_diagnostics_work_unavailable)
+            GatekeeperToast.show(requireContext(), R.string.power_diagnostics_work_unavailable)
             return
         }
         openSettings(intent)

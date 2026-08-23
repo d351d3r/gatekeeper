@@ -71,7 +71,7 @@ class FileShuttleForegroundTest {
      */
     @Test
     fun boundShuttleRunsInForeground() {
-        val application = context.applicationContext as ShelterApplication
+        val application = context.applicationContext as GatekeeperApplication
         application.bindFileShuttleService(connection)
         try {
             val name = FileShuttleService::class.java.name

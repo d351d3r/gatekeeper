@@ -24,7 +24,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import io.gatekeeper.util.ZindanToast
+import io.gatekeeper.util.GatekeeperToast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -37,8 +37,8 @@ import io.gatekeeper.R
 import io.gatekeeper.services.IAppInstallCallback
 import io.gatekeeper.services.IGetAppsCallback
 import io.gatekeeper.services.ILoadIconCallback
-import io.gatekeeper.services.IShelterService
-import io.gatekeeper.services.ShelterService
+import io.gatekeeper.services.IGatekeeperService
+import io.gatekeeper.services.GatekeeperService
 import io.gatekeeper.util.AntiSpyLaunchGate
 import io.gatekeeper.util.AntiSpyManager
 import io.gatekeeper.util.ApplicationInfoWrapper
@@ -48,7 +48,7 @@ import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.Utility
 
 class AppListFragment : BaseFragment() {
-    private var service: IShelterService? = null
+    private var service: IGatekeeperService? = null
     private var isRemote = false
     private var refreshing = false
     private var refreshPending = false
@@ -84,7 +84,7 @@ class AppListFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
         defaultIcon = requireActivity().packageManager.defaultActivityIcon
         val serviceBinder = requireArguments().getBinder("service")
-        service = IShelterService.Stub.asInterface(serviceBinder)
+        service = IGatekeeperService.Stub.asInterface(serviceBinder)
         isRemote = requireArguments().getBoolean("is_remote")
     }
 
@@ -314,7 +314,7 @@ class AppListFragment : BaseFragment() {
                     service!!.freezeApp(app)
                 } catch (_: RemoteException) {
                 }
-                ZindanToast.show(
+                GatekeeperToast.show(
                     requireContext(),
                     getString(R.string.freeze_success, app.getLabel()),
                 )
@@ -326,7 +326,7 @@ class AppListFragment : BaseFragment() {
                         service!!.unfreezeApp(app)
                     } catch (_: RemoteException) {
                     }
-                    ZindanToast.show(
+                    GatekeeperToast.show(
                         requireContext(),
                         getString(R.string.unfreeze_success, app.getLabel()),
                     )
@@ -370,7 +370,7 @@ class AppListFragment : BaseFragment() {
                             service!!.unfreezeApp(app)
                         } catch (_: RemoteException) {
                         }
-                        ZindanToast.show(
+                        GatekeeperToast.show(
                             requireContext(),
                             getString(R.string.unfreeze_success, app.getLabel()),
                         )
@@ -563,7 +563,7 @@ class AppListFragment : BaseFragment() {
         if (result == Activity.RESULT_OK) {
             var message = getString(if (isInstall) R.string.clone_success else R.string.uninstall_success)
             message = String.format(message, app.getLabel())
-            ZindanToast.show(requireContext(), message)
+            GatekeeperToast.show(requireContext(), message)
             if (isInstall && !isRemote) {
                 AutoFreezeDefaults.enableForWorkProfile(
                     requireContext(),
@@ -583,8 +583,8 @@ class AppListFragment : BaseFragment() {
                 AutoFreezeDefaults.clearWorkProfilePackageTracking(app.getPackageName())
             }
             requestAppListRefresh(followUpAfterInstall = isInstall && !isRemote)
-        } else if (result == ShelterService.RESULT_CANNOT_INSTALL_SYSTEM_APP) {
-            ZindanToast.show(
+        } else if (result == GatekeeperService.RESULT_CANNOT_INSTALL_SYSTEM_APP) {
+            GatekeeperToast.show(
                 requireContext(),
                 getString(
                     if (isInstall) R.string.clone_fail_system_app else R.string.uninstall_fail_system_app
@@ -643,7 +643,7 @@ class AppListFragment : BaseFragment() {
         private const val MENU_ITEM_ALLOW_CROSS_PROFILE_WIDGET = 10008
         private const val MENU_ITEM_ALLOW_CROSS_PROFILE_INTERACTION = 10009
 
-        fun newInstance(service: IShelterService, isRemote: Boolean): AppListFragment {
+        fun newInstance(service: IGatekeeperService, isRemote: Boolean): AppListFragment {
             return AppListFragment().apply {
                 arguments = Bundle().apply {
                     putBinder("service", service.asBinder())

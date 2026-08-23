@@ -24,9 +24,9 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
-            android:theme="@style/ThemeOverlay.Zindan.BrandBar"
+            android:theme="@style/ThemeOverlay.Gatekeeper.BrandBar"
             app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/ThemeOverlay.Zindan.PopupMenu"
+            app:popupTheme="@style/ThemeOverlay.Gatekeeper.PopupMenu"
             app:title="@string/app_name" />
 
     </com.google.android.material.appbar.AppBarLayout>

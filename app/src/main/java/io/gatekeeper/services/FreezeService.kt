@@ -14,7 +14,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
 import io.gatekeeper.R
-import io.gatekeeper.receivers.ShelterDeviceAdminReceiver
+import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.SettingsManager
 import io.gatekeeper.util.Utility
@@ -34,7 +34,7 @@ class FreezeService : Service() {
 
             if (appToFreeze.isNotEmpty()) {
                 val dpm = getSystemService(DevicePolicyManager::class.java)
-                val adminComponent = ComponentName(this, ShelterDeviceAdminReceiver::class.java)
+                val adminComponent = ComponentName(this, GatekeeperDeviceAdminReceiver::class.java)
                 for (app in appToFreeze) {
                     var shouldFreeze = true
                     val stats = usageStats[app]

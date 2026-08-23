@@ -32,7 +32,7 @@ import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.Utility
 import io.gatekeeper.util.VpnTunnelDetector
 import io.gatekeeper.util.WorkProfileBatchFreeze
-import io.gatekeeper.util.ZindanToast
+import io.gatekeeper.util.GatekeeperToast
 
 /**
  * Сторож VPN и блокировки экрана. Ничего не делает, пока пользователь не включил функцию:
@@ -367,7 +367,7 @@ class AntiSpyVpnWatchService : Service() {
     private fun postVpnStateAlert(textResId: Int) {
         val title = getString(R.string.anti_spy_monitor_notification_title)
         val text = getString(textResId)
-        ZindanToast.show(this, text)
+        GatekeeperToast.show(this, text)
         Utility.postUserAlert(this, VPN_STATE_NOTIFICATION_ID, title, text)
     }
 
@@ -465,7 +465,7 @@ class AntiSpyVpnWatchService : Service() {
             }
             val list = WorkProfileBatchFreeze.packagesForScope(this, config.scope)
             if (list.isEmpty()) {
-                postFreezeDiagnostic("WORK: список пуст — открой Zindan один раз")
+                postFreezeDiagnostic("WORK: список пуст — открой Gatekeeper один раз")
                 return
             }
             val frozen = WorkProfileBatchFreeze.freezeList(this, list)

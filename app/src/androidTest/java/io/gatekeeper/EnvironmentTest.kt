@@ -16,7 +16,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class EnvironmentTest {
     @Test
-    fun instrumentationTargetsShelterPackage() {
+    fun instrumentationTargetsGatekeeperPackage() {
         assertEquals(BuildConfig.APPLICATION_ID, TestProfiles.targetPackage)
     }
 

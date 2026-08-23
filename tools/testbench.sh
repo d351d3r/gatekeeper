@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Стенд для инструментальных тестов zindan.
+# Стенд для инструментальных тестов Gatekeeper.
 #
 # Работает ТОЛЬКО с эмулятором emulator-5556. Любое другое устройство в списке adb --
 # аварийный выход: к adb пользователя может быть подключен боевой телефон с рабочим
@@ -21,7 +21,7 @@ PKG="io.gatekeeper"
 TEST_PKG="${PKG}.test"
 RUNNER="androidx.test.runner.AndroidJUnitRunner"
 CODE_PKG="io.gatekeeper"
-ADMIN="${PKG}/${CODE_PKG}.receivers.ShelterDeviceAdminReceiver"
+ADMIN="${PKG}/${CODE_PKG}.receivers.GatekeeperDeviceAdminReceiver"
 DUMMY="${PKG}/${CODE_PKG}.ui.DummyActivity"
 ACTION_FINALIZE="io.gatekeeper.action.FINALIZE_PROVISION"
 ACTION_SHUTTLE="io.gatekeeper.action.START_FILE_SHUTTLE"
@@ -76,7 +76,7 @@ require_work_user() {
     echo "$wu"
 }
 
-latest_apk() { (cd "$ROOT" && ls -t Zindan-*-debug.apk 2>/dev/null | head -1); }
+latest_apk() { (cd "$ROOT" && ls -t Gatekeeper-*-debug.apk 2>/dev/null | head -1); }
 
 test_apk() {
     ls -t "$ROOT"/app/build/outputs/apk/androidTest/debug/*.apk 2>/dev/null | head -1
@@ -302,7 +302,7 @@ $0 <команда>
   check              проверить, что подключен только $SERIAL и образ пригоден
   boot               запустить AVD $AVD на порту $PORT и дождаться загрузки
   build              ./gradlew assembleDebug
-  install [apk]      adb -s $SERIAL install -r (по умолчанию свежий Zindan-*-debug.apk)
+  install [apk]      adb -s $SERIAL install -r (по умолчанию свежий Gatekeeper-*-debug.apk)
   profile            поднять рабочий профиль обходным путем, зарегистрировать фильтры
   perms              выдать MANAGE_EXTERNAL_STORAGE и SYSTEM_ALERT_WINDOW в обоих профилях
   files              создать маркерные файлы для проверок File Shuttle

@@ -44,9 +44,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.gatekeeper.R
 import io.gatekeeper.receivers.AntiSpyVpnFreezeReceiver
 import io.gatekeeper.receivers.AppListRefreshReceiver
-import io.gatekeeper.receivers.ShelterDeviceAdminReceiver
+import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.services.BatchFreezeService
-import io.gatekeeper.services.IShelterService
+import io.gatekeeper.services.IGatekeeperService
 import io.gatekeeper.ui.AppListFragment
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.ui.MainActivity
@@ -618,7 +618,7 @@ object Utility {
     fun showToastOnMainProfile(context: Context, resId: Int) {
         val dpm = context.getSystemService(android.app.admin.DevicePolicyManager::class.java)
         if (dpm == null || !dpm.isProfileOwnerApp(context.packageName)) {
-            ZindanToast.show(context, resId)
+            GatekeeperToast.show(context, resId)
             scheduleAppListRefresh(context, APP_LIST_REFRESH_FOLLOWUP_DELAYS_MS)
             return
         }
@@ -704,7 +704,7 @@ object Utility {
         val manager = context.getSystemService(DevicePolicyManager::class.java)
         val adminComponent = ComponentName(
             context.applicationContext,
-            ShelterDeviceAdminReceiver::class.java
+            GatekeeperDeviceAdminReceiver::class.java
         )
 
         context.packageManager.setComponentEnabledSetting(
@@ -933,7 +933,7 @@ object Utility {
         val manager = context.getSystemService(DevicePolicyManager::class.java)
         val adminComponent = ComponentName(
             context.applicationContext,
-            ShelterDeviceAdminReceiver::class.java
+            GatekeeperDeviceAdminReceiver::class.java
         )
         manager.clearUserRestriction(adminComponent, UserManager.DISALLOW_INSTALL_APPS)
         manager.clearUserRestriction(adminComponent, UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES)
@@ -1025,14 +1025,14 @@ object Utility {
         }
     }
 
-    fun killShelterServices(serviceMain: IShelterService, serviceWork: IShelterService) {
+    fun killMainServices(serviceMain: IGatekeeperService, serviceWork: IGatekeeperService) {
         try {
-            serviceWork.stopShelterService(true)
+            serviceWork.stopGatekeeperService(true)
         } catch (e: Exception) {
         }
 
         try {
-            serviceMain.stopShelterService(false)
+            serviceMain.stopGatekeeperService(false)
         } catch (e: Exception) {
         }
     }
@@ -1257,11 +1257,8 @@ object Utility {
         launchIntents: MutableMap<String, Intent>,
         labels: MutableMap<String, String?>
     ) {
-        // Легаси-префикс "shelter-" оставлен, чтобы ярлыки, созданные прошлыми выпусками,
-        // находились и отключались; новые создаются только с префиксом "gatekeeper-".
         val matchesId = info.id == unfreezeShortcutId(packageName) ||
-                info.id.startsWith("gatekeeper-$packageName") ||
-                info.id.startsWith("shelter-$packageName")
+                info.id.startsWith("gatekeeper-$packageName")
         if (!matchesId && !unfreezeShortcutTargetsPackage(info.intent, packageName)) {
             return
         }
@@ -1316,7 +1313,7 @@ object Utility {
                     ).intentSender
                 )
             } else {
-                ZindanToast.show(
+                GatekeeperToast.show(
                     context,
                     context.getString(R.string.unsupported_launcher),
                     android.widget.Toast.LENGTH_LONG,
@@ -1331,7 +1328,7 @@ object Utility {
                 drawableToBitmap(icon.loadDrawable(context)!!)
             )
             context.sendBroadcast(shortcutIntent)
-            ZindanToast.show(context, R.string.shortcut_create_success)
+            GatekeeperToast.show(context, R.string.shortcut_create_success)
         }
     }
 
@@ -1427,10 +1424,6 @@ object Utility {
     private const val NOTIFICATION_CHANNEL_ID = "GatekeeperService"
     private const val NOTIFICATION_CHANNEL_IMPORTANT = "GatekeeperService-Important"
     private const val NOTIFICATION_CHANNEL_USER_ALERTS = "GatekeeperUserAlerts"
-    // Каналы прошлых выпусков: создатели новых каналов обязаны удалить их, чтобы
-    // в системных настройках не оставались сироты.
-    private val LEGACY_NOTIFICATION_CHANNELS =
-        listOf("ShelterService", "ShelterService-Important", "ShelterUserAlerts")
     private const val VPN_AUTO_FREEZE_SUCCESS_NOTIFICATION_ID = 0xe49d3
 
     fun postUserAlert(
@@ -1466,7 +1459,6 @@ object Utility {
         val app = context.applicationContext
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val nm = app.getSystemService(NotificationManager::class.java)
-            LEGACY_NOTIFICATION_CHANNELS.forEach(nm::deleteNotificationChannel)
             if (nm.getNotificationChannel(NOTIFICATION_CHANNEL_USER_ALERTS) == null) {
                 val chan = NotificationChannel(
                     NOTIFICATION_CHANNEL_USER_ALERTS,
@@ -1552,7 +1544,6 @@ object Utility {
         val nm = context.getSystemService(NotificationManager::class.java)
         // Канал настраивается только при создании: перебивать выбор пользователя из кода
         // недопустимо, и Android этого все равно не дает.
-        LEGACY_NOTIFICATION_CHANNELS.forEach(nm::deleteNotificationChannel)
         if (nm.getNotificationChannel(id) == null) {
             val chan = NotificationChannel(
                 id,

@@ -25,7 +25,7 @@ import androidx.fragment.app.Fragment
 import com.android.setupwizardlib.SetupWizardLayout
 import com.android.setupwizardlib.view.NavigationBar
 import io.gatekeeper.R
-import io.gatekeeper.receivers.ShelterDeviceAdminReceiver
+import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.util.AuthenticationUtility
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.Utility
@@ -139,7 +139,7 @@ class SetupWizardActivity : AppCompatActivity() {
     private class ProfileProvisionContract : ActivityResultContract<Void?, Boolean>() {
         override fun createIntent(context: Context, input: Void?): Intent {
             val admin = ComponentName(
-                context.applicationContext, ShelterDeviceAdminReceiver::class.java
+                context.applicationContext, GatekeeperDeviceAdminReceiver::class.java
             )
             return Intent(DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE).apply {
                 putExtra(DevicePolicyManager.EXTRA_PROVISIONING_SKIP_ENCRYPTION, true)
@@ -186,7 +186,7 @@ class SetupWizardActivity : AppCompatActivity() {
             return view
         }
 
-        private fun applyZindanSetupWizardColors() {
+        private fun applySetupWizardColors() {
             val ctx = requireContext()
             val header = wizard!!.headerTextView
             header?.setTextColor(ContextCompat.getColor(ctx, R.color.setupWizardHeaderText))
@@ -202,7 +202,7 @@ class SetupWizardActivity : AppCompatActivity() {
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
-            applyZindanSetupWizardColors()
+            applySetupWizardColors()
             ViewCompat.setOnApplyWindowInsetsListener(wizard!!) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
 

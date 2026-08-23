@@ -7,7 +7,7 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.util.Log
-import io.gatekeeper.receivers.ShelterDeviceAdminReceiver
+import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.services.FreezeService
 
 /**
@@ -35,7 +35,7 @@ object WorkProfileBatchFreeze {
             return 0
         }
         val dpm = context.getSystemService(DevicePolicyManager::class.java) ?: return 0
-        val admin = ComponentName(context, ShelterDeviceAdminReceiver::class.java)
+        val admin = ComponentName(context, GatekeeperDeviceAdminReceiver::class.java)
         var newlyFrozen = 0
         var alreadyHidden = 0
         var reconciled = 0

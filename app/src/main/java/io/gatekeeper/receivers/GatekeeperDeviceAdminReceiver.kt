@@ -11,7 +11,7 @@ import io.gatekeeper.R
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.Utility
 
-class ShelterDeviceAdminReceiver : DeviceAdminReceiver() {
+class GatekeeperDeviceAdminReceiver : DeviceAdminReceiver() {
     override fun onProfileProvisioningComplete(context: Context, intent: Intent) {
         super.onProfileProvisioningComplete(context, intent)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) return

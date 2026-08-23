@@ -8,12 +8,12 @@ import android.util.Log
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.color.DynamicColorsOptions
 import io.gatekeeper.services.FileShuttleService
-import io.gatekeeper.services.ShelterService
+import io.gatekeeper.services.GatekeeperService
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.SettingsManager
 
-class ShelterApplication : Application() {
-    private var shelterServiceConnection: ServiceConnection? = null
+class GatekeeperApplication : Application() {
+    private var mainServiceConnection: ServiceConnection? = null
     private var fileShuttleServiceConnection: ServiceConnection? = null
 
     override fun onCreate() {
@@ -32,12 +32,12 @@ class ShelterApplication : Application() {
         )
     }
 
-    fun bindShelterService(conn: ServiceConnection, foreground: Boolean) {
-        unbindShelterService()
-        val intent = Intent(applicationContext, ShelterService::class.java)
+    fun bindMainService(conn: ServiceConnection, foreground: Boolean) {
+        unbindMainService()
+        val intent = Intent(applicationContext, GatekeeperService::class.java)
         intent.putExtra("foreground", foreground)
         bindService(intent, conn, Context.BIND_AUTO_CREATE)
-        shelterServiceConnection = conn
+        mainServiceConnection = conn
     }
 
     /**
@@ -62,15 +62,15 @@ class ShelterApplication : Application() {
         fileShuttleServiceConnection = conn
     }
 
-    fun unbindShelterService() {
-        shelterServiceConnection?.let {
+    fun unbindMainService() {
+        mainServiceConnection?.let {
             try {
                 unbindService(it)
             } catch (_: Exception) {
                 // Service may already be unbound.
             }
         }
-        shelterServiceConnection = null
+        mainServiceConnection = null
     }
 
     fun unbindFileShuttleService() {
@@ -84,6 +84,6 @@ class ShelterApplication : Application() {
     }
 
     companion object {
-        private const val TAG = "ShelterApplication"
+        private const val TAG = "GatekeeperApplication"
     }
 }

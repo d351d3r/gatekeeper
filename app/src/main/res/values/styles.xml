@@ -46,7 +46,7 @@
 
         <item name="windowActionModeOverlay">true</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
-        <item name="bottomNavigationStyle">@style/Widget.Zindan.BottomNavigation</item>
+        <item name="bottomNavigationStyle">@style/Widget.Gatekeeper.BottomNavigation</item>
 
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
@@ -66,7 +66,7 @@
         и brandBarOn / brandBarOnVariant как содержимое на ней. Накладывается на тему
         активности, поэтому parent пустой - меняются только перечисленные атрибуты.
     -->
-    <style name="ThemeOverlay.Zindan.BrandBar" parent="">
+    <style name="ThemeOverlay.Gatekeeper.BrandBar" parent="">
         <item name="colorPrimary">@color/brandBarOn</item>
         <item name="colorOnSurface">@color/brandBarOn</item>
         <item name="colorOnSurfaceVariant">@color/brandBarOnVariant</item>
@@ -77,7 +77,7 @@
         <item name="android:textColorSecondary">@color/brandBarOnVariant</item>
         <item name="android:textColorHint">@color/brandBarOnVariant</item>
         <item name="actionMenuTextColor">@color/brandBarOn</item>
-        <item name="actionButtonStyle">@style/Widget.Zindan.ActionButton</item>
+        <item name="actionButtonStyle">@style/Widget.Gatekeeper.ActionButton</item>
     </style>
 
     <!--
@@ -85,7 +85,7 @@
         поэтому цвета текста возвращаются к токенам темы. Без этого меню наследовало бы
         золотой текст фирменной панели и на светлом фоне было бы нечитаемым.
     -->
-    <style name="ThemeOverlay.Zindan.PopupMenu" parent="">
+    <style name="ThemeOverlay.Gatekeeper.PopupMenu" parent="">
         <item name="colorSurface">@color/md_surfaceContainer</item>
         <item name="colorOnSurface">@color/md_onSurface</item>
         <item name="colorOnSurfaceVariant">@color/md_onSurfaceVariant</item>
@@ -96,22 +96,22 @@
         <item name="android:textColorSecondary">@color/md_onSurfaceVariant</item>
     </style>
 
-    <style name="Widget.Zindan.ActionButton" parent="Widget.AppCompat.ActionButton">
+    <style name="Widget.Gatekeeper.ActionButton" parent="Widget.AppCompat.ActionButton">
         <item name="android:minWidth">40dp</item>
         <item name="android:paddingStart">2dp</item>
         <item name="android:paddingEnd">2dp</item>
     </style>
 
-    <style name="Widget.Zindan.BottomNavigation" parent="Widget.Material3.BottomNavigationView">
+    <style name="Widget.Gatekeeper.BottomNavigation" parent="Widget.Material3.BottomNavigationView">
         <item name="android:background">@color/brandBar</item>
         <item name="itemIconTint">@color/bottom_navigation_item</item>
         <item name="itemTextColor">@color/bottom_navigation_item</item>
         <item name="itemRippleColor">@color/brandBarRipple</item>
-        <item name="itemActiveIndicatorStyle">@style/Widget.Zindan.BottomNavigation.Indicator</item>
+        <item name="itemActiveIndicatorStyle">@style/Widget.Gatekeeper.BottomNavigation.Indicator</item>
         <item name="elevation">0dp</item>
     </style>
 
-    <style name="Widget.Zindan.BottomNavigation.Indicator"
+    <style name="Widget.Gatekeeper.BottomNavigation.Indicator"
         parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">@color/brandBarIndicator</item>
     </style>
@@ -120,7 +120,7 @@
         DummyActivity: прозрачная активность-реле. Наследует токены приложения, чтобы
         диалоги, которые она показывает, брали те же цвета, что и остальные экраны.
     -->
-    <style name="Theme.Zindan.Translucent" parent="AppTheme.Base">
+    <style name="Theme.Gatekeeper.Translucent" parent="AppTheme.Base">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>

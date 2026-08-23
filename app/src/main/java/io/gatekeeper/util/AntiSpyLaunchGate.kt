@@ -3,7 +3,7 @@ package io.gatekeeper.util
 import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
-import io.gatekeeper.util.ZindanToast
+import io.gatekeeper.util.GatekeeperToast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.gatekeeper.R
 
@@ -80,7 +80,7 @@ object AntiSpyLaunchGate {
 
     fun notifyLaunchBlocked(context: Context, reason: Int, packageName: String) {
         val app = context.applicationContext
-        ZindanToast.show(app, messageForReason(app, reason), android.widget.Toast.LENGTH_LONG)
+        GatekeeperToast.show(app, messageForReason(app, reason), android.widget.Toast.LENGTH_LONG)
         val broadcast = Intent(BROADCAST_LAUNCH_BLOCKED_VPN)
         broadcast.putExtra(EXTRA_BLOCK_REASON, reason)
         if (!TextUtils.isEmpty(packageName)) {

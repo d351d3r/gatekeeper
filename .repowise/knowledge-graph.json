@@ -2,9 +2,9 @@
   "version": "1.0.0",
   "schema_version": 1,
   "project": {
-    "name": "zindan",
+    "name": "gatekeeper",
     "is_monorepo": false,
-    "total_files": 94,
+    "total_files": 119,
     "entry_points": [],
     "tech_stack": [
       {
@@ -22,6 +22,24 @@
     "graph_mode": "flow"
   },
   "nodes": [
+    {
+      "id": "class:app/src/androidTest/java/io/gatekeeper/TestProfiles.kt:TestProfiles",
+      "type": "class",
+      "filePath": "app/src/androidTest/java/io/gatekeeper/TestProfiles.kt",
+      "name": "TestProfiles",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "class:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt:GatekeeperDeviceAdminReceiver",
+      "type": "class",
+      "filePath": "app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
+      "name": "GatekeeperDeviceAdminReceiver",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
     {
       "id": "class:app/src/main/java/io/gatekeeper/services/AntiSpyVpnWatchService.kt:AntiSpyVpnWatchService",
       "type": "class",
@@ -167,6 +185,15 @@
       "summary": ""
     },
     {
+      "id": "class:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt:GatekeeperToast",
+      "type": "class",
+      "filePath": "app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "name": "GatekeeperToast",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
       "id": "class:app/src/main/java/io/gatekeeper/util/LegacyFreezeMigration.kt:LegacyFreezeMigration",
       "type": "class",
       "filePath": "app/src/main/java/io/gatekeeper/util/LegacyFreezeMigration.kt",
@@ -180,6 +207,42 @@
       "type": "class",
       "filePath": "app/src/main/java/io/gatekeeper/util/LocalStorageManager.kt",
       "name": "LocalStorageManager",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "class:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:PowerDiagnostics",
+      "type": "class",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "PowerDiagnostics",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "class:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:ProfileSignals",
+      "type": "class",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "ProfileSignals",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "class:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:Snapshot",
+      "type": "class",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "Snapshot",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "class:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:Status",
+      "type": "class",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "Status",
       "language": "kotlin",
       "tags": [],
       "summary": ""
@@ -230,13 +293,32 @@
       "summary": ""
     },
     {
-      "id": "class:app/src/main/java/io/gatekeeper/util/ZindanToast.kt:ZindanToast",
-      "type": "class",
-      "filePath": "app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
-      "name": "ZindanToast",
-      "language": "kotlin",
+      "id": "file:.claude/CLAUDE.md",
+      "type": "document",
+      "filePath": ".claude/CLAUDE.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 138,
+      "complexity": "moderate",
+      "pagerank": 0.002778,
+      "communityId": 8,
       "tags": [],
-      "summary": ""
+      "summary": "Repository instructions and context for AI coding agents."
+    },
+    {
+      "id": "file:.claude/settings.local.json",
+      "type": "config",
+      "filePath": ".claude/settings.local.json",
+      "language": "json",
+      "symbolCount": 0,
+      "lineCount": 11,
+      "complexity": "simple",
+      "pagerank": 0.002778,
+      "communityId": 9,
+      "tags": [
+        "config"
+      ],
+      "summary": "Configuration file: settings.local.json."
     },
     {
       "id": "file:.github/workflows/android.yml",
@@ -246,8 +328,8 @@
       "symbolCount": 0,
       "lineCount": 28,
       "complexity": "simple",
-      "pagerank": 0.002985,
-      "communityId": 7,
+      "pagerank": 0.002778,
+      "communityId": 10,
       "tags": [
         "config",
         "ci"
@@ -262,13 +344,56 @@
       "symbolCount": 0,
       "lineCount": 63,
       "complexity": "simple",
-      "pagerank": 0.002985,
-      "communityId": 8,
+      "pagerank": 0.002778,
+      "communityId": 11,
       "tags": [
         "config",
         "ci"
       ],
       "summary": "GitHub Actions CI/CD workflow definition."
+    },
+    {
+      "id": "file:.mcp.json",
+      "type": "config",
+      "filePath": ".mcp.json",
+      "language": "json",
+      "symbolCount": 0,
+      "lineCount": 8,
+      "complexity": "simple",
+      "pagerank": 0.002778,
+      "communityId": 12,
+      "tags": [
+        "config"
+      ],
+      "summary": "Configuration file: .mcp.json."
+    },
+    {
+      "id": "file:.serena/memories/project_overview.md",
+      "type": "document",
+      "filePath": ".serena/memories/project_overview.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 61,
+      "complexity": "simple",
+      "pagerank": 0.002778,
+      "communityId": 13,
+      "tags": [],
+      "summary": "Documentation: project_overview.md."
+    },
+    {
+      "id": "file:.serena/project.yml",
+      "type": "config",
+      "filePath": ".serena/project.yml",
+      "language": "yaml",
+      "symbolCount": 0,
+      "lineCount": 244,
+      "complexity": "moderate",
+      "pagerank": 0.002778,
+      "communityId": 14,
+      "tags": [
+        "config"
+      ],
+      "summary": "Configuration file: project.yml."
     },
     {
       "id": "file:BASELINE_1.5.3.md",
@@ -278,8 +403,8 @@
       "symbolCount": 0,
       "lineCount": 56,
       "complexity": "simple",
-      "pagerank": 0.002985,
-      "communityId": 9,
+      "pagerank": 0.002778,
+      "communityId": 15,
       "tags": [],
       "summary": "Documentation: BASELINE_1.5.3.md."
     },
@@ -291,8 +416,8 @@
       "symbolCount": 0,
       "lineCount": 150,
       "complexity": "moderate",
-      "pagerank": 0.002985,
-      "communityId": 10,
+      "pagerank": 0.002778,
+      "communityId": 16,
       "tags": [],
       "summary": "Release history and notable changes."
     },
@@ -304,8 +429,8 @@
       "symbolCount": 0,
       "lineCount": 497,
       "complexity": "moderate",
-      "pagerank": 0.002985,
-      "communityId": 11,
+      "pagerank": 0.002778,
+      "communityId": 17,
       "tags": [],
       "summary": "Documentation: PROBLEMS.md."
     },
@@ -317,8 +442,8 @@
       "symbolCount": 0,
       "lineCount": 418,
       "complexity": "moderate",
-      "pagerank": 0.002985,
-      "communityId": 12,
+      "pagerank": 0.002778,
+      "communityId": 18,
       "tags": [],
       "summary": "Documentation: PRODUCT.md."
     },
@@ -330,8 +455,8 @@
       "symbolCount": 0,
       "lineCount": 70,
       "complexity": "simple",
-      "pagerank": 0.002985,
-      "communityId": 13,
+      "pagerank": 0.002778,
+      "communityId": 19,
       "tags": [],
       "summary": "Project overview and entry point for new readers."
     },
@@ -343,8 +468,8 @@
       "symbolCount": 0,
       "lineCount": 902,
       "complexity": "complex",
-      "pagerank": 0.002985,
-      "communityId": 14,
+      "pagerank": 0.002778,
+      "communityId": 20,
       "tags": [],
       "summary": "Documentation: USER_GUIDE.md."
     },
@@ -356,8 +481,8 @@
       "symbolCount": 19,
       "lineCount": 231,
       "complexity": "complex",
-      "pagerank": 0.002985,
-      "communityId": 1,
+      "pagerank": 0.002778,
+      "communityId": 0,
       "tags": [
         "test"
       ],
@@ -372,8 +497,8 @@
       "symbolCount": 8,
       "lineCount": 56,
       "complexity": "moderate",
-      "pagerank": 0.002985,
-      "communityId": 2,
+      "pagerank": 0.002778,
+      "communityId": 7,
       "tags": [
         "test"
       ],
@@ -388,8 +513,8 @@
       "symbolCount": 39,
       "lineCount": 527,
       "complexity": "complex",
-      "pagerank": 0.002985,
-      "communityId": 5,
+      "pagerank": 0.002778,
+      "communityId": 1,
       "tags": [
         "test"
       ],
@@ -404,8 +529,8 @@
       "symbolCount": 3,
       "lineCount": 31,
       "complexity": "simple",
-      "pagerank": 0.002985,
-      "communityId": 4,
+      "pagerank": 0.002778,
+      "communityId": 5,
       "tags": [
         "test"
       ],
@@ -420,8 +545,8 @@
       "symbolCount": 9,
       "lineCount": 109,
       "complexity": "moderate",
-      "pagerank": 0.002985,
-      "communityId": 2,
+      "pagerank": 0.002778,
+      "communityId": 7,
       "tags": [
         "test"
       ],
@@ -436,8 +561,8 @@
       "symbolCount": 8,
       "lineCount": 96,
       "complexity": "moderate",
-      "pagerank": 0.003925,
-      "communityId": 2,
+      "pagerank": 0.003653,
+      "communityId": 7,
       "tags": [
         "test"
       ],
@@ -452,8 +577,8 @@
       "symbolCount": 3,
       "lineCount": 19,
       "complexity": "simple",
-      "pagerank": 0.003318,
-      "communityId": 0,
+      "pagerank": 0.003088,
+      "communityId": 7,
       "tags": [
         "test"
       ],
@@ -468,7 +593,7 @@
       "symbolCount": 2,
       "lineCount": 14,
       "complexity": "simple",
-      "pagerank": 0.002985,
+      "pagerank": 0.002778,
       "communityId": 6,
       "tags": [
         "test"
@@ -484,8 +609,8 @@
       "symbolCount": 10,
       "lineCount": 62,
       "complexity": "moderate",
-      "pagerank": 0.003974,
-      "communityId": 1,
+      "pagerank": 0.003698,
+      "communityId": 0,
       "tags": [
         "test"
       ],
@@ -500,10 +625,10 @@
       "symbolCount": 9,
       "lineCount": 104,
       "complexity": "moderate",
-      "pagerank": 0.003562,
-      "communityId": 2,
+      "pagerank": 0.003314,
+      "communityId": 7,
       "tags": [],
-      "summary": "Application module ShelterApplication defining ShelterApplication, onCreate, bindShelterService.",
+      "summary": "Application module ShelterApplication defining GatekeeperApplication, onCreate, bindMainService.",
       "primaryOwner": "Anatolii Cherednichenko"
     },
     {
@@ -514,8 +639,8 @@
       "symbolCount": 2,
       "lineCount": 23,
       "complexity": "simple",
-      "pagerank": 0.002985,
-      "communityId": 1,
+      "pagerank": 0.002778,
+      "communityId": 0,
       "tags": [],
       "summary": "Application module AntiSpyBootReceiver defining AntiSpyBootReceiver, onReceive.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -526,10 +651,10 @@
       "filePath": "app/src/main/java/io/gatekeeper/receivers/AntiSpyVpnFreezeReceiver.kt",
       "language": "kotlin",
       "symbolCount": 8,
-      "lineCount": 69,
+      "lineCount": 70,
       "complexity": "moderate",
-      "pagerank": 0.003156,
-      "communityId": 1,
+      "pagerank": 0.002937,
+      "communityId": 0,
       "tags": [],
       "summary": "Application module AntiSpyVpnFreezeReceiver defining AntiSpyVpnFreezeReceiver, onReceive, handleVpnBatchFreeze.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -542,25 +667,24 @@
       "symbolCount": 4,
       "lineCount": 32,
       "complexity": "moderate",
-      "pagerank": 0.003156,
-      "communityId": 1,
+      "pagerank": 0.002937,
+      "communityId": 0,
       "tags": [],
       "summary": "Application module AppListRefreshReceiver defining AppListRefreshReceiver, onReceive.",
       "primaryOwner": "Anatolii Cherednichenko"
     },
     {
-      "id": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "id": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "type": "file",
-      "filePath": "app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "filePath": "app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "language": "kotlin",
       "symbolCount": 3,
       "lineCount": 40,
       "complexity": "simple",
-      "pagerank": 0.003939,
-      "communityId": 1,
+      "pagerank": 0.003665,
+      "communityId": 0,
       "tags": [],
-      "summary": "Application module ShelterDeviceAdminReceiver defining ShelterDeviceAdminReceiver, onProfileProvisioningComplete.",
-      "primaryOwner": "Anatolii Cherednichenko"
+      "summary": "Application module GatekeeperDeviceAdminReceiver defining GatekeeperDeviceAdminReceiver, onProfileProvisioningComplete."
     },
     {
       "id": "file:app/src/main/java/io/gatekeeper/receivers/WorkProfilePackageAddedReceiver.kt",
@@ -570,8 +694,8 @@
       "symbolCount": 3,
       "lineCount": 36,
       "complexity": "simple",
-      "pagerank": 0.002985,
-      "communityId": 1,
+      "pagerank": 0.002778,
+      "communityId": 0,
       "tags": [],
       "summary": "Application module WorkProfilePackageAddedReceiver defining WorkProfilePackageAddedReceiver, onReceive.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -584,8 +708,8 @@
       "symbolCount": 20,
       "lineCount": 111,
       "complexity": "complex",
-      "pagerank": 0.003209,
-      "communityId": 5,
+      "pagerank": 0.002986,
+      "communityId": 1,
       "tags": [],
       "summary": "Service module AntiSpyDummyVpnService defining AntiSpyDummyVpnService, onStartCommand, startTunnel.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -596,10 +720,10 @@
       "filePath": "app/src/main/java/io/gatekeeper/services/AntiSpyVpnWatchService.kt",
       "language": "kotlin",
       "symbolCount": 68,
-      "lineCount": 758,
+      "lineCount": 759,
       "complexity": "complex",
-      "pagerank": 0.004528,
-      "communityId": 1,
+      "pagerank": 0.004214,
+      "communityId": 0,
       "tags": [],
       "summary": "Service module AntiSpyVpnWatchService defining AntiSpyVpnWatchService, onCreate, onStartCommand.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -612,8 +736,8 @@
       "symbolCount": 9,
       "lineCount": 96,
       "complexity": "moderate",
-      "pagerank": 0.00328,
-      "communityId": 1,
+      "pagerank": 0.003053,
+      "communityId": 0,
       "tags": [],
       "summary": "Service module BatchFreezeService defining BatchFreezeService, onCreate, onStartCommand.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -624,10 +748,10 @@
       "filePath": "app/src/main/java/io/gatekeeper/services/FileShuttleService.kt",
       "language": "kotlin",
       "symbolCount": 27,
-      "lineCount": 390,
+      "lineCount": 391,
       "complexity": "complex",
-      "pagerank": 0.003786,
-      "communityId": 5,
+      "pagerank": 0.003523,
+      "communityId": 1,
       "tags": [],
       "summary": "Service module FileShuttleService defining FileShuttleService, ping, loadFiles.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -640,11 +764,24 @@
       "symbolCount": 18,
       "lineCount": 134,
       "complexity": "complex",
-      "pagerank": 0.003512,
-      "communityId": 1,
+      "pagerank": 0.003268,
+      "communityId": 0,
       "tags": [],
       "summary": "Service module FreezeService defining FreezeService, onReceive, onReceive.",
       "primaryOwner": "Anatolii Cherednichenko"
+    },
+    {
+      "id": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "type": "file",
+      "filePath": "app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "language": "kotlin",
+      "symbolCount": 35,
+      "lineCount": 314,
+      "complexity": "complex",
+      "pagerank": 0.003084,
+      "communityId": 6,
+      "tags": [],
+      "summary": "Service module GatekeeperService defining GatekeeperService, ping, stopGatekeeperService."
     },
     {
       "id": "file:app/src/main/java/io/gatekeeper/services/KillerService.kt",
@@ -654,8 +791,8 @@
       "symbolCount": 9,
       "lineCount": 40,
       "complexity": "moderate",
-      "pagerank": 0.00303,
-      "communityId": 1,
+      "pagerank": 0.00282,
+      "communityId": 0,
       "tags": [],
       "summary": "Service module KillerService defining KillerService, onStartCommand, onBind.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -668,24 +805,10 @@
       "symbolCount": 3,
       "lineCount": 8,
       "complexity": "simple",
-      "pagerank": 0.003237,
-      "communityId": 2,
+      "pagerank": 0.003012,
+      "communityId": 1,
       "tags": [],
       "summary": "Service module PaymentStubService defining PaymentStubService, processCommandApdu, onDeactivated.",
-      "primaryOwner": "Anatolii Cherednichenko"
-    },
-    {
-      "id": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "type": "file",
-      "filePath": "app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "language": "kotlin",
-      "symbolCount": 35,
-      "lineCount": 313,
-      "complexity": "complex",
-      "pagerank": 0.003314,
-      "communityId": 6,
-      "tags": [],
-      "summary": "Service module ShelterService defining ShelterService, ping, stopShelterService.",
       "primaryOwner": "Anatolii Cherednichenko"
     },
     {
@@ -696,8 +819,8 @@
       "symbolCount": 13,
       "lineCount": 109,
       "complexity": "moderate",
-      "pagerank": 0.003275,
-      "communityId": 2,
+      "pagerank": 0.003048,
+      "communityId": 1,
       "tags": [],
       "summary": "UI module AntiSpyVpnPromptActivity defining AntiSpyVpnPromptActivity, onCreate, onNewIntent.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -708,10 +831,10 @@
       "filePath": "app/src/main/java/io/gatekeeper/ui/AppListAdapter.kt",
       "language": "kotlin",
       "symbolCount": 54,
-      "lineCount": 244,
+      "lineCount": 245,
       "complexity": "complex",
-      "pagerank": 0.003039,
-      "communityId": 0,
+      "pagerank": 0.002828,
+      "communityId": 2,
       "tags": [],
       "summary": "UI module AppListAdapter defining AppListAdapter, ViewHolder, onClick.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -722,10 +845,10 @@
       "filePath": "app/src/main/java/io/gatekeeper/ui/AppListFragment.kt",
       "language": "kotlin",
       "symbolCount": 44,
-      "lineCount": 658,
+      "lineCount": 659,
       "complexity": "complex",
-      "pagerank": 0.003201,
-      "communityId": 0,
+      "pagerank": 0.002979,
+      "communityId": 2,
       "tags": [],
       "summary": "UI module AppListFragment defining AppListFragment, onReceive, onReceive.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -738,7 +861,7 @@
       "symbolCount": 2,
       "lineCount": 5,
       "complexity": "simple",
-      "pagerank": 0.003039,
+      "pagerank": 0.002828,
       "communityId": 3,
       "tags": [],
       "summary": "UI module BaseFragment defining BaseFragment, runOnUiThread.",
@@ -750,10 +873,10 @@
       "filePath": "app/src/main/java/io/gatekeeper/ui/DummyActivity.kt",
       "language": "kotlin",
       "symbolCount": 99,
-      "lineCount": 993,
+      "lineCount": 994,
       "complexity": "complex",
-      "pagerank": 0.007762,
-      "communityId": 2,
+      "pagerank": 0.007223,
+      "communityId": 7,
       "tags": [],
       "summary": "UI module DummyActivity defining DummyActivity, onCreate, isAuthorized.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -766,8 +889,8 @@
       "symbolCount": 3,
       "lineCount": 55,
       "complexity": "simple",
-      "pagerank": 0.003282,
-      "communityId": 0,
+      "pagerank": 0.003054,
+      "communityId": 1,
       "tags": [],
       "summary": "UI module FileShuttleAuthActivity defining FileShuttleAuthActivity, onCreate, done.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -780,8 +903,8 @@
       "symbolCount": 2,
       "lineCount": 12,
       "complexity": "simple",
-      "pagerank": 0.002985,
-      "communityId": 2,
+      "pagerank": 0.002778,
+      "communityId": 1,
       "tags": [],
       "summary": "UI module FinalizeActivity defining FinalizeActivity, onCreate.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -792,10 +915,10 @@
       "filePath": "app/src/main/java/io/gatekeeper/ui/MainActivity.kt",
       "language": "kotlin",
       "symbolCount": 103,
-      "lineCount": 1109,
+      "lineCount": 1110,
       "complexity": "complex",
-      "pagerank": 0.003444,
-      "communityId": 2,
+      "pagerank": 0.003205,
+      "communityId": 5,
       "tags": [],
       "summary": "UI module MainActivity defining MainActivity, onReceive, onReceive.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -808,8 +931,8 @@
       "symbolCount": 4,
       "lineCount": 18,
       "complexity": "moderate",
-      "pagerank": 0.003098,
-      "communityId": 2,
+      "pagerank": 0.002883,
+      "communityId": 1,
       "tags": [],
       "summary": "UI module SettingsActivity defining SettingsActivity, onCreate, onSupportNavigateUp.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -820,9 +943,9 @@
       "filePath": "app/src/main/java/io/gatekeeper/ui/SettingsFragment.kt",
       "language": "kotlin",
       "symbolCount": 65,
-      "lineCount": 625,
+      "lineCount": 626,
       "complexity": "complex",
-      "pagerank": 0.002985,
+      "pagerank": 0.002778,
       "communityId": 3,
       "tags": [],
       "summary": "UI module SettingsFragment defining SettingsFragment, onViewCreated, onCreatePreferences.",
@@ -836,7 +959,7 @@
       "symbolCount": 71,
       "lineCount": 354,
       "complexity": "complex",
-      "pagerank": 0.003173,
+      "pagerank": 0.002953,
       "communityId": 3,
       "tags": [],
       "summary": "UI module SetupWizardActivity defining SetupWizardActivity, onCreate, onNewIntent.",
@@ -850,8 +973,8 @@
       "symbolCount": 29,
       "lineCount": 258,
       "complexity": "complex",
-      "pagerank": 0.003421,
-      "communityId": 4,
+      "pagerank": 0.003183,
+      "communityId": 5,
       "tags": [],
       "summary": "Utility module AntiSpyDummyVpnDisconnector defining AntiSpyDummyVpnDisconnector, isSuppressingVpnReactions, Callback.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -864,8 +987,8 @@
       "symbolCount": 16,
       "lineCount": 88,
       "complexity": "complex",
-      "pagerank": 0.003671,
-      "communityId": 0,
+      "pagerank": 0.003416,
+      "communityId": 5,
       "tags": [],
       "summary": "Utility module AntiSpyLaunchGate defining AntiSpyLaunchGate, BlockedCallback, onBlocked.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -878,8 +1001,8 @@
       "symbolCount": 26,
       "lineCount": 244,
       "complexity": "complex",
-      "pagerank": 0.005847,
-      "communityId": 1,
+      "pagerank": 0.005441,
+      "communityId": 0,
       "tags": [],
       "summary": "Utility module AntiSpyManager defining AntiSpyManager, invalidateAutoFreezeListSync, AutoFreezeDelivery.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -892,8 +1015,8 @@
       "symbolCount": 4,
       "lineCount": 23,
       "complexity": "moderate",
-      "pagerank": 0.003128,
-      "communityId": 0,
+      "pagerank": 0.002911,
+      "communityId": 7,
       "tags": [],
       "summary": "Utility module AntiSpyVpnGuard defining AntiSpyVpnGuard, resolveWorkAppLabel, forwardPublicUnfreezeToParent.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -906,8 +1029,8 @@
       "symbolCount": 19,
       "lineCount": 93,
       "complexity": "complex",
-      "pagerank": 0.003418,
-      "communityId": 1,
+      "pagerank": 0.003181,
+      "communityId": 0,
       "tags": [],
       "summary": "Utility module AntiSpyVpnPromptManager defining AntiSpyVpnPromptManager, isPromptActive, isDeclinedForCurrentVpnSession.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -920,8 +1043,8 @@
       "symbolCount": 34,
       "lineCount": 85,
       "complexity": "complex",
-      "pagerank": 0.004541,
-      "communityId": 1,
+      "pagerank": 0.004226,
+      "communityId": 0,
       "tags": [],
       "summary": "Utility module AntiSpyWatchPolicy defining AntiSpyFreezeScope, fromStored, AntiSpyTrigger.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -932,9 +1055,9 @@
       "filePath": "app/src/main/java/io/gatekeeper/util/ApplicationInfoWrapper.kt",
       "language": "kotlin",
       "symbolCount": 19,
-      "lineCount": 57,
+      "lineCount": 58,
       "complexity": "complex",
-      "pagerank": 0.004228,
+      "pagerank": 0.003935,
       "communityId": 6,
       "tags": [],
       "summary": "Utility module ApplicationInfoWrapper defining ApplicationInfoWrapper, loadLabel, setHidden.",
@@ -948,8 +1071,8 @@
       "symbolCount": 9,
       "lineCount": 58,
       "complexity": "moderate",
-      "pagerank": 0.004013,
-      "communityId": 1,
+      "pagerank": 0.003735,
+      "communityId": 0,
       "tags": [],
       "summary": "Utility module AuthPayload defining AuthPayload, canonicalize, encodeStringArray.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -960,10 +1083,10 @@
       "filePath": "app/src/main/java/io/gatekeeper/util/AuthenticationUtility.kt",
       "language": "kotlin",
       "symbolCount": 16,
-      "lineCount": 155,
+      "lineCount": 156,
       "complexity": "complex",
-      "pagerank": 0.004275,
-      "communityId": 1,
+      "pagerank": 0.003979,
+      "communityId": 0,
       "tags": [],
       "summary": "Utility module AuthenticationUtility defining AuthenticationUtility, signIntent, checkIntent.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -976,8 +1099,8 @@
       "symbolCount": 14,
       "lineCount": 203,
       "complexity": "moderate",
-      "pagerank": 0.003545,
-      "communityId": 1,
+      "pagerank": 0.003299,
+      "communityId": 0,
       "tags": [],
       "summary": "Utility module AutoFreezeDefaults defining AutoFreezeDefaults, enableForWorkProfile, enableForWorkProfile.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -990,8 +1113,8 @@
       "symbolCount": 7,
       "lineCount": 58,
       "complexity": "moderate",
-      "pagerank": 0.003351,
-      "communityId": 0,
+      "pagerank": 0.003119,
+      "communityId": 2,
       "tags": [],
       "summary": "Utility module AutoFreezePolicy defining AutoFreezePolicy, isInAutoFreezeList, shouldApplyVpnGate.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -1004,8 +1127,8 @@
       "symbolCount": 19,
       "lineCount": 285,
       "complexity": "complex",
-      "pagerank": 0.003789,
-      "communityId": 5,
+      "pagerank": 0.003526,
+      "communityId": 1,
       "tags": [],
       "summary": "Utility module CrossProfileDocumentsProvider defining CrossProfileDocumentsProvider, onCreate, queryRoots.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -1018,7 +1141,7 @@
       "symbolCount": 7,
       "lineCount": 33,
       "complexity": "moderate",
-      "pagerank": 0.003237,
+      "pagerank": 0.003012,
       "communityId": 6,
       "tags": [],
       "summary": "Utility module FileProviderProxy defining FileProviderProxy, openFile, setUriForwardProxy.",
@@ -1032,8 +1155,8 @@
       "symbolCount": 30,
       "lineCount": 406,
       "complexity": "complex",
-      "pagerank": 0.007003,
-      "communityId": 5,
+      "pagerank": 0.006517,
+      "communityId": 1,
       "tags": [],
       "summary": "Utility module FileShuttleConnection defining FileShuttleConnection, peek, touch.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -1046,11 +1169,24 @@
       "symbolCount": 5,
       "lineCount": 11,
       "complexity": "moderate",
-      "pagerank": 0.004078,
+      "pagerank": 0.003795,
       "communityId": 6,
       "tags": [],
       "summary": "Utility module ForwardedUriRegistry defining ForwardedUriRegistry, register, get.",
       "primaryOwner": "Anatolii Cherednichenko"
+    },
+    {
+      "id": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "type": "file",
+      "filePath": "app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "language": "kotlin",
+      "symbolCount": 5,
+      "lineCount": 21,
+      "complexity": "moderate",
+      "pagerank": 0.004152,
+      "communityId": 7,
+      "tags": [],
+      "summary": "Utility module GatekeeperToast defining GatekeeperToast, show, show."
     },
     {
       "id": "file:app/src/main/java/io/gatekeeper/util/InstallationProgressListener.kt",
@@ -1060,8 +1196,8 @@
       "symbolCount": 8,
       "lineCount": 37,
       "complexity": "moderate",
-      "pagerank": 0.003128,
-      "communityId": 0,
+      "pagerank": 0.002911,
+      "communityId": 2,
       "tags": [],
       "summary": "Utility module InstallationProgressListener defining InstallationProgressListener, onCreated, onBadgingChanged.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -1074,8 +1210,8 @@
       "symbolCount": 3,
       "lineCount": 10,
       "complexity": "simple",
-      "pagerank": 0.004205,
-      "communityId": 0,
+      "pagerank": 0.003913,
+      "communityId": 2,
       "tags": [],
       "summary": "Utility module LegacyFreezeMigration defining LegacyFreezeMigration, run.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -1088,8 +1224,8 @@
       "symbolCount": 60,
       "lineCount": 193,
       "complexity": "complex",
-      "pagerank": 0.007894,
-      "communityId": 1,
+      "pagerank": 0.007346,
+      "communityId": 0,
       "tags": [],
       "summary": "Utility module LocalStorageManager defining LocalStorageManager, prefs, remove.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -1102,7 +1238,7 @@
       "symbolCount": 3,
       "lineCount": 13,
       "complexity": "simple",
-      "pagerank": 0.003791,
+      "pagerank": 0.003527,
       "communityId": 4,
       "tags": [],
       "summary": "Utility module MiuiDetector defining MiuiDetector, isLikelyMiui.",
@@ -1116,8 +1252,8 @@
       "symbolCount": 4,
       "lineCount": 9,
       "complexity": "moderate",
-      "pagerank": 0.003763,
-      "communityId": 2,
+      "pagerank": 0.003501,
+      "communityId": 7,
       "tags": [],
       "summary": "Utility module PendingOperationRegistry defining PendingOperationRegistry, register, consume.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -1130,7 +1266,7 @@
       "symbolCount": 27,
       "lineCount": 45,
       "complexity": "complex",
-      "pagerank": 0.003944,
+      "pagerank": 0.00367,
       "communityId": 3,
       "tags": [],
       "summary": "Utility module PowerDiagnostics defining PowerDiagnostics, Status, ProfileSignals.",
@@ -1144,8 +1280,8 @@
       "symbolCount": 30,
       "lineCount": 47,
       "complexity": "complex",
-      "pagerank": 0.004019,
-      "communityId": 2,
+      "pagerank": 0.00374,
+      "communityId": 7,
       "tags": [],
       "summary": "Utility module ProfileActions defining ProfileActions.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -1158,7 +1294,7 @@
       "symbolCount": 11,
       "lineCount": 42,
       "complexity": "moderate",
-      "pagerank": 0.003791,
+      "pagerank": 0.003527,
       "communityId": 4,
       "tags": [],
       "summary": "Utility module ProfileForwarder defining ProfileForwarder, Candidate, pickForwarder.",
@@ -1172,8 +1308,8 @@
       "symbolCount": 11,
       "lineCount": 30,
       "complexity": "moderate",
-      "pagerank": 0.003551,
-      "communityId": 2,
+      "pagerank": 0.003305,
+      "communityId": 4,
       "tags": [],
       "summary": "Utility module SameProcessTokens defining SameProcessTokens, issue, consume.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -1186,7 +1322,7 @@
       "symbolCount": 3,
       "lineCount": 5,
       "complexity": "simple",
-      "pagerank": 0.003392,
+      "pagerank": 0.003157,
       "communityId": 6,
       "tags": [],
       "summary": "Utility module ServiceLiveness defining ServiceLiveness, areAlive.",
@@ -1200,8 +1336,8 @@
       "symbolCount": 35,
       "lineCount": 207,
       "complexity": "complex",
-      "pagerank": 0.003854,
-      "communityId": 1,
+      "pagerank": 0.003587,
+      "communityId": 0,
       "tags": [],
       "summary": "Utility module SettingsManager defining SettingsManager, syncSettingsToProfileBool, syncSettingsToProfileInt.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -1214,8 +1350,8 @@
       "symbolCount": 21,
       "lineCount": 198,
       "complexity": "complex",
-      "pagerank": 0.003645,
-      "communityId": 5,
+      "pagerank": 0.003392,
+      "communityId": 1,
       "tags": [],
       "summary": "Utility module ShuttleSession defining ShuttleSession, peek, touch.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -1228,7 +1364,7 @@
       "symbolCount": 8,
       "lineCount": 47,
       "complexity": "moderate",
-      "pagerank": 0.003597,
+      "pagerank": 0.003347,
       "communityId": 6,
       "tags": [],
       "summary": "Utility module UriForwardProxy defining UriForwardProxy, openFile, open.",
@@ -1239,10 +1375,10 @@
       "type": "file",
       "filePath": "app/src/main/java/io/gatekeeper/util/Utility.kt",
       "language": "kotlin",
-      "symbolCount": 105,
-      "lineCount": 1576,
+      "symbolCount": 104,
+      "lineCount": 1555,
       "complexity": "complex",
-      "pagerank": 0.011695,
+      "pagerank": 0.010883,
       "communityId": 4,
       "tags": [],
       "summary": "Utility module Utility defining Utility, normalizeStringList, launchFreezeInWorkProfile.",
@@ -1256,7 +1392,7 @@
       "symbolCount": 4,
       "lineCount": 43,
       "complexity": "moderate",
-      "pagerank": 0.003899,
+      "pagerank": 0.003628,
       "communityId": 3,
       "tags": [],
       "summary": "Utility module VpnRoutingAdvice defining VpnRoutingAdvice, evaluate, values.",
@@ -1270,8 +1406,8 @@
       "symbolCount": 10,
       "lineCount": 126,
       "complexity": "moderate",
-      "pagerank": 0.004112,
-      "communityId": 1,
+      "pagerank": 0.003827,
+      "communityId": 0,
       "tags": [],
       "summary": "Utility module VpnTunnelDetector defining VpnTunnelDetector, isVpnActive, logDiagnostics.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -1284,8 +1420,8 @@
       "symbolCount": 14,
       "lineCount": 158,
       "complexity": "moderate",
-      "pagerank": 0.003881,
-      "communityId": 1,
+      "pagerank": 0.003611,
+      "communityId": 0,
       "tags": [],
       "summary": "Utility module WorkProfileBatchFreeze defining WorkProfileBatchFreeze, FreezeOutcome, freezeList.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -1298,24 +1434,10 @@
       "symbolCount": 11,
       "lineCount": 48,
       "complexity": "moderate",
-      "pagerank": 0.003453,
-      "communityId": 2,
+      "pagerank": 0.003213,
+      "communityId": 5,
       "tags": [],
       "summary": "Utility module WorkServiceBindFailure defining WorkServiceBindFailure, classify, messageOf.",
-      "primaryOwner": "Anatolii Cherednichenko"
-    },
-    {
-      "id": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
-      "type": "file",
-      "filePath": "app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
-      "language": "kotlin",
-      "symbolCount": 5,
-      "lineCount": 21,
-      "complexity": "moderate",
-      "pagerank": 0.004462,
-      "communityId": 0,
-      "tags": [],
-      "summary": "Utility module ZindanToast defining ZindanToast, show, show.",
       "primaryOwner": "Anatolii Cherednichenko"
     },
     {
@@ -1326,8 +1448,8 @@
       "symbolCount": 8,
       "lineCount": 108,
       "complexity": "moderate",
-      "pagerank": 0.002985,
-      "communityId": 1,
+      "pagerank": 0.002778,
+      "communityId": 0,
       "tags": [
         "test"
       ],
@@ -1342,8 +1464,8 @@
       "symbolCount": 7,
       "lineCount": 52,
       "complexity": "moderate",
-      "pagerank": 0.002985,
-      "communityId": 1,
+      "pagerank": 0.002778,
+      "communityId": 0,
       "tags": [
         "test"
       ],
@@ -1358,7 +1480,7 @@
       "symbolCount": 2,
       "lineCount": 14,
       "complexity": "simple",
-      "pagerank": 0.002985,
+      "pagerank": 0.002778,
       "communityId": 6,
       "tags": [
         "test"
@@ -1374,7 +1496,7 @@
       "symbolCount": 7,
       "lineCount": 55,
       "complexity": "moderate",
-      "pagerank": 0.002985,
+      "pagerank": 0.002778,
       "communityId": 4,
       "tags": [
         "test"
@@ -1390,8 +1512,8 @@
       "symbolCount": 3,
       "lineCount": 28,
       "complexity": "simple",
-      "pagerank": 0.002985,
-      "communityId": 0,
+      "pagerank": 0.002778,
+      "communityId": 2,
       "tags": [
         "test"
       ],
@@ -1406,7 +1528,7 @@
       "symbolCount": 3,
       "lineCount": 18,
       "complexity": "simple",
-      "pagerank": 0.002985,
+      "pagerank": 0.002778,
       "communityId": 4,
       "tags": [
         "test"
@@ -1422,8 +1544,8 @@
       "symbolCount": 2,
       "lineCount": 14,
       "complexity": "simple",
-      "pagerank": 0.002985,
-      "communityId": 2,
+      "pagerank": 0.002778,
+      "communityId": 7,
       "tags": [
         "test"
       ],
@@ -1438,7 +1560,7 @@
       "symbolCount": 3,
       "lineCount": 53,
       "complexity": "simple",
-      "pagerank": 0.002985,
+      "pagerank": 0.002778,
       "communityId": 3,
       "tags": [
         "test"
@@ -1454,8 +1576,8 @@
       "symbolCount": 2,
       "lineCount": 44,
       "complexity": "simple",
-      "pagerank": 0.002985,
-      "communityId": 2,
+      "pagerank": 0.002778,
+      "communityId": 7,
       "tags": [
         "test"
       ],
@@ -1470,8 +1592,8 @@
       "symbolCount": 5,
       "lineCount": 22,
       "complexity": "moderate",
-      "pagerank": 0.002985,
-      "communityId": 2,
+      "pagerank": 0.002778,
+      "communityId": 4,
       "tags": [
         "test"
       ],
@@ -1486,8 +1608,8 @@
       "symbolCount": 25,
       "lineCount": 312,
       "complexity": "complex",
-      "pagerank": 0.002985,
-      "communityId": 5,
+      "pagerank": 0.002778,
+      "communityId": 1,
       "tags": [
         "test"
       ],
@@ -1502,7 +1624,7 @@
       "symbolCount": 4,
       "lineCount": 42,
       "complexity": "moderate",
-      "pagerank": 0.002985,
+      "pagerank": 0.002778,
       "communityId": 4,
       "tags": [
         "test"
@@ -1518,7 +1640,7 @@
       "symbolCount": 6,
       "lineCount": 53,
       "complexity": "moderate",
-      "pagerank": 0.002985,
+      "pagerank": 0.002778,
       "communityId": 3,
       "tags": [
         "test"
@@ -1534,8 +1656,8 @@
       "symbolCount": 8,
       "lineCount": 84,
       "complexity": "moderate",
-      "pagerank": 0.002985,
-      "communityId": 2,
+      "pagerank": 0.002778,
+      "communityId": 5,
       "tags": [
         "test"
       ],
@@ -1550,10 +1672,249 @@
       "symbolCount": 0,
       "lineCount": 19,
       "complexity": "simple",
-      "pagerank": 0.002985,
-      "communityId": 15,
+      "pagerank": 0.002778,
+      "communityId": 21,
       "tags": [],
       "summary": "Project overview and entry point for new readers."
+    },
+    {
+      "id": "file:docs/4pda_android15_16.md",
+      "type": "document",
+      "filePath": "docs/4pda_android15_16.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 942,
+      "complexity": "complex",
+      "pagerank": 0.002778,
+      "communityId": 22,
+      "tags": [],
+      "summary": "Documentation: 4pda_android15_16.md."
+    },
+    {
+      "id": "file:docs/4pda_banks_nfc.md",
+      "type": "document",
+      "filePath": "docs/4pda_banks_nfc.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 3645,
+      "complexity": "complex",
+      "pagerank": 0.002778,
+      "communityId": 23,
+      "tags": [],
+      "summary": "Documentation: 4pda_banks_nfc.md."
+    },
+    {
+      "id": "file:docs/4pda_code_verification.md",
+      "type": "document",
+      "filePath": "docs/4pda_code_verification.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 506,
+      "complexity": "complex",
+      "pagerank": 0.002778,
+      "communityId": 24,
+      "tags": [],
+      "summary": "Documentation: 4pda_code_verification.md."
+    },
+    {
+      "id": "file:docs/4pda_compat_matrix.md",
+      "type": "document",
+      "filePath": "docs/4pda_compat_matrix.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 440,
+      "complexity": "moderate",
+      "pagerank": 0.002778,
+      "communityId": 25,
+      "tags": [],
+      "summary": "Documentation: 4pda_compat_matrix.md."
+    },
+    {
+      "id": "file:docs/4pda_max_gov.md",
+      "type": "document",
+      "filePath": "docs/4pda_max_gov.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 2805,
+      "complexity": "complex",
+      "pagerank": 0.002778,
+      "communityId": 26,
+      "tags": [],
+      "summary": "Documentation: 4pda_max_gov.md."
+    },
+    {
+      "id": "file:docs/4pda_screenshot.md",
+      "type": "document",
+      "filePath": "docs/4pda_screenshot.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 915,
+      "complexity": "complex",
+      "pagerank": 0.002778,
+      "communityId": 27,
+      "tags": [],
+      "summary": "Documentation: 4pda_screenshot.md."
+    },
+    {
+      "id": "file:docs/4pda_sharing.md",
+      "type": "document",
+      "filePath": "docs/4pda_sharing.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 1263,
+      "complexity": "complex",
+      "pagerank": 0.002778,
+      "communityId": 28,
+      "tags": [],
+      "summary": "Documentation: 4pda_sharing.md."
+    },
+    {
+      "id": "file:docs/4pda_shelter_analysis.md",
+      "type": "document",
+      "filePath": "docs/4pda_shelter_analysis.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 318,
+      "complexity": "moderate",
+      "pagerank": 0.002778,
+      "communityId": 29,
+      "tags": [],
+      "summary": "Documentation: 4pda_shelter_analysis.md."
+    },
+    {
+      "id": "file:docs/HANDOFF_shelter_research.md",
+      "type": "document",
+      "filePath": "docs/HANDOFF_shelter_research.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 740,
+      "complexity": "complex",
+      "pagerank": 0.002778,
+      "communityId": 30,
+      "tags": [],
+      "summary": "Documentation: HANDOFF_shelter_research.md."
+    },
+    {
+      "id": "file:docs/android_modernization.md",
+      "type": "document",
+      "filePath": "docs/android_modernization.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 498,
+      "complexity": "moderate",
+      "pagerank": 0.002778,
+      "communityId": 31,
+      "tags": [],
+      "summary": "Documentation: android_modernization.md."
+    },
+    {
+      "id": "file:docs/antispy_settings_requirements.md",
+      "type": "document",
+      "filePath": "docs/antispy_settings_requirements.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 155,
+      "complexity": "moderate",
+      "pagerank": 0.002778,
+      "communityId": 32,
+      "tags": [],
+      "summary": "Documentation: antispy_settings_requirements.md."
+    },
+    {
+      "id": "file:docs/audit_shelter_coreguard.md",
+      "type": "document",
+      "filePath": "docs/audit_shelter_coreguard.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 489,
+      "complexity": "moderate",
+      "pagerank": 0.002778,
+      "communityId": 33,
+      "tags": [],
+      "summary": "Documentation: audit_shelter_coreguard.md."
+    },
+    {
+      "id": "file:docs/design_spec.md",
+      "type": "document",
+      "filePath": "docs/design_spec.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 175,
+      "complexity": "moderate",
+      "pagerank": 0.002778,
+      "communityId": 59,
+      "tags": [
+        "test"
+      ],
+      "summary": "Documentation: design_spec.md."
+    },
+    {
+      "id": "file:docs/feature_ca_certs.md",
+      "type": "document",
+      "filePath": "docs/feature_ca_certs.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 161,
+      "complexity": "moderate",
+      "pagerank": 0.002778,
+      "communityId": 34,
+      "tags": [],
+      "summary": "Documentation: feature_ca_certs.md."
+    },
+    {
+      "id": "file:docs/feature_media_mirror.md",
+      "type": "document",
+      "filePath": "docs/feature_media_mirror.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 147,
+      "complexity": "moderate",
+      "pagerank": 0.002778,
+      "communityId": 35,
+      "tags": [],
+      "summary": "Documentation: feature_media_mirror.md."
+    },
+    {
+      "id": "file:docs/research_scrape_4pda.py",
+      "type": "file",
+      "filePath": "docs/research_scrape_4pda.py",
+      "language": "python",
+      "symbolCount": 7,
+      "lineCount": 93,
+      "complexity": "moderate",
+      "pagerank": 0.002778,
+      "communityId": 36,
+      "tags": [],
+      "summary": "Docs & Tooling module research_scrape_4pda defining detect_max_st, main.",
+      "primaryOwner": "Anatolii Cherednichenko"
+    },
+    {
+      "id": "file:docs/test_checklist_coloros16.md",
+      "type": "document",
+      "filePath": "docs/test_checklist_coloros16.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 433,
+      "complexity": "moderate",
+      "pagerank": 0.002778,
+      "communityId": 59,
+      "tags": [
+        "test"
+      ],
+      "summary": "Documentation: test_checklist_coloros16.md."
+    },
+    {
+      "id": "file:docs/threat_model.md",
+      "type": "document",
+      "filePath": "docs/threat_model.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 163,
+      "complexity": "moderate",
+      "pagerank": 0.002778,
+      "communityId": 37,
+      "tags": [],
+      "summary": "Documentation: threat_model.md."
     },
     {
       "id": "file:gradlew",
@@ -1563,8 +1924,8 @@
       "symbolCount": 3,
       "lineCount": 132,
       "complexity": "moderate",
-      "pagerank": 0.002985,
-      "communityId": 32,
+      "pagerank": 0.002778,
+      "communityId": 54,
       "tags": [],
       "summary": "Application module gradlew defining warn, die, save."
     },
@@ -1576,8 +1937,8 @@
       "symbolCount": 0,
       "lineCount": 28,
       "complexity": "simple",
-      "pagerank": 0.002985,
-      "communityId": 33,
+      "pagerank": 0.002778,
+      "communityId": 55,
       "tags": [],
       "summary": "Application module repackage.",
       "primaryOwner": "Anatolii Cherednichenko"
@@ -1588,13 +1949,68 @@
       "filePath": "tools/testbench.sh",
       "language": "shell",
       "symbolCount": 28,
-      "lineCount": 368,
+      "lineCount": 369,
       "complexity": "complex",
-      "pagerank": 0.002985,
-      "communityId": 34,
+      "pagerank": 0.002778,
+      "communityId": 56,
       "tags": [],
       "summary": "Utility module testbench defining die, say, guard_no_foreign.",
       "primaryOwner": "Anatolii Cherednichenko"
+    },
+    {
+      "id": "file:zindan/.claude/CLAUDE.md",
+      "type": "document",
+      "filePath": "zindan/.claude/CLAUDE.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 103,
+      "complexity": "moderate",
+      "pagerank": 0.002778,
+      "communityId": 57,
+      "tags": [],
+      "summary": "Repository instructions and context for AI coding agents."
+    },
+    {
+      "id": "file:zindan/.mcp.json",
+      "type": "config",
+      "filePath": "zindan/.mcp.json",
+      "language": "json",
+      "symbolCount": 0,
+      "lineCount": 8,
+      "complexity": "simple",
+      "pagerank": 0.002778,
+      "communityId": 58,
+      "tags": [
+        "config"
+      ],
+      "summary": "Configuration file: .mcp.json."
+    },
+    {
+      "id": "function:app/src/androidTest/java/io/gatekeeper/TestProfiles.kt:assumeRunningInPersonalProfileWithWorkProfile",
+      "type": "function",
+      "filePath": "app/src/androidTest/java/io/gatekeeper/TestProfiles.kt",
+      "name": "assumeRunningInPersonalProfileWithWorkProfile",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/androidTest/java/io/gatekeeper/TestProfiles.kt:assumeWorkProfile",
+      "type": "function",
+      "filePath": "app/src/androidTest/java/io/gatekeeper/TestProfiles.kt",
+      "name": "assumeWorkProfile",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt:onProfileProvisioningComplete",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
+      "name": "onProfileProvisioningComplete",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
     },
     {
       "id": "function:app/src/main/java/io/gatekeeper/services/AntiSpyVpnWatchService.kt:applyTriggers",
@@ -3190,6 +3606,24 @@
       "summary": ""
     },
     {
+      "id": "function:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt:findToastContext",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "name": "findToastContext",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt:show",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "name": "show",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
       "id": "function:app/src/main/java/io/gatekeeper/util/LegacyFreezeMigration.kt:run",
       "type": "function",
       "filePath": "app/src/main/java/io/gatekeeper/util/LegacyFreezeMigration.kt",
@@ -3437,6 +3871,150 @@
       "type": "function",
       "filePath": "app/src/main/java/io/gatekeeper/util/LocalStorageManager.kt",
       "name": "stringListContains",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:asStatus",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "asStatus",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:collect",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "collect",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:component1",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "component1",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:component2",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "component2",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:component3",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "component3",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:component4",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "component4",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:component5",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "component5",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:component6",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "component6",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:component7",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "component7",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:copy",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "copy",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:equals",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "equals",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:hasProblem",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "hasProblem",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:hashCode",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "hashCode",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:toString",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "toString",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:valueOf",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "valueOf",
+      "language": "kotlin",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:values",
+      "type": "function",
+      "filePath": "app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "name": "values",
       "language": "kotlin",
       "tags": [],
       "summary": ""
@@ -3784,10 +4362,10 @@
       "summary": ""
     },
     {
-      "id": "function:app/src/main/java/io/gatekeeper/util/Utility.kt:killShelterServices",
+      "id": "function:app/src/main/java/io/gatekeeper/util/Utility.kt:killMainServices",
       "type": "function",
       "filePath": "app/src/main/java/io/gatekeeper/util/Utility.kt",
-      "name": "killShelterServices",
+      "name": "killMainServices",
       "language": "kotlin",
       "tags": [],
       "summary": ""
@@ -4274,24 +4852,6 @@
       "type": "function",
       "filePath": "app/src/main/java/io/gatekeeper/util/VpnTunnelDetector.kt",
       "name": "logDiagnostics",
-      "language": "kotlin",
-      "tags": [],
-      "summary": ""
-    },
-    {
-      "id": "function:app/src/main/java/io/gatekeeper/util/ZindanToast.kt:findToastContext",
-      "type": "function",
-      "filePath": "app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
-      "name": "findToastContext",
-      "language": "kotlin",
-      "tags": [],
-      "summary": ""
-    },
-    {
-      "id": "function:app/src/main/java/io/gatekeeper/util/ZindanToast.kt:show",
-      "type": "function",
-      "filePath": "app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
-      "name": "show",
       "language": "kotlin",
       "tags": [],
       "summary": ""
@@ -5078,6 +5638,13 @@
     },
     {
       "source": "file:app/src/androidTest/java/io/gatekeeper/TestProfiles.kt",
+      "target": "class:app/src/androidTest/java/io/gatekeeper/TestProfiles.kt:TestProfiles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/androidTest/java/io/gatekeeper/TestProfiles.kt",
       "target": "file:external:android.app.admin.DevicePolicyManager",
       "type": "tested_by",
       "direction": "forward",
@@ -5126,6 +5693,34 @@
       "weight": 1.0
     },
     {
+      "source": "file:app/src/androidTest/java/io/gatekeeper/TestProfiles.kt",
+      "target": "function:app/src/androidTest/java/io/gatekeeper/TestProfiles.kt:assumeRunningInPersonalProfileWithWorkProfile",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/androidTest/java/io/gatekeeper/TestProfiles.kt",
+      "target": "function:app/src/androidTest/java/io/gatekeeper/TestProfiles.kt:assumeWorkProfile",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/androidTest/java/io/gatekeeper/TestProfiles.kt::TestProfiles",
+      "target": "function:app/src/androidTest/java/io/gatekeeper/TestProfiles.kt:assumeRunningInPersonalProfileWithWorkProfile",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/androidTest/java/io/gatekeeper/TestProfiles.kt::TestProfiles",
+      "target": "function:app/src/androidTest/java/io/gatekeeper/TestProfiles.kt:assumeWorkProfile",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
       "source": "file:app/src/main/java/io/gatekeeper/ShelterApplication.kt",
       "target": "file:app/src/main/java/io/gatekeeper/services/FileShuttleService.kt",
       "type": "imports",
@@ -5134,7 +5729,7 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ShelterApplication.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -5343,72 +5938,93 @@
       "weight": 1.0
     },
     {
-      "source": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "source": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
+      "target": "class:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt:GatekeeperDeviceAdminReceiver",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "target": "file:app/src/main/java/io/gatekeeper/ui/DummyActivity.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
     },
     {
-      "source": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "source": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "target": "file:app/src/main/java/io/gatekeeper/util/Utility.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
     },
     {
-      "source": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "source": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "target": "file:external:android.app.Notification",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
     },
     {
-      "source": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "source": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "target": "file:external:android.app.NotificationManager",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
     },
     {
-      "source": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "source": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "target": "file:external:android.app.PendingIntent",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
     },
     {
-      "source": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "source": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "target": "file:external:android.app.admin.DeviceAdminReceiver",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
     },
     {
-      "source": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "source": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "target": "file:external:android.content.Context",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
     },
     {
-      "source": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "source": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "target": "file:external:android.content.Intent",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
     },
     {
-      "source": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "source": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "target": "file:external:android.os.Build",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
     },
     {
-      "source": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "source": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "target": "file:external:io.gatekeeper.R",
       "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt:onProfileProvisioningComplete",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt::GatekeeperDeviceAdminReceiver",
+      "target": "function:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt:onProfileProvisioningComplete",
+      "type": "contains",
       "direction": "forward",
       "weight": 1.0
     },
@@ -5569,6 +6185,13 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/services/AntiSpyVpnWatchService.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/AntiSpyVpnWatchService.kt",
       "target": "file:app/src/main/java/io/gatekeeper/util/LocalStorageManager.kt",
       "type": "imports",
       "direction": "forward",
@@ -5591,13 +6214,6 @@
     {
       "source": "file:app/src/main/java/io/gatekeeper/services/AntiSpyVpnWatchService.kt",
       "target": "file:app/src/main/java/io/gatekeeper/util/WorkProfileBatchFreeze.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/AntiSpyVpnWatchService.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -6507,7 +7123,7 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/services/FreezeService.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -6632,6 +7248,190 @@
       "weight": 1.0
     },
     {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/ShelterApplication.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/services/AntiSpyVpnWatchService.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "same_package"
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/services/FreezeService.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "same_package"
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/ui/DummyActivity.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/util/ApplicationInfoWrapper.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/util/FileProviderProxy.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/util/UriForwardProxy.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/util/Utility.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/util/VpnTunnelDetector.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.app.Activity",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.app.ActivityManager",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.app.Service",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.app.admin.DevicePolicyManager",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.content.ComponentName",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.content.Intent",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.content.pm.ApplicationInfo",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.content.pm.PackageManager",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.graphics.Bitmap",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.net.Uri",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.os.Build",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.os.Bundle",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.os.IBinder",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.os.PowerManager",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:android.os.RemoteException",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
+      "target": "file:external:io.gatekeeper.R",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
       "source": "file:app/src/main/java/io/gatekeeper/services/KillerService.kt",
       "target": "file:app/src/main/java/io/gatekeeper/services/AntiSpyVpnWatchService.kt",
       "type": "imports",
@@ -6677,190 +7477,6 @@
     {
       "source": "file:app/src/main/java/io/gatekeeper/services/PaymentStubService.kt",
       "target": "file:external:android.os.Bundle",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/ShelterApplication.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/services/AntiSpyVpnWatchService.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0,
-      "hint": "same_package"
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/services/FreezeService.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0,
-      "hint": "same_package"
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/ui/DummyActivity.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/util/ApplicationInfoWrapper.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/util/FileProviderProxy.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/util/UriForwardProxy.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/util/Utility.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/util/VpnTunnelDetector.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.app.Activity",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.app.ActivityManager",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.app.Service",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.app.admin.DevicePolicyManager",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.content.ComponentName",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.content.Intent",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.content.pm.ApplicationInfo",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.content.pm.PackageManager",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.graphics.Bitmap",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.net.Uri",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.os.Build",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.os.Bundle",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.os.IBinder",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.os.PowerManager",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:android.os.RemoteException",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
-      "target": "file:external:io.gatekeeper.R",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -7035,21 +7651,21 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/AppListAdapter.kt",
-      "target": "file:external:io.gatekeeper.services.ILoadIconCallback",
+      "target": "file:external:io.gatekeeper.services.IGatekeeperService",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/AppListAdapter.kt",
-      "target": "file:external:io.gatekeeper.services.IShelterService",
+      "target": "file:external:io.gatekeeper.services.ILoadIconCallback",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/AppListFragment.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -7122,6 +7738,13 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/AppListFragment.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/ui/AppListFragment.kt",
       "target": "file:app/src/main/java/io/gatekeeper/util/LocalStorageManager.kt",
       "type": "imports",
       "direction": "forward",
@@ -7130,13 +7753,6 @@
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/AppListFragment.kt",
       "target": "file:app/src/main/java/io/gatekeeper/util/Utility.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/ui/AppListFragment.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -7381,6 +7997,13 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/AppListFragment.kt",
+      "target": "file:external:io.gatekeeper.services.IGatekeeperService",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/ui/AppListFragment.kt",
       "target": "file:external:io.gatekeeper.services.IGetAppsCallback",
       "type": "imports",
       "direction": "forward",
@@ -7389,13 +8012,6 @@
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/AppListFragment.kt",
       "target": "file:external:io.gatekeeper.services.ILoadIconCallback",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/ui/AppListFragment.kt",
-      "target": "file:external:io.gatekeeper.services.IShelterService",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -7437,7 +8053,7 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/DummyActivity.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -7516,6 +8132,13 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/DummyActivity.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/ui/DummyActivity.kt",
       "target": "file:app/src/main/java/io/gatekeeper/util/InstallationProgressListener.kt",
       "type": "imports",
       "direction": "forward",
@@ -7566,13 +8189,6 @@
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/DummyActivity.kt",
       "target": "file:app/src/main/java/io/gatekeeper/util/WorkProfileBatchFreeze.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/ui/DummyActivity.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -8503,7 +9119,7 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/FileShuttleAuthActivity.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -8633,6 +9249,13 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/MainActivity.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/ui/MainActivity.kt",
       "target": "file:app/src/main/java/io/gatekeeper/util/LocalStorageManager.kt",
       "type": "imports",
       "direction": "forward",
@@ -8683,13 +9306,6 @@
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/MainActivity.kt",
       "target": "file:app/src/main/java/io/gatekeeper/util/WorkServiceBindFailure.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/ui/MainActivity.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -8997,14 +9613,14 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/MainActivity.kt",
-      "target": "file:external:io.gatekeeper.services.IGetAppsCallback",
+      "target": "file:external:io.gatekeeper.services.IGatekeeperService",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/MainActivity.kt",
-      "target": "file:external:io.gatekeeper.services.IShelterService",
+      "target": "file:external:io.gatekeeper.services.IGetAppsCallback",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -9069,6 +9685,13 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/SettingsFragment.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/ui/SettingsFragment.kt",
       "target": "file:app/src/main/java/io/gatekeeper/util/LocalStorageManager.kt",
       "type": "imports",
       "direction": "forward",
@@ -9105,13 +9728,6 @@
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/SettingsFragment.kt",
       "target": "file:app/src/main/java/io/gatekeeper/util/VpnTunnelDetector.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/ui/SettingsFragment.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -9300,14 +9916,14 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/SettingsFragment.kt",
-      "target": "file:external:io.gatekeeper.services.IShelterService",
+      "target": "file:external:io.gatekeeper.services.IGatekeeperService",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/ui/SetupWizardActivity.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -9626,6 +10242,13 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/util/AntiSpyLaunchGate.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/AntiSpyLaunchGate.kt",
       "target": "file:app/src/main/java/io/gatekeeper/util/LocalStorageManager.kt",
       "type": "imports",
       "direction": "forward",
@@ -9638,13 +10261,6 @@
       "direction": "forward",
       "weight": 1.0,
       "hint": "same_package"
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/util/AntiSpyLaunchGate.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/util/AntiSpyLaunchGate.kt",
@@ -11056,7 +11672,7 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/util/AutoFreezePolicy.kt",
-      "target": "file:external:io.gatekeeper.services.IShelterService",
+      "target": "file:external:io.gatekeeper.services.IGatekeeperService",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -11593,6 +12209,69 @@
       "weight": 1.0
     },
     {
+      "source": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "target": "class:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt:GatekeeperToast",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "target": "file:external:android.app.Activity",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "target": "file:external:android.content.Context",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "target": "file:external:android.content.ContextWrapper",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "target": "file:external:android.widget.Toast",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt:findToastContext",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt:show",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt::GatekeeperToast",
+      "target": "function:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt:findToastContext",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt::GatekeeperToast",
+      "target": "function:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt:show",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
       "source": "file:app/src/main/java/io/gatekeeper/util/InstallationProgressListener.kt",
       "target": "file:external:android.app.Activity",
       "type": "imports",
@@ -12070,6 +12749,160 @@
       "weight": 1.0
     },
     {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "class:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:PowerDiagnostics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "class:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:ProfileSignals",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "class:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:Snapshot",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "class:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:Status",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:asStatus",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:collect",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:component1",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:component2",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:component3",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:component4",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:component5",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:component6",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:component7",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:copy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:equals",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:hasProblem",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:hashCode",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:toString",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:valueOf",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:values",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt::PowerDiagnostics",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:asStatus",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt::PowerDiagnostics",
+      "target": "function:app/src/main/java/io/gatekeeper/util/PowerDiagnostics.kt:collect",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
       "source": "file:app/src/main/java/io/gatekeeper/util/ProfileActions.kt",
       "target": "class:app/src/main/java/io/gatekeeper/util/ProfileActions.kt:ProfileActions",
       "type": "contains",
@@ -12285,7 +13118,7 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/util/Utility.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -12343,6 +13176,14 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/util/Utility.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "same_package"
+    },
+    {
+      "source": "file:app/src/main/java/io/gatekeeper/util/Utility.kt",
       "target": "file:app/src/main/java/io/gatekeeper/util/LocalStorageManager.kt",
       "type": "imports",
       "direction": "forward",
@@ -12368,14 +13209,6 @@
     {
       "source": "file:app/src/main/java/io/gatekeeper/util/Utility.kt",
       "target": "file:app/src/main/java/io/gatekeeper/util/SettingsManager.kt",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0,
-      "hint": "same_package"
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/util/Utility.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0,
@@ -12677,7 +13510,7 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/util/Utility.kt",
-      "target": "file:external:io.gatekeeper.services.IShelterService",
+      "target": "file:external:io.gatekeeper.services.IGatekeeperService",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -12950,7 +13783,7 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/util/Utility.kt",
-      "target": "function:app/src/main/java/io/gatekeeper/util/Utility.kt:killShelterServices",
+      "target": "function:app/src/main/java/io/gatekeeper/util/Utility.kt:killMainServices",
       "type": "contains",
       "direction": "forward",
       "weight": 1.0
@@ -13503,7 +14336,7 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/util/Utility.kt::Utility",
-      "target": "function:app/src/main/java/io/gatekeeper/util/Utility.kt:killShelterServices",
+      "target": "function:app/src/main/java/io/gatekeeper/util/Utility.kt:killMainServices",
       "type": "contains",
       "direction": "forward",
       "weight": 1.0
@@ -13958,7 +14791,7 @@
     },
     {
       "source": "file:app/src/main/java/io/gatekeeper/util/WorkProfileBatchFreeze.kt",
-      "target": "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "target": "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "type": "imports",
       "direction": "forward",
       "weight": 1.0
@@ -14046,69 +14879,6 @@
       "source": "file:app/src/main/java/io/gatekeeper/util/WorkServiceBindFailure.kt",
       "target": "file:external:io.gatekeeper.R",
       "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
-      "target": "class:app/src/main/java/io/gatekeeper/util/ZindanToast.kt:ZindanToast",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
-      "target": "file:external:android.app.Activity",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
-      "target": "file:external:android.content.Context",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
-      "target": "file:external:android.content.ContextWrapper",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
-      "target": "file:external:android.widget.Toast",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
-      "target": "function:app/src/main/java/io/gatekeeper/util/ZindanToast.kt:findToastContext",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
-      "target": "function:app/src/main/java/io/gatekeeper/util/ZindanToast.kt:show",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt::ZindanToast",
-      "target": "function:app/src/main/java/io/gatekeeper/util/ZindanToast.kt:findToastContext",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1.0
-    },
-    {
-      "source": "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt::ZindanToast",
-      "target": "function:app/src/main/java/io/gatekeeper/util/ZindanToast.kt:show",
-      "type": "contains",
       "direction": "forward",
       "weight": 1.0
     },
@@ -14606,9 +15376,9 @@
         "file:app/src/main/java/io/gatekeeper/services/BatchFreezeService.kt",
         "file:app/src/main/java/io/gatekeeper/services/FileShuttleService.kt",
         "file:app/src/main/java/io/gatekeeper/services/FreezeService.kt",
+        "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
         "file:app/src/main/java/io/gatekeeper/services/KillerService.kt",
-        "file:app/src/main/java/io/gatekeeper/services/PaymentStubService.kt",
-        "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt"
+        "file:app/src/main/java/io/gatekeeper/services/PaymentStubService.kt"
       ],
       "display_order": 1,
       "order_basis": "imports"
@@ -14618,6 +15388,7 @@
       "name": "Application",
       "description": "",
       "nodeIds": [
+        "file:.mcp.json",
         "file:BASELINE_1.5.3.md",
         "file:CHANGELOG.md",
         "file:PROBLEMS.md",
@@ -14628,11 +15399,13 @@
         "file:app/src/main/java/io/gatekeeper/receivers/AntiSpyBootReceiver.kt",
         "file:app/src/main/java/io/gatekeeper/receivers/AntiSpyVpnFreezeReceiver.kt",
         "file:app/src/main/java/io/gatekeeper/receivers/AppListRefreshReceiver.kt",
-        "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+        "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
         "file:app/src/main/java/io/gatekeeper/receivers/WorkProfilePackageAddedReceiver.kt",
         "file:assets/README.md",
         "file:gradlew",
-        "file:repackage/repackage.sh"
+        "file:repackage/repackage.sh",
+        "file:zindan/.claude/CLAUDE.md",
+        "file:zindan/.mcp.json"
       ],
       "display_order": 2,
       "order_basis": "imports"
@@ -14642,8 +15415,12 @@
       "name": "Config",
       "description": "",
       "nodeIds": [
+        "file:.claude/CLAUDE.md",
+        "file:.claude/settings.local.json",
         "file:.github/workflows/android.yml",
-        "file:.github/workflows/release.yml"
+        "file:.github/workflows/release.yml",
+        "file:.serena/memories/project_overview.md",
+        "file:.serena/project.yml"
       ],
       "display_order": 3,
       "order_basis": "imports"
@@ -14668,6 +15445,7 @@
         "file:app/src/main/java/io/gatekeeper/util/FileProviderProxy.kt",
         "file:app/src/main/java/io/gatekeeper/util/FileShuttleConnection.kt",
         "file:app/src/main/java/io/gatekeeper/util/ForwardedUriRegistry.kt",
+        "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
         "file:app/src/main/java/io/gatekeeper/util/InstallationProgressListener.kt",
         "file:app/src/main/java/io/gatekeeper/util/LegacyFreezeMigration.kt",
         "file:app/src/main/java/io/gatekeeper/util/LocalStorageManager.kt",
@@ -14686,10 +15464,34 @@
         "file:app/src/main/java/io/gatekeeper/util/VpnTunnelDetector.kt",
         "file:app/src/main/java/io/gatekeeper/util/WorkProfileBatchFreeze.kt",
         "file:app/src/main/java/io/gatekeeper/util/WorkServiceBindFailure.kt",
-        "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
         "file:tools/testbench.sh"
       ],
       "display_order": 4,
+      "order_basis": "imports"
+    },
+    {
+      "id": "layer:docs-tooling",
+      "name": "Docs & Tooling",
+      "description": "",
+      "nodeIds": [
+        "file:docs/4pda_android15_16.md",
+        "file:docs/4pda_banks_nfc.md",
+        "file:docs/4pda_code_verification.md",
+        "file:docs/4pda_compat_matrix.md",
+        "file:docs/4pda_max_gov.md",
+        "file:docs/4pda_screenshot.md",
+        "file:docs/4pda_sharing.md",
+        "file:docs/4pda_shelter_analysis.md",
+        "file:docs/HANDOFF_shelter_research.md",
+        "file:docs/android_modernization.md",
+        "file:docs/antispy_settings_requirements.md",
+        "file:docs/audit_shelter_coreguard.md",
+        "file:docs/feature_ca_certs.md",
+        "file:docs/feature_media_mirror.md",
+        "file:docs/research_scrape_4pda.py",
+        "file:docs/threat_model.md"
+      ],
+      "display_order": 5,
       "order_basis": "imports"
     },
     {
@@ -14719,9 +15521,11 @@
         "file:app/src/test/java/io/gatekeeper/ShuttleSessionTest.kt",
         "file:app/src/test/java/io/gatekeeper/SmokeTest.kt",
         "file:app/src/test/java/io/gatekeeper/VpnRoutingAdviceTest.kt",
-        "file:app/src/test/java/io/gatekeeper/WorkServiceBindFailureTest.kt"
+        "file:app/src/test/java/io/gatekeeper/WorkServiceBindFailureTest.kt",
+        "file:docs/design_spec.md",
+        "file:docs/test_checklist_coloros16.md"
       ],
-      "display_order": 5,
+      "display_order": 6,
       "order_basis": "imports"
     }
   ],
@@ -14788,9 +15592,9 @@
     },
     {
       "order": 7,
-      "target_path": "app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
+      "target_path": "app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
       "page_type": "file_page",
-      "title": "ZindanToast.kt",
+      "title": "GatekeeperToast.kt",
       "depth": 1,
       "kind": "code",
       "reason": "Directly imported by the anchor above; a core collaborator.",
@@ -14818,9 +15622,9 @@
     },
     {
       "order": 10,
-      "target_path": "app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+      "target_path": "app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
       "page_type": "file_page",
-      "title": "ShelterDeviceAdminReceiver.kt",
+      "title": "GatekeeperDeviceAdminReceiver.kt",
       "depth": 1,
       "kind": "code",
       "reason": "Directly imported by the anchor above; a core collaborator.",
@@ -14880,9 +15684,9 @@
         "file:app/src/main/java/io/gatekeeper/services/BatchFreezeService.kt",
         "file:app/src/main/java/io/gatekeeper/services/FileShuttleService.kt",
         "file:app/src/main/java/io/gatekeeper/services/FreezeService.kt",
+        "file:app/src/main/java/io/gatekeeper/services/GatekeeperService.kt",
         "file:app/src/main/java/io/gatekeeper/services/KillerService.kt",
-        "file:app/src/main/java/io/gatekeeper/services/PaymentStubService.kt",
-        "file:app/src/main/java/io/gatekeeper/services/ShelterService.kt"
+        "file:app/src/main/java/io/gatekeeper/services/PaymentStubService.kt"
       ],
       "wholeLayer": true,
       "language": "kotlin"
@@ -14893,6 +15697,7 @@
       "path": "",
       "layerId": "layer:application",
       "nodeIds": [
+        "file:.mcp.json",
         "file:BASELINE_1.5.3.md",
         "file:CHANGELOG.md",
         "file:PROBLEMS.md",
@@ -14903,14 +15708,32 @@
         "file:app/src/main/java/io/gatekeeper/receivers/AntiSpyBootReceiver.kt",
         "file:app/src/main/java/io/gatekeeper/receivers/AntiSpyVpnFreezeReceiver.kt",
         "file:app/src/main/java/io/gatekeeper/receivers/AppListRefreshReceiver.kt",
-        "file:app/src/main/java/io/gatekeeper/receivers/ShelterDeviceAdminReceiver.kt",
+        "file:app/src/main/java/io/gatekeeper/receivers/GatekeeperDeviceAdminReceiver.kt",
         "file:app/src/main/java/io/gatekeeper/receivers/WorkProfilePackageAddedReceiver.kt",
         "file:assets/README.md",
         "file:gradlew",
-        "file:repackage/repackage.sh"
+        "file:repackage/repackage.sh",
+        "file:zindan/.claude/CLAUDE.md",
+        "file:zindan/.mcp.json"
       ],
       "wholeLayer": true,
       "language": "markdown"
+    },
+    {
+      "id": "module:config",
+      "name": "Config",
+      "path": "",
+      "layerId": "layer:config",
+      "nodeIds": [
+        "file:.claude/CLAUDE.md",
+        "file:.claude/settings.local.json",
+        "file:.github/workflows/android.yml",
+        "file:.github/workflows/release.yml",
+        "file:.serena/memories/project_overview.md",
+        "file:.serena/project.yml"
+      ],
+      "wholeLayer": true,
+      "language": "yaml"
     },
     {
       "id": "module:utility",
@@ -14933,6 +15756,7 @@
         "file:app/src/main/java/io/gatekeeper/util/FileProviderProxy.kt",
         "file:app/src/main/java/io/gatekeeper/util/FileShuttleConnection.kt",
         "file:app/src/main/java/io/gatekeeper/util/ForwardedUriRegistry.kt",
+        "file:app/src/main/java/io/gatekeeper/util/GatekeeperToast.kt",
         "file:app/src/main/java/io/gatekeeper/util/InstallationProgressListener.kt",
         "file:app/src/main/java/io/gatekeeper/util/LegacyFreezeMigration.kt",
         "file:app/src/main/java/io/gatekeeper/util/LocalStorageManager.kt",
@@ -14951,16 +15775,41 @@
         "file:app/src/main/java/io/gatekeeper/util/VpnTunnelDetector.kt",
         "file:app/src/main/java/io/gatekeeper/util/WorkProfileBatchFreeze.kt",
         "file:app/src/main/java/io/gatekeeper/util/WorkServiceBindFailure.kt",
-        "file:app/src/main/java/io/gatekeeper/util/ZindanToast.kt",
         "file:tools/testbench.sh"
       ],
       "wholeLayer": true,
       "language": "kotlin"
     },
     {
-      "id": "module:app-src",
+      "id": "module:docs",
+      "name": "Docs & Tooling",
+      "path": "docs",
+      "layerId": "layer:docs-tooling",
+      "nodeIds": [
+        "file:docs/4pda_android15_16.md",
+        "file:docs/4pda_banks_nfc.md",
+        "file:docs/4pda_code_verification.md",
+        "file:docs/4pda_compat_matrix.md",
+        "file:docs/4pda_max_gov.md",
+        "file:docs/4pda_screenshot.md",
+        "file:docs/4pda_sharing.md",
+        "file:docs/4pda_shelter_analysis.md",
+        "file:docs/HANDOFF_shelter_research.md",
+        "file:docs/android_modernization.md",
+        "file:docs/antispy_settings_requirements.md",
+        "file:docs/audit_shelter_coreguard.md",
+        "file:docs/feature_ca_certs.md",
+        "file:docs/feature_media_mirror.md",
+        "file:docs/research_scrape_4pda.py",
+        "file:docs/threat_model.md"
+      ],
+      "wholeLayer": true,
+      "language": "markdown"
+    },
+    {
+      "id": "module:test",
       "name": "Test",
-      "path": "app/src",
+      "path": "",
       "layerId": "layer:test",
       "nodeIds": [
         "file:app/src/androidTest/java/io/gatekeeper/AntiSpyVpnWatchTest.kt",
@@ -14985,7 +15834,9 @@
         "file:app/src/test/java/io/gatekeeper/ShuttleSessionTest.kt",
         "file:app/src/test/java/io/gatekeeper/SmokeTest.kt",
         "file:app/src/test/java/io/gatekeeper/VpnRoutingAdviceTest.kt",
-        "file:app/src/test/java/io/gatekeeper/WorkServiceBindFailureTest.kt"
+        "file:app/src/test/java/io/gatekeeper/WorkServiceBindFailureTest.kt",
+        "file:docs/design_spec.md",
+        "file:docs/test_checklist_coloros16.md"
       ],
       "wholeLayer": true,
       "language": "kotlin"

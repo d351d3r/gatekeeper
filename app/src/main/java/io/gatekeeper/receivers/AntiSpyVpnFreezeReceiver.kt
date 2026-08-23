@@ -44,7 +44,7 @@ class AntiSpyVpnFreezeReceiver : BroadcastReceiver() {
             Utility.postUserAlert(
                 app,
                 DIAG_NOTIFICATION_ID,
-                "Zindan VPN-диагностика",
+                "Gatekeeper VPN-диагностика",
                 "RECEIVER: список основного профиля пуст",
             )
             return
@@ -60,7 +60,7 @@ class AntiSpyVpnFreezeReceiver : BroadcastReceiver() {
         Utility.postUserAlert(
             app,
             DIAG_NOTIFICATION_ID,
-            "Zindan VPN-диагностика",
+            "Gatekeeper VPN-диагностика",
             "RECEIVER: список=${list.size}, сервис в work=$started",
         )
     }

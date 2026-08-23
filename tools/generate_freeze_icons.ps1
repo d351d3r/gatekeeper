@@ -2,15 +2,15 @@ Add-Type -AssemblyName System.Drawing
 
 $RepoRoot = Split-Path $PSScriptRoot -Parent
 $ResRoot = Join-Path $RepoRoot "app\src\main\res"
-$FreezeSource = if ($env:ZINDAN_FREEZE_ICON_SOURCE) {
-    $env:ZINDAN_FREEZE_ICON_SOURCE
+$FreezeSource = if ($env:GATEKEEPER_FREEZE_ICON_SOURCE) {
+    $env:GATEKEEPER_FREEZE_ICON_SOURCE
 } else {
-    Join-Path $RepoRoot "assets\zindan_icon_freeze_source.png"
+    Join-Path $RepoRoot "assets\gatekeeper_icon_freeze_source.png"
 }
-$UnfreezeSource = if ($env:ZINDAN_UNFREEZE_ICON_SOURCE) {
-    $env:ZINDAN_UNFREEZE_ICON_SOURCE
+$UnfreezeSource = if ($env:GATEKEEPER_UNFREEZE_ICON_SOURCE) {
+    $env:GATEKEEPER_UNFREEZE_ICON_SOURCE
 } else {
-    Join-Path $RepoRoot "assets\zindan_icon_unfreeze_source.png"
+    Join-Path $RepoRoot "assets\gatekeeper_icon_unfreeze_source.png"
 }
 
 # Sampled from sketch corner pixels (#223D2C).

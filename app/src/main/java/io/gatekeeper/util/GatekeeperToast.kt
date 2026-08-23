@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.widget.Toast
 
-object ZindanToast {
+object GatekeeperToast {
     fun show(context: Context, text: CharSequence, duration: Int = Toast.LENGTH_LONG) {
         val anchor = findToastContext(context)
         Toast.makeText(anchor, text, duration).show()

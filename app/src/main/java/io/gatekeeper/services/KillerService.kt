@@ -9,13 +9,13 @@ import android.os.IBinder
 // about their removal from recent tasks. Since we need to keep the VPN watch alive when
 // the app is closed by any means, we ensure Anti Spy monitoring persists.
 class KillerService : Service() {
-    private var serviceMain: IShelterService? = null
-    private var serviceWork: IShelterService? = null
+    private var serviceMain: IGatekeeperService? = null
+    private var serviceWork: IGatekeeperService? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val extras = intent?.getBundleExtra("extra")
-        serviceMain = IShelterService.Stub.asInterface(extras?.getBinder("main"))
-        serviceWork = IShelterService.Stub.asInterface(extras?.getBinder("work"))
+        serviceMain = IGatekeeperService.Stub.asInterface(extras?.getBinder("main"))
+        serviceWork = IGatekeeperService.Stub.asInterface(extras?.getBinder("work"))
         return START_REDELIVER_INTENT
     }
 
@@ -37,11 +37,11 @@ class KillerService : Service() {
 
     private fun keepVpnWatchAlive() {
         try {
-            serviceWork?.stopShelterService(true)
+            serviceWork?.stopGatekeeperService(true)
         } catch (_: Exception) {
         }
         try {
-            serviceMain?.stopShelterService(false)
+            serviceMain?.stopGatekeeperService(false)
         } catch (_: Exception) {
         }
         AntiSpyVpnWatchService.syncState(applicationContext)

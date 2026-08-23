@@ -122,7 +122,7 @@ $outputPdfPath = [System.IO.Path]::GetFullPath($OutputPdf)
 $htmlPath = [System.IO.Path]::ChangeExtension($outputPdfPath, ".html")
 $lines = Get-Content -LiteralPath $inputPath -Encoding UTF8
 $body = Convert-MarkdownToHtml $lines
-$pageTitle = "Zindan"
+$pageTitle = "Gatekeeper"
 foreach ($l in $lines) {
     if ($l -match '^# (.+)$') {
         $pageTitle = $Matches[1]
