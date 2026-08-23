@@ -89,6 +89,8 @@ repackage/*
 /Zindan-*.apk
 /Gatekeeper-*.apk
 
+/zindan/
+
 # Test APKs kept on disk for manual emulator installs, never committed
 /apk/
 
