@@ -18,6 +18,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.PowerManager
 import android.os.RemoteException
 import android.text.TextUtils
 import android.util.TypedValue
@@ -50,11 +51,14 @@ import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.FileShuttleConnection
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.ProfileActions
+import io.gatekeeper.util.PowerDiagnostics
+import io.gatekeeper.util.ServiceLiveness
 import io.gatekeeper.util.SettingsManager
 import io.gatekeeper.util.UriForwardProxy
 import io.gatekeeper.util.Utility
 import io.gatekeeper.util.WorkServiceBindFailure
 import androidx.core.content.ContextCompat
+import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
     private val startSetup =
@@ -97,8 +101,10 @@ class MainActivity : AppCompatActivity() {
     private var pendingLaunchPackageName: String? = null
     private var pendingBatchAction: String? = null
     private var pendingApkInstallAfterVpnGate = false
+    private var workStartAttempts = 0
     private var workBindAttempts = 0
     private var pendingBindFailureReason = 0
+    private var retryStartupProbeAfterFailure = false
     private var pendingDocumentsUi = false
     private var dynamicColorsApplied = false
     private var mainAppListFragment: AppListFragment? = null
@@ -278,11 +284,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun tryStartWorkServiceCb(result: ActivityResult) {
-        if (result.resultCode == RESULT_OK) {
+        val resultOk = result.resultCode == RESULT_OK
+        if (resultOk) {
+            workStartAttempts = 0
             bindWorkService()
+        } else if (WorkServiceBindFailure.shouldRetryStartupProbe(
+                resultOk = resultOk,
+                attemptsMade = workStartAttempts
+            )
+        ) {
+            workStartAttempts++
+            tryStartWorkService()
         } else {
-            ZindanToast.show(this, getString(R.string.work_mode_disabled), android.widget.Toast.LENGTH_LONG)
-            finish()
+            showWorkServiceBindFailed(
+                WorkServiceBindFailure.CANCELLED,
+                retryStartupProbe = true
+            )
         }
     }
 
@@ -314,10 +331,71 @@ class MainActivity : AppCompatActivity() {
         window.decorView.post {
             runAntiSpyStartupFreezeIfNeeded()
             AntiSpyManager.syncVpnWatchEverywhere(this@MainActivity)
+            checkPowerDiagnosticsOnceDaily()
             runPendingBatchShortcutAction()
             startWorkListPolling()
         }
         buildView()
+    }
+
+    private fun checkPowerDiagnosticsOnceDaily() {
+        val localStorage = storage ?: return
+        val now = System.currentTimeMillis()
+        val lastPromptAt = localStorage.getLong(
+                LocalStorageManager.PREF_POWER_DIAGNOSTICS_LAST_PROMPT_AT,
+                0L
+            )
+        if (lastPromptAt > 0L && now - lastPromptAt < POWER_DIAGNOSTICS_PROMPT_INTERVAL_MS) return
+        localStorage.setLong(LocalStorageManager.PREF_POWER_DIAGNOSTICS_LAST_PROMPT_AT, now)
+
+        val work = serviceWork ?: return
+        Thread {
+            val power = getSystemService(PowerManager::class.java)
+            val activity = getSystemService(android.app.ActivityManager::class.java)
+            val mainSignals = runCatching {
+                PowerDiagnostics.ProfileSignals(
+                    ignoringBatteryOptimizations =
+                        power?.isIgnoringBatteryOptimizations(packageName) ?: return@runCatching null,
+                    backgroundRestricted =
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
+                            (activity?.isBackgroundRestricted ?: return@runCatching null),
+                )
+            }.getOrNull()
+            val workSignals = runCatching {
+                PowerDiagnostics.ProfileSignals(
+                    ignoringBatteryOptimizations = work.isIgnoringBatteryOptimizations(),
+                    backgroundRestricted = work.isBackgroundRestricted(),
+                )
+            }.getOrNull()
+            val snapshot = PowerDiagnostics.collect(
+                mainSignals = mainSignals,
+                workSignals = workSignals,
+                powerSaveMode = runCatching { power?.isPowerSaveMode }.getOrNull(),
+                deviceIdleMode = runCatching { power?.isDeviceIdleMode }.getOrNull(),
+                workServiceAlive = work.asBinder().isBinderAlive,
+            )
+            if (snapshot.hasProblem()) {
+                window.decorView.post {
+                    if (!isFinishing) {
+                        Snackbar.make(
+                            window.decorView,
+                            R.string.power_diagnostics_problem_detected,
+                            Snackbar.LENGTH_LONG,
+                        ).setAction(R.string.power_diagnostics_open) {
+                            openPowerDiagnostics()
+                        }.show()
+                    }
+                }
+            }
+        }.start()
+    }
+
+    private fun openPowerDiagnostics() {
+        val work = requireWorkService() ?: return
+        startActivity(Intent(this, SettingsActivity::class.java).apply {
+            putExtra(SettingsActivity.EXTRA_OPEN_POWER_DIAGNOSTICS, true)
+            putExtra("extras", Bundle().apply { putBinder("profile_service", work.asBinder()) })
+        })
     }
 
     /**
@@ -344,22 +422,29 @@ class MainActivity : AppCompatActivity() {
         showWorkServiceBindFailed(reason)
     }
 
-    private fun showWorkServiceBindFailed(reason: Int) {
+    private fun showWorkServiceBindFailed(reason: Int, retryStartupProbe: Boolean = false) {
         if (isFinishing) return
         // Именно STARTED: результат привязки приезжает до onResume, а внутри onResume
         // androidx-состояние еще STARTED -- по RESUMED сообщение не показалось бы никогда.
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             pendingBindFailureReason = reason
+            retryStartupProbeAfterFailure = retryStartupProbe
             return
         }
         pendingBindFailureReason = 0
+        retryStartupProbeAfterFailure = false
         AlertDialog.Builder(this)
             .setTitle(R.string.work_service_bind_failed_title)
             .setMessage(WorkServiceBindFailure.messageOf(reason))
             .setCancelable(false)
             .setPositiveButton(R.string.work_service_bind_retry) { _, _ ->
-                workBindAttempts = 0
-                bindWorkService()
+                if (retryStartupProbe) {
+                    workStartAttempts = 0
+                    tryStartWorkService()
+                } else {
+                    workBindAttempts = 0
+                    bindWorkService()
+                }
             }
             .setNegativeButton(R.string.work_service_bind_close) { _, _ -> finish() }
             .show()
@@ -499,19 +584,8 @@ class MainActivity : AppCompatActivity() {
     fun getOtherService(isRemote: Boolean): IShelterService =
         if (isRemote) serviceMain!! else serviceWork!!
 
-    fun servicesAlive(): Boolean {
-        try {
-            serviceMain!!.ping()
-        } catch (_: Exception) {
-            return false
-        }
-        try {
-            serviceWork!!.ping()
-        } catch (_: Exception) {
-            return false
-        }
-        return true
-    }
+    fun servicesAlive(): Boolean =
+        ServiceLiveness.areAlive(serviceMain?.asBinder(), serviceWork?.asBinder())
 
     private fun registerStartActivityProxies() {
         try {
@@ -553,8 +627,10 @@ class MainActivity : AppCompatActivity() {
         }
         if (pendingBindFailureReason != 0) {
             val reason = pendingBindFailureReason
+            val retryStartupProbe = retryStartupProbeAfterFailure
             pendingBindFailureReason = 0
-            showWorkServiceBindFailed(reason)
+            retryStartupProbeAfterFailure = false
+            showWorkServiceBindFailed(reason, retryStartupProbe)
         }
         if (pendingDocumentsUi) {
             pendingDocumentsUi = false
@@ -758,14 +834,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.main_menu_settings -> {
-                requireWorkService()?.let { work ->
-                    val settingsIntent = Intent(this, SettingsActivity::class.java)
-                    val extras = Bundle().apply {
-                        putBinder("profile_service", work.asBinder())
-                    }
-                    settingsIntent.putExtra("extras", extras)
-                    startActivity(settingsIntent)
-                }
+                openSettings()
                 true
             }
             R.id.main_menu_create_freeze_all_shortcut -> {
@@ -815,6 +884,14 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun openSettings() {
+        requireWorkService()?.let { work ->
+            startActivity(Intent(this, SettingsActivity::class.java).apply {
+                putExtra("extras", Bundle().apply { putBinder("profile_service", work.asBinder()) })
+            })
         }
     }
 
@@ -988,6 +1065,7 @@ class MainActivity : AppCompatActivity() {
         private val APP_LIST_FRAGMENT_TAGS = arrayOf("f0", "f1")
         private const val APP_LIST_INSTALL_REFRESH_MS = 2000L
         private const val WORK_LIST_POLL_INTERVAL_MS = 2000L
+        private const val POWER_DIAGNOSTICS_PROMPT_INTERVAL_MS = 24L * 60L * 60L * 1000L
 
         /** Сквозной путь привязки шаттла -- ~300 мс (замер Фазы 1); ждем с запасом. */
         private const val DOCUMENTS_UI_WARMUP_MS = 1500L

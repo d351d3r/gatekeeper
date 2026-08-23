@@ -30,4 +30,6 @@ interface IShelterService {
     void setCrossProfilePackages(in List<String> packages);
     // Новые методы дописываются только в конец: номер транзакции задается порядком.
     boolean isDefaultNetworkTunneled();
+    boolean isIgnoringBatteryOptimizations();
+    boolean isBackgroundRestricted();
 }

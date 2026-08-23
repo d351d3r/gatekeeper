@@ -50,11 +50,9 @@ import io.gatekeeper.services.IShelterService
 import io.gatekeeper.ui.AppListFragment
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.ui.MainActivity
-import java.io.BufferedReader
 import java.io.FileDescriptor
 import java.io.IOException
 import java.io.InputStream
-import java.io.InputStreamReader
 import java.io.OutputStream
 
 object Utility {
@@ -878,6 +876,12 @@ object Utility {
 
         manager.addCrossProfileIntentFilter(
             adminComponent,
+            IntentFilter(DummyActivity.OPEN_POWER_SETTINGS),
+            DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT
+        )
+
+        manager.addCrossProfileIntentFilter(
+            adminComponent,
             IntentFilter(BatchFreezeService.ACTION),
             DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED
         )
@@ -909,6 +913,7 @@ object Utility {
             DummyActivity.SYNCHRONIZE_PREFERENCE,
             DummyActivity.SYNC_ANTI_SPY_VPN_WATCH,
             DummyActivity.VPN_SESSION_COMPLETE,
+            DummyActivity.OPEN_POWER_SETTINGS,
             DummyActivity.INSTALL_PACKAGE,
             DummyActivity.UNINSTALL_PACKAGE,
         )
@@ -1004,16 +1009,11 @@ object Utility {
         manager.addUserRestriction(adminComponent, UserManager.ALLOW_PARENT_PROFILE_APP_LINKING)
     }
 
-    fun isMIUI(): Boolean {
-        return try {
-            val proc = Runtime.getRuntime().exec("getprop ro.miui.ui.version.name")
-            val reader = BufferedReader(InputStreamReader(proc.inputStream))
-            val line = reader.readLine().trim()
-            line.isNotEmpty()
-        } catch (e: Exception) {
-            false
-        }
-    }
+    fun isMIUI(): Boolean = MiuiDetector.isLikelyMiui(
+        manufacturer = Build.MANUFACTURER,
+        brand = Build.BRAND,
+        display = Build.DISPLAY
+    )
 
     fun drawableToBitmap(drawable: Drawable, maxSizePx: Int = 0): Bitmap {
         if (drawable is BitmapDrawable) {

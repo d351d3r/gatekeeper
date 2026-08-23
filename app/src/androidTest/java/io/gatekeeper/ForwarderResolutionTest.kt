@@ -1,6 +1,7 @@
 package io.gatekeeper
 
 import android.content.Intent
+import android.os.SystemClock
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.ProfileActions
 import io.gatekeeper.util.Utility
@@ -58,6 +59,35 @@ class ForwarderResolutionTest {
             "старый action больше не пересекает профиль: $candidates",
             candidates.contains("android")
         )
+    }
+
+    @Test
+    fun powerSettingsRelayGoesToTheSystemForwarder() {
+        refreshWorkProfilePolicies()
+        val intent = Intent(DummyActivity.OPEN_POWER_SETTINGS)
+        Utility.transferIntentToProfileUnsigned(context, intent)
+        assertEquals(
+            "настроики батареи не ушли в рабочии профиль: ${intent.component}",
+            "android",
+            intent.component?.packageName
+        )
+    }
+
+    /** An APK update cannot alter profile-owner policy until its work-profile process runs. */
+    private fun refreshWorkProfilePolicies() {
+        val refresh = Intent(DummyActivity.TRY_START_SERVICE).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        Utility.transferIntentToProfileUnsigned(context, refresh)
+        context.startActivity(refresh)
+        repeat(20) {
+            val hasSystemForwarder = context.packageManager
+                .queryIntentActivities(Intent(DummyActivity.OPEN_POWER_SETTINGS), 0)
+                .any { it.activityInfo.packageName == "android" }
+            if (hasSystemForwarder) return
+            SystemClock.sleep(100)
+        }
+        throw AssertionError("обновленные политики рабочего профиля не применились")
     }
 
     /** Действие, которого нет ни у форвардера, ни у нас, резолва не имеет вовсе. */

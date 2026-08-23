@@ -70,4 +70,16 @@ class WorkServiceBindFailureTest {
         assertFalse(WorkServiceBindFailure.shouldRetrySilently(WorkServiceBindFailure.SILENT_RETRIES))
         assertFalse(WorkServiceBindFailure.shouldRetrySilently(WorkServiceBindFailure.SILENT_RETRIES + 1))
     }
+
+    @Test
+    fun cancelledStartupProbeIsRecoverable() {
+        assertTrue(WorkServiceBindFailure.shouldRetryStartupProbe(resultOk = false, attemptsMade = 0))
+        assertFalse(
+            WorkServiceBindFailure.shouldRetryStartupProbe(
+                resultOk = false,
+                attemptsMade = WorkServiceBindFailure.SILENT_RETRIES
+            )
+        )
+        assertFalse(WorkServiceBindFailure.shouldRetryStartupProbe(resultOk = true, attemptsMade = 0))
+    }
 }

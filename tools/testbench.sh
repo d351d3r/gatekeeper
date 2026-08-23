@@ -223,11 +223,20 @@ cmd_instr_work() {
     a shell pm install-existing --user "$wu" "$TEST_PKG" > /dev/null
     cmd_profile
     say "инструментальные тесты, user $wu"
+    local result
+    set +e
     if [ $# -gt 0 ]; then
         a shell am instrument --user "$wu" -w -e class "$1" "$TEST_PKG/$RUNNER"
     else
         a shell am instrument --user "$wu" -w "$TEST_PKG/$RUNNER"
     fi
+    result=$?
+    set -e
+    # androidTest добавляет тестовый пакет с намеренным перехватчиком START_SERVICE.
+    # Он нужен только на время проверки: оставленный в профиле, он вызывает системный chooser.
+    a shell pm uninstall --user 0 "$TEST_PKG" > /dev/null || true
+    a shell pm uninstall --user "$wu" "$TEST_PKG" > /dev/null || true
+    return "$result"
 }
 
 # Сценарий "обновление поверх", шаг 1: базовая сборка и поднятый на ней профиль.

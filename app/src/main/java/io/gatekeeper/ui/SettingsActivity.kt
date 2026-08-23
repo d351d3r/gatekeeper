@@ -18,4 +18,8 @@ class SettingsActivity : AppCompatActivity() {
         finish()
         return true
     }
+
+    companion object {
+        const val EXTRA_OPEN_POWER_DIAGNOSTICS = "open_power_diagnostics"
+    }
 }

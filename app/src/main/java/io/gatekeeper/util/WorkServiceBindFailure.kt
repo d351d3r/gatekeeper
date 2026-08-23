@@ -38,4 +38,7 @@ object WorkServiceBindFailure {
     }
 
     fun shouldRetrySilently(attemptsMade: Int): Boolean = attemptsMade < SILENT_RETRIES
+
+    fun shouldRetryStartupProbe(resultOk: Boolean, attemptsMade: Int): Boolean =
+        !resultOk && shouldRetrySilently(attemptsMade)
 }

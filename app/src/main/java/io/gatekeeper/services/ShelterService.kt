@@ -1,6 +1,7 @@
 package io.gatekeeper.services
 
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.Service
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
@@ -12,6 +13,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.os.PowerManager
 import android.os.RemoteException
 import io.gatekeeper.R
 import io.gatekeeper.ShelterApplication
@@ -230,6 +232,14 @@ class ShelterService : Service() {
          */
         override fun isDefaultNetworkTunneled(): Boolean =
             VpnTunnelDetector.isDefaultNetworkTunneled(this@ShelterService)
+
+        override fun isIgnoringBatteryOptimizations(): Boolean =
+            getSystemService(PowerManager::class.java)
+                ?.isIgnoringBatteryOptimizations(packageName) ?: false
+
+        override fun isBackgroundRestricted(): Boolean =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
+                (getSystemService(ActivityManager::class.java)?.isBackgroundRestricted ?: false)
     }
 
     override fun onCreate() {

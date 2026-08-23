@@ -22,14 +22,21 @@ object AuthenticationUtility {
     fun signIntent(intent: Intent) {
         var key = LocalStorageManager.getInstance().getString(LocalStorageManager.PREF_AUTH_KEY)
         if (key == null || hexStringToByteArray(key) == null) {
+            if (intent.action !in BOOTSTRAP_ACTIONS) {
+                Log.w(TAG, "cross-profile action deferred until bootstrap: ${intent.action}")
+                return
+            }
             key = generateKey()
             LocalStorageManager.getInstance().setString(LocalStorageManager.PREF_AUTH_KEY, key)
-            intent.putExtra("auth_key", key)
-        } else {
-            val timestamp = System.currentTimeMillis()
-            intent.putExtra("timestamp", timestamp)
-            intent.putExtra("signature", AuthPayload.sign(key, signedPayload(intent, timestamp)))
         }
+
+        if (intent.action in BOOTSTRAP_ACTIONS) {
+            intent.putExtra("auth_key", key)
+        }
+
+        val timestamp = System.currentTimeMillis()
+        intent.putExtra("timestamp", timestamp)
+        intent.putExtra("signature", AuthPayload.sign(key, signedPayload(intent, timestamp)))
     }
 
     fun checkIntent(intent: Intent): Boolean {

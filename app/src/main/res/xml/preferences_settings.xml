@@ -36,6 +36,11 @@
     <androidx.preference.PreferenceCategory
         android:title="@string/settings_services">
 
+        <androidx.preference.Preference
+            android:key="settings_power_diagnostics"
+            android:title="@string/settings_power_diagnostics"
+            android:summary="@string/settings_power_diagnostics_desc" />
+
         <androidx.preference.CheckBoxPreference
             android:key="settings_auto_freeze_service"
             android:title="@string/settings_auto_freeze_service"

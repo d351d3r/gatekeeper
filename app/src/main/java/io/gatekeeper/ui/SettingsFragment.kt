@@ -1,6 +1,7 @@
 package io.gatekeeper.ui
 
 import android.app.ActivityManager
+import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.os.RemoteException
 import android.provider.Settings
 import android.view.View
@@ -27,10 +29,12 @@ import io.gatekeeper.services.IShelterService
 import io.gatekeeper.util.AntiSpyFreezeScope
 import io.gatekeeper.util.AntiSpyWatchConfig
 import io.gatekeeper.util.LocalStorageManager
+import io.gatekeeper.util.PowerDiagnostics
 import io.gatekeeper.util.SettingsManager
 import io.gatekeeper.util.Utility
 import io.gatekeeper.util.VpnRoutingAdvice
 import io.gatekeeper.util.VpnTunnelDetector
+import io.gatekeeper.util.ZindanToast
 
 class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
     private val manager = SettingsManager.getInstance()
@@ -72,6 +76,8 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
 
         findPreference<Preference>(SETTINGS_SOURCE_CODE)!!
             .setOnPreferenceClickListener(this::openSummaryUrl)
+        findPreference<Preference>(SETTINGS_POWER_DIAGNOSTICS)!!
+            .setOnPreferenceClickListener(this::openPowerDiagnostics)
 
         setUpDynamicColors()
 
@@ -123,6 +129,10 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         val am = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         if (am.isLowRamDevice) {
             prefCrossProfileFileChooser!!.isEnabled = false
+        }
+
+        if (requireActivity().intent.getBooleanExtra(SettingsActivity.EXTRA_OPEN_POWER_DIAGNOSTICS, false)) {
+            view?.post { showPowerDiagnostics() }
         }
     }
 
@@ -283,6 +293,108 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         return true
     }
 
+    private fun openPowerDiagnostics(pref: Preference): Boolean {
+        showPowerDiagnostics()
+        return true
+    }
+
+    private fun showPowerDiagnostics() {
+        val appContext = requireContext().applicationContext
+        val workService = serviceWork
+        Thread {
+            val snapshot = collectPowerDiagnostics(appContext, workService)
+            activity?.runOnUiThread {
+                if (!isAdded) return@runOnUiThread
+                AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.settings_power_diagnostics)
+                    .setMessage(
+                        getString(
+                            R.string.settings_power_diagnostics_message,
+                            statusTitle(snapshot.mainIgnoringBatteryOptimizations),
+                            statusTitle(snapshot.workIgnoringBatteryOptimizations),
+                            statusTitle(snapshot.mainBackgroundRestricted),
+                            statusTitle(snapshot.workBackgroundRestricted),
+                            statusTitle(snapshot.powerSaveMode),
+                            statusTitle(snapshot.deviceIdleMode),
+                            statusTitle(snapshot.workServiceAlive),
+                        )
+                    )
+                    .setPositiveButton(R.string.power_diagnostics_open_battery) { _, _ ->
+                        openSettings(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+                    }
+                    .setNeutralButton(R.string.power_diagnostics_open_app) { _, _ ->
+                        openSettings(appDetailsIntent())
+                    }
+                    .setNegativeButton(R.string.power_diagnostics_open_work) { _, _ ->
+                        openWorkPowerSettings()
+                    }
+                    .show()
+            }
+        }.start()
+    }
+
+    private fun collectPowerDiagnostics(
+        context: Context,
+        workService: IShelterService?,
+    ): PowerDiagnostics.Snapshot {
+        val local = runCatching {
+            val power = context.getSystemService(PowerManager::class.java)
+            val activity = context.getSystemService(ActivityManager::class.java)
+            PowerDiagnostics.ProfileSignals(
+                ignoringBatteryOptimizations =
+                    power?.isIgnoringBatteryOptimizations(context.packageName) ?: return@runCatching null,
+                backgroundRestricted =
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
+                        (activity?.isBackgroundRestricted ?: return@runCatching null),
+            )
+        }.getOrNull()
+        val work = workService?.let { service ->
+            runCatching {
+                PowerDiagnostics.ProfileSignals(
+                    ignoringBatteryOptimizations = service.isIgnoringBatteryOptimizations(),
+                    backgroundRestricted = service.isBackgroundRestricted(),
+                )
+            }.getOrNull()
+        }
+        val power = context.getSystemService(PowerManager::class.java)
+        return PowerDiagnostics.collect(
+            mainSignals = local,
+            workSignals = work,
+            powerSaveMode = runCatching { power?.isPowerSaveMode }.getOrNull(),
+            deviceIdleMode = runCatching { power?.isDeviceIdleMode }.getOrNull(),
+            workServiceAlive = workService?.asBinder()?.isBinderAlive,
+        )
+    }
+
+    private fun statusTitle(status: PowerDiagnostics.Status): String = getString(
+        when (status) {
+            PowerDiagnostics.Status.YES -> R.string.power_diagnostics_yes
+            PowerDiagnostics.Status.NO -> R.string.power_diagnostics_no
+            PowerDiagnostics.Status.UNKNOWN -> R.string.power_diagnostics_unknown
+        }
+    )
+
+    private fun appDetailsIntent(): Intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+        data = Uri.fromParts("package", requireContext().packageName, null)
+    }
+
+    private fun openSettings(intent: Intent) {
+        try {
+            startActivity(intent)
+        } catch (_: ActivityNotFoundException) {
+            ZindanToast.show(requireContext(), R.string.power_diagnostics_settings_unavailable)
+        }
+    }
+
+    private fun openWorkPowerSettings() {
+        val intent = Intent(DummyActivity.OPEN_POWER_SETTINGS)
+        if (!Utility.tryTransferIntentToProfile(requireContext(), intent)) {
+            ZindanToast.show(requireContext(), R.string.power_diagnostics_work_unavailable)
+            return
+        }
+        openSettings(intent)
+    }
+
     override fun onResume() {
         super.onResume()
         updateAutoFreezeDelay()
@@ -432,6 +544,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         private const val SETTINGS_ANTI_SPY_SCOPE = "settings_anti_spy_scope"
         private const val SETTINGS_ANTI_SPY_DELAY = "settings_anti_spy_delay"
         private const val SETTINGS_ANTI_SPY_ROUTING = "settings_anti_spy_routing"
+        private const val SETTINGS_POWER_DIAGNOSTICS = "settings_power_diagnostics"
         private const val SETTINGS_FREEZE_ALL = "settings_freeze_all"
         private const val SETTINGS_UNFREEZE_ALL = "settings_unfreeze_all"
         private const val SETTINGS_CREATE_FREEZE_ALL_SHORTCUT = "settings_create_freeze_all_shortcut"

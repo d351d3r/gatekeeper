@@ -43,6 +43,12 @@ class LocalStorageManager private constructor(context: Context) {
         prefs.edit().putInt(pref, value).apply()
     }
 
+    fun getLong(pref: String, defaultValue: Long): Long = prefs.getLong(pref, defaultValue)
+
+    fun setLong(pref: String, value: Long) {
+        prefs.edit().putLong(pref, value).apply()
+    }
+
     fun getString(pref: String): String? = prefs.getString(pref, null)
 
     fun setString(pref: String, value: String) {
@@ -120,6 +126,7 @@ class LocalStorageManager private constructor(context: Context) {
         const val PREF_AUTO_FREEZE_OPT_OUT_WORK_PROFILE = "auto_freeze_opt_out_work_profile"
         /** Store installs waiting for cross-profile write to the auto-freeze list. */
         const val PREF_PENDING_STORE_AUTO_FREEZE = "pending_store_auto_freeze"
+        const val PREF_POWER_DIAGNOSTICS_LAST_PROMPT_AT = "power_diagnostics_last_prompt_at"
 
         private const val LIST_DIVIDER = ","
         private const val PREFS_NAME = "prefs"

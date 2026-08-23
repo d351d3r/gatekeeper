@@ -116,6 +116,7 @@
                 <action android:name="net.typeblog.gatekeeper.action.SYNCHRONIZE_PREFERENCE" />
                 <action android:name="net.typeblog.gatekeeper.action.SYNC_ANTI_SPY_VPN_WATCH" />
                 <action android:name="net.typeblog.gatekeeper.action.PACKAGEINSTALLER_CALLBACK" />
+                <action android:name="net.typeblog.gatekeeper.action.OPEN_POWER_SETTINGS" />
                 <action android:name="net.typeblog.shelter.action.FINALIZE_PROVISION" />
                 <action android:name="net.typeblog.shelter.action.START_SERVICE" />
                 <action android:name="net.typeblog.shelter.action.TRY_START_SERVICE" />
@@ -138,6 +139,7 @@
                 <action android:name="net.typeblog.shelter.action.SYNCHRONIZE_PREFERENCE" />
                 <action android:name="net.typeblog.shelter.action.SYNC_ANTI_SPY_VPN_WATCH" />
                 <action android:name="net.typeblog.shelter.action.PACKAGEINSTALLER_CALLBACK" />
+                <action android:name="net.typeblog.shelter.action.OPEN_POWER_SETTINGS" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

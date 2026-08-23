@@ -28,14 +28,15 @@ object AutoFreezePolicy {
         if (storage.getBoolean(LocalStorageManager.PREF_LEGACY_FROZEN_MIGRATION_DONE)) {
             return
         }
-        storage.setBoolean(LocalStorageManager.PREF_LEGACY_FROZEN_MIGRATION_DONE, true)
-        for (app in apps) {
-            if (!app.isHidden()) continue
-            if (isInAutoFreezeList(app.getPackageName())) continue
-            try {
-                service.unfreezeApp(app)
-            } catch (_: Exception) {
-            }
+        val complete = LegacyFreezeMigration.run(
+            items = apps,
+            requiresAction = { app ->
+                app.isHidden() && !isInAutoFreezeList(app.getPackageName())
+            },
+            action = { app -> service.unfreezeApp(app) }
+        )
+        if (complete) {
+            storage.setBooleanNow(LocalStorageManager.PREF_LEGACY_FROZEN_MIGRATION_DONE, true)
         }
     }
 
@@ -63,4 +64,3 @@ object AutoFreezePolicy {
             else -> 2
         }
 }
-

@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.app.PendingIntent
 import android.app.admin.DevicePolicyManager
+import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
@@ -16,6 +17,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.os.RemoteException
 import android.os.StrictMode
+import android.provider.Settings
 import android.util.Log
 import io.gatekeeper.util.ZindanToast
 import androidx.appcompat.app.AlertDialog
@@ -36,6 +38,7 @@ import io.gatekeeper.util.AutoFreezeDefaults
 import io.gatekeeper.util.FileProviderProxy
 import io.gatekeeper.util.InstallationProgressListener
 import io.gatekeeper.util.LocalStorageManager
+import io.gatekeeper.util.PendingOperationRegistry
 import io.gatekeeper.util.ProfileActions
 import io.gatekeeper.util.SameProcessTokens
 import io.gatekeeper.util.SettingsManager
@@ -44,6 +47,8 @@ import io.gatekeeper.util.WorkProfileBatchFreeze
 import java.io.File
 import java.io.IOException
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 
 class DummyActivity : Activity() {
     private var isProfileOwner = false
@@ -118,38 +123,51 @@ class DummyActivity : Activity() {
             SYNCHRONIZE_PREFERENCE -> actionSynchronizePreference()
             SYNC_ANTI_SPY_VPN_WATCH -> actionSyncAntiSpyVpnWatch()
             VPN_SESSION_COMPLETE -> actionVpnSessionComplete()
+            OPEN_POWER_SETTINGS -> actionOpenPowerSettings()
             PACKAGEINSTALLER_CALLBACK -> handlePackageInstallerCallback(intent)
             else -> finish()
         }
     }
 
     private fun handlePackageInstallerCallback(callbackIntent: Intent) {
+        val operationId = callbackIntent.getStringExtra(PENDING_PACKAGE_OPERATION_ID)
         val status = callbackIntent.extras!!.getInt(PackageInstaller.EXTRA_STATUS)
         when (status) {
             PackageInstaller.STATUS_PENDING_USER_ACTION -> {
                 @Suppress("DEPRECATION")
                 startActivity(callbackIntent.extras!!.get(Intent.EXTRA_INTENT) as Intent)
             }
-            PackageInstaller.STATUS_SUCCESS -> appInstallFinished(RESULT_OK)
-            else -> appInstallFinished(RESULT_CANCELED)
+            PackageInstaller.STATUS_SUCCESS -> appInstallFinished(RESULT_OK, operationId)
+            else -> appInstallFinished(RESULT_CANCELED, operationId)
         }
+    }
+
+    private fun actionOpenPowerSettings() {
+        val details = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", packageName, null)
+        }
+        try {
+            startActivity(details)
+        } catch (_: ActivityNotFoundException) {
+            try {
+                startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+            } catch (_: ActivityNotFoundException) {
+                ZindanToast.show(this, R.string.power_diagnostics_settings_unavailable)
+            }
+        }
+        finish()
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val normalizedIntent = normalizeAction(intent)
         setIntent(normalizedIntent)
-
-        if (normalizedIntent.action == PACKAGEINSTALLER_CALLBACK) {
-            handlePackageInstallerCallback(normalizedIntent)
+        if (isProfileOwner) {
+            Utility.enforceWorkProfilePolicies(this)
+            Utility.enforceUserRestrictions(this)
+            SettingsManager.getInstance().applyAll()
         }
-        // Активность singleTask: если экземпляр в целевом профиле еще жив, система отдает
-        // интент сюда, а не в onCreate. Замерено: настройка, приехавшая из другого профиля,
-        // в этот момент терялась молча, и профили расходились. Гейт тот же, что в init():
-        // activity экспортирована, а обработчик пишет любой ключ настроек.
-        if (normalizedIntent.action == SYNCHRONIZE_PREFERENCE && isAuthorized(normalizedIntent)) {
-            actionSynchronizePreference()
-        }
+        init()
     }
 
     private fun normalizeAction(intent: Intent): Intent {
@@ -172,8 +190,9 @@ class DummyActivity : Activity() {
         }
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == REQUEST_INSTALL_PACKAGE) {
-            appInstallFinished(resultCode)
+        val operationId = consumeLegacyOperationId(requestCode)
+        if (requestCode == REQUEST_INSTALL_PACKAGE || operationId != null) {
+            appInstallFinished(resultCode, operationId)
         }
     }
 
@@ -237,7 +256,7 @@ class DummyActivity : Activity() {
     }
 
     private fun actionInstallPackage() {
-        capturePendingPackageOperation(OperationType.INSTALL)
+        val operationId = capturePendingPackageOperation(OperationType.INSTALL)
         var uri: Uri? = null
         if (intent.hasExtra("package")) {
             uri = Uri.fromParts("package", intent.getStringExtra("package"), null)
@@ -254,7 +273,7 @@ class DummyActivity : Activity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             try {
-                actionInstallPackageQ(uri, intent.getStringArrayExtra("split_apks"))
+                actionInstallPackageQ(uri, intent.getStringArrayExtra("split_apks"), operationId)
             } catch (e: IOException) {
                 throw RuntimeException(e)
             }
@@ -266,14 +285,18 @@ class DummyActivity : Activity() {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             @Suppress("DEPRECATION")
-            startActivityForResult(installIntent, REQUEST_INSTALL_PACKAGE)
+            startActivityForResult(installIntent, registerLegacyOperationId(operationId))
         }
 
         StrictMode.setVmPolicy(policy)
     }
 
     @Throws(IOException::class)
-    private fun actionInstallPackageQ(uri: Uri?, splitApks: Array<String>?) {
+    private fun actionInstallPackageQ(
+        uri: Uri?,
+        splitApks: Array<String>?,
+        operationId: String?
+    ) {
         val pi = packageManager.packageInstaller
         val params = PackageInstaller.SessionParams(
             PackageInstaller.SessionParams.MODE_FULL_INSTALL
@@ -287,9 +310,11 @@ class DummyActivity : Activity() {
             session.setStagingProgress(0.1f)
             val callbackIntent = Intent(this, DummyActivity::class.java).apply {
                 action = PACKAGEINSTALLER_CALLBACK
+                operationId?.let { putExtra(PENDING_PACKAGE_OPERATION_ID, it) }
+                data = Uri.parse("gatekeeper://package-installer/${operationId ?: sessionId}")
             }
             val pendingIntent = PendingIntent.getActivity(
-                this, 0, callbackIntent, PendingIntent.FLAG_MUTABLE
+                this, sessionId, callbackIntent, PendingIntent.FLAG_MUTABLE
             )
             session.commit(pendingIntent.intentSender)
         }
@@ -327,9 +352,9 @@ class DummyActivity : Activity() {
     }
 
     private fun actionUninstallPackage() {
-        capturePendingPackageOperation(OperationType.UNINSTALL)
+        val operationId = capturePendingPackageOperation(OperationType.UNINSTALL)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            actionUninstallPackageQ()
+            actionUninstallPackageQ(operationId)
             return
         }
 
@@ -338,24 +363,25 @@ class DummyActivity : Activity() {
             putExtra(Intent.EXTRA_RETURN_RESULT, true)
         }
         @Suppress("DEPRECATION")
-        startActivityForResult(uninstallIntent, REQUEST_INSTALL_PACKAGE)
+        startActivityForResult(uninstallIntent, registerLegacyOperationId(operationId))
     }
 
-    private fun actionUninstallPackageQ() {
+    private fun actionUninstallPackageQ(operationId: String?) {
         val pi = packageManager.packageInstaller
         val callbackIntent = Intent(this, DummyActivity::class.java).apply {
             action = PACKAGEINSTALLER_CALLBACK
+            operationId?.let { putExtra(PENDING_PACKAGE_OPERATION_ID, it) }
+            data = Uri.parse("gatekeeper://package-uninstall/${operationId ?: UUID.randomUUID()}")
         }
         val pendingIntent = PendingIntent.getActivity(
-            this, 0, callbackIntent, PendingIntent.FLAG_MUTABLE
+            this, operationId?.hashCode() ?: 0, callbackIntent, PendingIntent.FLAG_MUTABLE
         )
         pi.uninstall(requireNotNull(intent.getStringExtra("package")), pendingIntent.intentSender)
     }
 
-    private fun appInstallFinished(resultCode: Int) {
-        FileProviderProxy.clearForwardProxy()
-
-        val pending = consumePendingPackageOperation()
+    private fun appInstallFinished(resultCode: Int, operationId: String?) {
+        val pending = operationId?.let(::consumePendingPackageOperation)
+        FileProviderProxy.clearForwardProxy(pending?.forwardedUri)
         var callback: IAppInstallCallback? = null
         if (intent.hasExtra("callback")) {
             val callbackExtra = intent.getBundleExtra("callback")
@@ -401,14 +427,24 @@ class DummyActivity : Activity() {
         }
     }
 
-    private fun capturePendingPackageOperation(type: OperationType) {
-        val packageName = intent.getStringExtra("package") ?: return
+    private fun capturePendingPackageOperation(type: OperationType): String? {
         if (!intent.hasExtra("callback")) {
-            return
+            return null
         }
         val callbackExtra = intent.getBundleExtra("callback")!!
         val callback = IAppInstallCallback.Stub.asInterface(callbackExtra.getBinder("callback"))
-        registerPendingPackageOperation(PendingPackageOperation(type, packageName, callback))
+        @Suppress("DEPRECATION")
+        val forwardedUri = intent.getParcelableExtra<Uri>("direct_install_apk")
+        val operationId = registerPendingPackageOperation(
+            PendingPackageOperation(
+                type = type,
+                packageName = intent.getStringExtra("package"),
+                callback = callback,
+                forwardedUri = forwardedUri
+            )
+        )
+        intent.putExtra(PENDING_PACKAGE_OPERATION_ID, operationId)
+        return operationId
     }
 
     private fun operationTypeFromIntentAction(action: String?): OperationType? = when (action) {
@@ -894,9 +930,11 @@ class DummyActivity : Activity() {
         const val VPN_SESSION_COMPLETE =
             ProfileActions.VPN_SESSION_COMPLETE
         const val PACKAGEINSTALLER_CALLBACK = ProfileActions.PACKAGEINSTALLER_CALLBACK
+        const val OPEN_POWER_SETTINGS = ProfileActions.OPEN_POWER_SETTINGS
 
         private val ACTIONS_ALLOWED_WITHOUT_SIGNATURE = listOf(
             FINALIZE_PROVISION,
+            TRY_START_SERVICE,
             PUBLIC_FREEZE_ALL,
             PUBLIC_UNFREEZE_ALL,
             PUBLIC_UNFREEZE_AND_LAUNCH,
@@ -912,25 +950,33 @@ class DummyActivity : Activity() {
         )
 
         private const val REQUEST_INSTALL_PACKAGE = 1
+        private const val PENDING_PACKAGE_OPERATION_ID = "pending_package_operation_id"
         private const val REQUEST_PERMISSION_EXTERNAL_STORAGE = 2
         private const val REQUEST_PERMISSION_POST_NOTIFICATIONS = 3
         private const val REQUEST_ANTI_SPY_VPN = 4
 
         private var hasRequestedPermission = false
-        @Volatile
-        private var pendingPackageOperation: PendingPackageOperation? = null
+        private val pendingPackageOperations = PendingOperationRegistry<PendingPackageOperation>()
+        private val legacyOperationIds = ConcurrentHashMap<Int, String>()
+        private val nextLegacyRequestCode = AtomicInteger(REQUEST_INSTALL_PACKAGE + 1)
 
-        @Synchronized
-        private fun registerPendingPackageOperation(operation: PendingPackageOperation) {
-            pendingPackageOperation = operation
+        private fun registerPendingPackageOperation(operation: PendingPackageOperation): String =
+            pendingPackageOperations.register(operation)
+
+        private fun consumePendingPackageOperation(operationId: String): PendingPackageOperation? =
+            pendingPackageOperations.consume(operationId)
+
+        private fun registerLegacyOperationId(operationId: String?): Int {
+            if (operationId == null) return REQUEST_INSTALL_PACKAGE
+            val requestCode = nextLegacyRequestCode.getAndUpdate {
+                if (it >= 65_534) REQUEST_INSTALL_PACKAGE + 1 else it + 1
+            }
+            legacyOperationIds[requestCode] = operationId
+            return requestCode
         }
 
-        @Synchronized
-        private fun consumePendingPackageOperation(): PendingPackageOperation? {
-            val operation = pendingPackageOperation
-            pendingPackageOperation = null
-            return operation
-        }
+        private fun consumeLegacyOperationId(requestCode: Int): String? =
+            legacyOperationIds.remove(requestCode)
 
         private enum class OperationType {
             INSTALL, UNINSTALL
@@ -938,8 +984,9 @@ class DummyActivity : Activity() {
 
         private data class PendingPackageOperation(
             val type: OperationType,
-            val packageName: String,
-            val callback: IAppInstallCallback
+            val packageName: String?,
+            val callback: IAppInstallCallback,
+            val forwardedUri: Uri?
         )
 
         fun registerSameProcessRequest(intent: Intent) {

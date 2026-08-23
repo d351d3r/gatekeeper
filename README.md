@@ -6,6 +6,8 @@ Gatekeeper is a fork of [Shelter](https://cgit.typeblog.net/Shelter/about/), a F
 
 Shelter remains the upstream base. Gatekeeper adds a modernized interface, stable cross-profile file access, Anti Spy VPN controls, and diagnostics for profile reliability.
 
+Product direction and platform boundaries: [PRODUCT.md](PRODUCT.md).
+
 ## Features
 
 - Install or clone apps into an isolated work profile
