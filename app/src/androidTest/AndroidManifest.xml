@@ -4,7 +4,7 @@
     <application>
         <!--
             Второе приложение с теми же строками действий. Тестовый APK это отдельный пакет
-            (net.typeblog.shelter.test), и его достаточно, чтобы воспроизвести перехват
+            (io.gatekeeper.test), и его достаточно, чтобы воспроизвести перехват
             кросс-профильного реле (D4a), ничего больше на стенд ставить не надо.
 
             Приоритет не задан намеренно: положительный приоритет локального кандидата
@@ -19,8 +19,7 @@
             android:name="io.gatekeeper.ImpostorRelayActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="net.typeblog.gatekeeper.action.START_SERVICE" />
-                <action android:name="net.typeblog.shelter.action.START_SERVICE" />
+                <action android:name="io.gatekeeper.action.START_SERVICE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <!--

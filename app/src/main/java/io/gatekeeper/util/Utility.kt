@@ -651,24 +651,9 @@ object Utility {
     }
 
     fun transferIntentToProfileUnsigned(context: Context, intent: Intent) {
-        var candidates = context.packageManager.queryIntentActivities(intent, 0)
+        val candidates = context.packageManager.queryIntentActivities(intent, 0)
             .map { ProfileForwarder.Candidate(it.activityInfo.packageName, it.activityInfo.name) }
-        var forwarder = ProfileForwarder.pickForwarder(candidates)
-        if (forwarder == null) {
-            val currentAction = intent.action
-            val legacyAction = ProfileActions.legacyFor(currentAction)
-            if (legacyAction != null) {
-                intent.action = legacyAction
-                candidates = context.packageManager.queryIntentActivities(intent, 0)
-                    .map { ProfileForwarder.Candidate(it.activityInfo.packageName, it.activityInfo.name) }
-                forwarder = ProfileForwarder.pickForwarder(candidates)
-                if (forwarder != null) {
-                    Log.i(TAG, "using legacy cross-profile action for $currentAction")
-                } else {
-                    intent.action = currentAction
-                }
-            }
-        }
+        val forwarder = ProfileForwarder.pickForwarder(candidates)
         if (forwarder == null) {
             // Список кандидатов нужен, чтобы разобрать отказ на устройстве: он покажет и
             // прошивку с нештатным форвардером, и приложение, объявившее наши действия.
@@ -897,50 +882,6 @@ object Utility {
             IntentFilter(DummyActivity.UNINSTALL_PACKAGE),
             DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT
         )
-
-        val legacyManagedCanAccessParentActions = listOf(
-            DummyActivity.START_SERVICE,
-            DummyActivity.TRY_START_SERVICE,
-            DummyActivity.UNFREEZE_AND_LAUNCH,
-            DummyActivity.FREEZE_ALL_IN_LIST,
-            DummyActivity.UNFREEZE_ALL_IN_LIST,
-            DummyActivity.REFRESH_MAIN_APP_LIST,
-            MainActivity.ACTION_REFRESH_APP_LISTS,
-            DummyActivity.ENABLE_AUTO_FREEZE_WORK_PROFILE,
-            DummyActivity.REMOVE_UNFREEZE_SHORTCUT,
-            DummyActivity.START_FILE_SHUTTLE,
-            DummyActivity.START_FILE_SHUTTLE_2,
-            DummyActivity.SYNCHRONIZE_PREFERENCE,
-            DummyActivity.SYNC_ANTI_SPY_VPN_WATCH,
-            DummyActivity.VPN_SESSION_COMPLETE,
-            DummyActivity.OPEN_POWER_SETTINGS,
-            DummyActivity.INSTALL_PACKAGE,
-            DummyActivity.UNINSTALL_PACKAGE,
-        )
-        legacyManagedCanAccessParentActions.forEach { action ->
-            manager.addCrossProfileIntentFilter(
-                adminComponent,
-                IntentFilter(ProfileActions.legacyFor(action)!!),
-                DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT
-            )
-        }
-
-        val legacyParentCanAccessManagedActions = listOf(
-            DummyActivity.SHOW_TOAST,
-            DummyActivity.REFRESH_MAIN_APP_LIST,
-            MainActivity.ACTION_REFRESH_APP_LISTS,
-            DummyActivity.REMOVE_UNFREEZE_SHORTCUT,
-            DummyActivity.PUBLIC_FREEZE_ALL,
-            DummyActivity.PUBLIC_UNFREEZE_ALL,
-            DummyActivity.FINALIZE_PROVISION,
-        )
-        legacyParentCanAccessManagedActions.forEach { action ->
-            manager.addCrossProfileIntentFilter(
-                adminComponent,
-                IntentFilter(ProfileActions.legacyFor(action)!!),
-                DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED
-            )
-        }
 
         val actionSendFilter = IntentFilter().apply {
             addAction(Intent.ACTION_SEND)

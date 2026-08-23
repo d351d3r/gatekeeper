@@ -8,8 +8,8 @@ import org.junit.Test
 
 /**
  * Выбор кросс-профильного реле (D4a). Резолв по строке действия неявный, и стороннее
- * приложение, объявившее `net.typeblog.shelter.action.*`, попадает в кандидаты наравне с
- * системным форвардером. До правки брался первый кандидат, чей пакет не наш.
+ * приложение, объявившее те же строки действий, попадает в кандидаты наравне с системным
+ * форвардером. До правки брался первый кандидат, чей пакет не наш.
  */
 class ForwarderSelectionTest {
     private val systemForwarder =
@@ -34,7 +34,7 @@ class ForwarderSelectionTest {
     fun rejectsThirdPartyOnly() {
         val impostors = listOf(
             Candidate("com.example.impostor", "com.example.impostor.RelayActivity"),
-            Candidate("net.typeblog.shelter.dev2", "net.typeblog.shelter.ui.DummyActivity"),
+            Candidate("com.example.other", "com.example.other.ui.DummyActivity"),
         )
         assertNull(ProfileForwarder.pickForwarder(impostors))
     }
@@ -44,7 +44,7 @@ class ForwarderSelectionTest {
     fun ignoresOwnPackage() {
         assertNull(
             ProfileForwarder.pickForwarder(
-                listOf(Candidate("net.typeblog.shelter", "net.typeblog.shelter.ui.DummyActivity"))
+                listOf(Candidate("io.gatekeeper", "io.gatekeeper.ui.DummyActivity"))
             )
         )
     }

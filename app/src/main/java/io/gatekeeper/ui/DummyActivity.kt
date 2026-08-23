@@ -56,7 +56,6 @@ class DummyActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        normalizeAction(intent)
 
         policyManager = getSystemService(DevicePolicyManager::class.java)
         isProfileOwner = policyManager!!.isProfileOwnerApp(packageName)
@@ -93,7 +92,7 @@ class DummyActivity : Activity() {
             intent.action in ACTIONS_ALLOWED_WITHOUT_SIGNATURE
 
     private fun init() {
-        val intent = normalizeAction(intent)
+        val intent = intent
 
         if (!isAuthorized(intent)) {
             finish()
@@ -160,22 +159,13 @@ class DummyActivity : Activity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        val normalizedIntent = normalizeAction(intent)
-        setIntent(normalizedIntent)
+        setIntent(intent)
         if (isProfileOwner) {
             Utility.enforceWorkProfilePolicies(this)
             Utility.enforceUserRestrictions(this)
             SettingsManager.getInstance().applyAll()
         }
         init()
-    }
-
-    private fun normalizeAction(intent: Intent): Intent {
-        val normalizedAction = ProfileActions.normalize(intent.action)
-        if (normalizedAction != intent.action) {
-            intent.action = normalizedAction
-        }
-        return intent
     }
 
     @Deprecated("Deprecated in Java")

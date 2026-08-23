@@ -1,52 +1,32 @@
 package io.gatekeeper
 
 import io.gatekeeper.util.ProfileActions
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ProfileActionsTest {
+    /** Все строки действий живут на одном префиксе пакета; чужие домены в действия недопустимы. */
     @Test
-    fun normalizesLegacyGatekeeperAction() {
-        assertEquals(
-            ProfileActions.START_SERVICE,
-            ProfileActions.normalize(ProfileActions.LEGACY_START_SERVICE)
+    fun everyActionUsesApplicationPrefix() {
+        val prefix = "io.gatekeeper.action."
+        val actions = listOf(
+            ProfileActions.FINALIZE_PROVISION, ProfileActions.START_SERVICE,
+            ProfileActions.TRY_START_SERVICE, ProfileActions.INSTALL_PACKAGE,
+            ProfileActions.UNINSTALL_PACKAGE, ProfileActions.UNFREEZE_AND_LAUNCH,
+            ProfileActions.PUBLIC_UNFREEZE_AND_LAUNCH, ProfileActions.UNFREEZE_APP,
+            ProfileActions.PUBLIC_FREEZE_ALL, ProfileActions.PUBLIC_UNFREEZE_ALL,
+            ProfileActions.SHOW_TOAST, ProfileActions.REFRESH_MAIN_APP_LIST,
+            ProfileActions.FREEZE_ALL_IN_LIST, ProfileActions.UNFREEZE_ALL_IN_LIST,
+            ProfileActions.ENABLE_AUTO_FREEZE_WORK_PROFILE,
+            ProfileActions.REMOVE_UNFREEZE_SHORTCUT, ProfileActions.START_FILE_SHUTTLE,
+            ProfileActions.START_FILE_SHUTTLE_2, ProfileActions.SYNCHRONIZE_PREFERENCE,
+            ProfileActions.SYNC_ANTI_SPY_VPN_WATCH, ProfileActions.VPN_SESSION_COMPLETE,
+            ProfileActions.PACKAGEINSTALLER_CALLBACK, ProfileActions.BATCH_FREEZE_ALL,
+            ProfileActions.BATCH_UNFREEZE_ALL, ProfileActions.SHOW_BATCH_TOAST,
+            ProfileActions.REFRESH_APP_LISTS, ProfileActions.OPEN_POWER_SETTINGS
         )
-    }
-
-    @Test
-    fun leavesCurrentAndUnknownActionsUntouched() {
-        assertEquals(
-            ProfileActions.START_SERVICE,
-            ProfileActions.normalize(ProfileActions.START_SERVICE)
-        )
-        assertEquals("com.example.action.UNRELATED", ProfileActions.normalize("com.example.action.UNRELATED"))
-    }
-
-    @Test
-    fun exposesLegacyFallbackOnlyForMigratedAction() {
-        assertEquals(
-            ProfileActions.LEGACY_START_SERVICE,
-            ProfileActions.legacyFor(ProfileActions.START_SERVICE)
-        )
-        assertNull(ProfileActions.legacyFor("com.example.action.UNRELATED"))
-    }
-
-    @Test
-    fun policyRegistrationCoversCurrentAndLegacyAction() {
-        assertTrue(ProfileActions.variants(ProfileActions.START_SERVICE).containsAll(
-            listOf(ProfileActions.START_SERVICE, ProfileActions.LEGACY_START_SERVICE)
-        ))
-    }
-
-    @Test
-    fun everyCurrentActionHasOneLegacyCounterpart() {
-        ProfileActions.allCurrentActions.forEach { action ->
-            val legacy = ProfileActions.legacyFor(action)
-            assertTrue("old action is missing for $action", legacy != null)
-            assertEquals(action, ProfileActions.normalize(legacy))
-            assertEquals(setOf(action, legacy), ProfileActions.variants(action))
+        actions.forEach { action ->
+            assertTrue("action без префикса пакета: $action", action.startsWith(prefix))
         }
     }
 }

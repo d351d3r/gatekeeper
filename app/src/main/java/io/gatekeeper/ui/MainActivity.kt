@@ -138,7 +138,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        normalizeAction(intent)
         storage = LocalStorageManager.getInstance()
         dynamicColorsApplied = SettingsManager.getInstance().getDynamicColorsEnabled()
 
@@ -240,17 +239,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        val normalizedIntent = normalizeAction(intent)
-        setIntent(normalizedIntent)
-        handleBatchShortcutIntent(normalizedIntent)
-    }
-
-    private fun normalizeAction(intent: Intent): Intent {
-        val normalizedAction = ProfileActions.normalize(intent.action)
-        if (normalizedAction != intent.action) {
-            intent.action = normalizedAction
-        }
-        return intent
+        setIntent(intent)
+        handleBatchShortcutIntent(intent)
     }
 
     private fun setupWizardCb(result: Boolean) {

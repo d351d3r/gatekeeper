@@ -3,7 +3,6 @@ package io.gatekeeper
 import android.content.Intent
 import android.os.SystemClock
 import io.gatekeeper.ui.DummyActivity
-import io.gatekeeper.util.ProfileActions
 import io.gatekeeper.util.Utility
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -51,17 +50,6 @@ class ForwarderResolutionTest {
     }
 
     @Test
-    fun legacyActionStillHasSystemForwarderDuringMigration() {
-        val candidates = context.packageManager
-            .queryIntentActivities(Intent(ProfileActions.LEGACY_START_SERVICE), 0)
-            .map { it.activityInfo.packageName }
-        assertTrue(
-            "старый action больше не пересекает профиль: $candidates",
-            candidates.contains("android")
-        )
-    }
-
-    @Test
     fun powerSettingsRelayGoesToTheSystemForwarder() {
         refreshWorkProfilePolicies()
         val intent = Intent(DummyActivity.OPEN_POWER_SETTINGS)
@@ -93,7 +81,7 @@ class ForwarderResolutionTest {
     /** Действие, которого нет ни у форвардера, ни у нас, резолва не имеет вовсе. */
     @Test
     fun unknownActionIsRejected() {
-        val intent = Intent("net.typeblog.shelter.action.NO_SUCH_ACTION_" + System.nanoTime())
+        val intent = Intent("io.gatekeeper.action.NO_SUCH_ACTION_" + System.nanoTime())
         try {
             Utility.transferIntentToProfileUnsigned(context, intent)
             throw AssertionError("резолв не должен был найтись: ${intent.component}")
