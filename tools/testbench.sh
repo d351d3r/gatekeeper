@@ -14,9 +14,9 @@
 #
 set -euo pipefail
 
-SERIAL="emulator-5556"
-AVD="zindan_a16"
-PORT="5556"
+SERIAL="${TESTBENCH_SERIAL:-emulator-5556}"
+AVD="gatekeeper_a16"
+PORT="${TESTBENCH_PORT:-5556}"
 PKG="io.gatekeeper"
 TEST_PKG="${PKG}.test"
 RUNNER="androidx.test.runner.AndroidJUnitRunner"
