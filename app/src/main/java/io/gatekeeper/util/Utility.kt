@@ -17,7 +17,6 @@ import android.content.pm.ResolveInfo
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.content.pm.LauncherApps
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -39,6 +38,7 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.DrawableRes
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.gatekeeper.R
@@ -1275,6 +1275,7 @@ object Utility {
         unregisterUnfreezeShortcuts(packageName)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun collectUnfreezeShortcutIds(
         context: Context,
         packageName: String,
@@ -1307,6 +1308,7 @@ object Utility {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun collectUnfreezeShortcutInfo(
         info: ShortcutInfo,
         packageName: String,
@@ -1389,21 +1391,20 @@ object Utility {
         }
     }
 
-    fun getMediaStoreId(context: Context, path: String): Int {
-        val cursor: Cursor? = context.contentResolver.query(
+    fun getMediaStoreId(context: Context, path: String): Int =
+        context.contentResolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             arrayOf(MediaStore.MediaColumns._ID),
             MediaStore.MediaColumns.DATA + " LIKE ? ",
             arrayOf(path),
             null
-        )
-        if (cursor == null || cursor.count == 0) {
-            return -1
-        } else {
-            cursor.moveToFirst()
-            return cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID))
-        }
-    }
+        )?.use { cursor ->
+            if (!cursor.moveToFirst()) {
+                -1
+            } else {
+                cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID))
+            }
+        } ?: -1
 
     fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
         val height = options.outHeight

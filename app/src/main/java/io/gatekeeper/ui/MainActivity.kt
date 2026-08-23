@@ -19,7 +19,9 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
+import android.os.Process
 import android.os.RemoteException
+import android.os.UserManager
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.Menu
@@ -275,12 +277,28 @@ class MainActivity : AppCompatActivity() {
         try {
             Utility.transferIntentToProfile(this, intent)
         } catch (_: IllegalStateException) {
-            storage!!.setBoolean(LocalStorageManager.PREF_HAS_SETUP, false)
-            ZindanToast.show(this, getString(R.string.work_profile_not_found), android.widget.Toast.LENGTH_LONG)
-            finish()
+            // Отказ резолва бывает транзиторным: clearCrossProfileIntentFilters уже прошел,
+            // а повторная регистрация фильтров в enforceWorkProfilePolicies еще нет. Стирать
+            // PREF_HAS_SETUP можно только убедившись, что профиля действительно нет, --
+            // иначе приложение перестает управлять живым профилем и уводит в мастер.
+            if (hasManagedProfile()) {
+                showWorkServiceBindFailed(
+                    WorkServiceBindFailure.NO_RESOLUTION,
+                    retryStartupProbe = true
+                )
+            } else {
+                storage!!.setBoolean(LocalStorageManager.PREF_HAS_SETUP, false)
+                ZindanToast.show(this, getString(R.string.work_profile_not_found), android.widget.Toast.LENGTH_LONG)
+                finish()
+            }
             return
         }
         tryStartWorkService.launch(intent)
+    }
+
+    private fun hasManagedProfile(): Boolean {
+        val userManager = getSystemService(UserManager::class.java) ?: return false
+        return userManager.userProfiles.any { it != Process.myUserHandle() }
     }
 
     private fun tryStartWorkServiceCb(result: ActivityResult) {
@@ -765,7 +783,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestAntiSpyVpnPermission() {
         if (isFinishing) return
-        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+        // Именно STARTED, а не RESUMED: вызов из onResume, где androidx-состояние еще
+        // STARTED (ReportFragment шлет ON_RESUME после onActivityPostResumed). Гейт RESUMED
+        // откладывал бы запрос до следующего возврата на экран, то есть навсегда.
+        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             pendingVpnBlockReason = AntiSpyLaunchGate.REASON_VPN_PERMISSION_REQUIRED
             return
         }
@@ -793,7 +814,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun showAntiSpyVpnLaunchBlockedDialog(reason: Int) {
         if (isFinishing) return
-        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+        // STARTED по той же причине, что и в showWorkServiceBindFailed: диалог, отложенный
+        // из onResume по гейту RESUMED, не показался бы никогда (план Фазы 13, п.15).
+        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             pendingVpnBlockReason = reason
             return
         }

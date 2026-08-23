@@ -25,7 +25,7 @@
         android:contentDescription="@string/auto_freeze"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_freeze"
-        android:tint="?attr/colorTertiary"
+        app:tint="?attr/colorTertiary"
         android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@id/list_app_select_order"
         app:layout_goneMarginEnd="16dp"

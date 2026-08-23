@@ -209,8 +209,10 @@ class ShelterService : Service() {
             check(isProfileOwner) {
                 "Cannot access cross-profile packages without being profile owner"
             }
-            check(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                "Cross-profile packages support is only available on Android 11 and later"
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                throw IllegalStateException(
+                    "Cross-profile packages support is only available on Android 11 and later"
+                )
             }
             return ArrayList(policyManager!!.getCrossProfilePackages(adminComponent!!))
         }
@@ -219,8 +221,10 @@ class ShelterService : Service() {
             check(isProfileOwner) {
                 "Cannot access cross-profile packages without being profile owner"
             }
-            check(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                "Cross-profile packages support is only available on Android 11 and later"
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                throw IllegalStateException(
+                    "Cross-profile packages support is only available on Android 11 and later"
+                )
             }
             policyManager!!.setCrossProfilePackages(adminComponent!!, HashSet(packages))
         }

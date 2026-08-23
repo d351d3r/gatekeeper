@@ -228,14 +228,31 @@ class FileShuttleService : Service() {
         suicide()
     }
 
+    // Единственный корень, который сервис имеет право трогать. Документ-Id приходят двух видов:
+    // с префиксом DUMMY_ROOT (прямые вызовы провайдера) и уже развернутые абсолютные пути
+    // (loadFileMeta отдает COLUMN_DOCUMENT_ID как абсолютный путь, и DocumentsUI возвращает их
+    // как есть). Оба вида обязаны лежать в общем внешнем хранилище: канонизация отсекает
+    // выход через ".." и симлинки. Путь вне корня заменяется на сам корень -- операции на нем
+    // безопасно отказывают (открытие каталога дает IOException, удаление непустого каталога
+    // неуспешно), а исключение из стаба унесло бы весь процесс профиля.
     private fun resolvePath(path: String): String {
-        return if (path.startsWith(CrossProfileDocumentsProvider.DUMMY_ROOT)) {
-            path.replaceFirst(
-                CrossProfileDocumentsProvider.DUMMY_ROOT,
-                Environment.getExternalStorageDirectory().absolutePath,
-            )
+        val root = Environment.getExternalStorageDirectory()
+        val f = if (path.startsWith(CrossProfileDocumentsProvider.DUMMY_ROOT)) {
+            File(root, path.substring(CrossProfileDocumentsProvider.DUMMY_ROOT.length))
         } else {
-            path
+            File(path)
+        }
+        val canonical = try {
+            f.canonicalFile
+        } catch (_: IOException) {
+            root
+        }
+        val rootPath = root.absolutePath
+        val canonicalPath = canonical.absolutePath
+        return if (canonicalPath == rootPath || canonicalPath.startsWith("$rootPath/")) {
+            canonicalPath
+        } else {
+            rootPath
         }
     }
 

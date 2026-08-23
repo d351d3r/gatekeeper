@@ -15,6 +15,7 @@ import android.provider.Settings
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.Insets
+import androidx.core.content.IntentCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.preference.CheckBoxPreference
@@ -68,7 +69,9 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
     override fun onCreatePreferences(bundle: Bundle?, s: String?) {
         addPreferencesFromResource(R.xml.preferences_settings)
         serviceWork = IShelterService.Stub.asInterface(
-            (requireActivity().intent.getParcelableExtra<Bundle>("extras"))!!.getBinder("profile_service")
+            IntentCompat.getParcelableExtra(
+                requireActivity().intent, "extras", Bundle::class.java
+            )?.getBinder("profile_service")
         )
 
         findPreference<Preference>(SETTINGS_VERSION)!!.summary =
@@ -415,7 +418,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     val hasPermission = ensureSpecialAccessPermission({
                         try {
-                            serviceWork!!.hasAllFileAccessPermission() &&
+                            serviceWork?.hasAllFileAccessPermission() == true &&
                                 Utility.checkAllFileAccessPermission()
                         } catch (_: RemoteException) {
                             false
@@ -450,7 +453,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
 
                 val hasPermission = ensureSpecialAccessPermission({
                     try {
-                        serviceWork!!.hasUsageStatsPermission() &&
+                        serviceWork?.hasUsageStatsPermission() == true &&
                             Utility.checkUsageStatsPermission(requireContext())
                     } catch (_: RemoteException) {
                         false
