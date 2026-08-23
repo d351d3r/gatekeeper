@@ -855,7 +855,7 @@ class MainActivity : AppCompatActivity() {
                 Utility.createLauncherShortcut(
                     this, launchIntent,
                     Utility.createBatchShortcutIcon(this, R.drawable.ic_shortcut_freeze),
-                    "shelter-freeze-all", getString(R.string.freeze_all_shortcut)
+                    "gatekeeper-freeze-all", getString(R.string.freeze_all_shortcut)
                 )
                 true
             }
@@ -864,7 +864,7 @@ class MainActivity : AppCompatActivity() {
                 Utility.createLauncherShortcut(
                     this, launchIntent,
                     Utility.createBatchShortcutIcon(this, R.drawable.ic_shortcut_unfreeze),
-                    "shelter-unfreeze-all", getString(R.string.unfreeze_all_shortcut)
+                    "gatekeeper-unfreeze-all", getString(R.string.unfreeze_all_shortcut)
                 )
                 true
             }

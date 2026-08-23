@@ -270,7 +270,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         Utility.createLauncherShortcut(
             requireContext(), launchIntent,
             Utility.createBatchShortcutIcon(requireContext(), R.drawable.ic_shortcut_freeze),
-            "shelter-freeze-all", getString(R.string.freeze_all_shortcut)
+            "gatekeeper-freeze-all", getString(R.string.freeze_all_shortcut)
         )
         return true
     }
@@ -283,7 +283,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         Utility.createLauncherShortcut(
             requireContext(), launchIntent,
             Utility.createBatchShortcutIcon(requireContext(), R.drawable.ic_shortcut_unfreeze),
-            "shelter-unfreeze-all", getString(R.string.unfreeze_all_shortcut)
+            "gatekeeper-unfreeze-all", getString(R.string.unfreeze_all_shortcut)
         )
         return true
     }

@@ -30,7 +30,7 @@ class CrossProfileDocumentsProvider : DocumentsProvider() {
         val row = result.newRow()
         row.add(DocumentsContract.Root.COLUMN_ROOT_ID, DUMMY_ROOT)
         row.add(DocumentsContract.Root.COLUMN_DOCUMENT_ID, DUMMY_ROOT)
-        row.add(DocumentsContract.Root.COLUMN_ICON, R.mipmap.ic_launcher_zindan)
+        row.add(DocumentsContract.Root.COLUMN_ICON, R.drawable.ic_gatekeeper)
         row.add(
             DocumentsContract.Root.COLUMN_TITLE,
             if (Utility.isProfileOwner(context)) {
@@ -222,7 +222,7 @@ class CrossProfileDocumentsProvider : DocumentsProvider() {
     }
 
     companion object {
-        const val DUMMY_ROOT = "/shelter_storage_root/"
+        const val DUMMY_ROOT = "/gatekeeper_storage_root/"
         val AUTHORITY = BuildConfig.APPLICATION_ID + ".documents"
         private const val NO_SHUTTLE = "file shuttle is not connected"
         private val DEFAULT_ROOT_PROJECTION = arrayOf(

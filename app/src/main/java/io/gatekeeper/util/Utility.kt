@@ -1060,7 +1060,7 @@ object Utility {
     }
 
     fun unfreezeShortcutId(packageName: String, linkedPackages: String? = null): String {
-        var id = "shelter-$packageName"
+        var id = "gatekeeper-$packageName"
         if (linkedPackages != null) {
             id += linkedPackages.hashCode()
         }
@@ -1257,8 +1257,11 @@ object Utility {
         launchIntents: MutableMap<String, Intent>,
         labels: MutableMap<String, String?>
     ) {
+        // Легаси-префикс "shelter-" оставлен, чтобы ярлыки, созданные прошлыми выпусками,
+        // находились и отключались; новые создаются только с префиксом "gatekeeper-".
         val matchesId = info.id == unfreezeShortcutId(packageName) ||
-                (info.id.startsWith("shelter-$packageName") && info.id.length > "shelter-$packageName".length)
+                info.id.startsWith("gatekeeper-$packageName") ||
+                info.id.startsWith("shelter-$packageName")
         if (!matchesId && !unfreezeShortcutTargetsPackage(info.intent, packageName)) {
             return
         }
@@ -1421,9 +1424,13 @@ object Utility {
         }
     }
 
-    private const val NOTIFICATION_CHANNEL_ID = "ShelterService"
-    private const val NOTIFICATION_CHANNEL_IMPORTANT = "ShelterService-Important"
-    private const val NOTIFICATION_CHANNEL_USER_ALERTS = "ShelterUserAlerts"
+    private const val NOTIFICATION_CHANNEL_ID = "GatekeeperService"
+    private const val NOTIFICATION_CHANNEL_IMPORTANT = "GatekeeperService-Important"
+    private const val NOTIFICATION_CHANNEL_USER_ALERTS = "GatekeeperUserAlerts"
+    // Каналы прошлых выпусков: создатели новых каналов обязаны удалить их, чтобы
+    // в системных настройках не оставались сироты.
+    private val LEGACY_NOTIFICATION_CHANNELS =
+        listOf("ShelterService", "ShelterService-Important", "ShelterUserAlerts")
     private const val VPN_AUTO_FREEZE_SUCCESS_NOTIFICATION_ID = 0xe49d3
 
     fun postUserAlert(
@@ -1459,6 +1466,7 @@ object Utility {
         val app = context.applicationContext
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val nm = app.getSystemService(NotificationManager::class.java)
+            LEGACY_NOTIFICATION_CHANNELS.forEach(nm::deleteNotificationChannel)
             if (nm.getNotificationChannel(NOTIFICATION_CHANNEL_USER_ALERTS) == null) {
                 val chan = NotificationChannel(
                     NOTIFICATION_CHANNEL_USER_ALERTS,
@@ -1544,6 +1552,7 @@ object Utility {
         val nm = context.getSystemService(NotificationManager::class.java)
         // Канал настраивается только при создании: перебивать выбор пользователя из кода
         // недопустимо, и Android этого все равно не дает.
+        LEGACY_NOTIFICATION_CHANNELS.forEach(nm::deleteNotificationChannel)
         if (nm.getNotificationChannel(id) == null) {
             val chan = NotificationChannel(
                 id,

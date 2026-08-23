@@ -21,7 +21,7 @@ class ShelterDeviceAdminReceiver : DeviceAdminReceiver() {
         val notification = Utility.buildNotification(
             context,
             true,
-            "shelter-finish-provision",
+            "gatekeeper-finish-provision",
             context.getString(R.string.finish_provision_title),
             context.getString(R.string.finish_provision_desc),
             R.drawable.ic_notification,
