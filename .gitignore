@@ -108,3 +108,7 @@ repackage/*
 
 # Editor / shell junk
 =ro
+
+# Repowise local index state, never commit
+/.repowise/
+/.repowise-workspace*
