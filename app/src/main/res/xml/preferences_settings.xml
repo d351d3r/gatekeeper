@@ -34,6 +34,21 @@
     </androidx.preference.PreferenceCategory>
 
     <androidx.preference.PreferenceCategory
+        android:title="@string/settings_ca_category">
+
+        <androidx.preference.Preference
+            android:key="settings_ca_install"
+            android:title="@string/settings_ca_install"
+            android:summary="@string/settings_ca_install_desc" />
+
+        <androidx.preference.Preference
+            android:key="settings_ca_installed"
+            android:title="@string/settings_ca_installed"
+            android:summary="@string/settings_ca_installed_desc" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
         android:title="@string/settings_services">
 
         <androidx.preference.Preference

@@ -13,6 +13,7 @@ import android.os.PowerManager
 import android.os.RemoteException
 import android.provider.Settings
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.Insets
 import androidx.core.content.IntentCompat
@@ -29,6 +30,7 @@ import io.gatekeeper.R
 import io.gatekeeper.services.IGatekeeperService
 import io.gatekeeper.util.AntiSpyFreezeScope
 import io.gatekeeper.util.AntiSpyWatchConfig
+import io.gatekeeper.util.CaCertificates
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.PowerDiagnostics
 import io.gatekeeper.util.SettingsManager
@@ -40,6 +42,11 @@ import io.gatekeeper.util.GatekeeperToast
 class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
     private val manager = SettingsManager.getInstance()
     private var serviceWork: IGatekeeperService? = null
+
+    private val selectCertFile =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            onCertFileSelected(uri)
+        }
 
     private var prefCrossProfileFileChooser: CheckBoxPreference? = null
     private var prefBlockContactsSearching: CheckBoxPreference? = null
@@ -115,6 +122,17 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         prefSkipForeground!!.onPreferenceChangeListener = this
 
         setUpAntiSpyWatch()
+
+        findPreference<Preference>(SETTINGS_CA_INSTALL)!!
+            .setOnPreferenceClickListener {
+                launchCertPicker()
+                true
+            }
+        findPreference<Preference>(SETTINGS_CA_INSTALLED)!!
+            .setOnPreferenceClickListener {
+                showInstalledCaCerts()
+                true
+            }
 
         findPreference<Preference>(SETTINGS_UNFREEZE_ALL)!!
             .setOnPreferenceClickListener(this::startBatchUnfreeze)
@@ -398,6 +416,145 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         openSettings(intent)
     }
 
+    // ---- Корневые CA рабочего профиля (docs/feature_ca_certs.md) ----
+    // Все операции уходят биндером сервису рабочего профиля: только там приложение --
+    // владелец профиля, и только туда попадает сертификат. Личный профиль не затрагивается.
+
+    private fun launchCertPicker() {
+        try {
+            selectCertFile.launch(arrayOf("*/*"))
+        } catch (_: ActivityNotFoundException) {
+            GatekeeperToast.show(requireContext(), R.string.ca_read_failed)
+        }
+    }
+
+    private fun onCertFileSelected(uri: Uri?) {
+        if (uri == null) return
+        val bytes = try {
+            requireContext().contentResolver.openInputStream(uri)?.use { it.readBytes() }
+        } catch (_: Exception) {
+            null
+        }
+        if (bytes == null) {
+            GatekeeperToast.show(requireContext(), R.string.ca_read_failed)
+            return
+        }
+        val cert = CaCertificates.parse(bytes)
+        if (cert == null) {
+            GatekeeperToast.show(requireContext(), R.string.ca_not_a_certificate)
+            return
+        }
+        // Отпечаток обязан быть показан ДО установки -- пользователь сверяет его
+        // с опубликованным издателем (docs/feature_ca_certs.md, требования).
+        val info = CaCertificates.infoOf(cert)
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.ca_install_title)
+            .setMessage(
+                certDetailsText(info) + "\n\n" +
+                    getString(R.string.ca_install_limitation) + "\n\n" +
+                    getString(R.string.ca_install_monitored_warning)
+            )
+            .setPositiveButton(R.string.ca_install_action) { _, _ -> installCaCert(bytes) }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun certDetailsText(info: CaCertificates.Info): String =
+        getString(R.string.ca_cert_details, info.subject, info.sha256)
+
+    private fun installCaCert(cert: ByteArray) {
+        val work = serviceWork
+        if (work == null) {
+            GatekeeperToast.show(requireContext(), R.string.ca_no_work_service)
+            return
+        }
+        Thread {
+            // null -- успех; "" -- вызов не дошёл по транспорту; иначе текст ошибки DPM.
+            val error = try {
+                work.installCaCertificate(cert)
+            } catch (_: RemoteException) {
+                ""
+            }
+            activity?.runOnUiThread {
+                if (!isAdded) return@runOnUiThread
+                when (error) {
+                    null -> GatekeeperToast.show(requireContext(), R.string.ca_install_success)
+                    "" -> GatekeeperToast.show(requireContext(), R.string.ca_no_work_service)
+                    else -> GatekeeperToast.show(
+                        requireContext(), getString(R.string.ca_install_failed, error)
+                    )
+                }
+            }
+        }.start()
+    }
+
+    private fun showInstalledCaCerts() {
+        val work = serviceWork
+        if (work == null) {
+            GatekeeperToast.show(requireContext(), R.string.ca_no_work_service)
+            return
+        }
+        Thread {
+            val entries = try {
+                work.getInstalledCaCertificates()
+            } catch (_: RemoteException) {
+                null
+            }
+            activity?.runOnUiThread {
+                if (!isAdded) return@runOnUiThread
+                if (entries == null) {
+                    GatekeeperToast.show(requireContext(), R.string.ca_no_work_service)
+                    return@runOnUiThread
+                }
+                if (entries.isEmpty()) {
+                    AlertDialog.Builder(requireContext())
+                        .setTitle(R.string.settings_ca_installed)
+                        .setMessage(R.string.ca_installed_none)
+                        .show()
+                    return@runOnUiThread
+                }
+                val infos = entries.mapNotNull(CaCertificates::decodeInfo)
+                AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.settings_ca_installed)
+                    .setItems(infos.map { certDetailsText(it) }.toTypedArray()) { _, which ->
+                        confirmRemoveCaCert(infos[which])
+                    }
+                    .show()
+            }
+        }.start()
+    }
+
+    private fun confirmRemoveCaCert(info: CaCertificates.Info) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.ca_remove_title)
+            .setMessage(certDetailsText(info))
+            .setPositiveButton(R.string.ca_remove_action) { _, _ -> removeCaCert(info.sha256) }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun removeCaCert(sha256: String) {
+        val work = serviceWork
+        if (work == null) {
+            GatekeeperToast.show(requireContext(), R.string.ca_no_work_service)
+            return
+        }
+        Thread {
+            val removed = try {
+                work.removeCaCertificate(sha256)
+            } catch (_: RemoteException) {
+                false
+            }
+            activity?.runOnUiThread {
+                if (!isAdded) return@runOnUiThread
+                GatekeeperToast.show(
+                    requireContext(),
+                    if (removed) R.string.ca_remove_success else R.string.ca_remove_failed
+                )
+            }
+        }.start()
+    }
+
     override fun onResume() {
         super.onResume()
         updateAutoFreezeDelay()
@@ -548,6 +705,8 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         private const val SETTINGS_ANTI_SPY_DELAY = "settings_anti_spy_delay"
         private const val SETTINGS_ANTI_SPY_ROUTING = "settings_anti_spy_routing"
         private const val SETTINGS_POWER_DIAGNOSTICS = "settings_power_diagnostics"
+        private const val SETTINGS_CA_INSTALL = "settings_ca_install"
+        private const val SETTINGS_CA_INSTALLED = "settings_ca_installed"
         private const val SETTINGS_FREEZE_ALL = "settings_freeze_all"
         private const val SETTINGS_UNFREEZE_ALL = "settings_unfreeze_all"
         private const val SETTINGS_CREATE_FREEZE_ALL_SHORTCUT = "settings_create_freeze_all_shortcut"

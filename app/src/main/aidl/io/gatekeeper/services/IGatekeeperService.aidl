@@ -32,4 +32,9 @@ interface IGatekeeperService {
     boolean isDefaultNetworkTunneled();
     boolean isIgnoringBatteryOptimizations();
     boolean isBackgroundRestricted();
+    // Корневые CA рабочего профиля (docs/feature_ca_certs.md); вызываются только
+    // личным профилем у сервиса рабочего профиля.
+    String installCaCertificate(in byte[] cert);
+    List<String> getInstalledCaCertificates();
+    boolean removeCaCertificate(String sha256Fingerprint);
 }

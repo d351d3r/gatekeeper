@@ -171,4 +171,26 @@
     <string name="allow_cross_profile_interaction">Разрешить работу между профилями</string>
     <string name="settings_payment_stub_desc">Чтобы получить возможность выбрать платёжное приложение внутри рабочего профиля в Настройки - NFC, включите фальшивый платёжный сервис NFC в основном профиле. Это временное решение ошибки Android, из-за которой невозможно выбрать платёжное приложение внутри рабочего профиля, если в основном профиле таких нет.</string>
     <string name="settings_payment_stub">Заглушка платёжных сервисов</string>
+
+    <!-- Корневые CA рабочего профиля (docs/feature_ca_certs.md) -->
+    <string name="settings_ca_category">Корневые сертификаты</string>
+    <string name="settings_ca_install">Установить корневой сертификат…</string>
+    <string name="settings_ca_install_desc">Устанавливает корневой CA (например, корень Минцифры) только в рабочий профиль: госсайты начнут открываться в браузерах внутри профиля. Большинство приложений пользовательским CA не доверяют (ограничение Android 7+), личный профиль не затрагивается. Система покажет уведомление «сеть может отслеживаться» — это ожидаемо.</string>
+    <string name="settings_ca_installed">Установленные сертификаты</string>
+    <string name="settings_ca_installed_desc">Корневые сертификаты рабочего профиля. Тап — просмотр и удаление.</string>
+    <string name="ca_install_title">Установить сертификат?</string>
+    <string name="ca_cert_details">Владелец: %1$s\n\nОтпечаток SHA-256:\n%2$s</string>
+    <string name="ca_install_limitation">Перед установкой сверьте отпечаток со значением, опубликованным издателем сертификата. Сертификат будет доверенным только внутри рабочего профиля: браузеры откроют госсайты, но большинство приложений пользовательские CA не учитывают (Android 7+).</string>
+    <string name="ca_install_monitored_warning">После установки Android покажет в рабочем профиле уведомление «сеть может отслеживаться» — это требование системы, а не сбой.</string>
+    <string name="ca_install_action">Установить</string>
+    <string name="ca_not_a_certificate">Выбранный файл — не сертификат X.509</string>
+    <string name="ca_read_failed">Не удалось прочитать выбранный файл</string>
+    <string name="ca_install_success">Сертификат установлен в рабочий профиль</string>
+    <string name="ca_install_failed">Не удалось установить: %s</string>
+    <string name="ca_no_work_service">Нет связи с рабочим профилем</string>
+    <string name="ca_installed_none">В рабочем профиле нет установленных сертификатов</string>
+    <string name="ca_remove_title">Удалить сертификат?</string>
+    <string name="ca_remove_action">Удалить</string>
+    <string name="ca_remove_success">Сертификат удалён из рабочего профиля</string>
+    <string name="ca_remove_failed">Не удалось удалить сертификат</string>
 </resources>

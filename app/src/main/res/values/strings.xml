@@ -181,4 +181,26 @@
     <string name="format_minutes">%d min</string>
     <string name="format_seconds">%d s</string>
     <string name="format_immediately">Immediately</string>
+
+    <!-- Root CA certificates for the work profile (docs/feature_ca_certs.md) -->
+    <string name="settings_ca_category">Root certificates</string>
+    <string name="settings_ca_install">Install root certificate…</string>
+    <string name="settings_ca_install_desc">Install a root CA (for example, the Russian Ministry of Digital Development root) into the work profile only: government sites will then open in browsers inside the profile. Most apps do not trust user-installed CAs since Android 7, and the personal profile is never touched. Android will show a persistent \"network may be monitored\" notice — that is expected.</string>
+    <string name="settings_ca_installed">Installed certificates</string>
+    <string name="settings_ca_installed_desc">Root certificates installed in the work profile. Tap to review or remove.</string>
+    <string name="ca_install_title">Install certificate?</string>
+    <string name="ca_cert_details">Subject: %1$s\n\nSHA-256 fingerprint:\n%2$s</string>
+    <string name="ca_install_limitation">Check this fingerprint against the value published by the certificate issuer before installing. The certificate will be trusted only inside the work profile: browsers will open government sites, but most apps ignore user-installed CAs (Android 7+).</string>
+    <string name="ca_install_monitored_warning">After installation Android will show a \"network may be monitored\" notice in the work profile — this is a system requirement, not a failure.</string>
+    <string name="ca_install_action">Install</string>
+    <string name="ca_not_a_certificate">The selected file is not an X.509 certificate</string>
+    <string name="ca_read_failed">Could not read the selected file</string>
+    <string name="ca_install_success">Certificate installed in the work profile</string>
+    <string name="ca_install_failed">Install failed: %s</string>
+    <string name="ca_no_work_service">No connection to the work profile</string>
+    <string name="ca_installed_none">No certificates are installed in the work profile</string>
+    <string name="ca_remove_title">Remove certificate?</string>
+    <string name="ca_remove_action">Remove</string>
+    <string name="ca_remove_success">Certificate removed from the work profile</string>
+    <string name="ca_remove_failed">Could not remove the certificate</string>
 </resources>

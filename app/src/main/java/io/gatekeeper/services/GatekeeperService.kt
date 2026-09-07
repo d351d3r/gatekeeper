@@ -20,6 +20,7 @@ import io.gatekeeper.GatekeeperApplication
 import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.ApplicationInfoWrapper
+import io.gatekeeper.util.CaCertificates
 import io.gatekeeper.util.FileProviderProxy
 import io.gatekeeper.util.UriForwardProxy
 import io.gatekeeper.util.Utility
@@ -244,6 +245,53 @@ class GatekeeperService : Service() {
         override fun isBackgroundRestricted(): Boolean =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
                 (getSystemService(ActivityManager::class.java)?.isBackgroundRestricted ?: false)
+
+        /**
+         * Корневой CA ставится ТОЛЬКО в этот профиль: вызов проходит через биндер у
+         * сервиса рабочего профиля, владелец которого мы и есть. Личный профиль эти
+         * вызовы не видит. null -- успех, иначе текст ошибки для показа пользователю.
+         */
+        override fun installCaCertificate(cert: ByteArray): String? {
+            if (!isProfileOwner) return "not profile owner"
+            val parsed = CaCertificates.parse(cert) ?: return "not a certificate"
+            return try {
+                policyManager!!.installCaCert(adminComponent!!, parsed.encoded)
+                null
+            } catch (e: Exception) {
+                e.message ?: e.javaClass.simpleName
+            }
+        }
+
+        override fun getInstalledCaCertificates(): List<String> {
+            if (!isProfileOwner) return emptyList()
+            return try {
+                policyManager!!.getInstalledCaCerts(adminComponent!!).mapNotNull { bytes ->
+                    val cert = CaCertificates.parse(bytes) ?: return@mapNotNull null
+                    CaCertificates.encodeInfo(CaCertificates.infoOf(cert))
+                }
+            } catch (_: Exception) {
+                emptyList()
+            }
+        }
+
+        override fun removeCaCertificate(sha256Fingerprint: String): Boolean {
+            if (!isProfileOwner) return false
+            return try {
+                policyManager!!.getInstalledCaCerts(adminComponent!!).any { bytes ->
+                    val cert = CaCertificates.parse(bytes) ?: return@any false
+                    if (CaCertificates.sha256Hex(cert.encoded)
+                        .equals(sha256Fingerprint, ignoreCase = true)
+                    ) {
+                        policyManager!!.uninstallCaCert(adminComponent!!, cert.encoded)
+                        true
+                    } else {
+                        false
+                    }
+                }
+            } catch (_: Exception) {
+                false
+            }
+        }
     }
 
     override fun onCreate() {
