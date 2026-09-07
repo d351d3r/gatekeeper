@@ -44,7 +44,21 @@
     <string name="clone_success">Приложение \"%s\" успешно клонировано</string>
     <string name="uninstall_success">Приложение \"%s\" успешно удалено</string>
     <string name="freeze_success">Приложение \"%s\" успешно заморожено</string>
-    <string name="unfreeze_success">Приложение \"%s\" успешно разморожено</string><string name="clone_fail_system_app">Невозможно клонировать системные приложения в профиль, который Gatekeeper не контролирует.</string>
+    <string name="unfreeze_success">Приложение \"%s\" успешно разморожено</string>
+    <string name="clone_fail_system_app">Системное приложение недоступно в рабочем профиле этой прошивки, либо профиль не контролируется Gatekeeper.</string>
+    <string name="clone_fail_already_installed">«%s» уже установлено в рабочем профиле (замороженное тоже считается установленным). Разморозьте его из списка вместо повторного клонирования.</string>
+    <string name="clone_fail_no_connection">Рабочий профиль недоступен (Work Mode выключен или профиль остановлен). Повторите, когда он работает.</string>
+    <string name="clone_fail_cancelled">Установка «%s» отменена.</string>
+    <string name="clone_fail_blocked">Установка «%s» заблокирована (политика устройства, ограничения прошивки или шифрование хранилища).</string>
+    <string name="clone_fail_conflict">«%s» конфликтует с пакетом, уже установленным в рабочем профиле (другая подпись или версия).</string>
+    <string name="clone_fail_incompatible">«%s» несовместимо с этим устройством или рабочим профилем.</string>
+    <string name="clone_fail_invalid">Набор APK «%s» неполный или нечитаемый (неподходящий набор split APK или повреждённый файл).</string>
+    <string name="clone_fail_storage">В рабочем профиле недостаточно места для установки «%s».</string>
+    <string name="clone_fail_aborted">Установка «%s» прервана. Попробуйте ещё раз.</string>
+    <string name="clone_fail_generic">Операция с «%s» не удалась (код %d).</string>
+    <string name="install_unknown_sources_title">Разрешить установку из Gatekeeper</string>
+    <string name="install_unknown_sources_message">Android требует одноразовое разрешение, прежде чем Gatekeeper сможет ставить приложения в рабочий профиль. Включите «Разрешить из этого источника» в открывшемся экране и повторите клонирование.</string>
+    <string name="install_unknown_sources_open">Открыть настройки</string>
     <string name="uninstall_fail_system_app">Невозможно удалить системные приложения в профиле, который Gatekeeper не контролирует.</string>
     <string name="unsupported_launcher">Невозможно добавить ярлык в ваш лаунчер. Пожалуйста, свяжитесь с разработчиком.</string>
     <string name="app_context_menu_title">Операции для %s</string>

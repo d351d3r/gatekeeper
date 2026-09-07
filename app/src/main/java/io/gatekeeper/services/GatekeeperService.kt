@@ -21,6 +21,7 @@ import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.CaCertificates
+import io.gatekeeper.util.CloneOutcome
 import io.gatekeeper.util.FileProviderProxy
 import io.gatekeeper.util.UriForwardProxy
 import io.gatekeeper.util.Utility
@@ -103,6 +104,13 @@ class GatekeeperService : Service() {
 
         override fun installApp(app: ApplicationInfoWrapper, callback: IAppInstallCallback) {
             if (!app.isSystem()) {
+                // Честный отказ до запуска сессии: пакет уже стоит в этом профиле
+                // (в том числе заморожен/скрыт) -- повторное клонирование объяснимо
+                // и мгновенно, вместо криптичного отказа PackageInstaller.
+                if (isPackageInstalledHere(app.getPackageName())) {
+                    callback.callback(CloneOutcome.RESULT_ALREADY_IN_PROFILE)
+                    return
+                }
                 val intent = Intent(DummyActivity.INSTALL_PACKAGE)
                 intent.component = ComponentName(this@GatekeeperService, DummyActivity::class.java)
                 intent.putExtra("package", app.getPackageName())
@@ -119,11 +127,18 @@ class GatekeeperService : Service() {
                 startActivityProxy?.startActivity(intent)
             } else {
                 if (isProfileOwner) {
+                    // enableSystemApp молчит о результате: если прошивка не отдаёт пакет
+                    // в профиль (класс Galaxy Store), его просто не будет после вызова.
+                    // Проверяем фактическое наличие -- это отказ, а не молчаливый "успех".
                     policyManager!!.enableSystemApp(adminComponent!!, app.getPackageName())
+                    if (!isPackageInstalledHere(app.getPackageName())) {
+                        callback.callback(CloneOutcome.RESULT_CANNOT_INSTALL_SYSTEM_APP)
+                        return
+                    }
                     policyManager!!.setApplicationHidden(adminComponent!!, app.getPackageName(), false)
                     callback.callback(Activity.RESULT_OK)
                 } else {
-                    callback.callback(RESULT_CANNOT_INSTALL_SYSTEM_APP)
+                    callback.callback(CloneOutcome.RESULT_CANNOT_INSTALL_SYSTEM_APP)
                 }
             }
         }
@@ -160,7 +175,7 @@ class GatekeeperService : Service() {
                     policyManager!!.setApplicationHidden(adminComponent!!, app.getPackageName(), true)
                     callback.callback(Activity.RESULT_OK)
                 } else {
-                    callback.callback(RESULT_CANNOT_INSTALL_SYSTEM_APP)
+                    callback.callback(CloneOutcome.RESULT_CANNOT_INSTALL_SYSTEM_APP)
                 }
             }
         }
@@ -318,6 +333,14 @@ class GatekeeperService : Service() {
             policyManager!!.isApplicationHidden(adminComponent!!, packageName)
     }
 
+    /** Установлен ли пакет в профиле, где работает этот сервис (скрытые -- тоже установлены). */
+    private fun isPackageInstalledHere(packageName: String): Boolean = try {
+        packageManager!!.getApplicationInfo(packageName, 0)
+        true
+    } catch (_: PackageManager.NameNotFoundException) {
+        false
+    }
+
     private fun setForeground() {
         startForeground(
             NOTIFICATION_ID,
@@ -335,7 +358,6 @@ class GatekeeperService : Service() {
     }
 
     companion object {
-        const val RESULT_CANNOT_INSTALL_SYSTEM_APP = 100001
         private const val NOTIFICATION_ID = 0x49a11
         private const val LIST_ICON_MAX_PX = 128
     }

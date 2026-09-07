@@ -2,6 +2,7 @@ package io.gatekeeper.ui
 
 import android.Manifest
 import android.app.Activity
+import android.app.ActivityOptions
 import android.app.PendingIntent
 import android.app.admin.DevicePolicyManager
 import android.content.ActivityNotFoundException
@@ -131,12 +132,28 @@ class DummyActivity : Activity() {
         val status = callbackIntent.extras!!.getInt(PackageInstaller.EXTRA_STATUS)
         when (status) {
             PackageInstaller.STATUS_PENDING_USER_ACTION -> {
+                // Единственная опасная ветка при бесподписном действии: запуск чужого
+                // интента. Пускаем только системный экран подтверждения установки.
                 @Suppress("DEPRECATION")
-                startActivity(callbackIntent.extras!!.get(Intent.EXTRA_INTENT) as Intent)
+                val confirmIntent = callbackIntent.extras!!.get(Intent.EXTRA_INTENT) as? Intent
+                if (confirmIntent == null || !isSystemInstallerIntent(confirmIntent)) {
+                    Log.w(TAG, "PACKAGEINSTALLER_CALLBACK: чужой EXTRA_INTENT отклонён")
+                    return
+                }
+                startActivity(confirmIntent)
             }
             PackageInstaller.STATUS_SUCCESS -> appInstallFinished(RESULT_OK, operationId)
             else -> appInstallFinished(RESULT_CANCELED, operationId)
         }
+    }
+
+    private fun isSystemInstallerIntent(intent: Intent): Boolean {
+        val resolved = intent.resolveActivity(packageManager) ?: return false
+        val pkg = resolved.packageName ?: return false
+        return pkg == "android" ||
+            pkg == packageName ||
+            pkg == "com.android.packageinstaller" ||
+            pkg == "com.google.android.packageinstaller"
     }
 
     private fun actionOpenPowerSettings() {
@@ -260,6 +277,28 @@ class DummyActivity : Activity() {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // AOSP 14+: сессия установки упирается в «unknown apps»-appop, без него
+            // системный экран показывает отказ без шансов. Проверяем до сессии и
+            // отводим пользователя в переключатель одним тапом (Фаза 19).
+            if (!packageManager.canRequestPackageInstalls()) {
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.install_unknown_sources_title)
+                    .setMessage(R.string.install_unknown_sources_message)
+                    .setPositiveButton(R.string.install_unknown_sources_open) { _, _ ->
+                        val settings = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                            data = Uri.fromParts("package", packageName, null)
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        try {
+                            startActivity(settings)
+                        } catch (_: ActivityNotFoundException) {
+                            GatekeeperToast.show(this, R.string.power_diagnostics_settings_unavailable)
+                        }
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+                return
+            }
             try {
                 actionInstallPackageQ(uri, intent.getStringArrayExtra("split_apks"), operationId)
             } catch (e: IOException) {
@@ -294,16 +333,14 @@ class DummyActivity : Activity() {
         pi.registerSessionCallback(InstallationProgressListener(this, pi, sessionId))
 
         val session = pi.openSession(sessionId)
-        doInstallPackageQ(uri, splitApks, session) {
+        doInstallPackageQ(uri, splitApks, session, operationId) {
             session.setStagingProgress(0.1f)
             val callbackIntent = Intent(this, DummyActivity::class.java).apply {
                 action = PACKAGEINSTALLER_CALLBACK
                 operationId?.let { putExtra(PENDING_PACKAGE_OPERATION_ID, it) }
                 data = Uri.parse("gatekeeper://package-installer/${operationId ?: sessionId}")
             }
-            val pendingIntent = PendingIntent.getActivity(
-                this, sessionId, callbackIntent, PendingIntent.FLAG_MUTABLE
-            )
+            val pendingIntent = packageInstallerCallbackPendingIntent(sessionId, callbackIntent)
             session.commit(pendingIntent.intentSender)
         }
     }
@@ -312,6 +349,7 @@ class DummyActivity : Activity() {
         baseUri: Uri?,
         splitApks: Array<String>?,
         session: PackageInstaller.Session,
+        operationId: String?,
         callback: Runnable
     ) {
         val uris = ArrayList<Uri>()
@@ -323,6 +361,7 @@ class DummyActivity : Activity() {
         }
 
         Thread {
+            var stagingFailed = false
             for (uri in uris) {
                 try {
                     contentResolver.openInputStream(uri).use { input ->
@@ -332,11 +371,61 @@ class DummyActivity : Activity() {
                                 session.fsync(output)
                             }
                     }
-                } catch (_: IOException) {
+                } catch (e: IOException) {
+                    // Фаза 19: непрочитанный APK (файл переехал, URI отозван) -- это отказ
+                    // с объяснением, а не молчаливый коммит неполной сессии.
+                    Log.w(TAG, "failed to stage $uri", e)
+                    stagingFailed = true
                 }
+                if (stagingFailed) break
+            }
+            if (stagingFailed) {
+                abortStaging(session, operationId)
+                return@Thread
             }
             runOnUiThread(callback)
         }.start()
+    }
+
+    /**
+     * PendingIntent статуса PackageInstaller отправляет из фона сама система. На
+     * targetSdk 31+ BAL по умолчанию требует явного opt-in создателя PendingIntent,
+     * иначе доставка статуса блокируется и установка молча зависает (замер Фазы 19
+     * на AOSP 16: "balRequireOptInByPendingIntentCreator", result code=3).
+     */
+    private fun packageInstallerCallbackPendingIntent(
+        requestCode: Int,
+        callbackIntent: Intent
+    ): PendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        val options = ActivityOptions.makeBasic().apply {
+            setPendingIntentCreatorBackgroundActivityStartMode(
+                ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
+            )
+        }
+        PendingIntent.getActivity(
+            this, requestCode, callbackIntent, PendingIntent.FLAG_MUTABLE, options.toBundle()
+        )
+    } else {
+        PendingIntent.getActivity(this, requestCode, callbackIntent, PendingIntent.FLAG_MUTABLE)
+    }
+
+    /**
+     * Откат сессии при ошибке стейджинга: сессия закрывается, ожидающая операция
+     * потребляется и получает объяснимый отказ (INVALID: набор APK неполный/нечитаем).
+     */
+    private fun abortStaging(session: PackageInstaller.Session, operationId: String?) {
+        try {
+            session.abandon()
+        } catch (_: Exception) {
+        }
+        val pending = operationId?.let(::consumePendingPackageOperation)
+        FileProviderProxy.clearForwardProxy(pending?.forwardedUri)
+        try {
+            pending?.callback?.callback(
+                Activity.RESULT_FIRST_USER + PackageInstaller.STATUS_FAILURE_INVALID
+            )
+        } catch (_: RemoteException) {
+        }
     }
 
     private fun actionUninstallPackage() {
@@ -361,8 +450,8 @@ class DummyActivity : Activity() {
             operationId?.let { putExtra(PENDING_PACKAGE_OPERATION_ID, it) }
             data = Uri.parse("gatekeeper://package-uninstall/${operationId ?: UUID.randomUUID()}")
         }
-        val pendingIntent = PendingIntent.getActivity(
-            this, operationId?.hashCode() ?: 0, callbackIntent, PendingIntent.FLAG_MUTABLE
+        val pendingIntent = packageInstallerCallbackPendingIntent(
+            operationId?.hashCode() ?: 0, callbackIntent
         )
         pi.uninstall(requireNotNull(intent.getStringExtra("package")), pendingIntent.intentSender)
     }
@@ -911,6 +1000,13 @@ class DummyActivity : Activity() {
             PUBLIC_UNFREEZE_AND_LAUNCH,
             REFRESH_MAIN_APP_LIST,
             SHOW_TOAST,
+            // Свой PendingIntent статуса PackageInstaller: доставляет система, подпись и
+            // nonce неприменимы (PI живёт дольше 30-секундного окна и стреляет повторно,
+            // nonce одноразовый -- оба гейта рвали бы доставку статуса, замер Фазы 19 на
+            // AOSP 16). Результат уходит только в наш биндер из pending-реестра; единственная
+            // опасная ветка -- запуск EXTRA_INTENT при PENDING_USER_ACTION -- гейтится
+            // списком системных пакетов в [isSystemInstallerIntent].
+            PACKAGEINSTALLER_CALLBACK,
         )
 
         private val ACTIONS_ALLOWED_WITHOUT_SIGNATURE_SAME_PROCESS = listOf(

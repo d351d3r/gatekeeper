@@ -38,12 +38,12 @@ import io.gatekeeper.services.IAppInstallCallback
 import io.gatekeeper.services.IGetAppsCallback
 import io.gatekeeper.services.ILoadIconCallback
 import io.gatekeeper.services.IGatekeeperService
-import io.gatekeeper.services.GatekeeperService
 import io.gatekeeper.util.AntiSpyLaunchGate
 import io.gatekeeper.util.AntiSpyManager
 import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.AutoFreezeDefaults
 import io.gatekeeper.util.AutoFreezePolicy
+import io.gatekeeper.util.CloneOutcome
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.Utility
 
@@ -551,6 +551,9 @@ class AppListFragment : BaseFragment() {
                 service!!.uninstallApp(app, callback)
             }
         } catch (_: RemoteException) {
+            // Профиль-приёмник недоступен (Work Mode выключен, процесс убит, реле не прошло):
+            // молчать нельзя -- пользователь только что попросил операцию.
+            installAppCallback(CloneOutcome.RESULT_NO_PROFILE_CONNECTION, app, isInstall)
         }
     }
 
@@ -578,13 +581,43 @@ class AppListFragment : BaseFragment() {
                 AutoFreezeDefaults.clearWorkProfilePackageTracking(app.getPackageName())
             }
             requestAppListRefresh(followUpAfterInstall = isInstall && !isRemote)
-        } else if (result == GatekeeperService.RESULT_CANNOT_INSTALL_SYSTEM_APP) {
-            GatekeeperToast.show(
-                requireContext(),
-                getString(
-                    if (isInstall) R.string.clone_fail_system_app else R.string.uninstall_fail_system_app
-                ),
+        } else {
+            GatekeeperToast.show(requireContext(), cloneFailureText(result, app, isInstall))
+        }
+    }
+
+    /**
+     * Фаза 19: каждый отказ установки/удаления обязан объяснить себя. Коды --
+     * либо наши (проверки до PackageInstaller), либо RESULT_FIRST_USER + STATUS_...
+     * от PackageInstaller; расшифровка -- [CloneOutcome.reasonOf].
+     */
+    private fun cloneFailureText(result: Int, app: ApplicationInfoWrapper, isInstall: Boolean): String {
+        val label = app.getLabel()
+        return when (CloneOutcome.reasonOf(result)) {
+            CloneOutcome.Reason.SUCCESS -> getString(R.string.clone_fail_generic, label, result)
+            CloneOutcome.Reason.ALREADY_IN_PROFILE ->
+                getString(R.string.clone_fail_already_installed, label)
+            CloneOutcome.Reason.SYSTEM_APP_UNAVAILABLE -> getString(
+                if (isInstall) R.string.clone_fail_system_app else R.string.uninstall_fail_system_app
             )
+            CloneOutcome.Reason.NO_PROFILE_CONNECTION ->
+                getString(R.string.clone_fail_no_connection)
+            CloneOutcome.Reason.CANCELLED_BY_USER ->
+                getString(R.string.clone_fail_cancelled, label)
+            CloneOutcome.Reason.BLOCKED ->
+                getString(R.string.clone_fail_blocked, label)
+            CloneOutcome.Reason.CONFLICT ->
+                getString(R.string.clone_fail_conflict, label)
+            CloneOutcome.Reason.INCOMPATIBLE ->
+                getString(R.string.clone_fail_incompatible, label)
+            CloneOutcome.Reason.INVALID_APK ->
+                getString(R.string.clone_fail_invalid, label)
+            CloneOutcome.Reason.OUT_OF_SPACE ->
+                getString(R.string.clone_fail_storage, label)
+            CloneOutcome.Reason.ABORTED ->
+                getString(R.string.clone_fail_aborted, label)
+            CloneOutcome.Reason.UNKNOWN ->
+                getString(R.string.clone_fail_generic, label, result)
         }
     }
 
