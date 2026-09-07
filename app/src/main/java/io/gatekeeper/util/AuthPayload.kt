@@ -9,7 +9,7 @@ object AuthPayload {
     val SIGNED_EXTRA_KEYS = listOf(
         "packageName", "package", "apk", "direct_install_apk", "split_apks", "list",
         "linkedPackages", "linkedPackagesShouldFreeze", "shouldFreeze", "name", "boolean",
-        "int", "auto_freeze_list", "toast_res_id", "work_packages"
+        "int", "auto_freeze_list", "toast_res_id"
     )
 
     fun canonicalize(action: String?, timestamp: Long, extras: List<Pair<String, String>>): String {

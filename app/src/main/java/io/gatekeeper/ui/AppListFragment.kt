@@ -461,15 +461,10 @@ class AppListFragment : BaseFragment() {
                             LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE,
                             apps
                         )
-                        var autoFreezeListChanged = false
-                        autoFreezeListChanged = AutoFreezeDefaults.applyDefaultsForNewPackages(
-                            requireContext(),
-                            knownWorkProfilePackages, currentPackages
-                        )
                         knownWorkProfilePackages = currentSet
                         AntiSpyManager.syncAutoFreezeListToWorkProfile(
                             requireContext(),
-                            force = autoFreezeListChanged
+                            force = false
                         )
                         AutoFreezePolicy.migrateLegacyFrozenWithoutAutoFreeze(service!!, apps)
                         autoFreezePackages = HashSet(

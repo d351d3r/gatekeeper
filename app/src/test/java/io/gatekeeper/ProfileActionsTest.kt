@@ -17,7 +17,6 @@ class ProfileActionsTest {
             ProfileActions.PUBLIC_FREEZE_ALL, ProfileActions.PUBLIC_UNFREEZE_ALL,
             ProfileActions.SHOW_TOAST, ProfileActions.REFRESH_MAIN_APP_LIST,
             ProfileActions.FREEZE_ALL_IN_LIST, ProfileActions.UNFREEZE_ALL_IN_LIST,
-            ProfileActions.ENABLE_AUTO_FREEZE_WORK_PROFILE,
             ProfileActions.REMOVE_UNFREEZE_SHORTCUT, ProfileActions.START_FILE_SHUTTLE,
             ProfileActions.START_FILE_SHUTTLE_2, ProfileActions.SYNCHRONIZE_PREFERENCE,
             ProfileActions.SYNC_ANTI_SPY_VPN_WATCH, ProfileActions.VPN_SESSION_COMPLETE,

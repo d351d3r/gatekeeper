@@ -34,7 +34,6 @@ import io.gatekeeper.util.AntiSpyLaunchGate
 import io.gatekeeper.util.AntiSpyManager
 import io.gatekeeper.util.AntiSpyVpnGuard
 import io.gatekeeper.util.AuthenticationUtility
-import io.gatekeeper.util.AutoFreezeDefaults
 import io.gatekeeper.util.FileProviderProxy
 import io.gatekeeper.util.InstallationProgressListener
 import io.gatekeeper.util.LocalStorageManager
@@ -116,7 +115,6 @@ class DummyActivity : Activity() {
             REFRESH_MAIN_APP_LIST -> actionRefreshMainAppList()
             FREEZE_ALL_IN_LIST -> actionFreezeAllInList()
             UNFREEZE_ALL_IN_LIST -> actionUnfreezeAllInList()
-            ENABLE_AUTO_FREEZE_WORK_PROFILE -> actionEnableAutoFreezeWorkProfile()
             REMOVE_UNFREEZE_SHORTCUT -> actionRemoveUnfreezeShortcut()
             START_FILE_SHUTTLE, START_FILE_SHUTTLE_2 -> actionStartFileShuttle()
             SYNCHRONIZE_PREFERENCE -> actionSynchronizePreference()
@@ -399,9 +397,6 @@ class DummyActivity : Activity() {
     private fun onPackageOperationFinished(type: OperationType, packageName: String) {
         when (type) {
             OperationType.INSTALL -> {
-                if (isProfileOwner) {
-                    AutoFreezeDefaults.requestEnableOnMainProfile(this, packageName)
-                }
             }
             OperationType.UNINSTALL -> {
                 if (isProfileOwner) {
@@ -585,18 +580,6 @@ class DummyActivity : Activity() {
             forwardIntent.putExtra("linkedPackagesShouldFreeze", packagesShouldFreeze)
         }
         startActivity(forwardIntent)
-    }
-
-    private fun actionEnableAutoFreezeWorkProfile() {
-        if (!isProfileOwner) {
-            val packageName = intent.getStringExtra("packageName")
-            if (packageName != null) {
-                AutoFreezeDefaults.enableForWorkProfile(this, packageName, clearOptOut = true)
-            }
-            Utility.deliverAppListRefreshInMainProcess(this)
-            Utility.scheduleAppListRefresh(this, longArrayOf(700L, 2000L, 4500L))
-        }
-        finish()
     }
 
     private fun registerAppToFreeze(packageName: String) {
@@ -906,8 +889,6 @@ class DummyActivity : Activity() {
         const val REFRESH_MAIN_APP_LIST = ProfileActions.REFRESH_MAIN_APP_LIST
         const val FREEZE_ALL_IN_LIST = ProfileActions.FREEZE_ALL_IN_LIST
         const val UNFREEZE_ALL_IN_LIST = ProfileActions.UNFREEZE_ALL_IN_LIST
-        const val ENABLE_AUTO_FREEZE_WORK_PROFILE =
-            ProfileActions.ENABLE_AUTO_FREEZE_WORK_PROFILE
         const val REMOVE_UNFREEZE_SHORTCUT =
             ProfileActions.REMOVE_UNFREEZE_SHORTCUT
         const val START_FILE_SHUTTLE = ProfileActions.START_FILE_SHUTTLE

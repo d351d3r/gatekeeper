@@ -120,12 +120,8 @@ class LocalStorageManager private constructor(context: Context) {
         const val PREF_ANTI_SPY_FREEZE_DELAY = "anti_spy_freeze_delay"
         const val PREF_UNFREEZE_SHORTCUT_REGISTRY = "unfreeze_shortcut_registry"
         const val PREF_LEGACY_FROZEN_MIGRATION_DONE = "legacy_frozen_migration_done"
-        /** Last seen work-profile package set; used to detect store installs between sessions. */
-        const val PREF_KNOWN_WORK_PROFILE_PACKAGES = "known_work_profile_packages"
         /** User removed auto-freeze; do not re-assign until they enable it in the menu. */
         const val PREF_AUTO_FREEZE_OPT_OUT_WORK_PROFILE = "auto_freeze_opt_out_work_profile"
-        /** Store installs waiting for cross-profile write to the auto-freeze list. */
-        const val PREF_PENDING_STORE_AUTO_FREEZE = "pending_store_auto_freeze"
         const val PREF_POWER_DIAGNOSTICS_LAST_PROMPT_AT = "power_diagnostics_last_prompt_at"
 
         private const val LIST_DIVIDER = ","
