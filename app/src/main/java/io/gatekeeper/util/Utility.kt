@@ -188,7 +188,7 @@ object Utility {
         try {
             val intent = freezeAllInListIntent(normalized)
             transferIntentToProfile(context, intent)
-            val pi = PendingIntent.getActivity(
+            val pi = PendingIntents.activity(
                 context,
                 0xE49E1,
                 intent,
@@ -351,7 +351,7 @@ object Utility {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             }
             transferIntentToProfile(context, intent)
-            val pi = PendingIntent.getActivity(
+            val pi = PendingIntents.activity(
                 context,
                 0xE49E7,
                 intent,
@@ -456,7 +456,7 @@ object Utility {
             var requestCode = 0xE49E8
             for (delay in APP_LIST_REFRESH_DELIVERY_DELAYS_MS) {
                 val intent = refreshMainAppListIntent(app, fromWork)
-                val pi = PendingIntent.getActivity(
+                val pi = PendingIntents.activity(
                     app,
                     requestCode++,
                     intent,

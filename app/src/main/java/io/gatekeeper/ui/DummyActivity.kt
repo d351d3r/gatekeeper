@@ -38,6 +38,7 @@ import io.gatekeeper.util.AuthenticationUtility
 import io.gatekeeper.util.FileProviderProxy
 import io.gatekeeper.util.InstallationProgressListener
 import io.gatekeeper.util.LocalStorageManager
+import io.gatekeeper.util.PendingIntents
 import io.gatekeeper.util.PendingOperationRegistry
 import io.gatekeeper.util.ProfileActions
 import io.gatekeeper.util.SameProcessTokens
@@ -388,26 +389,16 @@ class DummyActivity : Activity() {
     }
 
     /**
-     * PendingIntent статуса PackageInstaller отправляет из фона сама система. На
-     * targetSdk 31+ BAL по умолчанию требует явного opt-in создателя PendingIntent,
-     * иначе доставка статуса блокируется и установка молча зависает (замер Фазы 19
-     * на AOSP 16: "balRequireOptInByPendingIntentCreator", result code=3).
+     * PendingIntent статуса PackageInstaller отправляет из фона сама система; без
+     * явного opt-in создателя BAL режет доставку и установка молча зависает
+     * (замер Фазы 19 на AOSP 16). Общая логика -- [PendingIntents.activity].
      */
     private fun packageInstallerCallbackPendingIntent(
         requestCode: Int,
         callbackIntent: Intent
-    ): PendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        val options = ActivityOptions.makeBasic().apply {
-            setPendingIntentCreatorBackgroundActivityStartMode(
-                ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
-            )
-        }
-        PendingIntent.getActivity(
-            this, requestCode, callbackIntent, PendingIntent.FLAG_MUTABLE, options.toBundle()
-        )
-    } else {
-        PendingIntent.getActivity(this, requestCode, callbackIntent, PendingIntent.FLAG_MUTABLE)
-    }
+    ): PendingIntent = PendingIntents.activity(
+        this, requestCode, callbackIntent, PendingIntent.FLAG_MUTABLE
+    )
 
     /**
      * Откат сессии при ошибке стейджинга: сессия закрывается, ожидающая операция
