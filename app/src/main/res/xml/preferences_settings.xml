@@ -22,6 +22,12 @@
             android:summary="@string/settings_cross_profile_file_chooser_desc" />
 
         <androidx.preference.CheckBoxPreference
+            android:dependency="settings_cross_profile_file_chooser"
+            android:key="settings_media_mirror"
+            android:title="@string/settings_media_mirror"
+            android:summary="@string/settings_media_mirror_desc" />
+
+        <androidx.preference.CheckBoxPreference
             android:key="settings_block_contacts_searching"
             android:title="@string/settings_block_contacts_searching"
             android:summary="@string/settings_block_contacts_searching_desc" />

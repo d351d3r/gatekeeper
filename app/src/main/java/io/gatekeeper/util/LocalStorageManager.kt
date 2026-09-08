@@ -123,6 +123,10 @@ class LocalStorageManager private constructor(context: Context) {
         /** User removed auto-freeze; do not re-assign until they enable it in the menu. */
         const val PREF_AUTO_FREEZE_OPT_OUT_WORK_PROFILE = "auto_freeze_opt_out_work_profile"
         const val PREF_POWER_DIAGNOSTICS_LAST_PROMPT_AT = "power_diagnostics_last_prompt_at"
+        /** Фаза 17 (D8): автоперенос медиа из рабочего профиля, по умолчанию выключен. */
+        const val PREF_MEDIA_MIRROR_ENABLED = "media_mirror_enabled"
+        /** Watermark догонa: mtime последнего перенесённого (или пропущенного) файла. */
+        const val PREF_MEDIA_MIRROR_WATERMARK = "media_mirror_watermark"
 
         private const val LIST_DIVIDER = ","
         private const val PREFS_NAME = "prefs"

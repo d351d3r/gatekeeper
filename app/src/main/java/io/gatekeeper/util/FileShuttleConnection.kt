@@ -311,6 +311,9 @@ object FileShuttleConnection {
         }
         schedulePing()
         appContext?.let { notifyChange(it) }
+        // Фаза 17 (D8): каждое оживление шаттла -- шанс догнать новые медиа рабочего
+        // профиля; внутри гейт по настройке и направлению, работа уходит в свой поток.
+        appContext?.let { MediaMirror.mirrorIfEnabled(it) }
         // Без подписки на смерть BpBinder о ней не узнает и isBinderAlive продолжит врать.
         try {
             service.asBinder().linkToDeath({ session.discard(generation) }, 0)

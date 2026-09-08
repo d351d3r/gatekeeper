@@ -59,6 +59,8 @@
     <string name="install_unknown_sources_title">Разрешить установку из Gatekeeper</string>
     <string name="install_unknown_sources_message">Android требует одноразовое разрешение, прежде чем Gatekeeper сможет ставить приложения в рабочий профиль. Включите «Разрешить из этого источника» в открывшемся экране и повторите клонирование.</string>
     <string name="install_unknown_sources_open">Открыть настройки</string>
+    <string name="settings_media_mirror">Автокопирование скриншотов и фото из профиля</string>
+    <string name="settings_media_mirror_desc">Копировать новые скриншоты (Pictures/Screenshots) и фото/видео камеры (DCIM/Camera) из рабочего профиля в личную галерею — осознанная дырка в изоляции только для этих двух папок. Срабатывает при каждом подключении File Shuttle (например, при открытии «Файлов»); файлы копируются, а не переносятся. Всё остальное остаётся в рабочем профиле.</string>
     <string name="uninstall_fail_system_app">Невозможно удалить системные приложения в профиле, который Gatekeeper не контролирует.</string>
     <string name="unsupported_launcher">Невозможно добавить ярлык в ваш лаунчер. Пожалуйста, свяжитесь с разработчиком.</string>
     <string name="app_context_menu_title">Операции для %s</string>

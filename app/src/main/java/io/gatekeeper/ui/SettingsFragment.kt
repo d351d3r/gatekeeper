@@ -49,6 +49,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         }
 
     private var prefCrossProfileFileChooser: CheckBoxPreference? = null
+    private var prefMediaMirror: CheckBoxPreference? = null
     private var prefBlockContactsSearching: CheckBoxPreference? = null
     private var prefAutoFreezeService: CheckBoxPreference? = null
     private var prefSkipForeground: CheckBoxPreference? = null
@@ -94,6 +95,13 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         prefCrossProfileFileChooser = findPreference(SETTINGS_CROSS_PROFILE_FILE_CHOOSER)
         prefCrossProfileFileChooser!!.isChecked = manager.getCrossProfileFileChooserEnabled()
         prefCrossProfileFileChooser!!.onPreferenceChangeListener = this
+
+        prefMediaMirror = findPreference(SETTINGS_MEDIA_MIRROR)
+        prefMediaMirror!!.isChecked =
+            LocalStorageManager.getInstance().getBoolean(
+                LocalStorageManager.PREF_MEDIA_MIRROR_ENABLED
+            )
+        prefMediaMirror!!.onPreferenceChangeListener = this
 
         prefBlockContactsSearching = findPreference(SETTINGS_BLOCK_CONTACTS_SEARCHING)
         prefBlockContactsSearching!!.isChecked = manager.getBlockContactsSearchingEnabled()
@@ -588,6 +596,11 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
                 manager.setCrossProfileFileChooserEnabled(true)
                 true
             }
+            prefMediaMirror -> {
+                LocalStorageManager.getInstance()
+                    .setBoolean(LocalStorageManager.PREF_MEDIA_MIRROR_ENABLED, newState as Boolean)
+                true
+            }
             prefBlockContactsSearching -> {
                 manager.setBlockContactsSearchingEnabled(newState as Boolean)
                 true
@@ -689,6 +702,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         private const val SETTINGS_VERSION = "settings_version"
         private const val SETTINGS_SOURCE_CODE = "settings_source_code"
         private const val SETTINGS_CROSS_PROFILE_FILE_CHOOSER = "settings_cross_profile_file_chooser"
+        private const val SETTINGS_MEDIA_MIRROR = "settings_media_mirror"
         private const val SETTINGS_BLOCK_CONTACTS_SEARCHING = "settings_block_contacts_searching"
         private const val SETTINGS_AUTO_FREEZE_SERVICE = "settings_auto_freeze_service"
         private const val SETTINGS_AUTO_FREEZE_DELAY = "settings_auto_freeze_delay"
