@@ -116,3 +116,4 @@ repackage/*
 # Agent / editor local state, never commit
 /.claude/
 /.vscode/
+/.mcp.json

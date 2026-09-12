@@ -34,14 +34,8 @@ Tested on:
 ## Clone and build
 
 ```sh
-git clone --recurse-submodules https://github.com/d351d3r/gatekeeper.git
+git clone https://github.com/d351d3r/gatekeeper.git
 cd gatekeeper
-```
-
-If you already cloned without submodules:
-
-```powershell
-git submodule update --init --recursive
 ```
 
 Build a debug APK (Android Studio JBR or JDK 17+):
@@ -80,4 +74,4 @@ GPL-3.0-or-later - see [LICENSE](LICENSE). Gatekeeper is derived from Shelter; r
 ## Upstream
 
 - [Shelter](https://cgit.typeblog.net/Shelter/about/) by PeterCxy
-- [SetupWizardLibrary](https://gitea.angry.im/PeterCxy/SetupWizardLibrary) (git submodule)
+- [SetupWizardLibrary](https://gitea.angry.im/PeterCxy/SetupWizardLibrary) (vendored under `libs/SetupWizardLibrary`)
