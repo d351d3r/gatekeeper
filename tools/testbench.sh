@@ -189,6 +189,113 @@ cmd_up() {
     cmd_status
 }
 
+# Проверка календаря рабочего профиля (сценарий: приложение профиля добавляет событие).
+# Шелл без root в work profile не пускает (дефолтный рестрикшэн no_debugging_features,
+# см. .ai/crossprofile-fixes/plan.md, фаза 5), поэтому шаг работает под adb root.
+#
+# Что проверяет:
+#   1. CalendarProvider профиля доступен на запись как обычному приложению с
+#      WRITE_CALENDAR: создается тестовый календарь-приемник, в него пишется
+#      событие, событие читается обратно.
+#   2. Изоляция: события профиля не видны из user 0.
+#   3. Резолв ACTION_INSERT vnd.android.cursor.item/event внутри профиля
+#      (куда попадет intent от приложения профиля).
+#
+# Google-аккаунта на стенде нет, поэтому UI-путь Google Calendar ("No calendars
+# have been synchronized with this device yet") здесь не проверяется: он зависит
+# от аккаунта в профиле, а не от Gatekeeper. Артефакты проверки 2026-09-12 --
+# скриншоты .ai/crossprofile-fixes/screenshots/gk-*.png.
+CAL_ACCOUNT="gk.testbench@local"
+CAL_TYPE="gk.testbench.local"
+# Глобальные, а не локальные: RETURN-трап в bash 3.2 (штатный на macOS) срабатывает
+# уже после разбора локального скоупа функции -- с локалами он видел бы unbound.
+CAL_WU=""
+CAL_TITLE=""
+CAL_BID=""
+
+cleanup() {
+    trap - RETURN
+    [ -n "$CAL_BID" ] || return 0
+    a shell "content delete --user $CAL_WU --uri \
+        \"content://com.android.calendar/events?caller_is_syncadapter=true&account_name=$CAL_ACCOUNT&account_type=$CAL_TYPE\" \
+        --where \"title='$CAL_TITLE'\"" > /dev/null 2>&1 || true
+    a shell "content delete --user $CAL_WU --uri \
+        \"content://com.android.calendar/calendars/$CAL_BID?caller_is_syncadapter=true&account_name=$CAL_ACCOUNT&account_type=$CAL_TYPE\"" \
+        > /dev/null 2>&1 || true
+    CAL_BID=""
+    # unroot только здесь: уборка выше требует root (no_debugging_features),
+    # а RETURN-трап срабатывает после тела cmd_calendar, включая ее бывший unroot.
+    a unroot > /dev/null 2>&1 || true
+    a wait-for-device > /dev/null 2>&1 || true
+}
+
+cmd_calendar() {
+    guard
+    local rc=0
+    CAL_WU="$(require_work_user)"
+    CAL_TITLE="GK TestBench $(date +%s)"
+    local title="$CAL_TITLE" wu="$CAL_WU"
+    say "рабочий профиль: user $wu, маркер события: $title"
+    a root > /dev/null
+    a wait-for-device
+    for u in 0 "$wu"; do
+        a shell pm grant --user "$u" com.android.shell android.permission.WRITE_CALENDAR > /dev/null
+        a shell pm grant --user "$u" com.android.shell android.permission.READ_CALENDAR > /dev/null
+    done
+
+    # Провайдер требует caller_is_syncadapter в query и аккаунт ОДНОВРЕМЕННО
+    # в query-параметрах и в values (иначе "Sync adapters must specify an account").
+    a shell "content insert --user $wu --uri \
+        \"content://com.android.calendar/calendars?caller_is_syncadapter=true&account_name=$CAL_ACCOUNT&account_type=$CAL_TYPE\" \
+        --bind account_name:s:$CAL_ACCOUNT --bind account_type:s:$CAL_TYPE \
+        --bind name:s:GK_TestBench --bind calendar_displayName:s:GK_TestBench \
+        --bind calendar_color:i:3046706 --bind calendar_access_level:i:700 \
+        --bind ownerAccount:s:$CAL_ACCOUNT --bind sync_events:i:1 --bind visible:i:1" \
+        > /dev/null || { a unroot > /dev/null 2>&1; die "не удалось создать тестовый календарь в user $wu"; }
+    CAL_BID="$(a shell "content query --user $wu --uri content://com.android.calendar/calendars \
+        --projection _id --where \"calendar_displayName='GK_TestBench'\"" | tr -d '\r' \
+        | sed -n 's/.*_id=\([0-9]*\).*/\1/p' | head -1)"
+    [ -n "$CAL_BID" ] || { a unroot > /dev/null 2>&1; die "тестовый календарь не читается из user $wu"; }
+    say "тестовый календарь: _id=$CAL_BID"
+
+    # Гарантированная уборка тестовых данных даже при падении проверок ниже.
+    trap cleanup RETURN
+
+    fail() { say "FAIL: $*"; rc=1; }
+
+    # 1. Запись события от имени приложения профиля (WRITE_CALENDAR, без sync-adapter).
+    a shell "B=\$(date +%s); content insert --user $wu --uri content://com.android.calendar/events \
+        --bind calendar_id:i:$CAL_BID --bind title:s:\"$title\" \
+        --bind dtstart:l:\${B}000 --bind dtend:l:\$((B+3600))000 --bind eventTimezone:s:UTC" \
+        > /dev/null || fail "вставка события в user $wu не удалась"
+
+    # 2. Чтение обратно из профиля.
+    a shell "content query --user $wu --uri content://com.android.calendar/events \
+        --projection _id:title --where \"title='$title'\"" | tr -d '\r' | grep -q "$title" \
+        || fail "событие '$title' не читается из user $wu"
+    say "событие записано и прочитано из user $wu"
+
+    # 3. Изоляция: в user 0 маркера быть не должно.
+    if a shell "content query --user 0 --uri content://com.android.calendar/events \
+        --projection _id:title --where \"title='$title'\"" 2>/dev/null | tr -d '\r' | grep -q "$title"; then
+        fail "событие профиля видно из user 0 (утечка данных!)"
+    else
+        say "изоляция соблюдена: в user 0 события нет"
+    fi
+
+    # 4. Куда резолвится ACTION_INSERT события внутри профиля.
+    if a shell "cmd package query-activities --user $wu \
+        -a android.intent.action.INSERT -t vnd.android.cursor.item/event" | tr -d '\r' | grep -q "packageName="; then
+        say "ACTION_INSERT .../event резолвится в user $wu:"
+        a shell "cmd package query-activities --user $wu \
+            -a android.intent.action.INSERT -t vnd.android.cursor.item/event" | tr -d '\r' | grep -E "packageName=" | head -3
+    else
+        fail "ACTION_INSERT .../event не резолвится ни в одно приложение user $wu"
+    fi
+
+    [ "$rc" -eq 0 ] && say "calendar: OK" || { cleanup; die "calendar: есть падения"; }
+}
+
 cmd_unit() {
     say "JVM-тесты"
     gradlew testDebugUnitTest
@@ -307,6 +414,7 @@ $0 <команда>
   profile            поднять рабочий профиль обходным путем, зарегистрировать фильтры
   perms              выдать MANAGE_EXTERNAL_STORAGE и SYSTEM_ALERT_WINDOW в обоих профилях
   files              создать маркерные файлы для проверок File Shuttle
+  calendar           проверка календаря профиля: запись события, изоляция, резолв INSERT
   up                 boot + check + build + install + profile + perms + files + status
   unit               ./gradlew testDebugUnitTest
   instr [class]      инструментальные тесты в личном профиле (ANDROID_SERIAL=$SERIAL)
@@ -334,6 +442,7 @@ main() {
         profile) cmd_profile ;;
         perms) cmd_perms ;;
         files) cmd_files ;;
+        calendar) cmd_calendar ;;
         up) cmd_up ;;
         unit) cmd_unit ;;
         instr) cmd_instr "$@" ;;
