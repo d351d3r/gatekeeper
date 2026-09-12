@@ -22,6 +22,7 @@ import androidx.annotation.RequiresApi
 import io.gatekeeper.R
 import io.gatekeeper.GatekeeperApplication
 import io.gatekeeper.util.CrossProfileDocumentsProvider
+import io.gatekeeper.util.FileShuttlePathResolver
 import io.gatekeeper.util.Utility
 import java.io.File
 import java.io.FileNotFoundException
@@ -41,7 +42,8 @@ class FileShuttleService : Service() {
         override fun loadFiles(path: String): List<Map<String, Serializable>> {
             resetSuicideTask()
             val ret = ArrayList<Map<String, Serializable>>()
-            val f = File(resolvePath(path))
+            val resolved = resolvePath(path) ?: return ret
+            val f = File(resolved)
             f.listFiles()?.forEach { child ->
                 ret.add(loadFileMeta(child.path))
             }
@@ -50,8 +52,16 @@ class FileShuttleService : Service() {
 
         override fun loadFileMeta(path: String): Map<String, Serializable> {
             resetSuicideTask()
-            val f = File(resolvePath(path))
             val map = HashMap<String, Serializable>()
+            val resolved = resolvePath(path)
+            if (resolved == null) {
+                // Нейтральный отказ: документ без флагов и с исходным id, чтобы
+                // клиент видел запись, но не мог ни открыть, ни удалить её.
+                map[DocumentsContract.Document.COLUMN_DOCUMENT_ID] = path
+                map[DocumentsContract.Document.COLUMN_FLAGS] = 0
+                return map
+            }
+            val f = File(resolved)
             map[DocumentsContract.Document.COLUMN_DOCUMENT_ID] = f.absolutePath
             if (f == Environment.getExternalStorageDirectory()) {
                 map[DocumentsContract.Document.COLUMN_DISPLAY_NAME] = getString(R.string.app_name)
@@ -85,7 +95,8 @@ class FileShuttleService : Service() {
 
         override fun openFile(path: String, mode: String): ParcelFileDescriptor? {
             resetSuicideTask()
-            val f = File(resolvePath(path))
+            val resolved = resolvePath(path) ?: return null
+            val f = File(resolved)
             val numericMode = ParcelFileDescriptor.parseMode(mode)
 
             return try {
@@ -105,15 +116,12 @@ class FileShuttleService : Service() {
 
         override fun openThumbnail(path: String, sizeHint: Point): ParcelFileDescriptor? {
             resetSuicideTask()
-            val fullPath = resolvePath(path)
-            val mime = MimeTypeMap.getSingleton()
-                .getMimeTypeFromExtension(Utility.getFileExtension(fullPath))
-                ?: return null
-            return when {
-                mime.startsWith("image/") -> loadImageThumbnail(fullPath, sizeHint)
-                mime.startsWith("video/") -> loadVideoThumbnail(fullPath)
-                else -> null
-            }
+            return resolvePath(path)
+                ?.let { fullPath ->
+                    MimeTypeMap.getSingleton()
+                        .getMimeTypeFromExtension(Utility.getFileExtension(fullPath))
+                        ?.let { mime -> thumbnailFor(mime, fullPath, sizeHint) }
+                }
         }
 
         override fun createFile(path: String, mimeType: String, displayName: String): String? {
@@ -131,7 +139,8 @@ class FileShuttleService : Service() {
                 }
             }
 
-            val f = File(resolvePath(fullPath))
+            val resolved = resolvePath(fullPath) ?: return null
+            val f = File(resolved)
             return try {
                 if ((isDirectory && !f.mkdir()) || (!isDirectory && !f.createNewFile())) {
                     null
@@ -146,7 +155,8 @@ class FileShuttleService : Service() {
 
         override fun deleteFile(path: String): String {
             resetSuicideTask()
-            val f = File(resolvePath(path))
+            val resolved = resolvePath(path) ?: return path
+            val f = File(resolved)
             f.delete()
             return (f.parentFile ?: f).absolutePath
         }
@@ -155,17 +165,31 @@ class FileShuttleService : Service() {
             // Клиент считает срок связи от отправки любого дошедшего вызова, поэтому таймер
             // обязан сбрасывать каждый метод стаба без исключений.
             resetSuicideTask()
-            val parentFile = File(resolvePath(parent))
-            val childFile = File(resolvePath(child))
-            var parentPath = parentFile.absolutePath
-            if (parentPath[parentPath.length - 1] != '/') {
-                parentPath += "/"
-            }
-            return parentFile.exists() && parentFile.isDirectory &&
-                childFile.exists() &&
-                childFile.absolutePath.startsWith(parentPath)
+            return isChildResolved(parent, child) ?: false
         }
     }
+
+    private fun isChildResolved(parent: String, child: String): Boolean? {
+        val parentResolved = resolvePath(parent)
+        val childResolved = resolvePath(child)
+        if (parentResolved == null || childResolved == null) return null
+        val parentFile = File(parentResolved)
+        val childFile = File(childResolved)
+        var parentPath = parentFile.absolutePath
+        if (parentPath[parentPath.length - 1] != '/') {
+            parentPath += "/"
+        }
+        return parentFile.exists() && parentFile.isDirectory &&
+            childFile.exists() &&
+            childFile.absolutePath.startsWith(parentPath)
+    }
+
+    private fun thumbnailFor(mime: String, fullPath: String, sizeHint: Point): ParcelFileDescriptor? =
+        when {
+            mime.startsWith("image/") -> loadImageThumbnail(fullPath, sizeHint)
+            mime.startsWith("video/") -> loadVideoThumbnail(fullPath)
+            else -> null
+        }
 
     override fun onBind(intent: Intent?): IBinder {
         resetSuicideTask()
@@ -233,29 +257,18 @@ class FileShuttleService : Service() {
     // Единственный корень, который сервис имеет право трогать. Документ-Id приходят двух видов:
     // с префиксом DUMMY_ROOT (прямые вызовы провайдера) и уже развернутые абсолютные пути
     // (loadFileMeta отдает COLUMN_DOCUMENT_ID как абсолютный путь, и DocumentsUI возвращает их
-    // как есть). Оба вида обязаны лежать в общем внешнем хранилище: канонизация отсекает
-    // выход через ".." и симлинки. Путь вне корня заменяется на сам корень -- операции на нем
-    // безопасно отказывают (открытие каталога дает IOException, удаление непустого каталога
-    // неуспешно), а исключение из стаба унесло бы весь процесс профиля.
-    private fun resolvePath(path: String): String {
-        val root = Environment.getExternalStorageDirectory()
-        val f = if (path.startsWith(CrossProfileDocumentsProvider.DUMMY_ROOT)) {
-            File(root, path.substring(CrossProfileDocumentsProvider.DUMMY_ROOT.length))
-        } else {
-            File(path)
+    // как есть). Контракт и отказ -- в FileShuttlePathResolver: вне его стаб возвращает
+    // нейтральный отказ (пустой список/null/false), а не клампит в корень (E-7).
+    private fun resolvePath(path: String): String? {
+        val resolved = FileShuttlePathResolver.resolve(
+            path,
+            CrossProfileDocumentsProvider.DUMMY_ROOT,
+            Environment.getExternalStorageDirectory(),
+        )
+        if (resolved == null) {
+            android.util.Log.w("FileShuttleService", "refused document id outside shuttle root: $path")
         }
-        val canonical = try {
-            f.canonicalFile
-        } catch (_: IOException) {
-            root
-        }
-        val rootPath = root.absolutePath
-        val canonicalPath = canonical.absolutePath
-        return if (canonicalPath == rootPath || canonicalPath.startsWith("$rootPath/")) {
-            canonicalPath
-        } else {
-            rootPath
-        }
+        return resolved
     }
 
     private fun resetSuicideTask() {
