@@ -127,6 +127,10 @@ class LocalStorageManager private constructor(context: Context) {
         const val PREF_MEDIA_MIRROR_ENABLED = "media_mirror_enabled"
         /** Watermark догонa: mtime последнего перенесённого (или пропущенного) файла. */
         const val PREF_MEDIA_MIRROR_WATERMARK = "media_mirror_watermark"
+        /** Подсказка "клонировать магазин в рабочий профиль": состояние StoreCloneHint. */
+        const val PREF_STORE_CLONE_HINT_STATE = "store_clone_hint_state"
+        /** Момент нажатия "Позже" по подсказке магазина (снooze на неделю). */
+        const val PREF_STORE_CLONE_HINT_SNOOZE_AT = "store_clone_hint_snooze_at"
 
         private const val LIST_DIVIDER = ","
         private const val PREFS_NAME = "prefs"

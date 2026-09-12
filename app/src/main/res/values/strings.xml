@@ -163,6 +163,11 @@
     <string name="clone_fail_storage">Not enough storage space in the work profile to install \"%s\".</string>
     <string name="clone_fail_aborted">Installation of \"%s\" was aborted. Try again.</string>
     <string name="clone_fail_generic">Operation on \"%s\" failed (code %d).</string>
+    <string name="store_clone_hint_title">Install an app store in the work profile?</string>
+    <string name="store_clone_hint_message">\"%s\" is not in your work profile yet. Clone it now so you can install work apps straight from the store.</string>
+    <string name="store_clone_hint_clone">Clone %s</string>
+    <string name="store_clone_hint_later">Later</string>
+    <string name="store_clone_hint_never">Don\'t ask again</string>
     <string name="install_unknown_sources_title">Allow installs from Gatekeeper</string>
     <string name="install_unknown_sources_message">Android requires a one-time permission before Gatekeeper can install apps into the work profile. Enable \"Allow from this source\" in the screen that opens, then start the clone again.</string>
     <string name="install_unknown_sources_open">Open settings</string>

@@ -58,9 +58,12 @@ import io.gatekeeper.util.ProfileActions
 import io.gatekeeper.util.PowerDiagnostics
 import io.gatekeeper.util.ServiceLiveness
 import io.gatekeeper.util.SettingsManager
+import io.gatekeeper.util.StoreCloneHint
 import io.gatekeeper.util.UriForwardProxy
 import io.gatekeeper.util.Utility
 import io.gatekeeper.util.WorkServiceBindFailure
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 
@@ -356,6 +359,121 @@ class MainActivity : AppCompatActivity() {
             startWorkListPolling()
         }
         buildView()
+        maybePromptStoreClone()
+    }
+
+    /**
+     * Одноразовая подсказка после настройки: магазина приложений нет в
+     * рабочем профиле -- предлагаем клонировать одним тапом. Закрывает самый
+     * частый вопрос новичков (4PDA #2097-#2118, #2100). Чистая логика
+     * порогов -- в [StoreCloneHint]; здесь только binder-вызовы и UI.
+     */
+    private fun maybePromptStoreClone() {
+        val local = storage ?: return
+        if (!StoreCloneHint.isDue(
+                local.getIntFresh(
+                    LocalStorageManager.PREF_STORE_CLONE_HINT_STATE,
+                    StoreCloneHint.STATE_NEVER_ASKED,
+                ),
+                local.getLong(LocalStorageManager.PREF_STORE_CLONE_HINT_SNOOZE_AT, 0L),
+                System.currentTimeMillis(),
+            )
+        ) return
+        val main = serviceMain ?: return
+        val work = serviceWork ?: return
+        Thread {
+            val store = findCloneableStore(main, work) ?: return@Thread
+            window.decorView.post {
+                if (isFinishing) return@post
+                // Фиксируем показ сразу: повторный bind после поворота экрана
+                // не должен вызывать диалог повторно. "Позже" снooзит на неделю.
+                local.setInt(LocalStorageManager.PREF_STORE_CLONE_HINT_STATE, StoreCloneHint.STATE_SNOOZED)
+                local.setLong(
+                    LocalStorageManager.PREF_STORE_CLONE_HINT_SNOOZE_AT,
+                    System.currentTimeMillis(),
+                )
+                showStoreCloneDialog(store)
+            }
+        }.start()
+    }
+
+    private fun findCloneableStore(
+        main: IGatekeeperService,
+        work: IGatekeeperService,
+    ): ApplicationInfoWrapper? {
+        val workPackages = fetchAppPackages(work) ?: return null
+        val mainApps = fetchApps(main) ?: return null
+        val mainHasApk = mainApps.associate { wrapper ->
+            wrapper.getPackageName() to !wrapper.getSourceDir().isNullOrBlank()
+        }
+        val pkg = StoreCloneHint.pickCandidate(mainHasApk, workPackages) ?: return null
+        return mainApps.firstOrNull { it.getPackageName() == pkg }
+    }
+
+    private fun fetchApps(service: IGatekeeperService): List<ApplicationInfoWrapper>? {
+        val latch = CountDownLatch(1)
+        var result: List<ApplicationInfoWrapper>? = null
+        try {
+            service.getApps(object : IGetAppsCallback.Stub() {
+                override fun callback(apps: MutableList<ApplicationInfoWrapper>) {
+                    result = apps
+                    latch.countDown()
+                }
+            }, true)
+        } catch (_: RemoteException) {
+            return null
+        }
+        latch.await(STORE_LOOKUP_TIMEOUT_SEC, TimeUnit.SECONDS)
+        return result
+    }
+
+    private fun fetchAppPackages(service: IGatekeeperService): Set<String>? =
+        fetchApps(service)?.map { it.getPackageName() }?.toSet()
+
+    private fun showStoreCloneDialog(store: ApplicationInfoWrapper) {
+        val label = store.getLabel() ?: store.getPackageName()
+        AlertDialog.Builder(this)
+            .setTitle(R.string.store_clone_hint_title)
+            .setMessage(getString(R.string.store_clone_hint_message, label))
+            .setPositiveButton(getString(R.string.store_clone_hint_clone, label)) { _, _ ->
+                cloneStoreIntoWork(store)
+            }
+            .setNegativeButton(R.string.store_clone_hint_later, null)
+            .setNeutralButton(R.string.store_clone_hint_never) { _, _ ->
+                storage?.setInt(LocalStorageManager.PREF_STORE_CLONE_HINT_STATE, StoreCloneHint.STATE_NEVER)
+            }
+            .show()
+    }
+
+    private fun cloneStoreIntoWork(store: ApplicationInfoWrapper) {
+        val work = serviceWork ?: return
+        val callback = object : IAppInstallCallback.Stub() {
+            override fun callback(result: Int) {
+                window.decorView.post {
+                    val local = storage ?: return@post
+                    if (result == RESULT_OK) {
+                        local.setInt(
+                            LocalStorageManager.PREF_STORE_CLONE_HINT_STATE,
+                            StoreCloneHint.STATE_NEVER,
+                        )
+                        GatekeeperToast.show(
+                            this@MainActivity,
+                            String.format(getString(R.string.clone_success), store.getLabel()),
+                        )
+                    } else {
+                        GatekeeperToast.show(
+                            this@MainActivity,
+                            getString(R.string.clone_fail_generic, store.getLabel(), result),
+                        )
+                    }
+                }
+            }
+        }
+        try {
+            work.installApp(store, callback)
+        } catch (_: RemoteException) {
+            GatekeeperToast.show(this, getString(R.string.clone_fail_no_connection))
+        }
     }
 
     private fun checkPowerDiagnosticsOnceDaily() {
@@ -1060,6 +1178,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
+        private const val STORE_LOOKUP_TIMEOUT_SEC = 5L
 
         @JvmField
         @Volatile

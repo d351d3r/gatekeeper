@@ -56,6 +56,11 @@
     <string name="clone_fail_storage">В рабочем профиле недостаточно места для установки «%s».</string>
     <string name="clone_fail_aborted">Установка «%s» прервана. Попробуйте ещё раз.</string>
     <string name="clone_fail_generic">Операция с «%s» не удалась (код %d).</string>
+    <string name="store_clone_hint_title">Установить магазин приложений в рабочий профиль?</string>
+    <string name="store_clone_hint_message">«%s» пока нет в рабочем профиле. Склонируйте его сейчас, чтобы ставить рабочие приложения прямо из магазина.</string>
+    <string name="store_clone_hint_clone">Клонировать: %s</string>
+    <string name="store_clone_hint_later">Позже</string>
+    <string name="store_clone_hint_never">Больше не спрашивать</string>
     <string name="install_unknown_sources_title">Разрешить установку из Gatekeeper</string>
     <string name="install_unknown_sources_message">Android требует одноразовое разрешение, прежде чем Gatekeeper сможет ставить приложения в рабочий профиль. Включите «Разрешить из этого источника» в открывшемся экране и повторите клонирование.</string>
     <string name="install_unknown_sources_open">Открыть настройки</string>
