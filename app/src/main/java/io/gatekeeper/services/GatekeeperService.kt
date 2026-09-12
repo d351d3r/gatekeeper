@@ -106,43 +106,57 @@ class GatekeeperService : Service() {
 
         override fun installApp(app: ApplicationInfoWrapper, callback: IAppInstallCallback) {
             if (!app.isSystem()) {
-                // Честный отказ до запуска сессии: пакет уже стоит в этом профиле
-                // (в том числе заморожен/скрыт) -- повторное клонирование объяснимо
-                // и мгновенно, вместо криптичного отказа PackageInstaller.
-                if (isPackageInstalledHere(app.getPackageName())) {
-                    callback.callback(CloneOutcome.RESULT_ALREADY_IN_PROFILE)
+                installUserApp(app, callback)
+            } else {
+                installSystemApp(app, callback)
+            }
+        }
+
+        private fun installUserApp(app: ApplicationInfoWrapper, callback: IAppInstallCallback) {
+            // Честный отказ до запуска сессии: пакет уже стоит в этом профиле
+            // (в том числе заморожен/скрыт) -- повторное клонирование объяснимо
+            // и мгновенно, вместо криптичного отказа PackageInstaller.
+            if (isPackageInstalledHere(app.getPackageName())) {
+                callback.callback(CloneOutcome.RESULT_ALREADY_IN_PROFILE)
+                return
+            }
+            val intent = Intent(DummyActivity.INSTALL_PACKAGE)
+            intent.component = ComponentName(this@GatekeeperService, DummyActivity::class.java)
+            intent.putExtra("package", app.getPackageName())
+            intent.putExtra("apk", app.getSourceDir())
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                intent.putExtra("split_apks", app.getSplitApks())
+            }
+
+            val callbackExtra = Bundle()
+            callbackExtra.putBinder("callback", callback.asBinder())
+            intent.putExtra("callback", callbackExtra)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            DummyActivity.registerSameProcessRequest(intent)
+            startActivityProxy?.startActivity(intent)
+        }
+
+        private fun installSystemApp(app: ApplicationInfoWrapper, callback: IAppInstallCallback) {
+            if (!isProfileOwner) {
+                callback.callback(CloneOutcome.RESULT_CANNOT_INSTALL_SYSTEM_APP)
+                return
+            }
+            // enableSystemApp молчит о результате: если прошивка не отдаёт пакет
+            // в профиль (класс Galaxy Store), его просто не будет после вызова.
+            // Проверяем фактическое наличие -- это отказ, а не молчаливый "успех".
+            policyManager!!.enableSystemApp(adminComponent!!, app.getPackageName())
+            if (!isPackageInstalledHere(app.getPackageName())) {
+                // E-1: часть прошивок (Samsung) не отдаёт system-пакет через
+                // enableSystemApp. installExistingPackage (API 28+) ставит уже
+                // установленный в другом профиле пакет в этот -- кандидат-фикс;
+                // факт всё равно проверяем по наличию.
+                if (!installExistingSystemApp(app.getPackageName())) {
+                    callback.callback(CloneOutcome.RESULT_CANNOT_INSTALL_SYSTEM_APP)
                     return
                 }
-                val intent = Intent(DummyActivity.INSTALL_PACKAGE)
-                intent.component = ComponentName(this@GatekeeperService, DummyActivity::class.java)
-                intent.putExtra("package", app.getPackageName())
-                intent.putExtra("apk", app.getSourceDir())
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    intent.putExtra("split_apks", app.getSplitApks())
-                }
-
-                val callbackExtra = Bundle()
-                callbackExtra.putBinder("callback", callback.asBinder())
-                intent.putExtra("callback", callbackExtra)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                DummyActivity.registerSameProcessRequest(intent)
-                startActivityProxy?.startActivity(intent)
-            } else {
-                if (isProfileOwner) {
-                    // enableSystemApp молчит о результате: если прошивка не отдаёт пакет
-                    // в профиль (класс Galaxy Store), его просто не будет после вызова.
-                    // Проверяем фактическое наличие -- это отказ, а не молчаливый "успех".
-                    policyManager!!.enableSystemApp(adminComponent!!, app.getPackageName())
-                    if (!isPackageInstalledHere(app.getPackageName())) {
-                        callback.callback(CloneOutcome.RESULT_CANNOT_INSTALL_SYSTEM_APP)
-                        return
-                    }
-                    policyManager!!.setApplicationHidden(adminComponent!!, app.getPackageName(), false)
-                    callback.callback(Activity.RESULT_OK)
-                } else {
-                    callback.callback(CloneOutcome.RESULT_CANNOT_INSTALL_SYSTEM_APP)
-                }
             }
+            policyManager!!.setApplicationHidden(adminComponent!!, app.getPackageName(), false)
+            callback.callback(Activity.RESULT_OK)
         }
 
         override fun installApk(uriForwarder: UriForwardProxy, callback: IAppInstallCallback) {
@@ -337,6 +351,17 @@ class GatekeeperService : Service() {
                 local.setStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES, old)
                 false
             }
+        }
+    }
+
+    private fun installExistingSystemApp(packageName: String): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return false
+        return try {
+            policyManager!!.installExistingPackage(adminComponent!!, packageName) &&
+                isPackageInstalledHere(packageName)
+        } catch (e: SecurityException) {
+            Log.w(TAG, "installExistingPackage refused for $packageName", e)
+            false
         }
     }
 

@@ -69,9 +69,15 @@ class DummyActivity : Activity() {
             SettingsManager.getInstance().applyAll()
 
             synchronized(DummyActivity::class.java) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasRequestedPermission
-                    && FINALIZE_PROVISION != intent.action
-                ) {
+                // E-4: запрос POST_NOTIFICATIONS не должен блокировать установку/удаление --
+                // раньше диалог разрешения вставал перед install-потоком и первый тап по
+                // «Установить» уходил мимо. Для install-действий разрешение не спрашиваем
+                // (hasRequestedPermission не выставляется -- спросим при обычном входе).
+                val action = intent.action
+                val isInstallAction = action == INSTALL_PACKAGE || action == UNINSTALL_PACKAGE
+                val shouldAsk = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                    !hasRequestedPermission && FINALIZE_PROVISION != action && !isInstallAction
+                if (shouldAsk) {
                     hasRequestedPermission = true
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                         != PackageManager.PERMISSION_GRANTED
