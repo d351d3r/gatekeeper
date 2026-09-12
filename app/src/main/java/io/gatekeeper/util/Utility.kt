@@ -1226,22 +1226,34 @@ object Utility {
             val shortcutManager = context.getSystemService(ShortcutManager::class.java)
 
             if (shortcutManager.isRequestPinShortcutSupported) {
-                val info = ShortcutInfo.Builder(context, id)
-                    .setIntent(launchIntent)
-                    .setIcon(icon)
-                    .setShortLabel(label)
-                    .setLongLabel(label)
-                    .build()
-                val addIntent = shortcutManager.createShortcutResultIntent(info)
-                shortcutManager.requestPinShortcut(
-                    info,
-                    PendingIntent.getBroadcast(
+                // Пины ярлыка система/лаунчер вправе отклонить исключением (на A16 это
+                // наблюдаемый у апстрима краш при создании ярлыка общей заморозки,
+                // 4PDA #1706): отказ превращаем в тост, а не в падение приложения.
+                try {
+                    val info = ShortcutInfo.Builder(context, id)
+                        .setIntent(launchIntent)
+                        .setIcon(icon)
+                        .setShortLabel(label)
+                        .setLongLabel(label)
+                        .build()
+                    val addIntent = shortcutManager.createShortcutResultIntent(info)
+                    shortcutManager.requestPinShortcut(
+                        info,
+                        PendingIntent.getBroadcast(
+                            context,
+                            0,
+                            addIntent,
+                            PendingIntent.FLAG_IMMUTABLE
+                        ).intentSender
+                    )
+                } catch (e: Exception) {
+                    Log.w(TAG, "requestPinShortcut failed", e)
+                    GatekeeperToast.show(
                         context,
-                        0,
-                        addIntent,
-                        PendingIntent.FLAG_IMMUTABLE
-                    ).intentSender
-                )
+                        context.getString(R.string.unsupported_launcher),
+                        android.widget.Toast.LENGTH_LONG,
+                    )
+                }
             } else {
                 GatekeeperToast.show(
                     context,

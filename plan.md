@@ -54,15 +54,21 @@
 (#1706; [С] в матрице, гипотеза — adaptive-icon через
 `Icon.createWithResource` vs растр).
 
-- [ ] Аудит: `WorkProfileBatchFreeze` / создание ярлыка групповой заморозки;
-      сверить с тем, как создаются ярлыки отдельных приложений (они работают).
-- [ ] Если подтверждается — собирать иконку ярлыка тем же способом, что и
-      рабочие ярлыки.
-- [ ] Тесты: инструментальный на AVD Android 16 — создать ярлык общей
-      заморозки, пингануть через `LauncherApps`, убедиться, что нет исключения
-      (паттерн `ForwarderResolutionTest`).
-- [ ] PROBLEMS.md: отметить результат (в Gatekeeper ранее не воспроизводилось
-      на ColorOS 16 — перепроверить на AOSP-подобном AVD).
+- [x] Аудит (12.09.2026): гипотеза апстрима в Gatekeeper **не воспроизводится в
+      части иконки**: ярлык общей заморозки собирается через
+      `createBatchShortcutIcon` — декодированный PNG, сплющенный до непрозрачного
+      растра ≤512px, `Icon.createWithResource` на пути нет (только недостижимый
+      fallback). Найден соседний дефект: `Utility.createLauncherShortcut` звал
+      `requestPinShortcut`/`createShortcutResultIntent` без try/catch — исключение
+      системы/лаунчера уходило бы в краш вызывающего (ровно симптом #1706).
+- [x] Фикс: try/catch вокруг пина ярлыка → отказ превращается в тост
+      `unsupported_launcher`, приложение не падает.
+- [x] Тесты: `BatchShortcutIconTest` (androidTest) — контракт иконки
+      (bitmap-backed, ≤512px) и приёмка `ShortcutInfo.Builder`; компиляция
+      зелёная, прогон на AVD `gatekeeper_a16` — в ручной сессии (образов
+      эмулятора на машине нет).
+- [ ] Ручной сценарий: создать ярлык общей заморозки на AVD AOSP 16 /
+      PROBLEMS.md-запись.
 
 ### A3. Cross-profile DocumentsProvider: ANR / wait без таймаута — P0
 
