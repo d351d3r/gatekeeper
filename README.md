@@ -1,68 +1,74 @@
 # Gatekeeper
 
-Gatekeeper изолирует нежелательные приложения в Android Work Profile: отдельном
-пользователе системы со своими данными, аккаунтами, разрешениями и жизненным циклом.
-Клонированные приложения выглядят и работают как обычные, но не видят личную среду
-владельца телефона.
+Gatekeeper isolates unwanted apps inside an Android Work Profile: a separate
+system user with its own data, accounts, permissions, and lifecycle. Cloned apps
+look and behave like ordinary phone apps, but they cannot see the owner's
+personal environment.
 
-Проект — форк [Shelter](https://cgit.typeblog.net/Shelter/about/) (PeterCxy, GPL-3.0).
-От upstream отличается современным интерфейсом, стабильным кросс-профильным доступом
-к файлам, подсистемой Anti Spy и диагностикой надёжности профиля.
+The project is a fork of [Shelter](https://cgit.typeblog.net/Shelter/about/)
+(PeterCxy, GPL-3.0). Compared to upstream it adds a modernized interface, stable
+cross-profile file access, the Anti Spy subsystem, and diagnostics for profile
+reliability.
 
-**Репозиторий:** [d351d3r/gatekeeper](https://github.com/d351d3r/gatekeeper)
+**Repository:** [d351d3r/gatekeeper](https://github.com/d351d3r/gatekeeper)
 
-Продуктовая концепция и границы платформы: [PRODUCT.md](PRODUCT.md).
+Product direction and platform boundaries: [PRODUCT.md](PRODUCT.md).
+Русская версия: [README_RU.md](README_RU.md).
 
-## Возможности
+## Features
 
-- **Клонирование приложений** в изолированный рабочий профиль (установка из личного
-  профиля или APK на устройстве).
-- **Заморозка и разморозка** отдельных приложений: ярлык исчезает, процессы убиваются,
-  приложение не может запуститься в фоне.
-- **Автозаморозка** — список приложений, которые замораживаются вместе по блокировке
-  экрана, из панели инструментов, по событию Anti Spy или ярлыком на рабочем столе.
-- **Групповая заморозка/разморозка** одним действием из панели, настроек или ярлыков.
-- Замороженные приложения поднимаются в начало списка рабочего профиля.
-- **Anti Spy** — обнаружение стороннего VPN, диалог принудительной заморозки списка
-  и «заглушка» VPN при запуске защищаемого приложения.
-- **File Shuttle** — передача файлов между личным и рабочим профилем через Storage
-  Access Framework: документы открываются в нужном профиле без копирования данных.
-- **Автокопирование медиа** — новые скриншоты и фото/видео камеры из рабочего профиля
-  появляются в личной галерее при подключении File Shuttle (выключено по умолчанию).
-- **Корневые сертификаты для рабочего профиля** — установка корневого CA только в
-  рабочий профиль: с отпечатком SHA-256 перед установкой, списком и удалением в один тап.
-- Мастер первоначальной настройки и диагностика проблем прошивок.
+- **Clone apps** into the isolated work profile (installed from the personal
+  profile or from an APK on the device).
+- **Freeze and unfreeze** individual apps: the shortcut disappears, processes
+  are killed, and the app can no longer run in the background.
+- **Auto-freeze list** — apps frozen together on screen lock, from the toolbar,
+  on Anti Spy events, or via a home-screen shortcut.
+- **Batch freeze / unfreeze** in one action from the toolbar, settings, or
+  shortcuts.
+- Frozen apps are sorted to the top of the work-profile list.
+- **Anti Spy** — detects third-party VPNs, prompts to batch-freeze the list,
+  and displaces an active VPN with a dummy tunnel when a protected app launches.
+- **File Shuttle** — moves files between the personal and work profiles via
+  Storage Access Framework: documents open in the right profile without copying
+  data around.
+- **Media auto-copy** — new screenshots and camera photos/videos from the work
+  profile appear in the personal gallery whenever File Shuttle connects
+  (disabled by default).
+- **Work-profile root CA certificates** — install a root CA into the work
+  profile only, with the SHA-256 fingerprint shown before install, plus a
+  one-tap removable list.
+- First-run setup wizard and firmware-problem diagnostics.
 
-Инструкция для пользователя (русский): [USER_GUIDE.md](USER_GUIDE.md).
-Известные проблемы и тестовые заметки: [PROBLEMS.md](PROBLEMS.md).
-История изменений: [CHANGELOG.md](CHANGELOG.md).
+User guide (Russian): [USER_GUIDE.md](USER_GUIDE.md).
+Known issues and test notes: [PROBLEMS.md](PROBLEMS.md).
+Changelog: [CHANGELOG.md](CHANGELOG.md).
 
-## Требования
+## Requirements
 
 - Android 7.0+ (API 24+).
-- Устройство с корректной реализацией Work Profile (AOSP-подобные прошивки;
-  сильно переработанные оболочки вендоров могут ломать функции профиля).
+- A device with a working Work Profile implementation (AOSP-like ROMs work best;
+  heavily vendor-modified firmware may break profile features).
 
-Проверено на Samsung Galaxy S24 Ultra (SM-S928B/DS) и Galaxy Tab S9 FE+ (SM-X616B),
-на стенде AOSP 16 (эмулятор) в ходе разработки.
+Tested on Samsung Galaxy S24 Ultra (SM-S928B/DS) and Galaxy Tab S9 FE+
+(SM-X616B), and exercised on an AOSP 16 emulator during development.
 
-## Сборка
+## Building
 
-Нужен JDK 17 и Android SDK (compileSdk 36, build-tools 36.0.0).
+Requires JDK 17 and the Android SDK (compileSdk 36, build-tools 36.0.0).
 
 ```sh
 git clone https://github.com/d351d3r/gatekeeper.git
 cd gatekeeper
 ./gradlew :app:assembleDebug      # debug APK
-./gradlew :app:assembleRelease    # release APK (minify)
+./gradlew :app:assembleRelease    # release APK (minified)
 ```
 
-Готовый APK копируется в корень репозитория как
-`Gatekeeper-{version}-({versionCode})-{debug|release}.apk`. Номер версии берётся из
-[version.properties](version.properties) и может быть переопределён:
+The finished APK is copied to the repository root as
+`Gatekeeper-{version}-({versionCode})-{debug|release}.apk`. The version number
+comes from [version.properties](version.properties) and can be overridden:
 `./gradlew :app:assembleDebug -PversionCode=400`.
 
-Проверки перед сборкой (те же, что в CI):
+Run the same checks as CI before building:
 
 ```sh
 ./gradlew :app:lintDebug :app:detekt :app:testDebugUnitTest
@@ -70,39 +76,43 @@ cd gatekeeper
 
 ## CI
 
-Каждый пуш в `main` проходит пайплайн [.github/workflows/android.yml](.github/workflows/android.yml):
+Every push to `main` runs the pipeline in
+[.github/workflows/android.yml](.github/workflows/android.yml):
 
-1. **Gate** — Android lint → статический анализ detekt (с baseline) → юнит-тесты.
-2. **Build** — только после зелёного gate: бот коммитит бамп `VERSION_CODE` и собирает
-   **arm64-v8a debug и release APK** с новым номером версии. Артефакты и SHA-256
-   прикрепляются к прогону. Если заданы секреты `CI_RELEASE_KEYSTORE*`, release APK
-   подписывается релизным ключом, иначе — отладочным сертификатом.
+1. **Gate** — Android lint → detekt static analysis (baseline-locked) → unit
+   tests.
+2. **Build** — only after a green gate: a bot commits a `VERSION_CODE` bump and
+   assembles **arm64-v8a debug and release APKs** with the new version number.
+   Artifacts and SHA-256 checksums are attached to the run. If the
+   `CI_RELEASE_KEYSTORE*` secrets are set, the release APK is signed with the
+   release key; otherwise it uses the debug certificate.
 
-Релизы публикуются тегами `v*` — см. [.github/workflows/release.yml](.github/workflows/release.yml).
+Releases are published from `v*` tags — see
+[.github/workflows/release.yml](.github/workflows/release.yml).
 
-## Структура репозитория
+## Repository layout
 
-- `app/` — приложение (Kotlin + Java, AIDL).
-- `libs/SetupWizardLibrary/` — заимствованная библиотека мастера настройки
-  ([upstream](https://gitea.angry.im/PeterCxy/SetupWizardLibrary)), собирается
-  из исходников как модуль `:setup-wizard-lib`.
-- `tools/testbench.sh` — стенд проверки на эмуляторе (ADB).
-- `docs/` — модель угроз, спецификации фич, тестовые чеклисты.
-- `assets/` — исходники иконок тулбара/ярлыков.
+- `app/` — the application (Kotlin + Java, AIDL).
+- `libs/SetupWizardLibrary/` — vendored setup-wizard library
+  ([upstream](https://gitea.angry.im/PeterCxy/SetupWizardLibrary)), built from
+  source as the `:setup-wizard-lib` module.
+- `tools/testbench.sh` — emulator-based verification bench (ADB).
+- `docs/` — threat model, feature specs, test checklists.
+- `assets/` — toolbar/shortcut icon sources.
 
-## Удаление приложения
+## Uninstalling
 
-Сначала удалите рабочий профиль в настройках системы, затем удалите Gatekeeper
-обычным способом. Удаление только значка не удаляет профиль и клонированные
-приложения.
+Delete the work profile in system **Settings** first, then uninstall Gatekeeper
+normally. Removing only the launcher icon does not remove the work profile or
+the cloned apps.
 
-## Лицензия
+## License
 
-GPL-3.0-or-later — см. [LICENSE](LICENSE). Gatekeeper производен от Shelter;
-при распространении учитывайте лицензию upstream.
+GPL-3.0-or-later — see [LICENSE](LICENSE). Gatekeeper is derived from Shelter;
+respect upstream licensing when redistributing.
 
 ## Upstream
 
-- [Shelter](https://cgit.typeblog.net/Shelter/about/) — PeterCxy.
-- [SetupWizardLibrary](https://gitea.angry.im/PeterCxy/SetupWizardLibrary) — вендорится
-  в `libs/SetupWizardLibrary`.
+- [Shelter](https://cgit.typeblog.net/Shelter/about/) by PeterCxy.
+- [SetupWizardLibrary](https://gitea.angry.im/PeterCxy/SetupWizardLibrary) —
+  vendored under `libs/SetupWizardLibrary`.
