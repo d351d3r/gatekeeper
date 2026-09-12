@@ -96,6 +96,33 @@ class LocalStorageManager private constructor(context: Context) {
         setStringList(pref, list.toTypedArray())
     }
 
+    /** Снимок настроек по белому списку [allowlist] для бэкапа (C4). */
+    fun snapshotSettings(allowlist: Set<String>): Map<String, BackupPayload.SettingValue> {
+        val all = prefs.all
+        val out = LinkedHashMap<String, BackupPayload.SettingValue>()
+        for (key in allowlist) {
+            when (val v = all[key]) {
+                is Boolean -> out[key] = BackupPayload.SettingValue(BackupPayload.TYPE_BOOLEAN, v)
+                is Int -> out[key] = BackupPayload.SettingValue(BackupPayload.TYPE_INT, v)
+                is Long -> out[key] = BackupPayload.SettingValue(BackupPayload.TYPE_LONG, v)
+                is String -> out[key] = BackupPayload.SettingValue(BackupPayload.TYPE_STRING, v)
+            }
+        }
+        return out
+    }
+
+    /** Применение импортированного снимка; типы защищены парсером [BackupPayload]. */
+    fun applySettings(snapshot: Map<String, BackupPayload.SettingValue>) {
+        for ((key, sv) in snapshot) {
+            when (sv.type) {
+                BackupPayload.TYPE_BOOLEAN -> setBoolean(key, sv.value as Boolean)
+                BackupPayload.TYPE_INT -> setInt(key, sv.value as Int)
+                BackupPayload.TYPE_LONG -> setLong(key, sv.value as Long)
+                BackupPayload.TYPE_STRING -> setString(key, sv.value as String)
+            }
+        }
+    }
+
     companion object {
         const val PREF_IS_SETTING_UP = "is_setting_up"
         const val PREF_HAS_SETUP = "has_setup"

@@ -133,6 +133,8 @@ dependencies {
     debugImplementation project(path: ':setup-wizard-lib', configuration: 'gingerbreadCompatDebugRuntimeElements')
     releaseImplementation project(path: ':setup-wizard-lib', configuration: 'gingerbreadCompatReleaseRuntimeElements')
     testImplementation 'junit:junit:4.13.2'
+    // JVM-вариант org.json для unit-тестов сериализации бэкапа (на устройстве -- фреймворковый).
+    testImplementation 'org.json:json:20240303'
     androidTestImplementation 'androidx.test:core:1.7.0'
     androidTestImplementation 'androidx.test:runner:1.7.0'
     androidTestImplementation 'androidx.test:rules:1.7.0'

@@ -52,6 +52,7 @@ import io.gatekeeper.services.KillerService
 import io.gatekeeper.util.AntiSpyLaunchGate
 import io.gatekeeper.util.AntiSpyManager
 import io.gatekeeper.util.ApplicationInfoWrapper
+import io.gatekeeper.util.BackupPayload
 import io.gatekeeper.util.FileShuttleConnection
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.ProfileActions
@@ -79,6 +80,16 @@ class MainActivity : AppCompatActivity() {
                 arrayOf("application/vnd.android.package-archive")
             ),
             this::onApkSelected
+        )
+    private val createBackup =
+        registerForActivityResult(
+            ActivityResultContracts.CreateDocument("application/json"),
+            this::onBackupLocationPicked
+        )
+    private val openBackup =
+        registerForActivityResult(
+            ActivityResultContracts.OpenDocument(),
+            this::onBackupFilePicked
         )
     private val tryStartWorkService =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::tryStartWorkServiceCb)
@@ -1030,6 +1041,14 @@ class MainActivity : AppCompatActivity() {
                 openFileShuttleEntry()
                 true
             }
+            R.id.main_menu_export_backup -> {
+                createBackup.launch("gatekeeper-backup.json")
+                true
+            }
+            R.id.main_menu_import_backup -> {
+                openBackup.launch(arrayOf("*/*"))
+                true
+            }
             R.id.main_menu_documents_ui -> {
                 openDocumentsUiAfterWarmUp()
                 true
@@ -1098,6 +1117,72 @@ class MainActivity : AppCompatActivity() {
             }
             .setNegativeButton(R.string.first_run_alert_cancel, null)
             .show()
+    }
+
+    /**
+     * C4: бэкап настроек и списков приложений (4PDA #947, #948, #957).
+     * Данные приложений без root недоступны — экспортируем честные границы:
+     * настройки из [BackupPayload.EXPORTABLE_SETTINGS] (без ключа
+     * авторизации), пакеты обоих профилей и список автозаморозки. Файл --
+     * JSON через SAF, никаких прав на хранилище.
+     */
+    private fun onBackupLocationPicked(uri: Uri?) {
+        if (uri == null) return
+        val main = serviceMain
+        val work = serviceWork
+        Thread {
+            val local = storage ?: return@Thread
+            val payload = BackupPayload.Payload(
+                settings = local.snapshotSettings(BackupPayload.EXPORTABLE_SETTINGS),
+                mainApps = main?.let { fetchApps(it) }?.map { it.getPackageName() } ?: emptyList(),
+                workApps = work?.let { fetchApps(it) }?.map { it.getPackageName() } ?: emptyList(),
+                autoFreezeWork = local.getStringList(
+                    LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE
+                ).toList(),
+            )
+            val ok = runCatching {
+                contentResolver.openOutputStream(uri)?.use { out ->
+                    out.write(BackupPayload.serialize(payload).toByteArray())
+                } != null
+            }.getOrDefault(false)
+            window.decorView.post {
+                GatekeeperToast.show(
+                    this,
+                    getString(if (ok) R.string.backup_export_success else R.string.backup_export_failed),
+                )
+            }
+        }.start()
+    }
+
+    private fun onBackupFilePicked(uri: Uri?) {
+        if (uri == null) return
+        Thread {
+            val text = runCatching {
+                contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) }
+            }.getOrNull()
+            val payload = text?.let { BackupPayload.parse(it) }
+            window.decorView.post {
+                val local = storage ?: return@post
+                if (payload == null) {
+                    GatekeeperToast.show(this, R.string.backup_import_invalid)
+                    return@post
+                }
+                local.applySettings(payload.settings)
+                // Компоненты (провайдер файлов, платёжный стаб) и сторож
+                // VPN подхватывают значения из префов; кросс-профильная
+                // синхронизация догонит при следующем тумблере в настройках.
+                SettingsManager.getInstance().applyAll()
+                GatekeeperToast.show(
+                    this,
+                    getString(
+                        R.string.backup_import_success,
+                        payload.settings.size,
+                        payload.mainApps.size,
+                        payload.workApps.size,
+                    ),
+                )
+            }
+        }.start()
     }
 
     /**

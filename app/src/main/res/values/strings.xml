@@ -191,6 +191,12 @@
     <string name="file_shuttle_enable_action">Enable</string>
     <string name="file_shuttle_hint">Move files between profiles with the transfer button on the top bar</string>
     <string name="file_shuttle_hint_action">Show</string>
+    <string name="export_backup">Export backup</string>
+    <string name="import_backup">Import backup</string>
+    <string name="backup_export_success">Backup exported</string>
+    <string name="backup_export_failed">Export failed</string>
+    <string name="backup_import_invalid">This file is not a Gatekeeper backup</string>
+    <string name="backup_import_success">Imported %1$d settings; apps: %2$d personal, %3$d work</string>
 
     <string name="work_service_bind_failed_title">No connection to the work profile</string>
     <string name="work_service_bind_failed_cancelled">Gatekeeper in the work profile closed without answering. Usually it is killed there by power saving or by the vendor\'s app freezer. Exclude Gatekeeper from battery optimization and from background restrictions in <b>both</b> profiles, then retry.</string>
