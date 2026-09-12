@@ -28,6 +28,13 @@
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/main_menu_file_shuttle"
+        android:icon="@drawable/ic_file_shuttle"
+        android:title="@string/file_shuttle_action"
+        app:iconTint="?attr/colorOnSurface"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/main_menu_settings"
         android:icon="@drawable/ic_settings"
         android:title="@string/settings"

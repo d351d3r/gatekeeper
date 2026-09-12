@@ -185,6 +185,12 @@
     <string name="file_shuttle_read_failed">Could not read this directory from the other profile.</string>
     <string name="file_shuttle_service_title">File Shuttle</string>
     <string name="file_shuttle_service_desc">The other profile can read these files while you are working with them.</string>
+    <string name="file_shuttle_action">Transfer files</string>
+    <string name="file_shuttle_enable_title">Enable file transfer?</string>
+    <string name="file_shuttle_enable_message">The system share sheet cannot move files between profiles. Gatekeeper opens the file manager with access to both profiles instead.</string>
+    <string name="file_shuttle_enable_action">Enable</string>
+    <string name="file_shuttle_hint">Move files between profiles with the transfer button on the top bar</string>
+    <string name="file_shuttle_hint_action">Show</string>
 
     <string name="work_service_bind_failed_title">No connection to the work profile</string>
     <string name="work_service_bind_failed_cancelled">Gatekeeper in the work profile closed without answering. Usually it is killed there by power saving or by the vendor\'s app freezer. Exclude Gatekeeper from battery optimization and from background restrictions in <b>both</b> profiles, then retry.</string>

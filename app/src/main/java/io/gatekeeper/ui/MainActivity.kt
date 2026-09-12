@@ -359,7 +359,9 @@ class MainActivity : AppCompatActivity() {
             startWorkListPolling()
         }
         buildView()
-        maybePromptStoreClone()
+        if (!maybePromptStoreClone()) {
+            maybeShowFileShuttleHint()
+        }
     }
 
     /**
@@ -367,9 +369,10 @@ class MainActivity : AppCompatActivity() {
      * рабочем профиле -- предлагаем клонировать одним тапом. Закрывает самый
      * частый вопрос новичков (4PDA #2097-#2118, #2100). Чистая логика
      * порогов -- в [StoreCloneHint]; здесь только binder-вызовы и UI.
+     * @return true, если диалог будет показан (подсказки не наслаиваются).
      */
-    private fun maybePromptStoreClone() {
-        val local = storage ?: return
+    private fun maybePromptStoreClone(): Boolean {
+        val local = storage ?: return false
         if (!StoreCloneHint.isDue(
                 local.getIntFresh(
                     LocalStorageManager.PREF_STORE_CLONE_HINT_STATE,
@@ -378,9 +381,9 @@ class MainActivity : AppCompatActivity() {
                 local.getLong(LocalStorageManager.PREF_STORE_CLONE_HINT_SNOOZE_AT, 0L),
                 System.currentTimeMillis(),
             )
-        ) return
-        val main = serviceMain ?: return
-        val work = serviceWork ?: return
+        ) return false
+        val main = serviceMain ?: return false
+        val work = serviceWork ?: return false
         Thread {
             val store = findCloneableStore(main, work) ?: return@Thread
             window.decorView.post {
@@ -395,6 +398,7 @@ class MainActivity : AppCompatActivity() {
                 showStoreCloneDialog(store)
             }
         }.start()
+        return true
     }
 
     private fun findCloneableStore(
@@ -1022,6 +1026,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 true
             }
+            R.id.main_menu_file_shuttle -> {
+                openFileShuttleEntry()
+                true
+            }
             R.id.main_menu_documents_ui -> {
                 openDocumentsUiAfterWarmUp()
                 true
@@ -1068,6 +1076,46 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(null, "vnd.android.document/root")
         })
+    }
+
+    /**
+     * C3: вход в шаттл с верхней панели, а не из глубины меню. Если
+     * переключатель «Перенос файлов» выключен, старый путь молча открывал
+     * пустой системный проводник -- отсюда репорты «ничего не работает»
+     * (4PDA #2124-#2142). Теперь объясняем и включаем одним тапом.
+     */
+    private fun openFileShuttleEntry() {
+        if (SettingsManager.getInstance().getCrossProfileFileChooserEnabled()) {
+            openDocumentsUiAfterWarmUp()
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.file_shuttle_enable_title)
+            .setMessage(R.string.file_shuttle_enable_message)
+            .setPositiveButton(R.string.file_shuttle_enable_action) { _, _ ->
+                SettingsManager.getInstance().setCrossProfileFileChooserEnabled(true)
+                openDocumentsUiAfterWarmUp()
+            }
+            .setNegativeButton(R.string.first_run_alert_cancel, null)
+            .show()
+    }
+
+    /**
+     * Разовый Snackbar, указывающий на кнопку переноса файлов. Показываем
+     * только когда шаттл включён и диалог про магазин в этот раз не вылез,
+     * чтобы не наслаивать подсказки друг на друга.
+     */
+    private fun maybeShowFileShuttleHint() {
+        val local = storage ?: return
+        if (local.getBooleanFresh(LocalStorageManager.PREF_FILE_SHUTTLE_HINT_SHOWN, false)) return
+        if (!SettingsManager.getInstance().getCrossProfileFileChooserEnabled()) return
+        local.setBoolean(LocalStorageManager.PREF_FILE_SHUTTLE_HINT_SHOWN, true)
+        window.decorView.postDelayed({
+            if (isFinishing) return@postDelayed
+            Snackbar.make(window.decorView, R.string.file_shuttle_hint, Snackbar.LENGTH_LONG)
+                .setAction(R.string.file_shuttle_hint_action) { openFileShuttleEntry() }
+                .show()
+        }, FILE_SHUTTLE_HINT_DELAY_MS)
     }
 
     private val workListPollRunnable = Runnable { pollWorkAppListChanges() }
@@ -1179,6 +1227,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "MainActivity"
         private const val STORE_LOOKUP_TIMEOUT_SEC = 5L
+        private const val FILE_SHUTTLE_HINT_DELAY_MS = 1500L
 
         @JvmField
         @Volatile

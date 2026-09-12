@@ -142,6 +142,12 @@
     <string name="file_shuttle_read_failed">Не удалось прочитать этот каталог из другого профиля.</string>
     <string name="file_shuttle_service_title">Обмен файлами</string>
     <string name="file_shuttle_service_desc">Пока вы работаете с файлами, другой профиль может их читать.</string>
+    <string name="file_shuttle_action">Перенос файлов</string>
+    <string name="file_shuttle_enable_title">Включить перенос файлов?</string>
+    <string name="file_shuttle_enable_message">Системное меню «Поделиться» не переносит файлы между профилями. Вместо него Gatekeeper открывает проводник с доступом к обоим профилям.</string>
+    <string name="file_shuttle_enable_action">Включить</string>
+    <string name="file_shuttle_hint">Перенос файлов между профилями — кнопка со стрелками на верхней панели</string>
+    <string name="file_shuttle_hint_action">Показать</string>
     <string name="work_service_bind_failed_title">Нет связи с рабочим профилем</string>
     <string name="work_service_bind_failed_cancelled">Gatekeeper в рабочем профиле закрылся, не ответив. Обычно его убивает там энергосбережение или фирменная заморозка приложений в прошивке. Исключите Gatekeeper из оптимизации батареи и из ограничений фоновой работы в <b>обоих</b> профилях и повторите.</string>
     <string name="work_service_bind_failed_no_binder">Рабочий профиль ответил, но не передал свой сервис: скорее всего, процесс Gatekeeper там убили на старте. Исключите Gatekeeper из оптимизации батареи и из ограничений фоновой работы в <b>обоих</b> профилях и повторите.</string>
