@@ -175,6 +175,9 @@
     <string name="store_clone_hint_clone">Clone %s</string>
     <string name="store_clone_hint_later">Later</string>
     <string name="store_clone_hint_never">Don\'t ask again</string>
+    <string name="store_unfreeze_hint_title">Unfreeze the app store in the work profile?</string>
+    <string name="store_unfreeze_hint_message">"%s" is installed in the work profile but frozen. Unfreeze it to install work apps from the store.</string>
+    <string name="store_unfreeze_hint_unfreeze">Unfreeze %s</string>
     <string name="install_unknown_sources_title">Allow installs from Gatekeeper</string>
     <string name="install_unknown_sources_message">Android requires a one-time permission before Gatekeeper can install apps into the work profile. Enable \"Allow from this source\" in the screen that opens, then start the clone again.</string>
     <string name="install_unknown_sources_open">Open settings</string>

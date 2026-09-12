@@ -61,6 +61,9 @@
     <string name="store_clone_hint_clone">Клонировать: %s</string>
     <string name="store_clone_hint_later">Позже</string>
     <string name="store_clone_hint_never">Больше не спрашивать</string>
+    <string name="store_unfreeze_hint_title">Разморозить магазин приложений в рабочем профиле?</string>
+    <string name="store_unfreeze_hint_message">«%s» установлен в рабочем профиле, но заморожен. Разморозьте его, чтобы ставить рабочие приложения из магазина.</string>
+    <string name="store_unfreeze_hint_unfreeze">Разморозить: %s</string>
     <string name="install_unknown_sources_title">Разрешить установку из Gatekeeper</string>
     <string name="install_unknown_sources_message">Android требует одноразовое разрешение, прежде чем Gatekeeper сможет ставить приложения в рабочий профиль. Включите «Разрешить из этого источника» в открывшемся экране и повторите клонирование.</string>
     <string name="install_unknown_sources_open">Открыть настройки</string>

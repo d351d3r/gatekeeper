@@ -10,6 +10,7 @@ class ApplicationInfoWrapper private constructor() : Parcelable {
     private var info: ApplicationInfo? = null
     private var label: String? = null
     private var isHidden: Boolean = false
+    private var canLaunch: Boolean = false
 
     constructor(info: ApplicationInfo) : this() {
         this.info = info
@@ -26,6 +27,12 @@ class ApplicationInfoWrapper private constructor() : Parcelable {
         return this
     }
 
+    // Only used from GatekeeperService
+    fun setCanLaunch(launchable: Boolean): ApplicationInfoWrapper {
+        canLaunch = launchable
+        return this
+    }
+
     fun getPackageName(): String = info!!.packageName
 
     fun getLabel(): String? = label
@@ -39,14 +46,20 @@ class ApplicationInfoWrapper private constructor() : Parcelable {
 
     fun isHidden(): Boolean = isHidden
 
+    /** Есть launcher-активити, способная принять implicit MAIN/LAUNCHER. */
+    fun canLaunch(): Boolean = canLaunch
+
     fun getInfo(): ApplicationInfo? = info
 
     fun isSystem(): Boolean = (info!!.flags and ApplicationInfo.FLAG_SYSTEM) != 0
+
+    fun isInstalled(): Boolean = (info!!.flags and ApplicationInfo.FLAG_INSTALLED) != 0
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeParcelable(info, flags)
         dest.writeString(label)
         dest.writeByte((if (isHidden) 1 else 0).toByte())
+        dest.writeByte((if (canLaunch) 1 else 0).toByte())
     }
 
     override fun describeContents(): Int = info!!.packageName.hashCode()
@@ -64,6 +77,7 @@ class ApplicationInfoWrapper private constructor() : Parcelable {
                     )
                     wrapper.label = source.readString()
                     wrapper.isHidden = source.readByte().toInt() != 0
+                    wrapper.canLaunch = source.readByte().toInt() != 0
                     return wrapper
                 }
 

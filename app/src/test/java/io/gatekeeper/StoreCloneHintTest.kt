@@ -44,66 +44,145 @@ class StoreCloneHintTest {
 
     @Test
     fun picksPlayStoreWhenMissingFromWork() {
-        val candidate = StoreCloneHint.pickCandidate(
+        val action = StoreCloneHint.pickAction(
             mapOf(StoreCloneHint.PLAY_STORE to true),
-            emptySet(),
+            mapOf(StoreCloneHint.PLAY_STORE to StoreCloneHint.WORK_STATE_ABSENT),
         )
-        assertEquals(StoreCloneHint.PLAY_STORE, candidate)
+        assertEquals(StoreCloneHint.PLAY_STORE to StoreCloneHint.ACTION_CLONE, action)
     }
 
     @Test
     fun prefersPlayStoreOverRuStore() {
-        val candidate = StoreCloneHint.pickCandidate(
+        val action = StoreCloneHint.pickAction(
             mapOf(
                 StoreCloneHint.PLAY_STORE to true,
                 StoreCloneHint.RU_STORE to true,
             ),
-            emptySet(),
+            mapOf(
+                StoreCloneHint.PLAY_STORE to StoreCloneHint.WORK_STATE_ABSENT,
+                StoreCloneHint.RU_STORE to StoreCloneHint.WORK_STATE_ABSENT,
+            ),
         )
-        assertEquals(StoreCloneHint.PLAY_STORE, candidate)
+        assertEquals(StoreCloneHint.PLAY_STORE to StoreCloneHint.ACTION_CLONE, action)
     }
 
     @Test
     fun fallsBackToRuStoreWhenPlayAbsent() {
-        val candidate = StoreCloneHint.pickCandidate(
-            mapOf(StoreCloneHint.RU_STORE to true),
-            emptySet(),
+        val action = StoreCloneHint.pickAction(
+            mapOf(
+                StoreCloneHint.PLAY_STORE to false,
+                StoreCloneHint.RU_STORE to true,
+            ),
+            mapOf(
+                StoreCloneHint.PLAY_STORE to StoreCloneHint.WORK_STATE_ABSENT,
+                StoreCloneHint.RU_STORE to StoreCloneHint.WORK_STATE_ABSENT,
+            ),
         )
-        assertEquals(StoreCloneHint.RU_STORE, candidate)
+        assertEquals(StoreCloneHint.RU_STORE to StoreCloneHint.ACTION_CLONE, action)
     }
 
     @Test
-    fun skipsStoreAlreadyInWorkProfile() {
-        val candidate = StoreCloneHint.pickCandidate(
+    fun skipsStoreAvailableInWorkProfile() {
+        // C1: Play лежит в образе GMS-устройства -- вхождение в showAll-список
+        // недостаточно, должно быть AVAILABLE по факту (installed + launcher).
+        val action = StoreCloneHint.pickAction(
             mapOf(
                 StoreCloneHint.PLAY_STORE to true,
                 StoreCloneHint.RU_STORE to true,
             ),
-            setOf(StoreCloneHint.PLAY_STORE),
+            mapOf(
+                StoreCloneHint.PLAY_STORE to StoreCloneHint.WORK_STATE_AVAILABLE,
+                StoreCloneHint.RU_STORE to StoreCloneHint.WORK_STATE_ABSENT,
+            ),
         )
-        assertEquals(StoreCloneHint.RU_STORE, candidate)
+        assertEquals(StoreCloneHint.RU_STORE to StoreCloneHint.ACTION_CLONE, action)
     }
 
     @Test
-    fun nothingToAskWhenBothStoresPresentInWork() {
-        val candidate = StoreCloneHint.pickCandidate(
+    fun nothingToAskWhenBothStoresAvailableInWork() {
+        val action = StoreCloneHint.pickAction(
             mapOf(
                 StoreCloneHint.PLAY_STORE to true,
                 StoreCloneHint.RU_STORE to true,
             ),
-            setOf(StoreCloneHint.PLAY_STORE, StoreCloneHint.RU_STORE),
+            mapOf(
+                StoreCloneHint.PLAY_STORE to StoreCloneHint.WORK_STATE_AVAILABLE,
+                StoreCloneHint.RU_STORE to StoreCloneHint.WORK_STATE_AVAILABLE,
+            ),
         )
-        assertNull(candidate)
+        assertNull(action)
+    }
+
+    @Test
+    fun offersUnfreezeForFrozenStore() {
+        val action = StoreCloneHint.pickAction(
+            mapOf(StoreCloneHint.PLAY_STORE to true),
+            mapOf(StoreCloneHint.PLAY_STORE to StoreCloneHint.WORK_STATE_FROZEN),
+        )
+        assertEquals(StoreCloneHint.PLAY_STORE to StoreCloneHint.ACTION_UNFREEZE, action)
+    }
+
+    @Test
+    fun unfreezePreferredOverCloningNextCandidate() {
+        val action = StoreCloneHint.pickAction(
+            mapOf(
+                StoreCloneHint.PLAY_STORE to true,
+                StoreCloneHint.RU_STORE to true,
+            ),
+            mapOf(
+                StoreCloneHint.PLAY_STORE to StoreCloneHint.WORK_STATE_FROZEN,
+                StoreCloneHint.RU_STORE to StoreCloneHint.WORK_STATE_ABSENT,
+            ),
+        )
+        assertEquals(StoreCloneHint.PLAY_STORE to StoreCloneHint.ACTION_UNFREEZE, action)
     }
 
     @Test
     fun ignoresStoreEntryWithoutApkInMain() {
         // getInstalledApplications(MATCH_UNINSTALLED_PACKAGES) может вернуть
         // скелет без sourceDir -- такой "магазин" клонировать нельзя.
-        val candidate = StoreCloneHint.pickCandidate(
+        val action = StoreCloneHint.pickAction(
             mapOf(StoreCloneHint.PLAY_STORE to false),
-            emptySet(),
+            mapOf(StoreCloneHint.PLAY_STORE to StoreCloneHint.WORK_STATE_ABSENT),
         )
-        assertNull(candidate)
+        assertNull(action)
+    }
+
+    @Test
+    fun classifiesSkeletalPackageAsAbsent() {
+        // Системный пакет из образа без FLAG_INSTALLED: ни клонировать,
+        // ни разморозить -- его нет (C1, именно это ломало подсказку).
+        assertEquals(
+            StoreCloneHint.WORK_STATE_ABSENT,
+            StoreCloneHint.classifyWorkState(installed = false, hidden = false, canLaunch = false),
+        )
+    }
+
+    @Test
+    fun classifiesHiddenAsFrozen() {
+        // Скрытый пакет: launcher-интент PM может не вернуть, но пакет
+        // установлен -- правильная операция разморозка, а не клонирование.
+        assertEquals(
+            StoreCloneHint.WORK_STATE_FROZEN,
+            StoreCloneHint.classifyWorkState(installed = true, hidden = true, canLaunch = false),
+        )
+    }
+
+    @Test
+    fun classifiesInstalledAndLaunchableAsAvailable() {
+        assertEquals(
+            StoreCloneHint.WORK_STATE_AVAILABLE,
+            StoreCloneHint.classifyWorkState(installed = true, hidden = false, canLaunch = true),
+        )
+    }
+
+    @Test
+    fun classifiesInstalledWithoutLauncherAsAbsent() {
+        // Установлен, но не запускается (сервисный/отключённый пакет) --
+        // клонирование его не починит, честнее считать отсутствующим.
+        assertEquals(
+            StoreCloneHint.WORK_STATE_ABSENT,
+            StoreCloneHint.classifyWorkState(installed = true, hidden = false, canLaunch = false),
+        )
     }
 }

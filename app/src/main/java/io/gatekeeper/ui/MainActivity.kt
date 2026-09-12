@@ -406,7 +406,7 @@ class MainActivity : AppCompatActivity() {
             )
         ) return false
         Thread {
-            val store = findCloneableStore(main, work) ?: return@Thread
+            val (store, action) = findCloneableStore(main, work) ?: return@Thread
             window.decorView.post {
                 if (isFinishing) return@post
                 // Фиксируем показ сразу: повторный bind после поворота экрана
@@ -416,27 +416,48 @@ class MainActivity : AppCompatActivity() {
                     LocalStorageManager.PREF_STORE_CLONE_HINT_SNOOZE_AT,
                     System.currentTimeMillis(),
                 )
-                showStoreCloneDialog(store)
+                showStoreCloneDialog(store, action)
             }
         }.start()
         return true
     }
 
+    /**
+     * Кого и что предложить: см. [StoreCloneHint.pickAction]. Доступность в
+     * рабочем профиле считаем по факту (FLAG_INSTALLED + launcher-активти),
+     * а не по вхождению в showAll-выдачу: в неё попадают системные пакеты из
+     * образа прошивки с неснятым FLAG_INSTALLED, из-за чего подсказка на
+     * GMS-устройствах не срабатывала никогда (C1).
+     */
     private fun findCloneableStore(
         main: IGatekeeperService,
         work: IGatekeeperService,
-    ): ApplicationInfoWrapper? {
-        val workPackages = fetchAppPackages(work)
+    ): Pair<ApplicationInfoWrapper, Int>? {
         val mainApps = fetchApps(main)
-        val pkg = if (workPackages == null || mainApps == null) {
+        val workApps = fetchApps(work)
+        return if (mainApps == null || workApps == null) {
             null
         } else {
-            val mainHasApk = mainApps.associate { wrapper ->
-                wrapper.getPackageName() to !wrapper.getSourceDir().isNullOrBlank()
-            }
-            StoreCloneHint.pickCandidate(mainHasApk, workPackages)
+            pickCloneableStore(mainApps, workApps)
         }
-        return mainApps?.firstOrNull { pkg != null && it.getPackageName() == pkg }
+    }
+
+    private fun pickCloneableStore(
+        mainApps: List<ApplicationInfoWrapper>,
+        workApps: List<ApplicationInfoWrapper>,
+    ): Pair<ApplicationInfoWrapper, Int>? {
+        val mainHasApk = mainApps.associate { wrapper ->
+            wrapper.getPackageName() to (wrapper.isInstalled() && !wrapper.getSourceDir().isNullOrBlank())
+        }
+        val workStates = workApps.associate { wrapper ->
+            wrapper.getPackageName() to StoreCloneHint.classifyWorkState(
+                wrapper.isInstalled(),
+                wrapper.isHidden(),
+                wrapper.canLaunch(),
+            )
+        }
+        val (pkg, action) = StoreCloneHint.pickAction(mainHasApk, workStates) ?: return null
+        return mainApps.firstOrNull { it.getPackageName() == pkg }?.let { store -> store to action }
     }
 
     private fun fetchApps(service: IGatekeeperService): List<ApplicationInfoWrapper>? {
@@ -456,22 +477,56 @@ class MainActivity : AppCompatActivity() {
         return result
     }
 
-    private fun fetchAppPackages(service: IGatekeeperService): Set<String>? =
-        fetchApps(service)?.map { it.getPackageName() }?.toSet()
-
-    private fun showStoreCloneDialog(store: ApplicationInfoWrapper) {
+    private fun showStoreCloneDialog(store: ApplicationInfoWrapper, action: Int) {
         val label = store.getLabel() ?: store.getPackageName()
+        val title = if (action == StoreCloneHint.ACTION_UNFREEZE) {
+            R.string.store_unfreeze_hint_title
+        } else {
+            R.string.store_clone_hint_title
+        }
+        val message = if (action == StoreCloneHint.ACTION_UNFREEZE) {
+            getString(R.string.store_unfreeze_hint_message, label)
+        } else {
+            getString(R.string.store_clone_hint_message, label)
+        }
+        val positiveLabel = if (action == StoreCloneHint.ACTION_UNFREEZE) {
+            getString(R.string.store_unfreeze_hint_unfreeze, label)
+        } else {
+            getString(R.string.store_clone_hint_clone, label)
+        }
         AlertDialog.Builder(this)
-            .setTitle(R.string.store_clone_hint_title)
-            .setMessage(getString(R.string.store_clone_hint_message, label))
-            .setPositiveButton(getString(R.string.store_clone_hint_clone, label)) { _, _ ->
-                cloneStoreIntoWork(store)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(positiveLabel) { _, _ ->
+                if (action == StoreCloneHint.ACTION_UNFREEZE) {
+                    unfreezeStoreInWork(store)
+                } else {
+                    cloneStoreIntoWork(store)
+                }
             }
             .setNegativeButton(R.string.store_clone_hint_later, null)
             .setNeutralButton(R.string.store_clone_hint_never) { _, _ ->
                 storage?.setInt(LocalStorageManager.PREF_STORE_CLONE_HINT_STATE, StoreCloneHint.STATE_NEVER)
             }
             .show()
+    }
+
+    /**
+     * Магазин в рабочем профиле установлен, но заморожен: предложение не
+     * клонировать, а разморозить. Состояние подсказки фиксируем сразу после
+     * отправки -- обработчик UNFREEZE_APP сам снимет setApplicationHidden.
+     */
+    private fun unfreezeStoreInWork(store: ApplicationInfoWrapper) {
+        val forwardIntent = Intent(DummyActivity.UNFREEZE_APP)
+        if (!Utility.tryTransferIntentToProfile(this, forwardIntent)) {
+            GatekeeperToast.show(this, getString(R.string.clone_fail_no_connection))
+            return
+        }
+        forwardIntent.putExtra("packageName", store.getPackageName())
+        forwardIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(forwardIntent)
+        storage?.setInt(LocalStorageManager.PREF_STORE_CLONE_HINT_STATE, StoreCloneHint.STATE_NEVER)
+        GatekeeperToast.show(this, getString(R.string.unfreeze_success, store.getLabel()))
     }
 
     private fun cloneStoreIntoWork(store: ApplicationInfoWrapper) {

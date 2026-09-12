@@ -63,18 +63,32 @@ class GatekeeperService : Service() {
             Thread {
                 val pmFlags = PackageManager.MATCH_DISABLED_COMPONENTS or
                     PackageManager.MATCH_UNINSTALLED_PACKAGES
+                // canLaunch считаем один раз и несём в wrapper: подсказке C1 нужен
+                // фактический критерий доступности (FLAG_INSTALLED + launcher) даже
+                // в режиме showAll, где фильтр раньше его не вычислял.
+                data class ScanEntry(val info: ApplicationInfo, val canLaunch: Boolean)
+
                 val list = packageManager!!.getInstalledApplications(pmFlags)
                     .asSequence()
                     .filter { it.packageName != packageName }
-                    .filter {
-                        val isSystem = it.flags and ApplicationInfo.FLAG_SYSTEM != 0
-                        val isHidden = isHidden(it.packageName)
-                        val isInstalled = it.flags and ApplicationInfo.FLAG_INSTALLED != 0
-                        val canLaunch = packageManager!!.getLaunchIntentForPackage(it.packageName) != null
+                    .map { info ->
+                        ScanEntry(
+                            info,
+                            packageManager!!.getLaunchIntentForPackage(info.packageName) != null,
+                        )
+                    }
+                    .filter { (info, canLaunch) ->
+                        val isSystem = info.flags and ApplicationInfo.FLAG_SYSTEM != 0
+                        val isHidden = isHidden(info.packageName)
+                        val isInstalled = info.flags and ApplicationInfo.FLAG_INSTALLED != 0
                         showAll || (!isSystem && isInstalled) || isHidden || canLaunch
                     }
-                    .map { ApplicationInfoWrapper(it) }
-                    .map { wrapper -> wrapper.loadLabel(packageManager!!).setHidden(isHidden(wrapper.getPackageName())) }
+                    .map { (info, canLaunch) ->
+                        ApplicationInfoWrapper(info)
+                            .setCanLaunch(canLaunch)
+                            .loadLabel(packageManager!!)
+                            .setHidden(isHidden(info.packageName))
+                    }
                     .sortedWith { x, y ->
                         when {
                             x.isHidden() && !y.isHidden() -> -1
