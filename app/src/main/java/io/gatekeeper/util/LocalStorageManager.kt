@@ -160,6 +160,8 @@ class LocalStorageManager private constructor(context: Context) {
         const val PREF_STORE_CLONE_HINT_SNOOZE_AT = "store_clone_hint_snooze_at"
         /** Разовый Snackbar с указанием на кнопку переноса файлов показан. */
         const val PREF_FILE_SHUTTLE_HINT_SHOWN = "file_shuttle_hint_shown"
+        /** Правила перенаправления ссылок в рабочий профиль (C2), в одном профиле — то, что применено. */
+        const val PREF_CROSS_PROFILE_LINK_RULES = "cross_profile_link_rules"
 
         private const val LIST_DIVIDER = ","
         private const val PREFS_NAME = "prefs"

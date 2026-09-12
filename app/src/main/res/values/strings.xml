@@ -100,6 +100,13 @@
     <string name="settings_block_contacts_searching_desc">Deny access from main profile to contacts inside work profile.</string>
     <string name="settings_payment_stub">Payment Service Stub</string>
     <string name="settings_payment_stub_desc">Enable a fake NFC payment service in the main profile, so that the "contactless payments" option under Settings - NFC becomes enabled to allow you to choose a payment app inside the work profile. This works around an Android bug that makes it impossible to select a payment app inside the work profile if none is available in the main profile.</string>
+    <string name="settings_cross_profile_link_rules">Open links in work profile</string>
+    <string name="settings_cross_profile_link_rules_desc">http(s) links to these domains open in the work profile browser. Each entry covers the domain and all its subdomains.</string>
+    <string name="settings_cross_profile_link_rules_dialog">Comma-separated domains, e.g. .ru, .su, example.com. Warning: the work profile browser sees every matching link, including personal ones.</string>
+    <string name="settings_cross_profile_link_rules_none">Off — links open in the current profile</string>
+    <string name="settings_cross_profile_link_rules_current">Active: %1$s</string>
+    <string name="settings_cross_profile_link_rules_skipped">Ignored %1$d invalid entries</string>
+    <string name="settings_cross_profile_link_rules_failed">Couldn\'t apply rules (work profile unavailable)</string>
     <string name="settings_services">Services</string>
     <string name="settings_power_diagnostics">Power diagnostics</string>
     <string name="settings_power_diagnostics_desc">Check Android battery and background limits in both profiles.</string>

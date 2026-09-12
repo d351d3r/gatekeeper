@@ -37,4 +37,8 @@ interface IGatekeeperService {
     String installCaCertificate(in byte[] cert);
     List<String> getInstalledCaCertificates();
     boolean removeCaCertificate(String sha256Fingerprint);
+    // Кросс-профильные правила ссылок (C2, docs/feature_cross_profile_links.md):
+    // домены, чьи http(s)-ссылки открываются в рабочем профиле.
+    // Вызывается только личным профилем у сервиса рабочего профиля.
+    void setCrossProfileLinkRules(in List<String> rules);
 }

@@ -21,6 +21,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.preference.CheckBoxPreference
 import androidx.preference.DropDownPreference
+import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
@@ -31,6 +32,7 @@ import io.gatekeeper.services.IGatekeeperService
 import io.gatekeeper.util.AntiSpyFreezeScope
 import io.gatekeeper.util.AntiSpyWatchConfig
 import io.gatekeeper.util.CaCertificates
+import io.gatekeeper.util.CrossProfileLinkRules
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.PowerDiagnostics
 import io.gatekeeper.util.SettingsManager
@@ -54,6 +56,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
     private var prefAutoFreezeService: CheckBoxPreference? = null
     private var prefSkipForeground: CheckBoxPreference? = null
     private var prefPaymentStub: CheckBoxPreference? = null
+    private var prefLinkRules: EditTextPreference? = null
     private var prefDynamicColors: CheckBoxPreference? = null
     private var prefAutoFreezeDelay: DropDownPreference? = null
     private var prefAntiSpyEnabled: CheckBoxPreference? = null
@@ -110,6 +113,8 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         prefPaymentStub = findPreference(SETTINGS_PAYMENT_STUB)
         prefPaymentStub!!.isChecked = manager.getPaymentStubEnabled()
         prefPaymentStub!!.onPreferenceChangeListener = this
+
+        setUpLinkRules()
 
         prefAutoFreezeService = findPreference(SETTINGS_AUTO_FREEZE_SERVICE)
         prefAutoFreezeService!!.isChecked = manager.getAutoFreezeServiceEnabled()
@@ -182,6 +187,69 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
     private fun updateAutoFreezeDelay() {
         prefAutoFreezeDelay!!.summary =
             getString(R.string.format_minutes, manager.getAutoFreezeDelay() / 60)
+    }
+
+    /**
+     * C2: правила перенаправления ссылок в рабочий профиль. Храним
+     * нормализованный список в префах (он же уезжает в бэкап), применяет
+     * диф profile-owner через DPM. Порядок: сначала binder-вызов, потом
+     * персист -- чтобы недоехавшее правило не выглядело применённым.
+     */
+    private fun setUpLinkRules() {
+        prefLinkRules = findPreference(SETTINGS_CROSS_PROFILE_LINK_RULES)
+        val rules = LocalStorageManager.getInstance()
+            .getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES)
+            .toList()
+        prefLinkRules!!.text = rules.joinToString(", ")
+        updateLinkRulesSummary(rules)
+        prefLinkRules!!.setOnPreferenceChangeListener(this::onLinkRulesChanged)
+    }
+
+    private fun updateLinkRulesSummary(rules: List<String>) {
+        prefLinkRules!!.summary = if (rules.isEmpty()) {
+            getString(R.string.settings_cross_profile_link_rules_none)
+        } else {
+            getString(R.string.settings_cross_profile_link_rules_current, rules.joinToString(", "))
+        }
+    }
+
+    private fun onLinkRulesChanged(preference: Preference, newValue: Any): Boolean {
+        val raw = newValue as String
+        val rules = CrossProfileLinkRules.parseRules(raw)
+        val skipped = raw.split(',', ';', ' ', '\n', '\t')
+            .count { it.isNotBlank() && CrossProfileLinkRules.normalize(it) == null }
+        val work = serviceWork
+        if (work == null) {
+            GatekeeperToast.show(requireContext(), R.string.settings_cross_profile_link_rules_failed)
+            return false
+        }
+        Thread {
+            val applied = runCatching { work.setCrossProfileLinkRules(rules) }.isSuccess
+            activity?.runOnUiThread {
+                if (!isAdded) return@runOnUiThread
+                if (!applied) {
+                    GatekeeperToast.show(
+                        requireContext(),
+                        R.string.settings_cross_profile_link_rules_failed,
+                    )
+                    return@runOnUiThread
+                }
+                LocalStorageManager.getInstance().setStringList(
+                    LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES,
+                    rules.toTypedArray(),
+                )
+                prefLinkRules!!.text = rules.joinToString(", ")
+                updateLinkRulesSummary(rules)
+                if (skipped > 0) {
+                    GatekeeperToast.show(
+                        requireContext(),
+                        getString(R.string.settings_cross_profile_link_rules_skipped, skipped),
+                    )
+                }
+            }
+        }.start()
+        // Персистим сами после успешного применения, а не framework'ом.
+        return false
     }
 
     private fun setUpAntiSpyWatch() {
@@ -702,6 +770,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         private const val SETTINGS_VERSION = "settings_version"
         private const val SETTINGS_SOURCE_CODE = "settings_source_code"
         private const val SETTINGS_CROSS_PROFILE_FILE_CHOOSER = "settings_cross_profile_file_chooser"
+        private const val SETTINGS_CROSS_PROFILE_LINK_RULES = "settings_cross_profile_link_rules"
         private const val SETTINGS_MEDIA_MIRROR = "settings_media_mirror"
         private const val SETTINGS_BLOCK_CONTACTS_SEARCHING = "settings_block_contacts_searching"
         private const val SETTINGS_AUTO_FREEZE_SERVICE = "settings_auto_freeze_service"

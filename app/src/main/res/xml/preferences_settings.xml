@@ -37,6 +37,12 @@
             android:title="@string/settings_payment_stub"
             android:summary="@string/settings_payment_stub_desc" />
 
+        <androidx.preference.EditTextPreference
+            android:key="settings_cross_profile_link_rules"
+            android:title="@string/settings_cross_profile_link_rules"
+            android:dialogMessage="@string/settings_cross_profile_link_rules_dialog"
+            android:inputType="textUri" />
+
     </androidx.preference.PreferenceCategory>
 
     <androidx.preference.PreferenceCategory

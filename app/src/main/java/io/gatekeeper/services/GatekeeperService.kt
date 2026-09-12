@@ -6,6 +6,7 @@ import android.app.Service
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -22,7 +23,9 @@ import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.CaCertificates
 import io.gatekeeper.util.CloneOutcome
+import io.gatekeeper.util.CrossProfileLinkRules
 import io.gatekeeper.util.FileProviderProxy
+import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.UriForwardProxy
 import io.gatekeeper.util.Utility
 import io.gatekeeper.util.VpnTunnelDetector
@@ -307,7 +310,49 @@ class GatekeeperService : Service() {
                 false
             }
         }
+
+        /**
+         * C2: кросс-профильные фильтры ссылок (docs/feature_cross_profile_links.md).
+         * Только профиль-владелец может их ставить; личный профиль здесь
+         * молча игнорируется. removeCrossProfileIntentFilter убран из SDK 34+,
+         * поэтому изменение = clearCrossProfileIntentFilters + повторное
+         * добавление всего оставшегося набора. Применённый список храним сами:
+         * DPM не умеет его перечислять.
+         */
+        override fun setCrossProfileLinkRules(rules: List<String>) {
+            if (!isProfileOwner) return
+            val dpm = policyManager ?: return
+            val local = LocalStorageManager.getInstance()
+            val old = local.getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES).toSet()
+            val new = rules.toSet()
+            if (old == new) return
+            runCatching {
+                dpm.clearCrossProfileIntentFilters(adminComponent!!)
+                for (rule in new) {
+                    dpm.addCrossProfileIntentFilter(
+                        adminComponent!!,
+                        buildLinkViewFilter(rule),
+                        DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED,
+                    )
+                }
+            }
+            local.setStringList(
+                LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES,
+                new.toTypedArray(),
+            )
+        }
     }
+
+    private fun buildLinkViewFilter(rule: String): IntentFilter =
+        IntentFilter(Intent.ACTION_VIEW).apply {
+            addCategory(Intent.CATEGORY_DEFAULT)
+            addCategory(Intent.CATEGORY_BROWSABLE)
+            addDataScheme("http")
+            addDataScheme("https")
+            for (host in CrossProfileLinkRules.hostPatterns(rule)) {
+                addDataAuthority(host, null)
+            }
+        }
 
     override fun onCreate() {
         policyManager = getSystemService(DevicePolicyManager::class.java)

@@ -205,6 +205,13 @@
     <string name="allow_cross_profile_interaction">Разрешить работу между профилями</string>
     <string name="settings_payment_stub_desc">Чтобы получить возможность выбрать платёжное приложение внутри рабочего профиля в Настройки - NFC, включите фальшивый платёжный сервис NFC в основном профиле. Это временное решение ошибки Android, из-за которой невозможно выбрать платёжное приложение внутри рабочего профиля, если в основном профиле таких нет.</string>
     <string name="settings_payment_stub">Заглушка платёжных сервисов</string>
+    <string name="settings_cross_profile_link_rules">Ссылки в рабочем профиле</string>
+    <string name="settings_cross_profile_link_rules_desc">http(s)-ссылки на эти домены открываются браузером рабочего профиля. Каждая запись покрывает домен и все его поддомены.</string>
+    <string name="settings_cross_profile_link_rules_dialog">Домены через запятую, напр. .ru, .su, example.com. Внимание: браузер рабочего профиля увидит каждую подходящую ссылку, включая личные.</string>
+    <string name="settings_cross_profile_link_rules_none">Выключено — ссылки открываются в текущем профиле</string>
+    <string name="settings_cross_profile_link_rules_current">Активно: %1$s</string>
+    <string name="settings_cross_profile_link_rules_skipped">Пропущено неверных записей: %1$d</string>
+    <string name="settings_cross_profile_link_rules_failed">Не удалось применить правила (рабочий профиль недоступен)</string>
 
     <!-- Корневые CA рабочего профиля (docs/feature_ca_certs.md) -->
     <string name="settings_ca_category">Корневые сертификаты</string>
