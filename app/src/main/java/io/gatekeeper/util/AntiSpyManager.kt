@@ -154,7 +154,7 @@ object AntiSpyManager {
             Log.i(TAG, "auto-freeze via BatchFreezeService (background), list=${list.size}")
         } else {
             Log.w(TAG, "BatchFreezeService failed, AlarmManager fallback")
-            Utility.scheduleFreezeInWorkProfile(app, list)
+            Utility.scheduleFreezeInWorkProfile(app, list, vpnOrigin = true)
         }
         return -1
     }

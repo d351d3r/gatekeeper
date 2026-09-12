@@ -887,10 +887,16 @@ class DummyActivity : Activity() {
             AntiSpyVpnWatchService.syncState(this)
             val frozen = WorkProfileBatchFreeze.freezeList(this, list)
             val stillVisible = WorkProfileBatchFreeze.countStillVisible(this, list)
+            // E-3: уведомление постим только для фоновой VPN-заморозки (пользователь может
+            // быть в любом профиле). Ручной запрос ограничиваем тостом на личный профиль --
+            // уведомление в шторке рабочего выглядит как "toast снизу" и дублирует тост.
+            val vpnOrigin = intent.getBooleanExtra(EXTRA_VPN_ORIGIN, false)
             if (stillVisible == 0) {
                 Utility.notifyVpnBatchFreezeSessionComplete(this, frozen > 0)
             } else if (frozen > 0) {
-                Utility.postVpnAutoFreezeSuccessAlert(this)
+                if (vpnOrigin) {
+                    Utility.postVpnAutoFreezeSuccessAlert(this)
+                }
                 Utility.showToastOnMainProfile(this, R.string.freeze_all_success)
             }
             Utility.scheduleAppListRefreshDelivery(this)
@@ -1051,6 +1057,8 @@ class DummyActivity : Activity() {
             ProfileActions.VPN_SESSION_COMPLETE
         const val PACKAGEINSTALLER_CALLBACK = ProfileActions.PACKAGEINSTALLER_CALLBACK
         const val OPEN_POWER_SETTINGS = ProfileActions.OPEN_POWER_SETTINGS
+        /** Extra FREEZE_ALL_IN_LIST: запуск от фоновой VPN-заморозки (иначе — ручной). */
+        const val EXTRA_VPN_ORIGIN = "vpn_origin"
 
         private val ACTIONS_ALLOWED_WITHOUT_SIGNATURE = listOf(
             FINALIZE_PROVISION,

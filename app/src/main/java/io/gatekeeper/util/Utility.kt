@@ -77,13 +77,19 @@ object Utility {
     /**
      * Foreground delivery: [DummyActivity.FREEZE_ALL_IN_LIST] in the work profile.
      */
-    fun launchFreezeInWorkProfile(context: Context, list: Array<String>): Boolean {
+    /**
+     * @param vpnOrigin true только для фоновой заморозки по VPN: в этом случае
+     * исполнитель в рабочем профиле постит уведомление в его шторку (пользователь
+     * может быть где угодно). Ручной запуск уведомление не постит — вместо него
+     * тост на личный профиль (E-3).
+     */
+    fun launchFreezeInWorkProfile(context: Context, list: Array<String>, vpnOrigin: Boolean = false): Boolean {
         val normalized = normalizeStringList(list)
         if (normalized.isEmpty()) {
             return false
         }
         return try {
-            val intent = freezeAllInListIntent(normalized)
+            val intent = freezeAllInListIntent(normalized, vpnOrigin)
             transferIntentToProfile(context, intent)
             context.startActivity(intent)
             Log.i(TAG, "launch work-profile freeze for ${normalized.size} apps")
@@ -182,13 +188,13 @@ object Utility {
      * Fallback background delivery via `AlarmManager` when cross-profile
      * `startService` is unavailable (may still be blocked on some OEMs).
      */
-    fun scheduleFreezeInWorkProfile(context: Context, list: Array<String>) {
+    fun scheduleFreezeInWorkProfile(context: Context, list: Array<String>, vpnOrigin: Boolean = false) {
         val normalized = normalizeStringList(list)
         if (normalized.isEmpty()) {
             return
         }
         try {
-            val intent = freezeAllInListIntent(normalized)
+            val intent = freezeAllInListIntent(normalized, vpnOrigin)
             transferIntentToProfile(context, intent)
             val pi = PendingIntents.activity(
                 context,
@@ -290,9 +296,10 @@ object Utility {
         }
     }
 
-    private fun freezeAllInListIntent(list: Array<String>): Intent {
+    private fun freezeAllInListIntent(list: Array<String>, vpnOrigin: Boolean): Intent {
         val intent = Intent(DummyActivity.FREEZE_ALL_IN_LIST)
         intent.putExtra("list", list)
+        intent.putExtra(DummyActivity.EXTRA_VPN_ORIGIN, vpnOrigin)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         return intent
     }
