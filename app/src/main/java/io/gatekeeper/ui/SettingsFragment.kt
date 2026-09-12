@@ -3,6 +3,7 @@ package io.gatekeeper.ui
 import android.os.Bundle
 import android.os.RemoteException
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.IntentCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -63,6 +64,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onResume() {
         super.onResume()
+        // Аппаратная BACK обходит onSupportNavigateUp: при возврате на корень
+        // onResume корня срабатывает повторно -- тут и сбрасываем заголовок.
+        // Важно: через supportActionBar, а не activity.setTitle -- после явного
+        // присвоения title (экран подэкрана) ToolbarActionBar игнорирует
+        // setWindowTitle, и тулбар «залипает».
+        (activity as? AppCompatActivity)?.supportActionBar?.title =
+            getString(R.string.settings)
         updateFreezeSummary()
         updateAntiSpySummary()
         updateFilesSummary()
