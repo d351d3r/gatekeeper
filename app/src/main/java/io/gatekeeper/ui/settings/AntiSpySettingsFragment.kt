@@ -19,23 +19,31 @@ class AntiSpySettingsFragment : SettingsSubFragment() {
         bindCheckBox(
             SETTINGS_ANTI_SPY_ENABLED,
             manager.getAntiSpyWatchConfig().enabled,
-            manager::setAntiSpyWatchEnabled,
-        )
+        ) { enabled ->
+            manager.setAntiSpyWatchEnabled(enabled)
+            true
+        }
         bindCheckBox(
             SETTINGS_ANTI_SPY_FREEZE_ON_VPN,
             manager.getAntiSpyWatchConfig().freezeOnVpn,
-            manager::setAntiSpyFreezeOnVpn,
-        )
+        ) { enabled ->
+            manager.setAntiSpyFreezeOnVpn(enabled)
+            true
+        }
         bindCheckBox(
             SETTINGS_ANTI_SPY_FREEZE_ON_SCREEN_LOCK,
             manager.getAntiSpyWatchConfig().freezeOnScreenLock,
-            manager::setAntiSpyFreezeOnScreenLock,
-        )
+        ) { enabled ->
+            manager.setAntiSpyFreezeOnScreenLock(enabled)
+            true
+        }
         bindCheckBox(
             SETTINGS_ANTI_SPY_NOTIFY_ONLY,
             manager.getAntiSpyWatchConfig().notifyOnly,
-            manager::setAntiSpyNotifyOnly,
-        )
+        ) { enabled ->
+            manager.setAntiSpyNotifyOnly(enabled)
+            true
+        }
         bindScope()
         bindDelay()
     }
@@ -45,15 +53,6 @@ class AntiSpySettingsFragment : SettingsSubFragment() {
         updateRoutingBanner()
         updateScopeSummary()
         updateDelaySummary()
-    }
-
-    private fun bindCheckBox(key: String, checked: Boolean, apply: (Boolean) -> Unit) {
-        val pref = findPreference<SwitchPreferenceCompat>(key) ?: return
-        pref.isChecked = checked
-        pref.setOnPreferenceChangeListener { _, newState ->
-            apply(newState as Boolean)
-            true
-        }
     }
 
     private fun bindScope() {

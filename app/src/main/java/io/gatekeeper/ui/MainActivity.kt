@@ -82,16 +82,6 @@ class MainActivity : AppCompatActivity() {
             ),
             this::onApkSelected
         )
-    private val createBackup =
-        registerForActivityResult(
-            ActivityResultContracts.CreateDocument("application/json"),
-            this::onBackupLocationPicked
-        )
-    private val openBackup =
-        registerForActivityResult(
-            ActivityResultContracts.OpenDocument(),
-            this::onBackupFilePicked
-        )
     private val tryStartWorkService =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::tryStartWorkServiceCb)
     private val bindWorkService =
@@ -1124,14 +1114,6 @@ class MainActivity : AppCompatActivity() {
                 openFileShuttleEntry()
                 true
             }
-            R.id.main_menu_export_backup -> {
-                createBackup.launch("gatekeeper-backup.json")
-                true
-            }
-            R.id.main_menu_import_backup -> {
-                openBackup.launch(arrayOf("*/*"))
-                true
-            }
             R.id.main_menu_documents_ui -> {
                 openDocumentsUiAfterWarmUp()
                 true
@@ -1141,11 +1123,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openSettings() {
-        requireWorkService()?.let { work ->
-            startActivity(Intent(this, SettingsActivity::class.java).apply {
-                putExtra("extras", Bundle().apply { putBinder("profile_service", work.asBinder()) })
-            })
-        }
+        val work = requireWorkService() ?: return
+        val main = serviceMain ?: return
+        startActivity(Intent(this, SettingsActivity::class.java).apply {
+            putExtra(
+                "extras",
+                Bundle().apply {
+                    putBinder("profile_service", work.asBinder())
+                    putBinder("main_service", main.asBinder())
+                },
+            )
+        })
     }
 
     /**
@@ -1200,170 +1188,6 @@ class MainActivity : AppCompatActivity() {
             }
             .setNegativeButton(R.string.first_run_alert_cancel, null)
             .show()
-    }
-
-    /**
-     * C4: бэкап настроек и списков приложений (4PDA #947, #948, #957).
-     * Данные приложений без root недоступны — экспортируем честные границы:
-     * настройки из [BackupPayload.EXPORTABLE_SETTINGS] (без ключа
-     * авторизации), пакеты обоих профилей и список автозаморозки. Файл --
-     * JSON через SAF, никаких прав на хранилище.
-     */
-    private fun onBackupLocationPicked(uri: Uri?) {
-        if (uri == null) return
-        val main = serviceMain
-        val work = serviceWork
-        Thread {
-            val local = storage ?: return@Thread
-            val payload = BackupPayload.Payload(
-                settings = local.snapshotSettings(BackupPayload.EXPORTABLE_SETTINGS),
-                mainApps = main?.let { fetchApps(it) }?.map { it.getPackageName() } ?: emptyList(),
-                workApps = work?.let { fetchApps(it) }?.map { it.getPackageName() } ?: emptyList(),
-                autoFreezeWork = local.getStringList(
-                    LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE
-                ).toList(),
-            )
-            val ok = runCatching {
-                contentResolver.openOutputStream(uri)?.use { out ->
-                    out.write(BackupPayload.serialize(payload).toByteArray())
-                } != null
-            }.getOrDefault(false)
-            window.decorView.post {
-                GatekeeperToast.show(
-                    this,
-                    getString(if (ok) R.string.backup_export_success else R.string.backup_export_failed),
-                )
-            }
-        }.start()
-    }
-
-    private fun onBackupFilePicked(uri: Uri?) {
-        if (uri == null) return
-        Thread {
-            val text = runCatching {
-                contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) }
-            }.getOrNull()
-            val payload = text?.let { BackupPayload.parse(it) }
-            window.decorView.post {
-                val local = storage ?: return@post
-                if (payload == null) {
-                    GatekeeperToast.show(this, R.string.backup_import_invalid)
-                    return@post
-                }
-                local.applySettings(payload.settings)
-                // Компоненты (провайдер файлов, платёжный стаб) и сторож
-                // VPN подхватывают значения из префов; правила ссылок C2
-                // применяем сразу, не дожидаясь тумблера в настройках.
-                SettingsManager.getInstance().applyAll()
-                applyImportedLinkRules()
-                GatekeeperToast.show(
-                    this,
-                    getString(
-                        R.string.backup_import_success,
-                        payload.settings.size,
-                        payload.mainApps.size,
-                        payload.workApps.size,
-                    ),
-                )
-                maybeOfferAppRestore(payload)
-            }
-        }.start()
-    }
-
-    /**
-     * C2: правила ссылок из бэкапа лежат в префах после applySettings, но в
-     * профиле ещё не применены — догоняем сервис рабочего профиля. Отказ
-     * не критичен: список в префах, применится при следующем enforce.
-     */
-    private fun applyImportedLinkRules() {
-        val work = serviceWork ?: return
-        val rules = LocalStorageManager.getInstance()
-            .getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES)
-            .toList()
-        Thread {
-            runCatching { work.setCrossProfileLinkRules(rules) }
-        }.start()
-    }
-
-    /**
-     * C4+: после импорта предлагаем доклонировать недостающие приложения
-     * рабочего профиля из списка бэкапа. Донор -- личный профиль; кандидаты
-     * считаются чистой функцией [BackupPayload.restorableWorkApps].
-     */
-    private fun maybeOfferAppRestore(payload: BackupPayload.Payload) {
-        val main = serviceMain
-        val work = serviceWork
-        if (main == null || work == null) return
-        Thread {
-            val mainApps = fetchApps(main)
-            val workApps = fetchApps(work)
-            val restorable = if (mainApps == null || workApps == null) {
-                emptyList()
-            } else {
-                val workInstalled = workApps.map { it.getPackageName() }.toSet()
-                val mainInstalled = mainApps.map { it.getPackageName() }.toSet()
-                BackupPayload.restorableWorkApps(payload.workApps, workInstalled, mainInstalled)
-            }
-            if (restorable.isEmpty()) return@Thread
-            val byPkg = mainApps?.associateBy { it.getPackageName() } ?: emptyMap()
-            val candidates = restorable.mapNotNull { byPkg[it] }
-            if (candidates.isEmpty()) return@Thread
-            window.decorView.post {
-                if (isFinishing) return@post
-                AlertDialog.Builder(this)
-                    .setTitle(R.string.backup_restore_title)
-                    .setMessage(getString(R.string.backup_restore_message, candidates.size))
-                    .setPositiveButton(R.string.backup_restore_now) { _, _ ->
-                        restoreWorkAppsSequentially(candidates, work)
-                    }
-                    .setNegativeButton(R.string.backup_restore_later, null)
-                    .show()
-            }
-        }.start()
-    }
-
-    /**
-     * Ставим восстанавливаемые приложения строго по одному: параллельные
-     * PackageInstaller-сессии кладут резолвер. Каждый успех возвращается
-     * в список автозаморозки, как при ручном клонировании.
-     */
-    private fun restoreWorkAppsSequentially(apps: List<ApplicationInfoWrapper>, work: IGatekeeperService) {
-        var index = 0
-        var failed = 0
-        fun installNext() {
-            if (index >= apps.size) {
-                window.decorView.post {
-                    GatekeeperToast.show(
-                        this,
-                        getString(R.string.backup_restore_done, apps.size - failed, apps.size, failed),
-                    )
-                }
-                return
-            }
-            val app = apps[index]
-            index++
-            val callback = object : IAppInstallCallback.Stub() {
-                override fun callback(result: Int) {
-                    if (result == RESULT_OK) {
-                        AutoFreezeDefaults.enableForWorkProfile(
-                            this@MainActivity,
-                            app.getPackageName(),
-                            clearOptOut = true,
-                        )
-                    } else {
-                        failed++
-                    }
-                    installNext()
-                }
-            }
-            try {
-                work.installApp(app, callback)
-            } catch (_: RemoteException) {
-                failed++
-                installNext()
-            }
-        }
-        installNext()
     }
 
     /**

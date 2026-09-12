@@ -5,31 +5,44 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.RemoteException
 import android.provider.Settings
-import androidx.preference.SwitchPreferenceCompat
+import androidx.appcompat.app.AlertDialog
 import androidx.preference.DropDownPreference
 import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
+import androidx.preference.SwitchPreferenceCompat
 import io.gatekeeper.R
 import io.gatekeeper.ui.DummyActivity
+import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.Utility
 
-/** Экран «Заморозка»: автозаморозка по блокировке, задержка, пакетные действия, ярлыки. */
+/**
+ * Экран «Заморозка»: автозаморозка по блокировке, задержка, пакетные действия,
+ * ярлыки и список автозаморозки целиком -- в настройках, а не по одной
+ * снежинке в списке приложений.
+ */
 class FreezeSettingsFragment : SettingsSubFragment() {
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_freeze)
-        bindAutoFreeze()
+        bindCheckBox(
+            SETTINGS_AUTO_FREEZE_SERVICE,
+            manager.getAutoFreezeServiceEnabled(),
+        ) { enabled ->
+            manager.setAutoFreezeServiceEnabled(enabled)
+            true
+        }
+        bindCheckBox(
+            SETTINGS_SKIP_FOREGROUND,
+            manager.getSkipForegroundEnabled(),
+            this::onSkipForegroundChange,
+        )
         bindDelay()
-        bindSkipForeground()
         bindBatchActions()
     }
 
-    private fun bindAutoFreeze() {
-        val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_AUTO_FREEZE_SERVICE) ?: return
-        pref.isChecked = manager.getAutoFreezeServiceEnabled()
-        pref.setOnPreferenceChangeListener { _, newState ->
-            manager.setAutoFreezeServiceEnabled(newState as Boolean)
-            true
-        }
+    override fun onResume() {
+        super.onResume()
+        fillAutoFreezeList()
     }
 
     private fun bindDelay() {
@@ -42,44 +55,35 @@ class FreezeSettingsFragment : SettingsSubFragment() {
             .toTypedArray()
         pref.setOnPreferenceChangeListener { _, newState ->
             manager.setAutoFreezeDelay((newState as String).toInt())
-            updateDelaySummary()
+            pref.summary = getString(
+                R.string.format_minutes,
+                manager.getAutoFreezeDelay() / SECONDS_IN_MINUTE,
+            )
             true
         }
-        updateDelaySummary()
-    }
-
-    private fun updateDelaySummary() {
-        findPreference<DropDownPreference>(SETTINGS_AUTO_FREEZE_DELAY)?.summary =
-            getString(R.string.format_minutes, manager.getAutoFreezeDelay() / SECONDS_IN_MINUTE)
-    }
-
-    private fun bindSkipForeground() {
-        val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_SKIP_FOREGROUND) ?: return
-        pref.isChecked = manager.getSkipForegroundEnabled()
-        pref.setOnPreferenceChangeListener { _, newState ->
-            onSkipForegroundChange(newState as Boolean)
-        }
+        pref.summary = getString(
+            R.string.format_minutes,
+            manager.getAutoFreezeDelay() / SECONDS_IN_MINUTE,
+        )
     }
 
     private fun onSkipForegroundChange(enabled: Boolean): Boolean {
-        val granted = !enabled || usageStatsGranted()
+        val granted = !enabled || ensureSpecialAccessPermission(
+            checkPermission = {
+                try {
+                    serviceWork?.hasUsageStatsPermission() == true &&
+                        Utility.checkUsageStatsPermission(requireContext())
+                } catch (_: RemoteException) {
+                    false
+                }
+            },
+            alertRes = R.string.request_usage_stats,
+            settingsAction = Settings.ACTION_USAGE_ACCESS_SETTINGS,
+        )
         if (!granted) return false
         manager.setSkipForegroundEnabled(enabled)
         return true
     }
-
-    private fun usageStatsGranted(): Boolean = ensureSpecialAccessPermission(
-        checkPermission = {
-            try {
-                serviceWork?.hasUsageStatsPermission() == true &&
-                    Utility.checkUsageStatsPermission(requireContext())
-            } catch (_: RemoteException) {
-                false
-            }
-        },
-        alertRes = R.string.request_usage_stats,
-        settingsAction = Settings.ACTION_USAGE_ACCESS_SETTINGS,
-    )
 
     private fun bindBatchActions() {
         findPreference<Preference>(SETTINGS_UNFREEZE_ALL)
@@ -128,6 +132,70 @@ class FreezeSettingsFragment : SettingsSubFragment() {
         return true
     }
 
+    /** Список автозаморозки целиком: метки подтягиваем сервисом рабочего профиля. */
+    private fun fillAutoFreezeList() {
+        val category = findPreference<PreferenceCategory>(SETTINGS_AUTO_FREEZE_LIST) ?: return
+        val packages = LocalStorageManager.getInstance()
+            .getStringList(LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE)
+            .toSet()
+        val work = serviceWork
+        if (packages.isEmpty() || work == null) {
+            category.removeAll()
+            val empty = Preference(requireContext()).apply {
+                title = getString(R.string.settings_auto_freeze_list_empty)
+                isEnabled = false
+                isIconSpaceReserved = false
+            }
+            category.addPreference(empty)
+            return
+        }
+        Thread {
+            val apps = fetchApps(work)
+            postOnUi { showAutoFreezeEntries(category, packages, apps) }
+        }.start()
+    }
+
+    private fun showAutoFreezeEntries(
+        category: PreferenceCategory,
+        packages: Set<String>,
+        apps: List<io.gatekeeper.util.ApplicationInfoWrapper>?,
+    ) {
+        category.removeAll()
+        val labels = apps?.associate { it.getPackageName() to it.getLabel() }
+        packages.sortedBy { labels?.get(it) ?: it }.forEach { pkg ->
+            val pref = Preference(requireContext()).apply {
+                title = labels?.get(pkg) ?: pkg
+                summary = pkg
+                isIconSpaceReserved = false
+                setOnPreferenceClickListener {
+                    confirmRemoveFromAutoFreeze(pkg, title.toString())
+                    true
+                }
+            }
+            category.addPreference(pref)
+        }
+    }
+
+    private fun confirmRemoveFromAutoFreeze(pkg: String, label: String) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.settings_auto_freeze_remove_title)
+            .setMessage(getString(R.string.settings_auto_freeze_remove_message, label))
+            .setPositiveButton(R.string.ca_remove_action) { _, _ ->
+                val local = LocalStorageManager.getInstance()
+                val remaining = local
+                    .getStringList(LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE)
+                    .filterNot { it == pkg }
+                local.setStringList(
+                    LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE,
+                    remaining.toTypedArray(),
+                )
+                Utility.scheduleAppListRefresh(requireContext())
+                fillAutoFreezeList()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
     companion object {
         private const val SETTINGS_AUTO_FREEZE_SERVICE = "settings_auto_freeze_service"
         private const val SETTINGS_AUTO_FREEZE_DELAY = "settings_auto_freeze_delay"
@@ -136,6 +204,7 @@ class FreezeSettingsFragment : SettingsSubFragment() {
         private const val SETTINGS_UNFREEZE_ALL = "settings_unfreeze_all"
         private const val SETTINGS_CREATE_FREEZE_ALL_SHORTCUT = "settings_create_freeze_all_shortcut"
         private const val SETTINGS_CREATE_UNFREEZE_ALL_SHORTCUT = "settings_create_unfreeze_all_shortcut"
+        private const val SETTINGS_AUTO_FREEZE_LIST = "settings_auto_freeze_list"
 
         private const val SECONDS_IN_MINUTE = 60
         private val AUTO_FREEZE_DELAY_SECONDS = intArrayOf(0, 60, 2 * 60, 5 * 60)

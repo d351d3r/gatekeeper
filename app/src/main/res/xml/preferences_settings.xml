@@ -34,6 +34,18 @@
         app:fragment="io.gatekeeper.ui.settings.CertsSettingsFragment" />
 
     <androidx.preference.Preference
+        android:key="settings_root_backup"
+        android:title="@string/settings_root_backup"
+        android:summary="@string/settings_root_backup_desc"
+        app:fragment="io.gatekeeper.ui.settings.BackupSettingsFragment" />
+
+    <androidx.preference.Preference
+        android:key="settings_root_accesses"
+        android:title="@string/settings_root_accesses"
+        android:summary="@string/settings_root_accesses_desc"
+        app:fragment="io.gatekeeper.ui.settings.PermissionsSettingsFragment" />
+
+    <androidx.preference.Preference
         android:key="settings_root_diagnostics"
         android:title="@string/settings_root_diagnostics"
         android:summary="@string/settings_root_diagnostics_desc"

@@ -30,6 +30,10 @@ class SettingsActivity : AppCompatActivity(),
                         SettingsSubFragment.ARG_PROFILE_SERVICE,
                         intent.extras?.getBundle("extras")?.getBinder("profile_service"),
                     )
+                    putBinder(
+                        SettingsSubFragment.ARG_MAIN_SERVICE,
+                        intent.extras?.getBundle("extras")?.getBinder("main_service"),
+                    )
                 }
             }
             supportFragmentManager.beginTransaction()
@@ -50,6 +54,10 @@ class SettingsActivity : AppCompatActivity(),
                     putBinder(
                         SettingsSubFragment.ARG_PROFILE_SERVICE,
                         caller.arguments?.getBinder(SettingsSubFragment.ARG_PROFILE_SERVICE),
+                    )
+                    putBinder(
+                        SettingsSubFragment.ARG_MAIN_SERVICE,
+                        caller.arguments?.getBinder(SettingsSubFragment.ARG_MAIN_SERVICE),
                     )
                     putAll(pref.extras)
                 }

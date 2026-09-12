@@ -36,4 +36,8 @@
         android:key="settings_create_freeze_all_shortcut"
         android:title="@string/create_freeze_all_shortcut" />
 
+    <androidx.preference.PreferenceCategory
+        android:key="settings_auto_freeze_list"
+        android:title="@string/settings_auto_freeze_list" />
+
 </androidx.preference.PreferenceScreen>

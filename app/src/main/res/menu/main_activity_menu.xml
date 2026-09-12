@@ -54,14 +54,6 @@
         android:title="@string/install_app_to_profile" />
 
     <item
-        android:id="@+id/main_menu_export_backup"
-        android:title="@string/export_backup" />
-
-    <item
-        android:id="@+id/main_menu_import_backup"
-        android:title="@string/import_backup" />
-
-    <item
         android:id="@+id/main_menu_documents_ui"
         android:title="@string/documents_ui" />
 
