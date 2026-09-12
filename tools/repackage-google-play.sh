@@ -20,9 +20,9 @@ mv work/dist/*.apk app-release-google.apk
 rm -rf work
 
 echo "=> Zipaligning the new APK"
-$ANDROID_HOME/build-tools/30.0.2/zipalign -f 4 app-release-google.apk app-release-google-aligned.apk 
+$ANDROID_HOME/build-tools/36.0.0/zipalign -f 4 app-release-google.apk app-release-google-aligned.apk 
 
 echo "=> Signing the new APK"
 read -p "Enter keystore path: " KS_PATH
 read -p "Enter key alias: " KS_ALIAS
-$ANDROID_HOME/build-tools/30.0.2/apksigner sign --ks $KS_PATH --ks-key-alias $KS_ALIAS app-release-google-aligned.apk
+$ANDROID_HOME/build-tools/36.0.0/apksigner sign --ks $KS_PATH --ks-key-alias $KS_ALIAS app-release-google-aligned.apk

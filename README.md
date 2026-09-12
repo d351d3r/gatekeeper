@@ -5,15 +5,32 @@ system user with its own data, accounts, permissions, and lifecycle. Cloned apps
 look and behave like ordinary phone apps, but they cannot see the owner's
 personal environment.
 
-The project is a fork of [Shelter](https://cgit.typeblog.net/Shelter/about/)
-(PeterCxy, GPL-3.0). Compared to upstream it adds a modernized interface, stable
-cross-profile file access, the Anti Spy subsystem, and diagnostics for profile
-reliability.
-
 **Repository:** [d351d3r/gatekeeper](https://github.com/d351d3r/gatekeeper)
 
 Product direction and platform boundaries: [PRODUCT.md](PRODUCT.md).
 Русская версия: [README_RU.md](README_RU.md).
+
+## What's new in 1.5.3
+
+- **Work-profile media auto-copy** — new screenshots and camera photos/videos from
+  the work profile appear in the personal gallery whenever File Shuttle connects
+  (disabled by default). Catch-up-by-watermark model: no persistent service, files
+  that appeared while the connection was down are picked up on the next connect,
+  duplicates are skipped. Work → personal only. Details:
+  [docs/feature_media_mirror.md](docs/feature_media_mirror.md).
+- **Work-profile root CA certificates** — install a root CA into the work profile
+  only: the SHA-256 fingerprint is shown before install, installed certificates are
+  listed and removable in one tap. Browsers honor the user CA store, most apps
+  (targetSdk 24+) do not. Details:
+  [docs/feature_ca_certs.md](docs/feature_ca_certs.md).
+- **The auto-freeze list is now fully manual** — apps installed by stores inside
+  the work profile are no longer added to the list automatically; toggle the
+  snowflake per app. The background auto-add mechanism was reverted: on stock
+  Android 16 `PACKAGE_ADDED` receivers are not delivered, and work-to-parent
+  cross-profile sends resolve no recipients — the mechanism could only ever fire
+  when the user opened the app list anyway.
+- **Updating from earlier builds requires recreating the work profile** (the device
+  admin component changed) and re-pinning shortcuts / re-granting SAF folders.
 
 ## Features
 
@@ -41,7 +58,6 @@ Product direction and platform boundaries: [PRODUCT.md](PRODUCT.md).
 
 User guide (Russian): [USER_GUIDE.md](USER_GUIDE.md).
 Known issues and test notes: [PROBLEMS.md](PROBLEMS.md).
-Changelog: [CHANGELOG.md](CHANGELOG.md).
 
 ## Requirements
 
@@ -92,12 +108,13 @@ Releases are published from `v*` tags — see
 
 ## Repository layout
 
-- `app/` — the application (Kotlin + Java, AIDL).
-- `libs/SetupWizardLibrary/` — vendored setup-wizard library
-  ([upstream](https://gitea.angry.im/PeterCxy/SetupWizardLibrary)), built from
-  source as the `:setup-wizard-lib` module.
-- `tools/testbench.sh` — emulator-based verification bench (ADB).
-- `docs/` — threat model, feature specs, test checklists.
+- `app/` — the application (Kotlin, AIDL).
+- `libs/SetupWizardLibrary/` — the setup-wizard library, built from source as
+  the `:setup-wizard-lib` module.
+- `tools/` — utility scripts: `testbench.sh` (emulator verification bench over
+  ADB), `repackage-google-play.sh` (Google Play variant without
+  MANAGE_EXTERNAL_STORAGE).
+- `docs/` — threat model, feature specs.
 - `assets/` — toolbar/shortcut icon sources.
 
 ## Uninstalling
@@ -108,11 +125,4 @@ the cloned apps.
 
 ## License
 
-GPL-3.0-or-later — see [LICENSE](LICENSE). Gatekeeper is derived from Shelter;
-respect upstream licensing when redistributing.
-
-## Upstream
-
-- [Shelter](https://cgit.typeblog.net/Shelter/about/) by PeterCxy.
-- [SetupWizardLibrary](https://gitea.angry.im/PeterCxy/SetupWizardLibrary) —
-  vendored under `libs/SetupWizardLibrary`.
+GPL-3.0-or-later — see [LICENSE](LICENSE).

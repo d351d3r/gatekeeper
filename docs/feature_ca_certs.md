@@ -12,11 +12,11 @@
 
 **#2141** -- поставить Яндекс.Браузер, где сертификаты уже вшиты, и морозить его когда не нужен.
 
-Оба -- костыли. У Shelter есть прямой API.
+Оба -- костыли. Есть прямой API.
 
 ## Механизм
 
-Shelter -- Profile Owner, значит доступен `DevicePolicyManager.installCaCert(admin, certBuffer)`. Установка молчаливая, без диалогов, **область -- только управляемый профиль**. Личный профиль не затрагивается.
+Gatekeeper -- Profile Owner профиля, значит доступен `DevicePolicyManager.installCaCert(admin, certBuffer)`. Установка молчаливая, без диалогов, **область -- только управляемый профиль**. Личный профиль не затрагивается.
 
 Сопутствующее: `uninstallCaCert`, `hasCaCertInstalled`, `getInstalledCaCerts`, `uninstallAllUserCaCerts`.
 
