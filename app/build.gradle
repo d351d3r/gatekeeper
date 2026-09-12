@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.gitlab.arturbosch.detekt'
 
 def versionPropsFile = rootProject.file('version.properties')
 def versionProps = new Properties()
@@ -67,6 +68,11 @@ android {
         unitTests.returnDefaultValues = true
     }
     namespace 'io.gatekeeper'
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    baseline = file('detekt-baseline.xml')
 }
 
 afterEvaluate {

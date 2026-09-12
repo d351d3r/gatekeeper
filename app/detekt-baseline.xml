@@ -1,0 +1,184 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:FileShuttleService.kt$FileShuttleService.&lt;no name provided&gt;$(isDirectory &amp;&amp; !f.mkdir()) || (!isDirectory &amp;&amp; !f.createNewFile())</ID>
+    <ID>CyclomaticComplexMethod:AppListFragment.kt$AppListFragment$private fun onAppMenuItemSelected(itemId: Int, app: ApplicationInfoWrapper, checked: Boolean)</ID>
+    <ID>CyclomaticComplexMethod:DummyActivity.kt$DummyActivity$private fun init()</ID>
+    <ID>CyclomaticComplexMethod:SettingsFragment.kt$SettingsFragment$override fun onPreferenceChange(preference: Preference, newState: Any): Boolean</ID>
+    <ID>EmptyCatchBlock:Utility.kt$Utility${ }</ID>
+    <ID>EmptyFunctionBlock:AppListAdapter.kt$AppListAdapter.ViewHolder.&lt;no name provided&gt;${}</ID>
+    <ID>EmptyFunctionBlock:GatekeeperService.kt$GatekeeperService.&lt;no name provided&gt;${ }</ID>
+    <ID>EmptyFunctionBlock:InstallationProgressListener.kt$InstallationProgressListener${}</ID>
+    <ID>EmptyFunctionBlock:PaymentStubService.kt$PaymentStubService${ }</ID>
+    <ID>EmptyFunctionBlock:SetupWizardActivity.kt$SetupWizardActivity.BaseWizardFragment${}</ID>
+    <ID>FunctionParameterNaming:Utility.kt$Utility$`is`: InputStream</ID>
+    <ID>LargeClass:DummyActivity.kt$DummyActivity : Activity</ID>
+    <ID>LargeClass:MainActivity.kt$MainActivity : AppCompatActivity</ID>
+    <ID>LargeClass:Utility.kt$Utility</ID>
+    <ID>LongMethod:AppListFragment.kt$AppListFragment$private fun onAppMenuItemSelected(itemId: Int, app: ApplicationInfoWrapper, checked: Boolean)</ID>
+    <ID>LongMethod:AppListFragment.kt$AppListFragment$private fun showAppActionDialog(app: ApplicationInfoWrapper, anchor: View)</ID>
+    <ID>LongMethod:AppListFragment.kt$AppListFragment.&lt;no name provided&gt;$override fun callback(apps: MutableList&lt;ApplicationInfoWrapper&gt;)</ID>
+    <ID>LongMethod:MainActivity.kt$MainActivity$override fun onOptionsItemSelected(item: MenuItem): Boolean</ID>
+    <ID>LongMethod:SettingsFragment.kt$SettingsFragment$override fun onCreatePreferences(bundle: Bundle?, s: String?)</ID>
+    <ID>LongMethod:SettingsFragment.kt$SettingsFragment$override fun onPreferenceChange(preference: Preference, newState: Any): Boolean</ID>
+    <ID>LongMethod:Utility.kt$Utility$fun enforceWorkProfilePolicies(context: Context)</ID>
+    <ID>LongParameterList:AntiSpyLaunchGate.kt$AntiSpyLaunchGate$( context: Context, storage: LocalStorageManager, packageName: String?, forceGate: Boolean, onProceed: Runnable, onBlocked: BlockedCallback? )</ID>
+    <ID>LongParameterList:Utility.kt$Utility$( context: Context, important: Boolean, ticker: String, title: String, desc: String, icon: Int )</ID>
+    <ID>LoopWithTooManyJumpStatements:VpnTunnelDetector.kt$VpnTunnelDetector$for</ID>
+    <ID>MagicNumber:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$1000</ID>
+    <ID>MagicNumber:AntiSpyDummyVpnService.kt$AntiSpyDummyVpnService$32</ID>
+    <ID>MagicNumber:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService$1000L</ID>
+    <ID>MagicNumber:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService$1500L</ID>
+    <ID>MagicNumber:AppListAdapter.kt$AppListAdapter.&lt;no name provided&gt;$0.75f</ID>
+    <ID>MagicNumber:AppListAdapter.kt$AppListAdapter.&lt;no name provided&gt;$16</ID>
+    <ID>MagicNumber:AppListFragment.kt$AppListFragment$12</ID>
+    <ID>MagicNumber:AppListFragment.kt$AppListFragment$24</ID>
+    <ID>MagicNumber:AppListFragment.kt$AppListFragment$48</ID>
+    <ID>MagicNumber:AuthPayload.kt$AuthPayload$16</ID>
+    <ID>MagicNumber:AuthPayload.kt$AuthPayload$4</ID>
+    <ID>MagicNumber:AuthenticationUtility.kt$AuthenticationUtility$0xFF</ID>
+    <ID>MagicNumber:AuthenticationUtility.kt$AuthenticationUtility$16</ID>
+    <ID>MagicNumber:AuthenticationUtility.kt$AuthenticationUtility$256</ID>
+    <ID>MagicNumber:AuthenticationUtility.kt$AuthenticationUtility$4</ID>
+    <ID>MagicNumber:DummyActivity.kt$DummyActivity$0.1f</ID>
+    <ID>MagicNumber:DummyActivity.kt$DummyActivity$2000L</ID>
+    <ID>MagicNumber:DummyActivity.kt$DummyActivity$4500L</ID>
+    <ID>MagicNumber:DummyActivity.kt$DummyActivity$700L</ID>
+    <ID>MagicNumber:DummyActivity.kt$DummyActivity.Companion$65_534</ID>
+    <ID>MagicNumber:FileShuttleService.kt$FileShuttleService$100</ID>
+    <ID>MagicNumber:FreezeService.kt$FreezeService.&lt;no name provided&gt;$1000</ID>
+    <ID>MagicNumber:InstallationProgressListener.kt$InstallationProgressListener$100</ID>
+    <ID>MagicNumber:MainActivity.kt$MainActivity$16f</ID>
+    <ID>MagicNumber:MainActivity.kt$MainActivity$4</ID>
+    <ID>MagicNumber:SettingsFragment.kt$SettingsFragment$60</ID>
+    <ID>MagicNumber:Utility.kt$Utility$0xE49E1</ID>
+    <ID>MagicNumber:Utility.kt$Utility$0xE49E4</ID>
+    <ID>MagicNumber:Utility.kt$Utility$0xE49E5</ID>
+    <ID>MagicNumber:Utility.kt$Utility$0xE49E6</ID>
+    <ID>MagicNumber:Utility.kt$Utility$0xE49E7</ID>
+    <ID>MagicNumber:Utility.kt$Utility$0xE49E8</ID>
+    <ID>MagicNumber:Utility.kt$Utility$0xE49E9</ID>
+    <ID>MagicNumber:Utility.kt$Utility$2000L</ID>
+    <ID>MagicNumber:Utility.kt$Utility$3</ID>
+    <ID>MagicNumber:Utility.kt$Utility$4500L</ID>
+    <ID>MagicNumber:Utility.kt$Utility$50</ID>
+    <ID>MagicNumber:Utility.kt$Utility$50L</ID>
+    <ID>MagicNumber:Utility.kt$Utility$512</ID>
+    <ID>MagicNumber:Utility.kt$Utility$65536</ID>
+    <ID>MagicNumber:Utility.kt$Utility$700L</ID>
+    <ID>MaxLineLength:GatekeeperService.kt$GatekeeperService.&lt;no name provided&gt;$.</ID>
+    <ID>MaxLineLength:MediaMirrorSelectionTest.kt$MediaMirrorSelectionTest$)</ID>
+    <ID>NestedBlockDepth:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService$private fun performFreeze(trigger: AntiSpyTrigger)</ID>
+    <ID>NestedBlockDepth:AppListFragment.kt$AppListFragment$private fun onAppMenuItemSelected(itemId: Int, app: ApplicationInfoWrapper, checked: Boolean)</ID>
+    <ID>NestedBlockDepth:DummyActivity.kt$DummyActivity$private fun actionUnfreezeAllInList()</ID>
+    <ID>NestedBlockDepth:MediaMirror.kt$MediaMirror$private fun copyOne( context: Context, service: IFileShuttleService, remote: MediaMirrorSelection.RemoteFile, relativeDir: String, ): Boolean</ID>
+    <ID>NestedBlockDepth:VpnTunnelDetector.kt$VpnTunnelDetector$private fun hasVpnNetworkTransport(context: Context): Boolean</ID>
+    <ID>ReturnCount:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$private fun runOneDummyCycle(context: Context): Int</ID>
+    <ID>ReturnCount:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$private fun tryClearVpnBlocking(context: Context): Int</ID>
+    <ID>ReturnCount:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$private fun waitForSignal(signal: AtomicBoolean, lock: Object, timeoutMs: Long): Boolean</ID>
+    <ID>ReturnCount:AntiSpyDummyVpnService.kt$AntiSpyDummyVpnService$override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int</ID>
+    <ID>ReturnCount:AntiSpyDummyVpnService.kt$AntiSpyDummyVpnService$private fun startTunnel()</ID>
+    <ID>ReturnCount:AntiSpyManager.kt$AntiSpyManager$fun freezeAutoFreezeList(context: Context, delivery: AutoFreezeDelivery): Int</ID>
+    <ID>ReturnCount:AntiSpyManager.kt$AntiSpyManager$fun syncAutoFreezeListToWorkProfile(context: Context, force: Boolean = false)</ID>
+    <ID>ReturnCount:AntiSpyVpnFreezeReceiver.kt$AntiSpyVpnFreezeReceiver$private fun handleVpnBatchFreeze(app: Context)</ID>
+    <ID>ReturnCount:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService$override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int</ID>
+    <ID>ReturnCount:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService$private fun onVpnStateChanged(vpnActive: Boolean)</ID>
+    <ID>ReturnCount:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService$private fun performFreeze(trigger: AntiSpyTrigger)</ID>
+    <ID>ReturnCount:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService$private fun scheduleRestartIfNeeded()</ID>
+    <ID>ReturnCount:AppListAdapter.kt$AppListAdapter$fun getSelectedItems(): List&lt;ApplicationInfoWrapper&gt;?</ID>
+    <ID>ReturnCount:AppListAdapter.kt$AppListAdapter.ViewHolder$private fun onLongClick(): Boolean</ID>
+    <ID>ReturnCount:AppListFragment.kt$AppListFragment$fun refresh()</ID>
+    <ID>ReturnCount:AppListFragment.kt$AppListFragment.&lt;no name provided&gt;$override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean</ID>
+    <ID>ReturnCount:AuthPayload.kt$AuthPayload$fun verify(keyHex: String?, payload: String, signature: String?): Boolean</ID>
+    <ID>ReturnCount:AuthPayload.kt$AuthPayload$private fun decodeHex(value: String?): ByteArray?</ID>
+    <ID>ReturnCount:AuthenticationUtility.kt$AuthenticationUtility$fun checkIntent(intent: Intent): Boolean</ID>
+    <ID>ReturnCount:AuthenticationUtility.kt$AuthenticationUtility$private fun hexStringToByteArray(s: String): ByteArray?</ID>
+    <ID>ReturnCount:AutoFreezePolicy.kt$AutoFreezePolicy$fun shouldApplyVpnGate(packageName: String?, forceGate: Boolean = false): Boolean</ID>
+    <ID>ReturnCount:CrossProfileDocumentsProvider.kt$CrossProfileDocumentsProvider$override fun queryDocument(documentId: String, projection: Array&lt;String&gt;?): Cursor</ID>
+    <ID>ReturnCount:DummyActivity.kt$DummyActivity$private fun actionUnfreezeAndLaunch()</ID>
+    <ID>ReturnCount:DummyActivity.kt$DummyActivity$private fun actionUnfreezeApp()</ID>
+    <ID>ReturnCount:DummyActivity.kt$DummyActivity$private fun ensureAntiSpyVpnPermissionThenLaunch(): Boolean</ID>
+    <ID>ReturnCount:DummyActivity.kt$DummyActivity$private fun forwardBatchToMainActivityIfVisible(batchAction: String): Boolean</ID>
+    <ID>ReturnCount:DummyActivity.kt$DummyActivity$private fun isSystemInstallerIntent(intent: Intent): Boolean</ID>
+    <ID>ReturnCount:FileShuttleConnection.kt$FileShuttleConnection$fun &lt;T : Any&gt; call(block: (IFileShuttleService) -&gt; T?): T?</ID>
+    <ID>ReturnCount:FileShuttleConnection.kt$FileShuttleConnection$fun requestBind(context: Context): Boolean</ID>
+    <ID>ReturnCount:FileShuttleService.kt$FileShuttleService$private fun bitmapToFd(bmp: Bitmap?): ParcelFileDescriptor?</ID>
+    <ID>ReturnCount:FileShuttleService.kt$FileShuttleService$private fun loadImageThumbnail(fullPath: String, sizeHint: Point): ParcelFileDescriptor?</ID>
+    <ID>ReturnCount:GatekeeperService.kt$GatekeeperService.&lt;no name provided&gt;$override fun installCaCertificate(cert: ByteArray): String?</ID>
+    <ID>ReturnCount:MainActivity.kt$MainActivity$private fun checkPowerDiagnosticsOnceDaily()</ID>
+    <ID>ReturnCount:MainActivity.kt$MainActivity$private fun finishIfBackgroundShortcutLaunch(intent: Intent?): Boolean</ID>
+    <ID>ReturnCount:MainActivity.kt$MainActivity$private fun handleBatchShortcutIntent(intent: Intent?): Boolean</ID>
+    <ID>ReturnCount:MainActivity.kt$MainActivity$private fun requestAntiSpyVpnPermission()</ID>
+    <ID>ReturnCount:MediaMirror.kt$MediaMirror$private fun toRemoteFile(map: Map&lt;String, Serializable&gt;): MediaMirrorSelection.RemoteFile?</ID>
+    <ID>ReturnCount:MiuiDetector.kt$MiuiDetector$fun isLikelyMiui(manufacturer: String, brand: String, display: String): Boolean</ID>
+    <ID>ReturnCount:SettingsFragment.kt$SettingsFragment$override fun onPreferenceChange(preference: Preference, newState: Any): Boolean</ID>
+    <ID>ReturnCount:SettingsFragment.kt$SettingsFragment$private fun onCertFileSelected(uri: Uri?)</ID>
+    <ID>ReturnCount:ShuttleSession.kt$ShuttleSession$fun await(timeoutMs: Long): T?</ID>
+    <ID>ReturnCount:Utility.kt$Utility$fun normalizeStringList(list: Array&lt;String&gt;?): Array&lt;String&gt;</ID>
+    <ID>ReturnCount:Utility.kt$Utility$fun startServiceInManagedProfile(context: Context, intent: Intent): Boolean</ID>
+    <ID>ReturnCount:Utility.kt$Utility$private fun unfreezeShortcutTargetsPackage(intent: Intent?, packageName: String): Boolean</ID>
+    <ID>ReturnCount:VpnTunnelDetector.kt$VpnTunnelDetector$fun isDefaultNetworkTunneled(context: Context): Boolean</ID>
+    <ID>ReturnCount:VpnTunnelDetector.kt$VpnTunnelDetector$private fun activeNetworkMissingNotVpnCapability(context: Context): Boolean</ID>
+    <ID>ReturnCount:VpnTunnelDetector.kt$VpnTunnelDetector$private fun hasTunnelInterface(): Boolean</ID>
+    <ID>ReturnCount:VpnTunnelDetector.kt$VpnTunnelDetector$private fun hasVpnNetworkTransport(context: Context): Boolean</ID>
+    <ID>ReturnCount:WorkProfileBatchFreeze.kt$WorkProfileBatchFreeze$fun freezeList(context: Context, list: Array&lt;String&gt;): Int</ID>
+    <ID>ReturnCount:WorkProfileBatchFreeze.kt$WorkProfileBatchFreeze$private fun freezePackage( dpm: DevicePolicyManager, admin: ComponentName, context: Context, pkg: String, ): FreezeOutcome</ID>
+    <ID>SwallowedException:FileShuttleConnection.kt$FileShuttleConnection$e: ExecutionException</ID>
+    <ID>SwallowedException:FileShuttleConnection.kt$FileShuttleConnection$e: IllegalStateException</ID>
+    <ID>SwallowedException:FileShuttleConnection.kt$FileShuttleConnection$e: RemoteException</ID>
+    <ID>SwallowedException:FileShuttleConnection.kt$FileShuttleConnection$e: TimeoutException</ID>
+    <ID>SwallowedException:UriForwardProxy.kt$UriForwardProxy$e: RemoteException</ID>
+    <ID>SwallowedException:UriForwardProxy.kt$UriForwardProxy.&lt;no name provided&gt;$e: FileNotFoundException</ID>
+    <ID>SwallowedException:Utility.kt$Utility$e: Exception</ID>
+    <ID>SwallowedException:Utility.kt$Utility$e: IllegalStateException</ID>
+    <ID>SwallowedException:Utility.kt$Utility$e: PackageManager.NameNotFoundException</ID>
+    <ID>ThrowsCount:CrossProfileDocumentsProvider.kt$CrossProfileDocumentsProvider$private fun authRequired(): Nothing</ID>
+    <ID>TooGenericExceptionCaught:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AntiSpyDummyVpnService.kt$AntiSpyDummyVpnService$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AntiSpyVpnPromptManager.kt$AntiSpyVpnPromptManager$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService.Companion$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService.Companion$e: RuntimeException</ID>
+    <ID>TooGenericExceptionCaught:BatchFreezeService.kt$BatchFreezeService$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:FileShuttleService.kt$FileShuttleService$e: RuntimeException</ID>
+    <ID>TooGenericExceptionCaught:GatekeeperService.kt$GatekeeperService.&lt;no name provided&gt;$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:MediaMirror.kt$MediaMirror$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:Utility.kt$Utility$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:VpnTunnelDetector.kt$VpnTunnelDetector$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:WorkProfileBatchFreeze.kt$WorkProfileBatchFreeze$e: Exception</ID>
+    <ID>TooGenericExceptionThrown:DummyActivity.kt$DummyActivity$throw RuntimeException("unimplemented")</ID>
+    <ID>TooGenericExceptionThrown:DummyActivity.kt$DummyActivity$throw RuntimeException(e)</ID>
+    <ID>TooGenericExceptionThrown:FileShuttleConnection.kt$FileShuttleConnection$throw RuntimeException(cause)</ID>
+    <ID>TooGenericExceptionThrown:MainActivity.kt$MainActivity$throw RuntimeException(e)</ID>
+    <ID>TooGenericExceptionThrown:MainActivity.kt$MainActivity.&lt;no name provided&gt;$throw RuntimeException("How did this happen?")</ID>
+    <ID>TooManyFunctions:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector</ID>
+    <ID>TooManyFunctions:AntiSpyManager.kt$AntiSpyManager</ID>
+    <ID>TooManyFunctions:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService : Service</ID>
+    <ID>TooManyFunctions:AppListAdapter.kt$AppListAdapter : Adapter</ID>
+    <ID>TooManyFunctions:AppListFragment.kt$AppListFragment : BaseFragment</ID>
+    <ID>TooManyFunctions:ApplicationInfoWrapper.kt$ApplicationInfoWrapper : Parcelable</ID>
+    <ID>TooManyFunctions:CrossProfileDocumentsProvider.kt$CrossProfileDocumentsProvider : DocumentsProvider</ID>
+    <ID>TooManyFunctions:DummyActivity.kt$DummyActivity : Activity</ID>
+    <ID>TooManyFunctions:FileShuttleConnection.kt$FileShuttleConnection</ID>
+    <ID>TooManyFunctions:FileShuttleService.kt$FileShuttleService : Service</ID>
+    <ID>TooManyFunctions:GatekeeperService.kt$GatekeeperService$&lt;no name provided&gt; : Stub</ID>
+    <ID>TooManyFunctions:LocalStorageManager.kt$LocalStorageManager</ID>
+    <ID>TooManyFunctions:MainActivity.kt$MainActivity : AppCompatActivity</ID>
+    <ID>TooManyFunctions:SettingsFragment.kt$SettingsFragment : PreferenceFragmentCompatOnPreferenceChangeListener</ID>
+    <ID>TooManyFunctions:SettingsManager.kt$SettingsManager</ID>
+    <ID>TooManyFunctions:ShuttleSession.kt$ShuttleSession&lt;T : Any&gt;</ID>
+    <ID>TooManyFunctions:Utility.kt$Utility</ID>
+    <ID>UnusedParameter:AppListFragment.kt$AppListFragment$anchor: View</ID>
+    <ID>UnusedParameter:MediaMirror.kt$MediaMirror$context: Context</ID>
+    <ID>UnusedParameter:SettingsFragment.kt$SettingsFragment$pref: Preference</ID>
+    <ID>UnusedPrivateMember:Utility.kt$Utility$private fun sendAppListRefreshBroadcast(context: Context)</ID>
+    <ID>UnusedPrivateProperty:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$attempt</ID>
+    <ID>UnusedPrivateProperty:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$val cycleResult = runOneDummyCycle(context)</ID>
+    <ID>UseCheckOrError:GatekeeperService.kt$GatekeeperService.&lt;no name provided&gt;$throw IllegalStateException( "Cross-profile packages support is only available on Android 11 and later" )</ID>
+    <ID>UseCheckOrError:LegacyFreezeMigrationTest.kt$LegacyFreezeMigrationTest$throw IllegalStateException("binder lost")</ID>
+    <ID>UseCheckOrError:LocalStorageManager.kt$LocalStorageManager.Companion$throw IllegalStateException("LocalStorageManager must be initialized at start-up")</ID>
+    <ID>UseCheckOrError:SettingsManager.kt$SettingsManager.Companion$throw IllegalStateException("SettingsManager must be initialized at start-up")</ID>
+    <ID>UseCheckOrError:Utility.kt$Utility$throw IllegalStateException("Cannot find an intent in other profile")</ID>
+  </CurrentIssues>
+</SmellBaseline>
