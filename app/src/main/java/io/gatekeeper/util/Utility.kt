@@ -851,6 +851,21 @@ object Utility {
             DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED
         )
 
+        // C2: доменные правила перенаправления ссылок (docs/feature_cross_profile_links.md).
+        // Читаем из префов здесь, а не в GatekeeperService: этот метод — единственный
+        // владелец набора кросс-профильных фильтров (см. clearCrossProfileIntentFilters
+        // выше). Правила применяются идемпотентно вместе со служебными фильтрами,
+        // иначе их добавление из сервиса стирало бы весь релей между профилями.
+        val linkRules = LocalStorageManager.getInstance()
+            .getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES)
+        for (rule in linkRules) {
+            manager.addCrossProfileIntentFilter(
+                adminComponent,
+                buildLinkViewFilter(rule),
+                DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED
+            )
+        }
+
         manager.setCrossProfileContactsSearchDisabled(
             adminComponent,
             SettingsManager.getInstance().getBlockContactsSearchingEnabled()
@@ -858,6 +873,17 @@ object Utility {
 
         manager.setProfileEnabled(adminComponent)
     }
+
+    private fun buildLinkViewFilter(rule: String): IntentFilter =
+        IntentFilter(Intent.ACTION_VIEW).apply {
+            addCategory(Intent.CATEGORY_DEFAULT)
+            addCategory(Intent.CATEGORY_BROWSABLE)
+            addDataScheme("http")
+            addDataScheme("https")
+            for (host in CrossProfileLinkRules.hostPatterns(rule)) {
+                addDataAuthority(host, null)
+            }
+        }
 
     fun enforceUserRestrictions(context: Context) {
         val manager = context.getSystemService(DevicePolicyManager::class.java)

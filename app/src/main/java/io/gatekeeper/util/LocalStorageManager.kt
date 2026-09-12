@@ -156,7 +156,7 @@ class LocalStorageManager private constructor(context: Context) {
         const val PREF_MEDIA_MIRROR_WATERMARK = "media_mirror_watermark"
         /** Подсказка "клонировать магазин в рабочий профиль": состояние StoreCloneHint. */
         const val PREF_STORE_CLONE_HINT_STATE = "store_clone_hint_state"
-        /** Момент нажатия "Позже" по подсказке магазина (снooze на неделю). */
+        /** Момент нажатия "Позже" по подсказке магазина (snooze на неделю). */
         const val PREF_STORE_CLONE_HINT_SNOOZE_AT = "store_clone_hint_snooze_at"
         /** Разовый Snackbar с указанием на кнопку переноса файлов показан. */
         const val PREF_FILE_SHUTTLE_HINT_SHOWN = "file_shuttle_hint_shown"

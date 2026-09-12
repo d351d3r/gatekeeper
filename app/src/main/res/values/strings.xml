@@ -203,7 +203,7 @@
     <string name="backup_export_success">Backup exported</string>
     <string name="backup_export_failed">Export failed</string>
     <string name="backup_import_invalid">This file is not a Gatekeeper backup</string>
-    <string name="backup_import_success">Imported %1$d settings; apps: %2$d personal, %3$d work</string>
+    <string name="backup_import_success">Imported %1$d settings; listed apps: %2$d personal, %3$d work</string>
     <string name="backup_restore_title">Restore work apps?</string>
     <string name="backup_restore_message">%1$d apps from the backup are missing in the work profile and can be cloned from the personal profile.</string>
     <string name="backup_restore_now">Install</string>

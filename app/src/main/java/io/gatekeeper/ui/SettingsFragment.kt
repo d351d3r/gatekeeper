@@ -190,10 +190,12 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
     }
 
     /**
-     * C2: правила перенаправления ссылок в рабочий профиль. Храним
-     * нормализованный список в префах (он же уезжает в бэкап), применяет
-     * диф profile-owner через DPM. Порядок: сначала binder-вызов, потом
-     * персист -- чтобы недоехавшее правило не выглядело применённым.
+     * C2: правила перенаправления ссылок в рабочий профиль. Сервис рабочего
+     * профиля сам персистит нормализованный список в префах (он же уезжает в
+     * бэкап) и перестраивает фильтры через enforceWorkProfilePolicies; false
+     * оттуда = DPM отказал, правило не применено. Ниже персистим ту же копию
+     * в префы личного профиля только после подтверждения, чтобы недоехавшее
+     * правило не выглядело применённым.
      */
     private fun setUpLinkRules() {
         prefLinkRules = findPreference(SETTINGS_CROSS_PROFILE_LINK_RULES)
@@ -225,7 +227,8 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
             return false
         }
         Thread {
-            val applied = runCatching { work.setCrossProfileLinkRules(rules) }.isSuccess
+            val applied = runCatching { work.setCrossProfileLinkRules(rules) }
+                .getOrDefault(false)
             activity?.runOnUiThread {
                 if (!isAdded) return@runOnUiThread
                 if (!applied) {

@@ -38,7 +38,8 @@ interface IGatekeeperService {
     List<String> getInstalledCaCertificates();
     boolean removeCaCertificate(String sha256Fingerprint);
     // Кросс-профильные правила ссылок (C2, docs/feature_cross_profile_links.md):
-    // домены, чьи http(s)-ссылки открываются в рабочем профиле.
+    // домены, чьи http(s)-ссылки открываются в рабочем профиле. Персистит список
+    // и перестраивает фильтры через enforceWorkProfilePolicies; false = DPM отказал.
     // Вызывается только личным профилем у сервиса рабочего профиля.
-    void setCrossProfileLinkRules(in List<String> rules);
+    boolean setCrossProfileLinkRules(in List<String> rules);
 }

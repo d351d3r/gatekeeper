@@ -6,7 +6,6 @@ import android.app.Service
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -16,6 +15,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.os.PowerManager
 import android.os.RemoteException
+import android.util.Log
 import io.gatekeeper.R
 import io.gatekeeper.GatekeeperApplication
 import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
@@ -23,7 +23,6 @@ import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.CaCertificates
 import io.gatekeeper.util.CloneOutcome
-import io.gatekeeper.util.CrossProfileLinkRules
 import io.gatekeeper.util.FileProviderProxy
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.UriForwardProxy
@@ -314,45 +313,32 @@ class GatekeeperService : Service() {
         /**
          * C2: кросс-профильные фильтры ссылок (docs/feature_cross_profile_links.md).
          * Только профиль-владелец может их ставить; личный профиль здесь
-         * молча игнорируется. removeCrossProfileIntentFilter убран из SDK 34+,
-         * поэтому изменение = clearCrossProfileIntentFilters + повторное
-         * добавление всего оставшегося набора. Применённый список храним сами:
-         * DPM не умеет его перечислять.
+         * получает false. Сами фильтры строит Utility.enforceWorkProfilePolicies
+         * из префов — этот метод лишь персистит список и дёргает enforce,
+         * чтобы набор фильтров оставался целым (случайный clear тут стирал бы
+         * весь служебный релей между профилями). false = DPM отказал, префы
+         * откачены, правило не выглядит применённым.
          */
-        override fun setCrossProfileLinkRules(rules: List<String>) {
+        override fun setCrossProfileLinkRules(rules: List<String>): Boolean {
             val dpm = if (isProfileOwner) policyManager else null
-            if (dpm == null) return
+            if (dpm == null) return false
             val local = LocalStorageManager.getInstance()
-            val old = local.getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES).toSet()
+            val old = local.getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES)
             val new = rules.toSet()
-            if (old == new) return
-            runCatching {
-                dpm.clearCrossProfileIntentFilters(adminComponent!!)
-                for (rule in new) {
-                    dpm.addCrossProfileIntentFilter(
-                        adminComponent!!,
-                        buildLinkViewFilter(rule),
-                        DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED,
-                    )
-                }
-            }
             local.setStringList(
                 LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES,
                 new.toTypedArray(),
             )
-        }
-    }
-
-    private fun buildLinkViewFilter(rule: String): IntentFilter =
-        IntentFilter(Intent.ACTION_VIEW).apply {
-            addCategory(Intent.CATEGORY_DEFAULT)
-            addCategory(Intent.CATEGORY_BROWSABLE)
-            addDataScheme("http")
-            addDataScheme("https")
-            for (host in CrossProfileLinkRules.hostPatterns(rule)) {
-                addDataAuthority(host, null)
+            return try {
+                Utility.enforceWorkProfilePolicies(this@GatekeeperService)
+                true
+            } catch (e: SecurityException) {
+                Log.e(TAG, "setCrossProfileLinkRules: DPM refused link rules", e)
+                local.setStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES, old)
+                false
             }
         }
+    }
 
     override fun onCreate() {
         policyManager = getSystemService(DevicePolicyManager::class.java)
@@ -408,6 +394,7 @@ class GatekeeperService : Service() {
     }
 
     companion object {
+        private const val TAG = "GatekeeperService"
         private const val NOTIFICATION_ID = 0x49a11
         private const val LIST_ICON_MAX_PX = 128
     }

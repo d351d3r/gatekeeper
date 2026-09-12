@@ -410,7 +410,7 @@ class MainActivity : AppCompatActivity() {
             window.decorView.post {
                 if (isFinishing) return@post
                 // Фиксируем показ сразу: повторный bind после поворота экрана
-                // не должен вызывать диалог повторно. "Позже" снooзит на неделю.
+                // не должен вызывать диалог повторно. "Позже" snooze на неделю.
                 local.setInt(LocalStorageManager.PREF_STORE_CLONE_HINT_STATE, StoreCloneHint.STATE_SNOOZED)
                 local.setLong(
                     LocalStorageManager.PREF_STORE_CLONE_HINT_SNOOZE_AT,
@@ -1190,9 +1190,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 local.applySettings(payload.settings)
                 // Компоненты (провайдер файлов, платёжный стаб) и сторож
-                // VPN подхватывают значения из префов; кросс-профильная
-                // синхронизация догонит при следующем тумблере в настройках.
+                // VPN подхватывают значения из префов; правила ссылок C2
+                // применяем сразу, не дожидаясь тумблера в настройках.
                 SettingsManager.getInstance().applyAll()
+                applyImportedLinkRules()
                 GatekeeperToast.show(
                     this,
                     getString(
@@ -1204,6 +1205,21 @@ class MainActivity : AppCompatActivity() {
                 )
                 maybeOfferAppRestore(payload)
             }
+        }.start()
+    }
+
+    /**
+     * C2: правила ссылок из бэкапа лежат в префах после applySettings, но в
+     * профиле ещё не применены — догоняем сервис рабочего профиля. Отказ
+     * не критичен: список в префах, применится при следующем enforce.
+     */
+    private fun applyImportedLinkRules() {
+        val work = serviceWork ?: return
+        val rules = LocalStorageManager.getInstance()
+            .getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES)
+            .toList()
+        Thread {
+            runCatching { work.setCrossProfileLinkRules(rules) }
         }.start()
     }
 

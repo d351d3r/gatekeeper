@@ -9,19 +9,39 @@ intent-фильтры DevicePolicyManager, которыми управляет �
 
 - Настройка: список доменных правил (например `.ru`, `.su`,
   `example.com`). Каждое правило покрывает домен и все его поддомены.
-- Применение: Gatekeeper (Device Policy Controller рабочего профиля) вызывает
-  `DevicePolicyManager.addCrossProfileIntentFilter(admin, filter,
-  FLAG_PARENT_CAN_ACCESS_MANAGED)` для каждого правила. Фильтр:
+- Применение: единый владелец всех кросс-профильных фильтров —
+  `Utility.enforceWorkProfilePolicies` (вызывается DummyActivity рабочего
+  профиля и сервисом). Он регистрирует служебный релей профилей
+  (~30 фильтров) и затем, из префов рабочего профиля
+  (`PREF_CROSS_PROFILE_LINK_RULES`), доменные фильтры правил:
   `ACTION_VIEW` + `DEFAULT` + `BROWSABLE`, схемы `http`/`https`,
-  authority-паттерны `rule` и `*.rule`.
-- Изменение набора — `clearCrossProfileIntentFilters(admin)` и повторное
-  добавление всех оставшихся правил: точечного `removeCrossProfileIntentFilter`
-  больше нет (исключён из SDK 34+). Применённый список хранится в хранилище
-  рабочего профиля (`PREF_CROSS_PROFILE_LINK_RULES`), т.к. DPM не умеет
-  перечислять добавленные фильтры.
+  authority-паттерны `rule` и `*.rule`, флаг
+  `FLAG_PARENT_CAN_ACCESS_MANAGED`. Никакой другой код не вызывает
+  `clearCrossProfileIntentFilters` — иначе добавление правила стирало бы
+  весь служебный релей (P0-регрессия, найдена ревью 12.09.2026).
+- `GatekeeperService.setCrossProfileLinkRules` только персистит
+  нормализованный список в префы рабочего профиля и дёргает
+  `enforceWorkProfilePolicies`; возвращает `false` при отказе DPM
+  (с откатом префов). Точечного `removeCrossProfileIntentFilter` больше
+  нет (исключён из SDK 34+), поэтому пересборка всегда полная
+  (clear внутри enforce + добавление всего набора). Применённый список
+  храним сами: DPM не умеет перечислять добавленные фильтры.
 - Система: ссылка из личного приложения, совпавшая с фильтром, попадает в
   резолвер рабочего профиля и открывается там браузером по умолчанию
   (например, Яндекс Браузером рабочего профиля) или системным выбором.
+
+## Blanket-фильтр (важно, изначальное поведение)
+
+`enforceWorkProfilePolicies` регистрирует с первого релиза upstream
+два blanket-фильтра `ACTION_VIEW` + `BROWSABLE` на схемы `http`/`https`
+**без ограничения по хосту** (также `FLAG_PARENT_CAN_ACCESS_MANAGED`).
+То есть платформа уже позволяла открывать любые http(s)-ссылки личный →
+рабочий до появления этой фичи. Доменные правила C2 накладываются
+поверх и фактически дублируют blanket на своём подмножестве: они не
+сужают и не расширяют переброс. Blanket осознанно не снимается — это
+изменение поведения, требующее проверки на реальном устройстве
+(см. «Ограничения платформы»). Железная проверка текущего набора
+фильтров: `adb shell dumpsys device_policy | grep -A3 CrossProfile`.
 
 ## Threat model / приватность
 
@@ -54,8 +74,10 @@ intent-фильтры DevicePolicyManager, которыми управляет �
 - `util/CrossProfileLinkRules.kt` — чистая логика: нормализация ввода
   (scheme/path/port/регистр/точки), разбор списка, host-паттерны.
   Покрыта unit-тестами.
-- `IGatekeeperService.setCrossProfileLinkRules(List<String>)` — добавлено
-  в конец AIDL (порядок транзакций стабилен).
-- `GatekeeperService` — применяет дифф через DPM; только в профиле-владельце.
+- `IGatekeeperService.setCrossProfileLinkRules(List<String>): boolean` —
+  добавлено в конец AIDL (порядок транзакций стабилен); `false` = DPM
+  отказал.
+- `GatekeeperService` — персистит список в префы рабочего профиля и
+  вызывает `enforceWorkProfilePolicies`; только в профиле-владельце.
 - `SettingsFragment` — `EditTextPreference` в категории «Взаимодействие»,
   нормализованное значение, счётчик отброшенных записей, итог через toast.

@@ -153,7 +153,7 @@
     <string name="backup_export_success">Настройки экспортированы</string>
     <string name="backup_export_failed">Не удалось экспортировать</string>
     <string name="backup_import_invalid">Это не файл бэкапа Gatekeeper</string>
-    <string name="backup_import_success">Импортировано настроек: %1$d; приложений: %2$d личных, %3$d рабочих</string>
+    <string name="backup_import_success">Импортировано настроек: %1$d; в списке приложений: %2$d личных, %3$d рабочих</string>
     <string name="backup_restore_title">Восстановить приложения профиля?</string>
     <string name="backup_restore_message">%1$d приложений из бэкапа отсутствуют в рабочем профиле — их можно склонировать из личного.</string>
     <string name="backup_restore_now">Установить</string>
