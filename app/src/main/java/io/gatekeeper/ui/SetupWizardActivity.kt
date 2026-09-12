@@ -69,6 +69,19 @@ class SetupWizardActivity : AppCompatActivity() {
         }
     }
 
+    // Экран «Требуется действие» (resume) живёт, пока системный мастер профиля
+    // не доведёт провижининг до конца. На прошивках, где финальный шаг прячется
+    // (MIUI: кнопка финиша на долю секунды, #1034; «не приходит уведомление»,
+    // #1047/#2008), пользователь исправляет это в системном UI и возвращается
+    // сюда -- без перезапуска приложения экран сам завершится, как только
+    // профиль начнёт маршрутизировать TRY_START_SERVICE обратно.
+    override fun onResume() {
+        super.onResume()
+        if (ACTION_RESUME_SETUP == intent.action && Utility.isWorkProfileAvailable(this)) {
+            finishWithResult(true)
+        }
+    }
+
     private fun <T : BaseWizardFragment> switchToFragment(fragment: T, reverseAnimation: Boolean) {
         supportFragmentManager
             .beginTransaction()
