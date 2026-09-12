@@ -226,7 +226,17 @@ class MainActivity : AppCompatActivity() {
         if (s.getBoolean(LocalStorageManager.PREF_IS_SETTING_UP) && !Utility.isWorkProfileAvailable(this)) {
             resumeSetup.launch(null)
         } else if (!s.getBoolean(LocalStorageManager.PREF_HAS_SETUP)) {
-            startSetup.launch(null)
+            // Подхват живого профиля до запуска мастера: если managed profile ещё
+            // существует и маршрутизирует TRY_START_SERVICE обратно в Gatekeeper,
+            // isWorkProfileAvailable сама выставит PREF_HAS_SETUP/PREF_IS_SETTING_UP
+            // и восстановит управление без пересоздания профиля (4PDA #1404/#736:
+            // иначе мастер упирается в «профиль уже существует» и пользователь
+            // остаётся только с удалением профиля и потерей данных).
+            if (Utility.isWorkProfileAvailable(this)) {
+                init()
+            } else {
+                startSetup.launch(null)
+            }
         } else {
             if (AntiSpyManager.shouldRunStartupFreeze(s)) {
                 Utility.trimApplicationCache(this)
