@@ -352,6 +352,10 @@ class DummyActivity : Activity() {
         StrictMode.setVmPolicy(policy)
     }
 
+    private fun isProfileOwner(): Boolean = runCatching {
+        getSystemService(DevicePolicyManager::class.java)?.isProfileOwnerApp(packageName) == true
+    }.getOrDefault(false)
+
     @Throws(IOException::class)
     private fun actionInstallPackageQ(
         uri: Uri?,
@@ -362,6 +366,14 @@ class DummyActivity : Activity() {
         val params = PackageInstaller.SessionParams(
             PackageInstaller.SessionParams.MODE_FULL_INSTALL
         )
+        // Профиль-владелец вправе ставить пакеты в свой профиль без подтверждения:
+        // иначе массовое восстановление из бэкапа (C4) превращается в N системных
+        // диалогов подряд. В личном профиле (не владелец) подтверждение остаётся.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && isProfileOwner()) {
+            params.setRequireUserAction(
+                PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED
+            )
+        }
         val sessionId = pi.createSession(params)
 
         pi.registerSessionCallback(InstallationProgressListener(this, pi, sessionId))

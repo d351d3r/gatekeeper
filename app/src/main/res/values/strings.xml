@@ -169,7 +169,7 @@
     <string name="clone_fail_invalid">The APK set of \"%s\" is incomplete or unreadable (unsuitable split APK set or a damaged file).</string>
     <string name="clone_fail_storage">Not enough storage space in the work profile to install \"%s\".</string>
     <string name="clone_fail_aborted">Installation of \"%s\" was aborted. Try again.</string>
-    <string name="clone_fail_generic">Operation on \"%s\" failed (code %d).</string>
+    <string name="clone_fail_generic">Operation on \"%1$s\" failed (code %2$d).</string>
     <string name="store_clone_hint_title">Install an app store in the work profile?</string>
     <string name="store_clone_hint_message">\"%s\" is not in your work profile yet. Clone it now so you can install work apps straight from the store.</string>
     <string name="store_clone_hint_clone">Clone %s</string>
@@ -204,6 +204,11 @@
     <string name="backup_export_failed">Export failed</string>
     <string name="backup_import_invalid">This file is not a Gatekeeper backup</string>
     <string name="backup_import_success">Imported %1$d settings; apps: %2$d personal, %3$d work</string>
+    <string name="backup_restore_title">Restore work apps?</string>
+    <string name="backup_restore_message">%1$d apps from the backup are missing in the work profile and can be cloned from the personal profile.</string>
+    <string name="backup_restore_now">Install</string>
+    <string name="backup_restore_later">Later</string>
+    <string name="backup_restore_done">Restored %1$d of %2$d apps (%3$d failed)</string>
 
     <string name="work_service_bind_failed_title">No connection to the work profile</string>
     <string name="work_service_bind_failed_cancelled">Gatekeeper in the work profile closed without answering. Usually it is killed there by power saving or by the vendor\'s app freezer. Exclude Gatekeeper from battery optimization and from background restrictions in <b>both</b> profiles, then retry.</string>

@@ -55,7 +55,7 @@
     <string name="clone_fail_invalid">Набор APK «%s» неполный или нечитаемый (неподходящий набор split APK или повреждённый файл).</string>
     <string name="clone_fail_storage">В рабочем профиле недостаточно места для установки «%s».</string>
     <string name="clone_fail_aborted">Установка «%s» прервана. Попробуйте ещё раз.</string>
-    <string name="clone_fail_generic">Операция с «%s» не удалась (код %d).</string>
+    <string name="clone_fail_generic">Операция с «%1$s» не удалась (код %2$d).</string>
     <string name="store_clone_hint_title">Установить магазин приложений в рабочий профиль?</string>
     <string name="store_clone_hint_message">«%s» пока нет в рабочем профиле. Склонируйте его сейчас, чтобы ставить рабочие приложения прямо из магазина.</string>
     <string name="store_clone_hint_clone">Клонировать: %s</string>
@@ -154,6 +154,11 @@
     <string name="backup_export_failed">Не удалось экспортировать</string>
     <string name="backup_import_invalid">Это не файл бэкапа Gatekeeper</string>
     <string name="backup_import_success">Импортировано настроек: %1$d; приложений: %2$d личных, %3$d рабочих</string>
+    <string name="backup_restore_title">Восстановить приложения профиля?</string>
+    <string name="backup_restore_message">%1$d приложений из бэкапа отсутствуют в рабочем профиле — их можно склонировать из личного.</string>
+    <string name="backup_restore_now">Установить</string>
+    <string name="backup_restore_later">Позже</string>
+    <string name="backup_restore_done">Восстановлено приложений: %1$d из %2$d (не удалось: %3$d)</string>
     <string name="work_service_bind_failed_title">Нет связи с рабочим профилем</string>
     <string name="work_service_bind_failed_cancelled">Gatekeeper в рабочем профиле закрылся, не ответив. Обычно его убивает там энергосбережение или фирменная заморозка приложений в прошивке. Исключите Gatekeeper из оптимизации батареи и из ограничений фоновой работы в <b>обоих</b> профилях и повторите.</string>
     <string name="work_service_bind_failed_no_binder">Рабочий профиль ответил, но не передал свой сервис: скорее всего, процесс Gatekeeper там убили на старте. Исключите Gatekeeper из оптимизации батареи и из ограничений фоновой работы в <b>обоих</b> профилях и повторите.</string>

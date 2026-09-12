@@ -95,4 +95,34 @@ class BackupPayloadTest {
         assertTrue(LocalStorageManager.PREF_AUTO_FREEZE_SERVICE in BackupPayload.EXPORTABLE_SETTINGS)
         assertTrue(LocalStorageManager.PREF_ANTI_SPY_VPN_WATCH_ENABLED in BackupPayload.EXPORTABLE_SETTINGS)
     }
+
+    @Test
+    fun restorableSkipsAlreadyInstalledAndNoDonor() {
+        val restorable = BackupPayload.restorableWorkApps(
+            workApps = listOf("a", "b", "c", "d"),
+            workInstalled = setOf("a"),
+            mainInstalled = setOf("b", "c"),
+        )
+        assertEquals(listOf("b", "c"), restorable)
+    }
+
+    @Test
+    fun restorableEmptyWhenNothingMissing() {
+        val restorable = BackupPayload.restorableWorkApps(
+            workApps = listOf("a", "b"),
+            workInstalled = setOf("a", "b"),
+            mainInstalled = setOf("a", "b"),
+        )
+        assertTrue(restorable.isEmpty())
+    }
+
+    @Test
+    fun restorableKeepsBackupOrder() {
+        val restorable = BackupPayload.restorableWorkApps(
+            workApps = listOf("z", "y", "x"),
+            workInstalled = emptySet(),
+            mainInstalled = setOf("x", "y", "z"),
+        )
+        assertEquals(listOf("z", "y", "x"), restorable)
+    }
 }

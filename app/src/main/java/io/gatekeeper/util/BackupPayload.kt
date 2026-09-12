@@ -120,4 +120,16 @@ object BackupPayload {
 
     private fun readList(array: JSONArray): List<String> =
         (0 until array.length()).map { array.getString(it) }
+
+    /**
+     * Что можно восстановить из бэкапа на этом устройстве: приложения,
+     * которые есть в бэкапе рабочего профиля, ещё не установлены в рабочем
+     * и имеют донора в личном профиле (клонирование ставит APK личного
+     * профиля в рабочий). Чистая функция -- покрыта unit-тестами.
+     */
+    fun restorableWorkApps(
+        workApps: List<String>,
+        workInstalled: Set<String>,
+        mainInstalled: Set<String>,
+    ): List<String> = workApps.filter { it !in workInstalled && it in mainInstalled }
 }

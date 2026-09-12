@@ -52,6 +52,7 @@ import io.gatekeeper.services.KillerService
 import io.gatekeeper.util.AntiSpyLaunchGate
 import io.gatekeeper.util.AntiSpyManager
 import io.gatekeeper.util.ApplicationInfoWrapper
+import io.gatekeeper.util.AutoFreezeDefaults
 import io.gatekeeper.util.BackupPayload
 import io.gatekeeper.util.FileShuttleConnection
 import io.gatekeeper.util.LocalStorageManager
@@ -1201,8 +1202,90 @@ class MainActivity : AppCompatActivity() {
                         payload.workApps.size,
                     ),
                 )
+                maybeOfferAppRestore(payload)
             }
         }.start()
+    }
+
+    /**
+     * C4+: после импорта предлагаем доклонировать недостающие приложения
+     * рабочего профиля из списка бэкапа. Донор -- личный профиль; кандидаты
+     * считаются чистой функцией [BackupPayload.restorableWorkApps].
+     */
+    private fun maybeOfferAppRestore(payload: BackupPayload.Payload) {
+        val main = serviceMain
+        val work = serviceWork
+        if (main == null || work == null) return
+        Thread {
+            val mainApps = fetchApps(main)
+            val workApps = fetchApps(work)
+            val restorable = if (mainApps == null || workApps == null) {
+                emptyList()
+            } else {
+                val workInstalled = workApps.map { it.getPackageName() }.toSet()
+                val mainInstalled = mainApps.map { it.getPackageName() }.toSet()
+                BackupPayload.restorableWorkApps(payload.workApps, workInstalled, mainInstalled)
+            }
+            if (restorable.isEmpty()) return@Thread
+            val byPkg = mainApps?.associateBy { it.getPackageName() } ?: emptyMap()
+            val candidates = restorable.mapNotNull { byPkg[it] }
+            if (candidates.isEmpty()) return@Thread
+            window.decorView.post {
+                if (isFinishing) return@post
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.backup_restore_title)
+                    .setMessage(getString(R.string.backup_restore_message, candidates.size))
+                    .setPositiveButton(R.string.backup_restore_now) { _, _ ->
+                        restoreWorkAppsSequentially(candidates, work)
+                    }
+                    .setNegativeButton(R.string.backup_restore_later, null)
+                    .show()
+            }
+        }.start()
+    }
+
+    /**
+     * Ставим восстанавливаемые приложения строго по одному: параллельные
+     * PackageInstaller-сессии кладут резолвер. Каждый успех возвращается
+     * в список автозаморозки, как при ручном клонировании.
+     */
+    private fun restoreWorkAppsSequentially(apps: List<ApplicationInfoWrapper>, work: IGatekeeperService) {
+        var index = 0
+        var failed = 0
+        fun installNext() {
+            if (index >= apps.size) {
+                window.decorView.post {
+                    GatekeeperToast.show(
+                        this,
+                        getString(R.string.backup_restore_done, apps.size - failed, apps.size, failed),
+                    )
+                }
+                return
+            }
+            val app = apps[index]
+            index++
+            val callback = object : IAppInstallCallback.Stub() {
+                override fun callback(result: Int) {
+                    if (result == RESULT_OK) {
+                        AutoFreezeDefaults.enableForWorkProfile(
+                            this@MainActivity,
+                            app.getPackageName(),
+                            clearOptOut = true,
+                        )
+                    } else {
+                        failed++
+                    }
+                    installNext()
+                }
+            }
+            try {
+                work.installApp(app, callback)
+            } catch (_: RemoteException) {
+                failed++
+                installNext()
+            }
+        }
+        installNext()
     }
 
     /**
