@@ -510,6 +510,7 @@ class DummyActivity : Activity() {
     private fun onPackageOperationFinished(type: OperationType, packageName: String) {
         when (type) {
             OperationType.INSTALL -> {
+                grantPostNotificationsOnInstall(packageName)
             }
             OperationType.UNINSTALL -> {
                 if (isProfileOwner) {
@@ -522,6 +523,29 @@ class DummyActivity : Activity() {
                     )
                 }
             }
+        }
+    }
+
+    /**
+     * Клон в профиль: на Android 13+ свежеустановленное приложение не имеет
+     * POST_NOTIFICATIONS, и уведомления (включая всплывающие звонки мессенджеров
+     * вроде Max, 4PDA #1938) молча не приходят. Профиль-владелец может выдать
+     * грант за пользователя; прошивка вправе отказать -- тогда остаётся
+     * ручное разрешение в настройках профиля (см. USER_GUIDE).
+     */
+    private fun grantPostNotificationsOnInstall(packageName: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || !isProfileOwner) return
+        try {
+            val dpm = getSystemService(DevicePolicyManager::class.java) ?: return
+            val admin = ComponentName(this, GatekeeperDeviceAdminReceiver::class.java)
+            dpm.setPermissionGrantState(
+                admin,
+                packageName,
+                Manifest.permission.POST_NOTIFICATIONS,
+                DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED
+            )
+        } catch (e: Exception) {
+            Log.w(TAG, "grant POST_NOTIFICATIONS for $packageName failed", e)
         }
     }
 
