@@ -59,6 +59,33 @@ Product direction and platform boundaries: [PRODUCT.md](PRODUCT.md).
 User guide (Russian): [USER_GUIDE.md](USER_GUIDE.md).
 Known issues and test notes: [PROBLEMS.md](PROBLEMS.md).
 
+## Limitations (platform walls)
+
+These are Android/firmware boundaries, not Gatekeeper bugs — no app of this
+class can fix them:
+
+- **VPN visibility.** Apps inside the work profile can see that a VPN is
+  active (the tun0 interface), even when the VPN runs only in the personal
+  profile. Practical workarounds: run the VPN *inside* the work profile, or
+  rely on Anti Spy auto-freeze when the VPN comes up.
+- **NFC payments.** Payment apps installed only in the work profile are not
+  offered as the default payment app on most firmware (works on some devices,
+  e.g. recent Honor). The in-app "payment service stub" only works around one
+  specific Android bug.
+- **Freezing vs. running processes.** Hiding an app does not kill its already
+  running foreground process (e.g. music keeps playing); Gatekeeper only kills
+  background processes best-effort.
+- **Screenshots stay in the profile.** A screenshot taken inside the work
+  profile lands in the work profile's storage; Media Mirror auto-copies
+  screenshots and camera photos to the personal profile.
+- **Fake GPS cannot be per-profile.** Mock location is system-wide.
+- **Vendor ADB restrictions.** Some firmware (HyperOS, ColorOS) blocks
+  `pm ... --user <profile>` for shells, so profile cleanup via ADB is not
+  portable.
+- **Private Space** (Android 15+) solves a different problem than a work
+  profile: hiding apps behind another lock, not sandboxing untrusted apps.
+  See USER_GUIDE for details.
+
 ## Requirements
 
 - Android 7.0+ (API 24+).
