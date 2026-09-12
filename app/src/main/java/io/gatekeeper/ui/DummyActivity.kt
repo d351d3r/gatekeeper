@@ -544,7 +544,7 @@ class DummyActivity : Activity() {
                 Manifest.permission.POST_NOTIFICATIONS,
                 DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED
             )
-        } catch (e: Exception) {
+        } catch (e: SecurityException) {
             Log.w(TAG, "grant POST_NOTIFICATIONS for $packageName failed", e)
         }
     }

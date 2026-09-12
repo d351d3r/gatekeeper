@@ -214,6 +214,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
     }
 
     private fun onLinkRulesChanged(preference: Preference, newValue: Any): Boolean {
+        val pref = preference as EditTextPreference
         val raw = newValue as String
         val rules = CrossProfileLinkRules.parseRules(raw)
         val skipped = raw.split(',', ';', ' ', '\n', '\t')
@@ -238,7 +239,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
                     LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES,
                     rules.toTypedArray(),
                 )
-                prefLinkRules!!.text = rules.joinToString(", ")
+                pref.text = rules.joinToString(", ")
                 updateLinkRulesSummary(rules)
                 if (skipped > 0) {
                     GatekeeperToast.show(

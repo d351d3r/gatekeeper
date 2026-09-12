@@ -15,11 +15,11 @@
     <ID>FunctionParameterNaming:Utility.kt$Utility$`is`: InputStream</ID>
     <ID>LargeClass:DummyActivity.kt$DummyActivity : Activity</ID>
     <ID>LargeClass:MainActivity.kt$MainActivity : AppCompatActivity</ID>
+    <ID>LargeClass:SettingsFragment.kt$SettingsFragment : PreferenceFragmentCompatOnPreferenceChangeListener</ID>
     <ID>LargeClass:Utility.kt$Utility</ID>
     <ID>LongMethod:AppListFragment.kt$AppListFragment$private fun onAppMenuItemSelected(itemId: Int, app: ApplicationInfoWrapper, checked: Boolean)</ID>
     <ID>LongMethod:AppListFragment.kt$AppListFragment$private fun showAppActionDialog(app: ApplicationInfoWrapper, anchor: View)</ID>
     <ID>LongMethod:AppListFragment.kt$AppListFragment.&lt;no name provided&gt;$override fun callback(apps: MutableList&lt;ApplicationInfoWrapper&gt;)</ID>
-    <ID>LongMethod:MainActivity.kt$MainActivity$override fun onOptionsItemSelected(item: MenuItem): Boolean</ID>
     <ID>LongMethod:SettingsFragment.kt$SettingsFragment$override fun onCreatePreferences(bundle: Bundle?, s: String?)</ID>
     <ID>LongMethod:SettingsFragment.kt$SettingsFragment$override fun onPreferenceChange(preference: Preference, newState: Any): Boolean</ID>
     <ID>LongMethod:Utility.kt$Utility$fun enforceWorkProfilePolicies(context: Context)</ID>

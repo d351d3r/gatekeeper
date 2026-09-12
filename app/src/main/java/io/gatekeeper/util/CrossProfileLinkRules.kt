@@ -11,6 +11,7 @@ package io.gatekeeper.util
  */
 object CrossProfileLinkRules {
     private val DOMAIN_REGEX = Regex("^(\\*\\.)?[a-z0-9]([a-z0-9.-]*[a-z0-9])?$")
+    private const val SCHEME_DELIMITER = "://"
 
     /**
      * Привести произвольный ввод к правилу: отрезать scheme, путь, порт,
@@ -18,23 +19,23 @@ object CrossProfileLinkRules {
      * null -- запись бессмысленна и должна быть отброшена.
      */
     fun normalize(input: String): String? {
-        var s = input.trim().lowercase()
-        if (s.isEmpty()) return null
-        // Отрезаем scheme: "https://example.ru/path" -> "example.ru/path".
-        val schemeIdx = s.indexOf("://")
-        if (schemeIdx >= 0) s = s.substring(schemeIdx + 3)
-        // Путь, query, порт: "example.ru/path?q=1", "example.ru:8080".
-        s = s.substringBefore('/').substringBefore('?').substringBefore('#').substringBefore(':')
-        // "*.ru." -> "*.ru"; "example.ru." -> "example.ru".
+        var s = stripToHost(input.trim().lowercase()) ?: return null
         if (s.endsWith(".")) s = s.dropLast(1)
-        // Ведущая точка означает TLD-суффикс: ".ru" -> "*.ru".
         if (s.startsWith(".")) s = "*" + s
-        if (s.isEmpty()) return null
-        if (!DOMAIN_REGEX.matches(s)) return null
-        // Точки подряд и дефисы по краям лейблов не проходят regex полностью,
-        // но "..", "a..b" проходят -- режем явно.
-        if (s.replace("*.", "").split('.').any { it.isEmpty() }) return null
-        return s
+        val labels = s.replace("*.", "").split('.')
+        val valid = s.isNotEmpty() && DOMAIN_REGEX.matches(s) && labels.none { it.isEmpty() }
+        return if (valid) s else null
+    }
+
+    /** "https://example.ru/path?q=1:8080" -> "example.ru"; "" -> null. */
+    private fun stripToHost(raw: String): String? {
+        val withoutScheme = raw.substringAfter(SCHEME_DELIMITER)
+        val host = withoutScheme
+            .substringBefore('/')
+            .substringBefore('?')
+            .substringBefore('#')
+            .substringBefore(':')
+        return host.ifEmpty { null }
     }
 
     /**

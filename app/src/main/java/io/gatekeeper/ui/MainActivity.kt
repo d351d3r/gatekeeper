@@ -383,7 +383,18 @@ class MainActivity : AppCompatActivity() {
      * @return true, если диалог будет показан (подсказки не наслаиваются).
      */
     private fun maybePromptStoreClone(): Boolean {
-        val local = storage ?: return false
+        val local = storage
+        val main = serviceMain
+        val work = serviceWork
+        if (local == null || main == null || work == null) return false
+        return promptStoreCloneIfDue(local, main, work)
+    }
+
+    private fun promptStoreCloneIfDue(
+        local: LocalStorageManager,
+        main: IGatekeeperService,
+        work: IGatekeeperService,
+    ): Boolean {
         if (!StoreCloneHint.isDue(
                 local.getIntFresh(
                     LocalStorageManager.PREF_STORE_CLONE_HINT_STATE,
@@ -393,8 +404,6 @@ class MainActivity : AppCompatActivity() {
                 System.currentTimeMillis(),
             )
         ) return false
-        val main = serviceMain ?: return false
-        val work = serviceWork ?: return false
         Thread {
             val store = findCloneableStore(main, work) ?: return@Thread
             window.decorView.post {
@@ -416,13 +425,17 @@ class MainActivity : AppCompatActivity() {
         main: IGatekeeperService,
         work: IGatekeeperService,
     ): ApplicationInfoWrapper? {
-        val workPackages = fetchAppPackages(work) ?: return null
-        val mainApps = fetchApps(main) ?: return null
-        val mainHasApk = mainApps.associate { wrapper ->
-            wrapper.getPackageName() to !wrapper.getSourceDir().isNullOrBlank()
+        val workPackages = fetchAppPackages(work)
+        val mainApps = fetchApps(main)
+        val pkg = if (workPackages == null || mainApps == null) {
+            null
+        } else {
+            val mainHasApk = mainApps.associate { wrapper ->
+                wrapper.getPackageName() to !wrapper.getSourceDir().isNullOrBlank()
+            }
+            StoreCloneHint.pickCandidate(mainHasApk, workPackages)
         }
-        val pkg = StoreCloneHint.pickCandidate(mainHasApk, workPackages) ?: return null
-        return mainApps.firstOrNull { it.getPackageName() == pkg }
+        return mainApps?.firstOrNull { pkg != null && it.getPackageName() == pkg }
     }
 
     private fun fetchApps(service: IGatekeeperService): List<ApplicationInfoWrapper>? {
@@ -981,6 +994,40 @@ class MainActivity : AppCompatActivity() {
             .sendBroadcast(Intent(BROADCAST_CONTEXT_MENU_CLOSED))
     }
 
+    private fun createBatchShortcut(isFreeze: Boolean) {
+        val launchIntent = batchShortcutIntent(
+            if (isFreeze) DummyActivity.PUBLIC_FREEZE_ALL else DummyActivity.PUBLIC_UNFREEZE_ALL
+        )
+        Utility.createLauncherShortcut(
+            this,
+            launchIntent,
+            Utility.createBatchShortcutIcon(
+                this,
+                if (isFreeze) R.drawable.ic_shortcut_freeze else R.drawable.ic_shortcut_unfreeze,
+            ),
+            if (isFreeze) "gatekeeper-freeze-all" else "gatekeeper-unfreeze-all",
+            getString(if (isFreeze) R.string.freeze_all_shortcut else R.string.unfreeze_all_shortcut),
+        )
+    }
+
+    private fun toggleShowAll(item: MenuItem) {
+        val update = Runnable {
+            showAll = !item.isChecked
+            item.isChecked = showAll
+            LocalBroadcastManager.getInstance(this)
+                .sendBroadcast(Intent(AppListFragment.BROADCAST_REFRESH))
+        }
+        if (!item.isChecked) {
+            AlertDialog.Builder(this)
+                .setMessage(R.string.show_all_warning)
+                .setPositiveButton(R.string.first_run_alert_continue) { _, _ -> update.run() }
+                .setNegativeButton(R.string.first_run_alert_cancel, null)
+                .show()
+        } else {
+            update.run()
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.main_menu_unfreeze_all -> {
@@ -995,22 +1042,9 @@ class MainActivity : AppCompatActivity() {
                 openSettings()
                 true
             }
-            R.id.main_menu_create_freeze_all_shortcut -> {
-                val launchIntent = batchShortcutIntent(DummyActivity.PUBLIC_FREEZE_ALL)
-                Utility.createLauncherShortcut(
-                    this, launchIntent,
-                    Utility.createBatchShortcutIcon(this, R.drawable.ic_shortcut_freeze),
-                    "gatekeeper-freeze-all", getString(R.string.freeze_all_shortcut)
-                )
-                true
-            }
+            R.id.main_menu_create_freeze_all_shortcut,
             R.id.main_menu_create_unfreeze_all_shortcut -> {
-                val launchIntent = batchShortcutIntent(DummyActivity.PUBLIC_UNFREEZE_ALL)
-                Utility.createLauncherShortcut(
-                    this, launchIntent,
-                    Utility.createBatchShortcutIcon(this, R.drawable.ic_shortcut_unfreeze),
-                    "gatekeeper-unfreeze-all", getString(R.string.unfreeze_all_shortcut)
-                )
+                createBatchShortcut(item.itemId == R.id.main_menu_create_freeze_all_shortcut)
                 true
             }
             R.id.main_menu_install_app_to_profile -> {
@@ -1020,21 +1054,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.main_menu_show_all -> {
-                val update = Runnable {
-                    showAll = !item.isChecked
-                    item.isChecked = showAll
-                    LocalBroadcastManager.getInstance(this)
-                        .sendBroadcast(Intent(AppListFragment.BROADCAST_REFRESH))
-                }
-                if (!item.isChecked) {
-                    AlertDialog.Builder(this)
-                        .setMessage(R.string.show_all_warning)
-                        .setPositiveButton(R.string.first_run_alert_continue) { _, _ -> update.run() }
-                        .setNegativeButton(R.string.first_run_alert_cancel, null)
-                        .show()
-                } else {
-                    update.run()
-                }
+                toggleShowAll(item)
                 true
             }
             R.id.main_menu_file_shuttle -> {
@@ -1191,9 +1211,13 @@ class MainActivity : AppCompatActivity() {
      * чтобы не наслаивать подсказки друг на друга.
      */
     private fun maybeShowFileShuttleHint() {
-        val local = storage ?: return
-        if (local.getBooleanFresh(LocalStorageManager.PREF_FILE_SHUTTLE_HINT_SHOWN, false)) return
-        if (!SettingsManager.getInstance().getCrossProfileFileChooserEnabled()) return
+        val local = storage
+        val alreadyShown = local?.getBooleanFresh(
+            LocalStorageManager.PREF_FILE_SHUTTLE_HINT_SHOWN,
+            false,
+        ) ?: true
+        val shuttleEnabled = SettingsManager.getInstance().getCrossProfileFileChooserEnabled()
+        if (local == null || alreadyShown || !shuttleEnabled) return
         local.setBoolean(LocalStorageManager.PREF_FILE_SHUTTLE_HINT_SHOWN, true)
         window.decorView.postDelayed({
             if (isFinishing) return@postDelayed

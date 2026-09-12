@@ -86,10 +86,23 @@ object BackupPayload {
     fun parse(json: String): Payload? {
         return try {
             val root = JSONObject(json)
-            if (root.getString("format") != FORMAT) return null
-            if (root.getInt("version") > VERSION) return null
+            if (root.getString("format") != FORMAT || root.getInt("version") > VERSION) {
+                null
+            } else {
+                Payload(
+                    settings = readSettings(root.getJSONObject("settings")),
+                    mainApps = readList(root.getJSONArray("mainApps")),
+                    workApps = readList(root.getJSONArray("workApps")),
+                    autoFreezeWork = readList(root.getJSONArray("autoFreezeWork")),
+                )
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun readSettings(settingsObj: JSONObject): Map<String, SettingValue> {
         val settings = LinkedHashMap<String, SettingValue>()
-        val settingsObj = root.getJSONObject("settings")
         for (key in settingsObj.keys()) {
             val entry = settingsObj.getJSONObject(key)
             val type = entry.getString("type")
@@ -102,15 +115,7 @@ object BackupPayload {
             }
             settings[key] = SettingValue(type, value)
         }
-        Payload(
-            settings = settings,
-            mainApps = readList(root.getJSONArray("mainApps")),
-            workApps = readList(root.getJSONArray("workApps")),
-            autoFreezeWork = readList(root.getJSONArray("autoFreezeWork")),
-        )
-        } catch (_: Exception) {
-            null
-        }
+        return settings
     }
 
     private fun readList(array: JSONArray): List<String> =

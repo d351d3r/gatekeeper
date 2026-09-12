@@ -47,7 +47,10 @@ class BackupPayloadTest {
 
     @Test
     fun rejectsNewerVersion() {
-        val json = """{"format":"gatekeeper-backup","version":99,"settings":{},"mainApps":[],"workApps":[],"autoFreezeWork":[]}"""
+        val json = """
+            {"format":"gatekeeper-backup","version":99,"settings":{},
+            "mainApps":[],"workApps":[],"autoFreezeWork":[]}
+        """.trimIndent()
         assertNull(BackupPayload.parse(json))
     }
 
@@ -59,7 +62,11 @@ class BackupPayloadTest {
 
     @Test
     fun unknownSettingTypeIsSkippedNotFatal() {
-        val json = """{"format":"gatekeeper-backup","version":1,"settings":{"x":{"type":"weird","value":1}},"mainApps":[],"workApps":[],"autoFreezeWork":[]}"""
+        val json = """
+            {"format":"gatekeeper-backup","version":1,
+            "settings":{"x":{"type":"weird","value":1}},
+            "mainApps":[],"workApps":[],"autoFreezeWork":[]}
+        """.trimIndent()
         val parsed = BackupPayload.parse(json)!!
         assertTrue(parsed.settings.isEmpty())
     }

@@ -320,8 +320,8 @@ class GatekeeperService : Service() {
          * DPM не умеет его перечислять.
          */
         override fun setCrossProfileLinkRules(rules: List<String>) {
-            if (!isProfileOwner) return
-            val dpm = policyManager ?: return
+            val dpm = if (isProfileOwner) policyManager else null
+            if (dpm == null) return
             val local = LocalStorageManager.getInstance()
             val old = local.getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES).toSet()
             val new = rules.toSet()
