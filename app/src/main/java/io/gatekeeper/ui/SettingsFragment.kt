@@ -23,9 +23,7 @@ import androidx.preference.CheckBoxPreference
 import androidx.preference.DropDownPreference
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
-import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
-import com.google.android.material.color.DynamicColors
 import io.gatekeeper.BuildConfig
 import io.gatekeeper.R
 import io.gatekeeper.services.IGatekeeperService
@@ -58,7 +56,6 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
     private var prefSkipForeground: CheckBoxPreference? = null
     private var prefPaymentStub: CheckBoxPreference? = null
     private var prefLinkRules: EditTextPreference? = null
-    private var prefDynamicColors: CheckBoxPreference? = null
     private var prefAutoFreezeDelay: DropDownPreference? = null
     private var prefAntiSpyEnabled: CheckBoxPreference? = null
     private var prefAntiSpyFreezeOnVpn: CheckBoxPreference? = null
@@ -93,8 +90,6 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
             .setOnPreferenceClickListener(this::openSummaryUrl)
         findPreference<Preference>(SETTINGS_POWER_DIAGNOSTICS)!!
             .setOnPreferenceClickListener(this::openPowerDiagnostics)
-
-        setUpDynamicColors()
 
         prefCrossProfileFileChooser = findPreference(SETTINGS_CROSS_PROFILE_FILE_CHOOSER)
         prefCrossProfileFileChooser!!.isChecked = manager.getCrossProfileFileChooserEnabled()
@@ -173,20 +168,6 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         if (requireActivity().intent.getBooleanExtra(SettingsActivity.EXTRA_OPEN_POWER_DIAGNOSTICS, false)) {
             view?.post { showPowerDiagnostics() }
         }
-    }
-
-    /**
-     * Динамический цвет существует с Android 12. Ниже показывать переключатель нечего --
-     * категория убирается целиком, чтобы не оставлять неработающий пункт.
-     */
-    private fun setUpDynamicColors() {
-        if (!DynamicColors.isDynamicColorAvailable()) {
-            findPreference<PreferenceCategory>(SETTINGS_APPEARANCE)?.isVisible = false
-            return
-        }
-        prefDynamicColors = findPreference(SETTINGS_DYNAMIC_COLORS)
-        prefDynamicColors!!.isChecked = manager.getDynamicColorsEnabled()
-        prefDynamicColors!!.onPreferenceChangeListener = this
     }
 
     private fun updateAutoFreezeDelay() {
@@ -720,11 +701,6 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
                 manager.setPaymentStubEnabled(newState as Boolean)
                 true
             }
-            prefDynamicColors -> {
-                manager.setDynamicColorsEnabled(newState as Boolean)
-                requireActivity().recreate()
-                true
-            }
             prefAntiSpyEnabled -> {
                 manager.setAntiSpyWatchEnabled(newState as Boolean)
                 true
@@ -791,8 +767,6 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         private const val SETTINGS_AUTO_FREEZE_DELAY = "settings_auto_freeze_delay"
         private const val SETTINGS_SKIP_FOREGROUND = "settings_dont_freeze_foreground"
         private const val SETTINGS_PAYMENT_STUB = "settings_payment_stub"
-        private const val SETTINGS_APPEARANCE = "settings_appearance"
-        private const val SETTINGS_DYNAMIC_COLORS = "settings_dynamic_colors"
         private const val SETTINGS_ANTI_SPY_ENABLED = "settings_anti_spy_enabled"
         private const val SETTINGS_ANTI_SPY_FREEZE_ON_VPN = "settings_anti_spy_freeze_on_vpn"
         private const val SETTINGS_ANTI_SPY_FREEZE_ON_SCREEN_LOCK =

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.util.Log
 import com.google.android.material.color.DynamicColors
-import com.google.android.material.color.DynamicColorsOptions
 import io.gatekeeper.services.FileShuttleService
 import io.gatekeeper.services.GatekeeperService
 import io.gatekeeper.util.LocalStorageManager
@@ -20,16 +19,10 @@ class GatekeeperApplication : Application() {
         super.onCreate()
         LocalStorageManager.initialize(this)
         SettingsManager.initialize(this)
-        // Фирменная палитра -- по умолчанию. Динамический цвет перекрашивает только роли
-        // темы; фирменная панель задана отдельными цветовыми ресурсами и остается зеленой.
-        // Условие проверяется при создании каждой activity, поэтому переключатель в
-        // настройках срабатывает сразу после recreate(), без перезапуска процесса.
-        DynamicColors.applyToActivitiesIfAvailable(
-            this,
-            DynamicColorsOptions.Builder()
-                .setPrecondition { _, _ -> SettingsManager.getInstance().getDynamicColorsEnabled() }
-                .build()
-        )
+        // Палитра следует системе: динамический цвет накладывается там, где он
+        // есть (Android 12+), и обычная схема там, где нет. Переключателя нет
+        // (settings-plan.md): решение о фирменной палитре -- за продуктом.
+        DynamicColors.applyToActivitiesIfAvailable(this)
     }
 
     fun bindMainService(conn: ServiceConnection, foreground: Boolean) {

@@ -128,7 +128,6 @@ class LocalStorageManager private constructor(context: Context) {
         const val PREF_HAS_SETUP = "has_setup"
         const val PREF_AUTO_FREEZE_LIST_WORK_PROFILE = "auto_freeze_list_work_profile"
         const val PREF_CROSS_PROFILE_FILE_CHOOSER = "cross_profile_file_chooser"
-        const val PREF_DYNAMIC_COLORS = "dynamic_colors"
         const val PREF_AUTH_KEY = "auth_key"
         const val PREF_AUTH_BOOTSTRAPPED = "auth_bootstrapped"
         const val PREF_AUTO_FREEZE_SERVICE = "auto_freeze_service"

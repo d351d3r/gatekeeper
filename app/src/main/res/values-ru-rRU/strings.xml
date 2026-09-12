@@ -68,7 +68,7 @@
     <string name="install_unknown_sources_message">Android требует одноразовое разрешение, прежде чем Gatekeeper сможет ставить приложения в рабочий профиль. Включите «Разрешить из этого источника» в открывшемся экране и повторите клонирование.</string>
     <string name="install_unknown_sources_open">Открыть настройки</string>
     <string name="settings_media_mirror">Автокопирование скриншотов и фото из профиля</string>
-    <string name="settings_media_mirror_desc">Копировать новые скриншоты (Pictures/Screenshots) и фото/видео камеры (DCIM/Camera) из рабочего профиля в личную галерею — осознанная дырка в изоляции только для этих двух папок. Срабатывает при каждом подключении File Shuttle (например, при открытии «Файлов»); файлы копируются, а не переносятся. Всё остальное остаётся в рабочем профиле.</string>
+    <string name="settings_media_mirror_desc">Копирует новые скриншоты (Pictures/Screenshots) и фото/видео камеры (DCIM/Camera) из рабочего профиля в личную галерею. Срабатывает при каждом подключении File Shuttle (например, при открытии «Файлов»); файлы копируются, а не переносятся. Осознанная дырка в изоляции: только эти две папки, всё остальное остаётся в рабочем профиле.</string>
     <string name="uninstall_fail_system_app">Невозможно удалить системные приложения в профиле, который Gatekeeper не контролирует.</string>
     <string name="unsupported_launcher">Невозможно добавить ярлык в ваш лаунчер. Пожалуйста, свяжитесь с разработчиком.</string>
     <string name="app_context_menu_title">Операции для %s</string>
@@ -86,9 +86,6 @@
     <string name="show_all">Все приложения</string>
     <string name="settings_cross_profile_file_chooser">Перенос файлов</string>
     <string name="documents_ui">Открыть проводник</string>
-    <string name="settings_appearance">Оформление</string>
-    <string name="settings_dynamic_colors">Цвета системы</string>
-    <string name="settings_dynamic_colors_desc">Брать палитру из обоев системы (Android 12 и новее). По умолчанию выключено: приложение использует свои цвета.</string>
     <string name="settings_interaction">Взаимодействие</string>
     <string name="settings_auto_freeze_service">Служба автозаморозки</string>
     <string name="settings_auto_freeze_service_desc">При блокировке экрана автоматически замораживать приложения, запущенные с помощью ярлыка \"Разморозить и запустить\".</string>
@@ -178,9 +175,8 @@
     <string name="settings_payment_stub_desc">Чтобы получить возможность выбрать платёжное приложение внутри рабочего профиля в Настройки - NFC, включите фальшивый платёжный сервис NFC в основном профиле. Это временное решение ошибки Android, из-за которой невозможно выбрать платёжное приложение внутри рабочего профиля, если в основном профиле таких нет.</string>
     <string name="settings_payment_stub">Заглушка платёжных сервисов</string>
     <string name="settings_cross_profile_link_rules">Ссылки в рабочем профиле</string>
-    <string name="settings_cross_profile_link_rules_desc">http(s)-ссылки на эти домены открываются браузером рабочего профиля. Каждая запись покрывает домен и все его поддомены.</string>
     <string name="settings_cross_profile_link_rules_dialog">Домены через запятую, напр. .ru, .su, example.com. Внимание: браузер рабочего профиля увидит каждую подходящую ссылку, включая личные.</string>
-    <string name="settings_cross_profile_link_rules_none">Выключено — ссылки открываются в текущем профиле</string>
+    <string name="settings_cross_profile_link_rules_none">Правил нет: ссылки открываются в текущем профиле</string>
     <string name="settings_cross_profile_link_rules_current">Активно: %1$s</string>
     <string name="settings_cross_profile_link_rules_skipped">Пропущено неверных записей: %1$d</string>
     <string name="settings_cross_profile_link_rules_failed">Не удалось применить правила (рабочий профиль недоступен)</string>

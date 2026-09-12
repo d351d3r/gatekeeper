@@ -125,7 +125,6 @@ class MainActivity : AppCompatActivity() {
     private var pendingBindFailureReason = 0
     private var retryStartupProbeAfterFailure = false
     private var pendingDocumentsUi = false
-    private var dynamicColorsApplied = false
     private var mainAppListFragment: AppListFragment? = null
     private var workAppListFragment: AppListFragment? = null
     private val workListPollHandler = Handler(Looper.getMainLooper())
@@ -156,7 +155,6 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         storage = LocalStorageManager.getInstance()
-        dynamicColorsApplied = SettingsManager.getInstance().getDynamicColorsEnabled()
 
         if (getSystemService(DevicePolicyManager::class.java).isProfileOwnerApp(packageName)) {
             android.util.Log.d("MainActivity", "started in user profile. stopping.")
@@ -848,12 +846,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Динамический цвет накладывается при создании activity. Переключатель живет на
-        // экране настроек, поэтому список приложений надо пересобрать при возврате.
-        if (dynamicColorsApplied != SettingsManager.getInstance().getDynamicColorsEnabled()) {
-            recreate()
-            return
-        }
         isResumed = true
         visibleInstance = this
         AntiSpyManager.syncVpnWatchEverywhere(this)

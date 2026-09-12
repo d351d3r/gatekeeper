@@ -150,18 +150,6 @@ class SettingsManager private constructor(context: Context) {
         AntiSpyVpnWatchService.syncState(context)
     }
 
-    /**
-     * Динамический цвет системы вместо фирменной палитры. Настройка местная: она меняет
-     * только вид экранов текущего профиля и в другой профиль не синхронизируется.
-     * По умолчанию выключена -- узнаваемость палитры важнее.
-     */
-    fun getDynamicColorsEnabled(): Boolean =
-        storage.getBoolean(LocalStorageManager.PREF_DYNAMIC_COLORS)
-
-    fun setDynamicColorsEnabled(enabled: Boolean) {
-        storage.setBooleanNow(LocalStorageManager.PREF_DYNAMIC_COLORS, enabled)
-    }
-
     fun getPaymentStubEnabled(): Boolean =
         storage.getBoolean(LocalStorageManager.PREF_PAYMENT_STUB)
 
