@@ -25,6 +25,16 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
+        // Фиксированный debug-keystore в репозитории: без этого каждый прогон
+        // CI генерирует свой эфемерный ~/.android/debug.keystore, и debug APK
+        // от разных сборок имеют разные подписи -- Android отказывается
+        // обновлять такой пакет ("конфликтует"). Debug-ключ не секретен.
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
         // In CI the release APK is signed with a keystore supplied via -P properties
         // (decoded from the CI_RELEASE_KEYSTORE secret). Local release builds fall
         // back to the debug signing config.
