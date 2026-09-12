@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.preference.Preference
+        android:key="settings_power_diagnostics"
+        android:title="@string/settings_power_diagnostics"
+        android:summary="@string/settings_power_diagnostics_desc" />
+
+</androidx.preference.PreferenceScreen>

@@ -38,6 +38,28 @@
     <string name="anti_spy_vpn_prompt_failed_text">Сторонний VPN всё ещё активен. Откройте Gatekeeper, проверьте разрешение VPN или отключите VPN вручную перед групповой заморозкой.</string>
     <string name="freeze_all_shortcut">Заморозить</string>
     <string name="settings">Настройки</string>
+    <string name="settings_root_freeze">Заморозка</string>
+    <string name="settings_root_freeze_off">Выключена: приложения не замораживаются при блокировке</string>
+    <string name="settings_root_freeze_on">При блокировке экрана, задержка %1$d мин</string>
+    <string name="settings_root_antispy">Сторож VPN</string>
+    <string name="settings_root_antispy_off">Выключен, трафик профиля идёт мимо туннеля</string>
+    <string name="settings_root_antispy_on">Включён</string>
+    <string name="settings_root_files">Файлы и медиа</string>
+    <string name="settings_root_files_off">Обмен между профилями выключен</string>
+    <string name="settings_root_files_on">Обмен между профилями включён</string>
+    <string name="settings_root_links">Ссылки в профиле</string>
+    <string name="settings_root_certs">Сертификаты</string>
+    <string name="settings_root_certs_none">Не установлены</string>
+    <plurals name="settings_root_certs_count">
+        <item quantity="one">Установлен: %1$d</item>
+        <item quantity="few">Установлено: %1$d</item>
+        <item quantity="many">Установлено: %1$d</item>
+        <item quantity="other">Установлено: %1$d</item>
+    </plurals>
+    <string name="settings_root_diagnostics">Диагностика</string>
+    <string name="settings_root_diagnostics_desc">Батарея, фон, связь с профилем</string>
+    <string name="settings_root_misc">Прочее</string>
+    <string name="settings_root_misc_desc">Оплата NFC, контакты, о программе</string>
     <string name="settings_about">О программе</string>
     <string name="settings_version">Версия</string>
     <string name="settings_source_code">Исходный код</string><string name="provision_finished">Настройка Gatekeeper завершена. Перезапускам Gatekeeper. Если Gatekeeper не откроется сам, запустите его из вашего лаучнера.</string><string name="work_profile_not_found">Рабочий профиль не найден. Перезапустите приложение, чтобы пересоздать профиль.</string>

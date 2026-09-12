@@ -75,6 +75,26 @@
 
     <!-- Settings Options -->
     <string name="settings">Settings</string>
+    <string name="settings_root_freeze">Freeze</string>
+    <string name="settings_root_freeze_off">Off: apps are not frozen on screen lock</string>
+    <string name="settings_root_freeze_on">On screen lock, %1$d min delay</string>
+    <string name="settings_root_antispy">VPN watch</string>
+    <string name="settings_root_antispy_off">Off, profile traffic bypasses the tunnel</string>
+    <string name="settings_root_antispy_on">On</string>
+    <string name="settings_root_files">Files and media</string>
+    <string name="settings_root_files_off">Cross-profile exchange off</string>
+    <string name="settings_root_files_on">Cross-profile exchange on</string>
+    <string name="settings_root_links">Links in profile</string>
+    <string name="settings_root_certs">Certificates</string>
+    <string name="settings_root_certs_none">None installed</string>
+    <plurals name="settings_root_certs_count">
+        <item quantity="one">%1$d installed</item>
+        <item quantity="other">%1$d installed</item>
+    </plurals>
+    <string name="settings_root_diagnostics">Diagnostics</string>
+    <string name="settings_root_diagnostics_desc">Battery, background, link with the profile</string>
+    <string name="settings_root_misc">Misc</string>
+    <string name="settings_root_misc_desc">NFC payments, contacts, about</string>
     <string name="settings_interaction">Interaction</string>
     <string name="settings_cross_profile_file_chooser">File Shuttle</string>
     <string name="settings_cross_profile_file_chooser_desc">When enabled, you\'ll be able to browse / view / pick / copy files in Gatekeeper from main profile and vice-versa, ONLY through Documents UI (named Files or Documents on your launcher) or apps with Documents UI support (they only gain temporary access to files you choose in Documents UI), while still pertaining the filesystem isolation.</string>

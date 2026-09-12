@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.preference.CheckBoxPreference
+        android:key="settings_block_contacts_searching"
+        android:title="@string/settings_block_contacts_searching"
+        android:summary="@string/settings_block_contacts_searching_desc" />
+
+    <androidx.preference.CheckBoxPreference
+        android:key="settings_block_caller_id"
+        android:title="@string/settings_block_caller_id"
+        android:summary="@string/settings_block_caller_id_desc" />
+
+    <androidx.preference.CheckBoxPreference
+        android:key="settings_payment_stub"
+        android:title="@string/settings_payment_stub"
+        android:summary="@string/settings_payment_stub_desc" />
+
+    <androidx.preference.Preference
+        android:key="settings_version"
+        android:title="@string/settings_version" />
+
+    <androidx.preference.Preference
+        android:key="settings_source_code"
+        android:title="@string/settings_source_code"
+        android:summary="@string/settings_source_code_url" />
+
+</androidx.preference.PreferenceScreen>

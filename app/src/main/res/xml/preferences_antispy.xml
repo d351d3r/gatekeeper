@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.preference.Preference
+        android:key="settings_anti_spy_routing"
+        android:selectable="false"
+        android:title="@string/settings_anti_spy_routing" />
+
+    <androidx.preference.CheckBoxPreference
+        android:key="settings_anti_spy_enabled"
+        android:title="@string/settings_anti_spy_enabled"
+        android:summary="@string/settings_anti_spy_enabled_desc" />
+
+    <androidx.preference.CheckBoxPreference
+        android:dependency="settings_anti_spy_enabled"
+        android:key="settings_anti_spy_freeze_on_vpn"
+        android:title="@string/settings_anti_spy_freeze_on_vpn"
+        android:summary="@string/settings_anti_spy_freeze_on_vpn_desc" />
+
+    <androidx.preference.CheckBoxPreference
+        android:dependency="settings_anti_spy_enabled"
+        android:key="settings_anti_spy_freeze_on_screen_lock"
+        android:title="@string/settings_anti_spy_freeze_on_screen_lock"
+        android:summary="@string/settings_anti_spy_freeze_on_screen_lock_desc" />
+
+    <androidx.preference.DropDownPreference
+        android:dependency="settings_anti_spy_enabled"
+        android:key="settings_anti_spy_scope"
+        android:title="@string/settings_anti_spy_scope" />
+
+    <androidx.preference.CheckBoxPreference
+        android:dependency="settings_anti_spy_enabled"
+        android:key="settings_anti_spy_notify_only"
+        android:title="@string/settings_anti_spy_notify_only"
+        android:summary="@string/settings_anti_spy_notify_only_desc" />
+
+    <androidx.preference.DropDownPreference
+        android:dependency="settings_anti_spy_enabled"
+        android:key="settings_anti_spy_delay"
+        android:title="@string/settings_anti_spy_delay" />
+
+</androidx.preference.PreferenceScreen>

@@ -1,158 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.preference.PreferenceCategory
-        android:title="@string/settings_interaction">
+    <androidx.preference.Preference
+        android:key="settings_root_freeze"
+        android:title="@string/settings_root_freeze"
+        android:summary="@string/settings_root_freeze_off"
+        app:fragment="io.gatekeeper.ui.settings.FreezeSettingsFragment" />
 
-        <androidx.preference.CheckBoxPreference
-            android:key="settings_cross_profile_file_chooser"
-            android:title="@string/settings_cross_profile_file_chooser"
-            android:summary="@string/settings_cross_profile_file_chooser_desc" />
+    <androidx.preference.Preference
+        android:key="settings_root_antispy"
+        android:title="@string/settings_root_antispy"
+        android:summary="@string/settings_root_antispy_off"
+        app:fragment="io.gatekeeper.ui.settings.AntiSpySettingsFragment" />
 
-        <androidx.preference.CheckBoxPreference
-            android:dependency="settings_cross_profile_file_chooser"
-            android:key="settings_media_mirror"
-            android:title="@string/settings_media_mirror"
-            android:summary="@string/settings_media_mirror_desc" />
+    <androidx.preference.Preference
+        android:key="settings_root_files"
+        android:title="@string/settings_root_files"
+        android:summary="@string/settings_root_files_off"
+        app:fragment="io.gatekeeper.ui.settings.FilesSettingsFragment" />
 
-        <androidx.preference.CheckBoxPreference
-            android:key="settings_block_contacts_searching"
-            android:title="@string/settings_block_contacts_searching"
-            android:summary="@string/settings_block_contacts_searching_desc" />
+    <androidx.preference.Preference
+        android:key="settings_root_links"
+        android:title="@string/settings_root_links"
+        android:summary="@string/settings_cross_profile_link_rules_none"
+        app:fragment="io.gatekeeper.ui.settings.LinksSettingsFragment" />
 
-        <androidx.preference.CheckBoxPreference
-            android:key="settings_block_caller_id"
-            android:title="@string/settings_block_caller_id"
-            android:summary="@string/settings_block_caller_id_desc" />
+    <androidx.preference.Preference
+        android:key="settings_root_certs"
+        android:title="@string/settings_root_certs"
+        android:summary="@string/settings_root_certs_none"
+        app:fragment="io.gatekeeper.ui.settings.CertsSettingsFragment" />
 
-        <androidx.preference.CheckBoxPreference
-            android:key="settings_payment_stub"
-            android:title="@string/settings_payment_stub"
-            android:summary="@string/settings_payment_stub_desc" />
+    <androidx.preference.Preference
+        android:key="settings_root_diagnostics"
+        android:title="@string/settings_root_diagnostics"
+        android:summary="@string/settings_root_diagnostics_desc"
+        app:fragment="io.gatekeeper.ui.settings.DiagnosticsSettingsFragment" />
 
-        <androidx.preference.EditTextPreference
-            android:key="settings_cross_profile_link_rules"
-            android:title="@string/settings_cross_profile_link_rules"
-            android:dialogMessage="@string/settings_cross_profile_link_rules_dialog"
-            android:inputType="textUri" />
-
-    </androidx.preference.PreferenceCategory>
-
-    <androidx.preference.PreferenceCategory
-        android:title="@string/settings_ca_category">
-
-        <androidx.preference.Preference
-            android:key="settings_ca_install"
-            android:title="@string/settings_ca_install"
-            android:summary="@string/settings_ca_install_desc" />
-
-        <androidx.preference.Preference
-            android:key="settings_ca_installed"
-            android:title="@string/settings_ca_installed"
-            android:summary="@string/settings_ca_installed_desc" />
-
-    </androidx.preference.PreferenceCategory>
-
-    <androidx.preference.PreferenceCategory
-        android:title="@string/settings_services">
-
-        <androidx.preference.Preference
-            android:key="settings_power_diagnostics"
-            android:title="@string/settings_power_diagnostics"
-            android:summary="@string/settings_power_diagnostics_desc" />
-
-        <androidx.preference.CheckBoxPreference
-            android:key="settings_auto_freeze_service"
-            android:title="@string/settings_auto_freeze_service"
-            android:summary="@string/settings_auto_freeze_service_desc" />
-
-        <androidx.preference.DropDownPreference
-            android:dependency="settings_auto_freeze_service"
-            android:key="settings_auto_freeze_delay"
-            android:title="@string/settings_auto_freeze_delay" />
-
-        <androidx.preference.CheckBoxPreference
-            android:dependency="settings_auto_freeze_service"
-            android:key="settings_dont_freeze_foreground"
-            android:title="@string/settings_dont_freeze_foreground"
-            android:summary="@string/settings_dont_freeze_foreground_desc" />
-
-        <androidx.preference.Preference
-            android:key="settings_unfreeze_all"
-            android:title="@string/unfreeze_all"
-            android:summary="@string/settings_unfreeze_all_desc" />
-
-        <androidx.preference.Preference
-            android:key="settings_freeze_all"
-            android:title="@string/freeze_all"
-            android:summary="@string/settings_freeze_all_desc" />
-
-        <androidx.preference.Preference
-            android:key="settings_create_unfreeze_all_shortcut"
-            android:title="@string/create_unfreeze_all_shortcut" />
-
-        <androidx.preference.Preference
-            android:key="settings_create_freeze_all_shortcut"
-            android:title="@string/create_freeze_all_shortcut" />
-
-    </androidx.preference.PreferenceCategory>
-
-    <androidx.preference.PreferenceCategory
-        android:title="@string/settings_anti_spy">
-
-        <androidx.preference.Preference
-            android:key="settings_anti_spy_routing"
-            android:selectable="false"
-            android:title="@string/settings_anti_spy_routing" />
-
-        <androidx.preference.CheckBoxPreference
-            android:key="settings_anti_spy_enabled"
-            android:title="@string/settings_anti_spy_enabled"
-            android:summary="@string/settings_anti_spy_enabled_desc" />
-
-        <androidx.preference.CheckBoxPreference
-            android:dependency="settings_anti_spy_enabled"
-            android:key="settings_anti_spy_freeze_on_vpn"
-            android:title="@string/settings_anti_spy_freeze_on_vpn"
-            android:summary="@string/settings_anti_spy_freeze_on_vpn_desc" />
-
-        <androidx.preference.CheckBoxPreference
-            android:dependency="settings_anti_spy_enabled"
-            android:key="settings_anti_spy_freeze_on_screen_lock"
-            android:title="@string/settings_anti_spy_freeze_on_screen_lock"
-            android:summary="@string/settings_anti_spy_freeze_on_screen_lock_desc" />
-
-        <androidx.preference.DropDownPreference
-            android:dependency="settings_anti_spy_enabled"
-            android:key="settings_anti_spy_scope"
-            android:title="@string/settings_anti_spy_scope" />
-
-        <androidx.preference.CheckBoxPreference
-            android:dependency="settings_anti_spy_enabled"
-            android:key="settings_anti_spy_notify_only"
-            android:title="@string/settings_anti_spy_notify_only"
-            android:summary="@string/settings_anti_spy_notify_only_desc" />
-
-        <androidx.preference.DropDownPreference
-            android:dependency="settings_anti_spy_enabled"
-            android:key="settings_anti_spy_delay"
-            android:title="@string/settings_anti_spy_delay" />
-
-    </androidx.preference.PreferenceCategory>
-
-    <androidx.preference.PreferenceCategory
-        android:title="@string/settings_about">
-
-        <androidx.preference.Preference
-            android:key="settings_version"
-            android:title="@string/settings_version" />
-
-        <androidx.preference.Preference
-            android:key="settings_source_code"
-            android:title="@string/settings_source_code"
-            android:summary="@string/settings_source_code_url" />
-
-    </androidx.preference.PreferenceCategory>
+    <androidx.preference.Preference
+        android:key="settings_root_misc"
+        android:title="@string/settings_root_misc"
+        android:summary="@string/settings_root_misc_desc"
+        app:fragment="io.gatekeeper.ui.settings.MiscSettingsFragment" />
 
 </androidx.preference.PreferenceScreen>
