@@ -38,6 +38,7 @@ import io.gatekeeper.util.AntiSpyManager
 import io.gatekeeper.util.AntiSpyVpnGuard
 import io.gatekeeper.util.AuthenticationUtility
 import io.gatekeeper.util.FileProviderProxy
+import io.gatekeeper.util.InstallWarnPolicy
 import io.gatekeeper.util.InstallationProgressListener
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.PendingIntents
@@ -265,6 +266,34 @@ class DummyActivity : Activity() {
 
     private fun actionInstallPackage() {
         val operationId = capturePendingPackageOperation(OperationType.INSTALL)
+        // MIUI/HyperOS: сессия установки в рабочем профиле зависает на экране
+        // установщика. Предупреждаем до запуска сессии; отмена отвечает вызвавшему
+        // RESULT_CANCELED, а не молчаливым висяком (4PDA #2105, #2113).
+        if (InstallWarnPolicy.shouldWarn(Utility.isMIUI(), isProfileOwner)) {
+            AlertDialog.Builder(this)
+                .setMessage(R.string.miui_install_apk_warning)
+                .setPositiveButton(R.string.continue_anyway) { _, _ ->
+                    proceedInstallPackage(operationId)
+                }
+                .setNegativeButton(android.R.string.cancel) { _, _ ->
+                    cancelPendingInstall(operationId)
+                }
+                .show()
+            return
+        }
+        proceedInstallPackage(operationId)
+    }
+
+    private fun cancelPendingInstall(operationId: String?) {
+        val pending = operationId?.let(::consumePendingPackageOperation)
+        FileProviderProxy.clearForwardProxy(pending?.forwardedUri)
+        try {
+            pending?.callback?.callback(Activity.RESULT_CANCELED)
+        } catch (_: RemoteException) {
+        }
+    }
+
+    private fun proceedInstallPackage(operationId: String?) {
         var uri: Uri? = null
         if (intent.hasExtra("package")) {
             uri = Uri.fromParts("package", intent.getStringExtra("package"), null)

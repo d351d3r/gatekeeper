@@ -122,3 +122,6 @@ repackage/*
 /.claude/
 /.vscode/
 /.mcp.json
+
+# Serena MCP cache
+.serena/

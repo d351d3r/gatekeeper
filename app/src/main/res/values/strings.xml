@@ -190,6 +190,7 @@
 
     <!-- MIUI -->
     <string name="miui_cannot_clone">Cloning non-system apps to another profile is currently not possible on MIUI. Please clone your system\'s app store (e.g. <b>Play Store</b>) into the other profile and then install apps from there.</string>
+    <string name="miui_install_apk_warning">On MIUI/HyperOS, installing APKs inside a work profile often hangs on the system installer screen (a known firmware issue). Recommended: clone an app store (e.g. Play Store, RuStore or GetApps) into the work profile and install apps from there. Continue anyway?</string>
     <string name="continue_anyway">Continue anyway</string>
 
     <!-- Formats -->

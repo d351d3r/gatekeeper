@@ -67,6 +67,7 @@
     <string name="freeze_all_success">Все приложения в списке автозаморозки были успешно заморожены.</string>
     <string name="shortcut_create_success">Ярлык создан в вашем лаунчере.</string>
     <string name="miui_cannot_clone">Клонирование несистемных приложений в другой профиль в данный момент невозможно на MIUI. Пожалуйста, клонируйте магазин приложений вашей системы (например, <b>Play Маркет</b>) в ваш другой профиль и установите приложения оттуда.</string>
+    <string name="miui_install_apk_warning">На MIUI/HyperOS установка APK внутри рабочего профиля часто зависает на экране системного установщика (известная проблема прошивки). Рекомендуется: клонируйте магазин приложений (например, Play Маркет, RuStore или GetApps) в рабочий профиль и устанавливайте приложения через него. Продолжить в любом случае?</string>
     <string name="finish_provision_title">Нажмите, чтобы завершить настройку Gatekeeper</string>
     <string name="app_installing">Установка...</string>
     <string name="allow_cross_profile_widgets">Виджеты в осн. профиле</string>
