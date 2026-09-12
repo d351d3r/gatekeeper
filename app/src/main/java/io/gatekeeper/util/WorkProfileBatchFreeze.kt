@@ -1,5 +1,6 @@
 package io.gatekeeper.util
 
+import android.app.ActivityManager
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
@@ -88,6 +89,15 @@ object WorkProfileBatchFreeze {
     ): FreezeOutcome {
         if (!isResolvable(context, pkg)) {
             return FreezeOutcome.ALREADY
+        }
+        // Best-effort: скрытие пакета не останавливает уже запущенный процесс
+        // (платформа, 4PDA #2091). Фоновые процессы добиваем заранее; foreground-
+        // сервисы (музыка в фоне) этот вызов не трогает -- это честная граница.
+        try {
+            context.getSystemService(ActivityManager::class.java)
+                ?.killBackgroundProcesses(pkg)
+        } catch (e: Exception) {
+            Log.w(TAG, "killBackgroundProcesses($pkg) failed", e)
         }
         if (dpm.isApplicationHidden(admin, pkg)) {
             Log.w(TAG, "desync: $pkg hidden in DPM but visible in PM, re-applying")
