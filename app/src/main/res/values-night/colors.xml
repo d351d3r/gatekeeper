@@ -51,13 +51,10 @@
 
     <!-- Мастер настройки. Белый прямоугольник в темной теме устранен здесь. -->
     <color name="setupWizardHeaderBackground">@color/md_primaryContainer</color>
-    <color name="setupWizardHeaderText">@color/md_onPrimaryContainer</color>
-    <color name="setupWizardHeaderProgress">@color/md_primary</color>
+<color name="setupWizardHeaderProgress">@color/md_primary</color>
     <color name="setupWizardContentBackground">@color/md_surface</color>
     <color name="setupWizardContentText">@color/md_onSurface</color>
-    <color name="setupWizardNavText">@color/md_primary</color>
-
-    <!-- Состояния строки списка приложений -->
+<!-- Состояния строки списка приложений -->
     <color name="selectedAppBackground">@color/md_secondaryContainer</color>
     <color name="selectedAndDisabledAppBackground">@color/md_tertiaryContainer</color>
     <color name="disabledAppBackground">@color/md_surfaceContainerHighest</color>

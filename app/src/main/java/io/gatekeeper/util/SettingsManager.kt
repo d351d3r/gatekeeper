@@ -75,6 +75,14 @@ class SettingsManager private constructor(context: Context) {
     fun getBlockContactsSearchingEnabled(): Boolean =
         storage.getBoolean(LocalStorageManager.PREF_BLOCK_CONTACTS_SEARCHING)
 
+    fun setBlockCallerIdEnabled(enabled: Boolean) {
+        storage.setBoolean(LocalStorageManager.PREF_BLOCK_CALLER_ID, enabled)
+        syncSettingsToProfileBool(LocalStorageManager.PREF_BLOCK_CALLER_ID, enabled)
+    }
+
+    fun getBlockCallerIdEnabled(): Boolean =
+        storage.getBoolean(LocalStorageManager.PREF_BLOCK_CALLER_ID)
+
     fun setAutoFreezeServiceEnabled(enabled: Boolean) {
         storage.setBoolean(LocalStorageManager.PREF_AUTO_FREEZE_SERVICE, enabled)
     }

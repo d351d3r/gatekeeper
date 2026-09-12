@@ -878,6 +878,13 @@ object Utility {
             SettingsManager.getInstance().getBlockContactsSearchingEnabled()
         )
 
+        // Парная политика: без нее номер, сохраненный только в профиле, все равно
+        // подписывается именем в журнале личного профиля.
+        manager.setCrossProfileCallerIdDisabled(
+            adminComponent,
+            SettingsManager.getInstance().getBlockCallerIdEnabled()
+        )
+
         manager.setProfileEnabled(adminComponent)
     }
 

@@ -7,22 +7,7 @@
     <string name="payment_stub_description">Payment Service Stub (DO NOT USE)</string>
 
     <!-- Setup Wizard -->
-    <string name="setup_wizard_welcome">Welcome to Gatekeeper</string>
-    <string name="setup_wizard_welcome_text">Gatekeeper is an application to help you run other applications in an isolated profile. It does so by making use of the <b>Work Profile</b> feature of Android.\n\nClick \"Next\", and we will provide you with more information about Gatekeeper, and guide you through the setup process.\n\nWe suggest that you read through all of the following pages carefully.</string>
-    <string name="setup_wizard_permissions">A word on permissions</string>
-    <string name="setup_wizard_permissions_text">By default, Gatekeeper will not ask for any individual permissions. However, once you proceed with the setup process, Gatekeeper will try to set up a Work Profile and hence become the <b>profile manager</b> of said profile.\n\nThis will grant Gatekeeper an extensive list of permissions inside the profile, comparable to that of a Device Admin, albeit confined to the profile. Being the profile manager is necessary for most of Gatekeeper\'s functionality.\n\nSome advanced features of Gatekeeper may require more permissions <b>outside</b> the Work Profile. When needed, Gatekeeper will ask for those permissions separately when you enable the corresponding features.</string>
-    <string name="setup_wizard_compatibility">Compatibility</string>
-    <string name="setup_wizard_compatibility_text">Gatekeeper is developed and tested on AOSP-like Android derivatives. This includes AOSP (Android Open Source Project), Google Android (on Pixels), and <b>most AOSP-based open-source custom ROMs</b> such as LineageOS. If your phone is running one of the Android derivatives listed above, then congratulations! Gatekeeper is probably going to work correctly on your device.\n\nSome device vendors introduce very invasive customizations into the Android code base, resulting in conflicts, incompatibility and unexpected behavior. Some custom ROMs can also introduce compatibility-breaking changes, but generally these are rarer occurrences compared to phone vendor-introduced incompatibilities.\n\nGatekeeper is merely an interface into the Work Profile feature provided by the system. If the feature provided by the system is broken or non-standard, <b>Gatekeeper could not magically resolve the issue on its own</b>. If you are currently using a vendor-modified Android version that is known to break Work Profiles, <b>you have been warned</b>. You may proceed anyway, but there is no guarantee that Gatekeeper would behave correctly under these circumstances.</string>
-    <string name="setup_wizard_ready">Ready?</string>
-    <string name="setup_wizard_ready_text">We are now ready to set up Gatekeeper for you. If your device is running Android 7 or lower, please first ensure that your device is <b>not</b> in Do Not Disturb mode, because you will need to <b>click on a notification</b> later to finalize the setup process.\n\nWhen you are ready, click on \"Next\" to begin the setup process.</string>
-    <string name="setup_wizard_please_wait">Please waitтАж</string>
-    <string name="setup_wizard_please_wait_text">We are trying to initialize Work Profile and set up Gatekeeper on your device.</string>
-    <string name="setup_wizard_failed">Setup failed</string>
-    <string name="setup_wizard_failed_text">We regret to inform you that we were not able to set up Gatekeeper for you.\n\nIf your device already had a Work Profile, either from a previous installation of Gatekeeper or from another application, you will have to remove that profile in Settings -> Account before Gatekeeper can proceed.\n\nOtherwise, if you did not cancel the setup manually, then the reason for the failure is most commonly due to a heavily modified system, or a conflict between Gatekeeper and other Work Profile managers. Unfortunately, there is not much that we could do about this.\n\nClick \"Next\" to exit.</string>
-    <string name="setup_wizard_action_required">Action required</string>
-    <string name="setup_wizard_action_required_text">You should now be seeing a notification from Gatekeeper. <b>Please click on that notification</b> to finish the setup process.\n\nIf you do not see the notification, make sure your device is not in Do Not Disturb mode and try pulling down the notification center.\n\nTo reset Gatekeeper and start over, you can clear the data of Gatekeeper in Settings.</string>
-
-    <!-- Notifications -->
+<!-- Notifications -->
     <string name="notifications_important">Gatekeeper Important</string>
     <string name="finish_provision_title">Click here to finish setting up Gatekeeper</string>
     <string name="finish_provision_desc">Congratulations! You are one click away from finishing setting up Gatekeeper.</string>
@@ -98,6 +83,8 @@
     <string name="settings_cross_profile_file_chooser_desc">When enabled, you\'ll be able to browse / view / pick / copy files in Gatekeeper from main profile and vice-versa, ONLY through Documents UI (named Files or Documents on your launcher) or apps with Documents UI support (they only gain temporary access to files you choose in Documents UI), while still pertaining the filesystem isolation.</string>
     <string name="settings_block_contacts_searching">Block Contacts Searching</string>
     <string name="settings_block_contacts_searching_desc">Deny access from main profile to contacts inside work profile.</string>
+    <string name="settings_block_caller_id">Hide caller names from the profile</string>
+    <string name="settings_block_caller_id_desc">A call from a number saved only in the work profile shows up as unknown in the personal call log.</string>
     <string name="settings_payment_stub">Payment Service Stub</string>
     <string name="settings_payment_stub_desc">Enable a fake NFC payment service in the main profile, so that the "contactless payments" option under Settings - NFC becomes enabled to allow you to choose a payment app inside the work profile. This works around an Android bug that makes it impossible to select a payment app inside the work profile if none is available in the main profile.</string>
     <string name="settings_cross_profile_link_rules">Open links in work profile</string>
@@ -251,4 +238,27 @@
     <string name="ca_remove_action">Remove</string>
     <string name="ca_remove_success">Certificate removed from the work profile</string>
     <string name="ca_remove_failed">Could not remove the certificate</string>
+    <!-- Setup wizard -->
+    <string name="wizard_step">Step %1$d of %2$d</string>
+    <string name="wizard_next">Next</string>
+    <string name="wizard_back">Back</string>
+    <string name="wizard_create_profile">Create the profile</string>
+    <string name="wizard_retry">Retry</string>
+    <string name="wizard_exit">Exit</string>
+    <string name="wizard_welcome_title">A separate zone inside your phone</string>
+    <string name="wizard_welcome_text">Gatekeeper creates an Android work profile - an isolated zone with its own data, accounts and permissions. Apps inside cannot see your personal side of the phone: not the accounts, not the files, not the contacts.\n\nOne tap freezes an app: it leaves the home screen and stops running in the background. Files cross between profiles only when you pick them.\n\nHonest about the limits: this is isolation, not anonymity. Apps inside the profile still see the phone model and that a VPN is up, and NFC payments from the profile work only on some firmware.</string>
+    <string name="wizard_permissions_title">What permissions are needed</string>
+    <string name="wizard_permissions_text">Gatekeeper becomes the owner of the new profile. Inside it, it can install, remove, hide and launch apps, manage their permissions and install root certificates - into that profile only.\n\nOn the personal side it gets nothing until you turn a feature on yourself. File transfer, the VPN watcher and media copying ask for permission when you enable them, and say what it is for.\n\nAll of it is revoked in one move: delete the work profile in system settings. Personal data is untouched.</string>
+    <string name="wizard_check_title">I checked your device</string>
+    <string name="wizard_check_text">The work profile is a system feature. Where the vendor cut it down, Gatekeeper cannot work around it - so I check up front.</string>
+    <string name="wizard_check_android">Android %1$s, work profile supported</string>
+    <string name="wizard_check_slot_free">The profile slot is free: no other profile manager</string>
+    <string name="wizard_check_slot_busy">The profile slot is taken: remove the existing work profile in system settings</string>
+    <string name="wizard_check_miui">%1$s: installing APKs inside the profile often hangs. Install apps from a store inside the profile instead.</string>
+    <string name="wizard_wait_title">Creating the work profile</string>
+    <string name="wizard_wait_text">Usually 10 to 30 seconds. Android is about to show its own profile-creation screen: two or three taps, and you come back here.</string>
+    <string name="wizard_action_title">Android is finishing the profile</string>
+    <string name="wizard_action_text">One system step is left. On Android 7 you have to tap the Gatekeeper notification in the shade; on newer versions the system shows its own completion screen.\n\nIf you see neither: turn off Do Not Disturb and pull the shade down. On Xiaomi and Redmi the system finish button sometimes flashes for a split second - open Settings, Accounts, and check whether the work profile was created.\n\nThis screen closes itself as soon as the profile starts answering.</string>
+    <string name="wizard_failed_title">The profile could not be created</string>
+    <string name="wizard_failed_text">Common causes: the device already has a work profile from another app or an earlier install - Android allows only one; the firmware blocks profile creation; the setup was cancelled on the system screen.\n\nWhat to do: open Settings, Accounts, remove the existing work profile and tap Retry. Removing the profile erases its apps and their data; the personal side is untouched.</string>
 </resources>

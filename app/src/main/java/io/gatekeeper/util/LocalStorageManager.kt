@@ -135,6 +135,8 @@ class LocalStorageManager private constructor(context: Context) {
         const val PREF_DONT_FREEZE_FOREGROUND = "dont_freeze_foreground"
         const val PREF_AUTO_FREEZE_DELAY = "auto_freeze_delay"
         const val PREF_BLOCK_CONTACTS_SEARCHING = "block_contacts_searching"
+        /** Парная к предыдущей политика: имя звонящего из книги профиля в личном журнале. */
+        const val PREF_BLOCK_CALLER_ID = "block_caller_id"
         const val PREF_PAYMENT_STUB = "payment_stub"
         const val PREF_ANTI_SPY_BOOT_FREEZE_PENDING = "anti_spy_boot_freeze_pending"
         const val PREF_ANTI_SPY_LAUNCH_VERSION_CODE = "anti_spy_launch_version_code"

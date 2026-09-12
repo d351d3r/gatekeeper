@@ -59,43 +59,5 @@
     <string name="install_app_to_profile_success">仕事用プロファイル内にアプリがインストールされました。</string>
     <string name="settings_block_contacts_searching_desc">メインプロファイルから仕事用プロファイル内の連絡先へのアクセスを拒否します。</string><string name="settings_cross_profile_file_chooser">ファイル同期</string>
     <string name="settings_cross_profile_file_chooser_desc">有効にした場合、メインプロファイルからGatekeeper内のファイルを管理できるようになります。Gatekeeper内のファイルへはDocument UI（標準ファイラー）のみから隔離されたファイルシステムにアクセスできます。</string>
-    <string name="setup_wizard_welcome_text">Gatekeeperはアプリを隔離されたプロファイル内で実行するためのツールです。このアプリではAndroidの <b>仕事用プロファイル</b> 機能を利用しています。
-\n
-\n「次へ」をタップするとGatekeeperの詳細が表示されセットアップに進みます。
-\n
-\n次のページの項目をよく読んでおくことを推奨します。</string>
-    <string name="setup_wizard_compatibility">互換性</string>
-    <string name="setup_wizard_ready">準備はよろしいですか？</string>
-    <string name="setup_wizard_please_wait">しばらくお待ちください…</string>
-    <string name="setup_wizard_please_wait_text">仕事用プロファイルを設定してGatekeeperをセットアップしようとしています。</string>
-    <string name="setup_wizard_failed">セットアップに失敗しました</string>
-    <string name="setup_wizard_action_required">操作が必要です</string>
-    <string name="setup_wizard_welcome">Gatekeeperへようこそ</string>
-    <string name="settings_dont_freeze_foreground_desc">画面をロックしたときに、フォアグラウンドのアプリ（アクティビティが表示されているもの）を凍結しない。これは音楽プレーヤーなどのアプリには便利ですが、その後「バッチフリーズ・ショートカット」を使って手動で凍結する必要があります。</string>
-    <string name="setup_wizard_ready_text">これで、Gatekeeperの設定が完了しました。Android 7以下の端末の場合、セットアッププロセスを完了させるには、後で<b>通知をタップ</b>する必要があるため、まずお使いのデバイスが<b>サイレントモードになっていない</b>ことを確認してください。
-\n
-\n準備ができたら、「次へ」をタップして、セットアッププロセスを開始します。</string>
-    <string name="setup_wizard_permissions">権限についてひとこと</string>
-    <string name="setup_wizard_action_required_text">これで、Gatekeeperからの通知が表示されるはずです。<b>通知をタップして</b>、セットアッププロセスを終了してください。
-\n
-\n通知が表示されない場合は、デバイスが「サイレントモード」になっていないことを確認し、通知センターを下げてみてください。
-\n
-\nGatekeeperをリセットして最初からやり直すには、「設定」でGatekeeperのデータを消去してください。</string>
-    <string name="setup_wizard_permissions_text">デフォルトでは、Gatekeeperは個々の権限を要求しません。しかし、セットアッププロセスを進めると、Gatekeeperは仕事用プロファイルを設定しようとします。設定が完了すると、そのプロファイルの<b>プロファイルマネージャー</b>になります。
-\n
-\nこれにより、Gatekeeperには、プロファイル内に限定されてはいるものの、デバイス管理者に匹敵する幅広い権限が与えられます。プロファイルマネージャーになることは、Gatekeeperのほとんどの機能に必要です。
-\n
-\nGatekeeperの高度な機能の中には、仕事用プロファイル<b>以外</b>のより多くの権限を必要とするものがあります。必要な場合は、あなたが対応する機能を有効したときに、Gatekeeperはそれらの権限を別途要求します。</string>
-    <string name="setup_wizard_compatibility_text">Gatekeeperは、AOSPライクなAndroid派生機種で開発・テストされています。これには、AOSP（Android Open Source Project）、Google Android（Pixel）、およびLineageOSなどの<b>ほとんどのAOSPベースのオープンソース・カスタムROM</b>が含まれます。お使いの携帯電話が上記のAndroid派生機種のいずれかを搭載しているのであれば、おめでとうございます。シェルターはおそらくあなたの端末で正しく動作するでしょう。
-\n
-\n一部の端末ベンダーは、Androidのコードベースに非常に侵襲的なカスタマイズを導入しているため、競合や非互換性、予期せぬ動作が発生することがあります。また、カスタムROMの中には、互換性を壊すような変更を加えるものもありますが、一般的には、端末ベンダーが導入した非互換性に比べれば、そのようなことはほとんどありません。
-\n
-\nGatekeeperは、システムが提供する機能のインターフェイスに過ぎません。システムが提供する機能が壊れていたり、非標準であったりした場合、<b>Gatekeeper は魔法のように独自に問題を解決することはできません。</b>仕事用プロファイルが壊れることが知られているベンダー修正の Android バージョンを現在使用している場合は、<b>警告</b>されます。いずれにしても続行しても構いませんが、このような状況下でシェルターが正しく動作するという保証はありません。</string>
-    <string name="setup_wizard_failed_text">Gatekeeperのセットアップを行うことができませんでした。
-\n
-\nお使いのデバイスに、以前にGatekeeperをインストールしたことがある場合や、他のアプリケーションで作成した仕事用プロファイルがすでに設定されている場合は、Gatekeeperの設定を始める前に、「設定」→「アカウント」→「仕事用」でそのプロファイルを削除する必要があります。
-\n
-\nそうでなければ、あなたが途中でセットアップをキャンセルしたわけではない場合、失敗の原因は、システムが大きく変更されているか、Gatekeeperと他の仕事用プロファイルマネージャーとの間で競合が発生していることがほとんどです。残念ながら、これに対してできることはあまりありません。
-\n
-\nNext \"をタップして終了します。</string>
+<string name="settings_dont_freeze_foreground_desc">画面をロックしたときに、フォアグラウンドのアプリ（アクティビティが表示されているもの）を凍結しない。これは音楽プレーヤーなどのアプリには便利ですが、その後「バッチフリーズ・ショートカット」を使って手動で凍結する必要があります。</string>
 </resources>

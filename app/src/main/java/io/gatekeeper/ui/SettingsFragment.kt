@@ -53,6 +53,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
     private var prefCrossProfileFileChooser: CheckBoxPreference? = null
     private var prefMediaMirror: CheckBoxPreference? = null
     private var prefBlockContactsSearching: CheckBoxPreference? = null
+    private var prefBlockCallerId: CheckBoxPreference? = null
     private var prefAutoFreezeService: CheckBoxPreference? = null
     private var prefSkipForeground: CheckBoxPreference? = null
     private var prefPaymentStub: CheckBoxPreference? = null
@@ -109,6 +110,10 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         prefBlockContactsSearching = findPreference(SETTINGS_BLOCK_CONTACTS_SEARCHING)
         prefBlockContactsSearching!!.isChecked = manager.getBlockContactsSearchingEnabled()
         prefBlockContactsSearching!!.onPreferenceChangeListener = this
+
+        prefBlockCallerId = findPreference(SETTINGS_BLOCK_CALLER_ID)
+        prefBlockCallerId!!.isChecked = manager.getBlockCallerIdEnabled()
+        prefBlockCallerId!!.onPreferenceChangeListener = this
 
         prefPaymentStub = findPreference(SETTINGS_PAYMENT_STUB)
         prefPaymentStub!!.isChecked = manager.getPaymentStubEnabled()
@@ -677,6 +682,10 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
                 manager.setBlockContactsSearchingEnabled(newState as Boolean)
                 true
             }
+            prefBlockCallerId -> {
+                manager.setBlockCallerIdEnabled(newState as Boolean)
+                true
+            }
             prefAutoFreezeService -> {
                 manager.setAutoFreezeServiceEnabled(newState as Boolean)
                 true
@@ -777,6 +786,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         private const val SETTINGS_CROSS_PROFILE_LINK_RULES = "settings_cross_profile_link_rules"
         private const val SETTINGS_MEDIA_MIRROR = "settings_media_mirror"
         private const val SETTINGS_BLOCK_CONTACTS_SEARCHING = "settings_block_contacts_searching"
+        private const val SETTINGS_BLOCK_CALLER_ID = "settings_block_caller_id"
         private const val SETTINGS_AUTO_FREEZE_SERVICE = "settings_auto_freeze_service"
         private const val SETTINGS_AUTO_FREEZE_DELAY = "settings_auto_freeze_delay"
         private const val SETTINGS_SKIP_FOREGROUND = "settings_dont_freeze_foreground"

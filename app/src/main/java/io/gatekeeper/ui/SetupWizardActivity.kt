@@ -5,25 +5,24 @@ import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
+import androidx.core.view.isNotEmpty
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
-import com.android.setupwizardlib.SetupWizardLayout
-import com.android.setupwizardlib.view.NavigationBar
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import io.gatekeeper.R
 import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.util.AuthenticationUtility
@@ -82,7 +81,7 @@ class SetupWizardActivity : AppCompatActivity() {
         }
     }
 
-    private fun <T : BaseWizardFragment> switchToFragment(fragment: T, reverseAnimation: Boolean) {
+    fun <T : BaseWizardFragment> switchToFragment(fragment: T, reverseAnimation: Boolean) {
         supportFragmentManager
             .beginTransaction()
             .setCustomAnimations(
@@ -93,12 +92,12 @@ class SetupWizardActivity : AppCompatActivity() {
             .commit()
     }
 
-    private fun finishWithResult(succeeded: Boolean) {
+    fun finishWithResult(succeeded: Boolean) {
         setResult(if (succeeded) RESULT_OK else RESULT_CANCELED)
         finish()
     }
 
-    private fun setupProfile() {
+    fun setupProfile() {
         if (!policyManager!!.isProvisioningAllowed(DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE)) {
             switchToFragment(FailedFragment(), false)
             return
@@ -165,15 +164,34 @@ class SetupWizardActivity : AppCompatActivity() {
         }
     }
 
-    abstract class BaseWizardFragment : Fragment(), NavigationBar.NavigationBarListener {
+    /**
+     * Общий каркас экрана мастера: счетчик шагов с полосой прогресса, заголовок,
+     * текст, необязательный список фактов и две кнопки. Раньше все это давала
+     * вендоренная com.android.setupwizardlib; теперь это Material 3 и модуль
+     * :setup-wizard-lib из сборки убран.
+     */
+    abstract class BaseWizardFragment : Fragment() {
         protected var setupActivity: SetupWizardActivity? = null
-        protected var wizard: SetupWizardLayout? = null
 
-        protected abstract fun getLayoutResource(): Int
+        protected abstract val titleRes: Int
+        protected abstract val textRes: Int
 
-        override fun onNavigateBack() {}
+        /** 0 -- экран вне последовательности шагов: ожидание, отказ. */
+        protected open val step: Int = 0
+        protected open val nextLabelRes: Int = R.string.wizard_next
+        protected open val backLabelRes: Int = R.string.wizard_back
+        protected open val showNext: Boolean = true
+        protected open val showBack: Boolean = true
 
-        override fun onNavigateNext() {}
+        /** Ожидание: полоса без делений вместо счетчика шагов. */
+        protected open val waiting: Boolean = false
+
+        open fun onNavigateNext() {}
+
+        open fun onNavigateBack() {}
+
+        /** Экран проверки устройства дополняет текст списком фактов. */
+        protected open fun fillChecks(container: LinearLayout) {}
 
         override fun onAttach(context: Context) {
             super.onAttach(context)
@@ -189,194 +207,205 @@ class SetupWizardActivity : AppCompatActivity() {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-        ): View {
-            val view = inflater.inflate(getLayoutResource(), container, false)
-            wizard = view.findViewById(R.id.wizard)
-            wizard!!.navigationBar.setNavigationBarListener(this)
-            wizard!!.setLayoutBackground(
-                ContextCompat.getDrawable(inflater.context, R.color.setupWizardHeaderBackground)
-            )
-            return view
-        }
-
-        private fun applySetupWizardColors() {
-            val ctx = requireContext()
-            val header = wizard!!.headerTextView
-            header?.setTextColor(ContextCompat.getColor(ctx, R.color.setupWizardHeaderText))
-            val nav = wizard!!.navigationBar
-            nav.setBackgroundColor(ContextCompat.getColor(ctx, R.color.setupWizardHeaderBackground))
-            val navTextColor = ContextCompat.getColor(ctx, R.color.setupWizardNavText)
-            val navTextColors = ColorStateList.valueOf(navTextColor)
-            for (button in arrayOf(nav.backButton, nav.nextButton, nav.moreButton)) {
-                button.setTextColor(navTextColors)
-                TextViewCompat.setCompoundDrawableTintList(button, navTextColors)
-            }
-        }
+        ): View = inflater.inflate(R.layout.fragment_setup_wizard, container, false)
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
-            applySetupWizardColors()
-            ViewCompat.setOnApplyWindowInsetsListener(wizard!!) { _, windowInsets ->
-                val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
 
-                wizard!!.setDecorPaddingTop(insets.top)
+            view.findViewById<TextView>(R.id.wizard_title).setText(titleRes)
+            view.findViewById<TextView>(R.id.wizard_text).setText(textRes)
 
-                val nav = wizard!!.navigationBar
-                val params = nav.layoutParams
-                params.height += insets.bottom
+            bindProgress(view)
+            bindButtons(view)
 
-                nav.layoutParams = params
+            val checks = view.findViewById<LinearLayout>(R.id.wizard_checks)
+            fillChecks(checks)
+            if (checks.isNotEmpty()) {
+                checks.visibility = View.VISIBLE
+            }
 
-                nav.setPadding(
-                    nav.paddingLeft, nav.paddingTop, nav.paddingRight, insets.bottom
-                )
+            ViewCompat.setOnApplyWindowInsetsListener(view) { root, windowInsets ->
+                val bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+                root.setPadding(0, bars.top, 0, bars.bottom)
                 WindowInsetsCompat.CONSUMED
             }
         }
-    }
 
-    abstract class TextWizardFragment : BaseWizardFragment() {
-        abstract fun getTextRes(): Int
+        private fun bindProgress(view: View) {
+            val progress = view.findViewById<LinearProgressIndicator>(R.id.wizard_progress)
+            val label = view.findViewById<TextView>(R.id.wizard_step_label)
+            when {
+                waiting -> {
+                    progress.isIndeterminate = true
+                    label.visibility = View.GONE
+                }
+                step > 0 -> {
+                    progress.max = TOTAL_STEPS
+                    progress.progress = step
+                    label.text = getString(R.string.wizard_step, step, TOTAL_STEPS)
+                }
+                else -> view.findViewById<View>(R.id.wizard_step_row).visibility = View.GONE
+            }
+        }
 
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-            view.findViewById<TextView>(R.id.setup_wizard_generic_text).setText(getTextRes())
+        private fun bindButtons(view: View) {
+            val next = view.findViewById<MaterialButton>(R.id.wizard_next)
+            next.setText(nextLabelRes)
+            next.visibility = if (showNext) View.VISIBLE else View.GONE
+            next.setOnClickListener { onNavigateNext() }
+
+            val back = view.findViewById<MaterialButton>(R.id.wizard_back)
+            back.setText(backLabelRes)
+            back.visibility = if (showBack) View.VISIBLE else View.GONE
+            back.setOnClickListener { onNavigateBack() }
+        }
+
+        /** Строка факта: иконка плюс текст, без собственной разметки. */
+        protected fun addCheck(container: LinearLayout, iconRes: Int, text: String) {
+            val context = container.context
+            val density = resources.displayMetrics.density
+            val row = TextView(context).apply {
+                this.text = text
+                setTextAppearance(
+                    com.google.android.material.R.style.TextAppearance_Material3_BodyMedium
+                )
+                setTextColor(ContextCompat.getColor(context, R.color.setupWizardContentText))
+                setCompoundDrawablesRelativeWithIntrinsicBounds(iconRes, 0, 0, 0)
+                compoundDrawablePadding = (CHECK_ICON_GAP_DP * density).toInt()
+                val pad = (CHECK_ROW_PADDING_DP * density).toInt()
+                setPadding(0, pad, 0, pad)
+            }
+            container.addView(
+                row,
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            )
+        }
+
+        private companion object {
+            const val CHECK_ICON_GAP_DP = 12
+            const val CHECK_ROW_PADDING_DP = 10
         }
     }
 
-    class WelcomeFragment : TextWizardFragment() {
-        override fun getLayoutResource(): Int = R.layout.fragment_setup_wizard_generic_text
-
-        override fun getTextRes(): Int = R.string.setup_wizard_welcome_text
+    class WelcomeFragment : BaseWizardFragment() {
+        override val titleRes: Int = R.string.wizard_welcome_title
+        override val textRes: Int = R.string.wizard_welcome_text
+        override val step: Int = 1
+        override val showBack: Boolean = false
 
         override fun onNavigateNext() {
-            super.onNavigateNext()
             setupActivity!!.switchToFragment(PermissionsFragment(), false)
-        }
-
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-            wizard!!.setHeaderText(R.string.setup_wizard_welcome)
-            wizard!!.navigationBar.backButton.visibility = View.GONE
         }
     }
 
-    class PermissionsFragment : TextWizardFragment() {
-        override fun getLayoutResource(): Int = R.layout.fragment_setup_wizard_generic_text
-
-        override fun getTextRes(): Int = R.string.setup_wizard_permissions_text
+    class PermissionsFragment : BaseWizardFragment() {
+        override val titleRes: Int = R.string.wizard_permissions_title
+        override val textRes: Int = R.string.wizard_permissions_text
+        override val step: Int = 2
 
         override fun onNavigateBack() {
-            super.onNavigateBack()
             setupActivity!!.switchToFragment(WelcomeFragment(), true)
         }
 
         override fun onNavigateNext() {
-            super.onNavigateNext()
-            setupActivity!!.switchToFragment(CompatibilityFragment(), false)
-        }
-
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-            wizard!!.setHeaderText(R.string.setup_wizard_permissions)
+            setupActivity!!.switchToFragment(CheckFragment(), false)
         }
     }
 
-    class CompatibilityFragment : TextWizardFragment() {
-        override fun getLayoutResource(): Int = R.layout.fragment_setup_wizard_generic_text
+    /**
+     * Проверка устройства вместо эссе о прошивках: версия Android, свободен ли
+     * слот профиля, известные проблемы вендора. Факты считаются здесь и сейчас,
+     * поэтому пользователь видит свое устройство, а не общие слова.
+     */
+    class CheckFragment : BaseWizardFragment() {
+        override val titleRes: Int = R.string.wizard_check_title
+        override val textRes: Int = R.string.wizard_check_text
+        override val step: Int = TOTAL_STEPS
+        override val nextLabelRes: Int = R.string.wizard_create_profile
 
-        override fun getTextRes(): Int = R.string.setup_wizard_compatibility_text
+        override fun fillChecks(container: LinearLayout) {
+            addCheck(
+                container,
+                R.drawable.ic_check,
+                getString(R.string.wizard_check_android, Build.VERSION.RELEASE),
+            )
+
+            val policyManager = container.context.getSystemService(DevicePolicyManager::class.java)
+            val slotFree = policyManager
+                ?.isProvisioningAllowed(DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE)
+                ?: false
+            addCheck(
+                container,
+                if (slotFree) R.drawable.ic_check else R.drawable.ic_warning,
+                getString(
+                    if (slotFree) R.string.wizard_check_slot_free else R.string.wizard_check_slot_busy
+                ),
+            )
+
+            if (Utility.isMIUI()) {
+                addCheck(
+                    container,
+                    R.drawable.ic_warning,
+                    getString(R.string.wizard_check_miui, Build.MANUFACTURER),
+                )
+            }
+        }
 
         override fun onNavigateBack() {
-            super.onNavigateBack()
             setupActivity!!.switchToFragment(PermissionsFragment(), true)
         }
 
         override fun onNavigateNext() {
-            super.onNavigateNext()
-            setupActivity!!.switchToFragment(ReadyFragment(), false)
-        }
-
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-            wizard!!.setHeaderText(R.string.setup_wizard_compatibility)
+            setupActivity!!.switchToFragment(PleaseWaitFragment(), false)
+            setupActivity!!.setupProfile()
         }
     }
 
-    class ReadyFragment : TextWizardFragment() {
-        override fun getLayoutResource(): Int = R.layout.fragment_setup_wizard_generic_text
+    class PleaseWaitFragment : BaseWizardFragment() {
+        override val titleRes: Int = R.string.wizard_wait_title
+        override val textRes: Int = R.string.wizard_wait_text
+        override val waiting: Boolean = true
+        override val showNext: Boolean = false
+        override val showBack: Boolean = false
+    }
 
-        override fun getTextRes(): Int = R.string.setup_wizard_ready_text
+    /**
+     * Экран, на котором застревают чаще всего (4PDA #1047, #1034, #2008).
+     * На Android 7 завершение вешается уведомлением, на 8+ его показывает сама
+     * система, поэтому текст говорит про оба случая и про то, что экран
+     * закроется сам, как только профиль начнет отвечать (см. onResume).
+     */
+    class ActionRequiredFragment : BaseWizardFragment() {
+        override val titleRes: Int = R.string.wizard_action_title
+        override val textRes: Int = R.string.wizard_action_text
+        override val waiting: Boolean = true
+        override val showNext: Boolean = false
+        override val showBack: Boolean = false
+    }
 
-        override fun onNavigateBack() {
-            super.onNavigateBack()
-            setupActivity!!.switchToFragment(CompatibilityFragment(), true)
-        }
+    class FailedFragment : BaseWizardFragment() {
+        override val titleRes: Int = R.string.wizard_failed_title
+        override val textRes: Int = R.string.wizard_failed_text
+        override val nextLabelRes: Int = R.string.wizard_retry
+        override val backLabelRes: Int = R.string.wizard_exit
 
         override fun onNavigateNext() {
-            super.onNavigateNext()
             setupActivity!!.switchToFragment(PleaseWaitFragment(), false)
             setupActivity!!.setupProfile()
         }
 
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-            wizard!!.setHeaderText(R.string.setup_wizard_ready)
-        }
-    }
-
-    class PleaseWaitFragment : TextWizardFragment() {
-        override fun getLayoutResource(): Int = R.layout.fragment_setup_wizard_generic_text
-
-        override fun getTextRes(): Int = R.string.setup_wizard_please_wait_text
-
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-            wizard!!.setHeaderText(R.string.setup_wizard_please_wait)
-            wizard!!.setProgressBarColor(
-                view.context.getColorStateList(R.color.setup_wizard_progress_bar)
-            )
-            wizard!!.isProgressBarShown = true
-            wizard!!.navigationBar.backButton.visibility = View.GONE
-            wizard!!.navigationBar.nextButton.visibility = View.GONE
-        }
-    }
-
-    class ActionRequiredFragment : TextWizardFragment() {
-        override fun getLayoutResource(): Int = R.layout.fragment_setup_wizard_generic_text
-
-        override fun getTextRes(): Int = R.string.setup_wizard_action_required_text
-
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-            wizard!!.setHeaderText(R.string.setup_wizard_action_required)
-            wizard!!.setProgressBarColor(
-                view.context.getColorStateList(R.color.setup_wizard_progress_bar)
-            )
-            wizard!!.isProgressBarShown = true
-            wizard!!.navigationBar.backButton.visibility = View.GONE
-            wizard!!.navigationBar.nextButton.visibility = View.GONE
-        }
-    }
-
-    class FailedFragment : TextWizardFragment() {
-        override fun getLayoutResource(): Int = R.layout.fragment_setup_wizard_generic_text
-
-        override fun getTextRes(): Int = R.string.setup_wizard_failed_text
-
-        override fun onNavigateNext() {
-            super.onNavigateNext()
+        override fun onNavigateBack() {
             setupActivity!!.finishWithResult(false)
-        }
-
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-            wizard!!.setHeaderText(R.string.setup_wizard_failed)
-            wizard!!.navigationBar.backButton.visibility = View.GONE
         }
     }
 
     companion object {
+        /** Экранов с счетчиком: приветствие, права, проверка устройства. */
+        private const val TOTAL_STEPS = 3
+
         const val ACTION_RESUME_SETUP = "io.gatekeeper.RESUME_SETUP"
         const val ACTION_PROFILE_PROVISIONED = "io.gatekeeper.PROFILE_PROVISIONED"
     }

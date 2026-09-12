@@ -1,31 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="first_run_alert_continue">להמשיך</string>
-    <string name="setup_wizard_welcome">ברוכים הבאים Gatekeeper</string>
-    <string name="setup_wizard_permissions">מילה על הרשאות</string>
-    <string name="setup_wizard_compatibility">תאימות</string>
-    <string name="first_run_alert_cancel">ביי</string>
-    <string name="device_admin_desc">שירות בידוד אפליקציות</string><string name="setup_wizard_welcome_text">Gatekeeper הוא יישום שעוזר לך להפעיל יישומים אחרים בפרופיל מבודד. זה עושה זאת על ידי שימוש בתכונה <b>פרופיל עבודה</b> של Android.
-\n
-\nלחץ על \"הבא\", ואנו נספק לך מידע נוסף על Gatekeeper, וננחה אותך בתהליך ההגדרה.
-\n
-\nאנו ממליצים לקרוא בעיון את כל העמודים הבאים.</string>
-    <string name="allow_cross_profile_widgets">אפשר ווידג\'טים בפרופיל הראשי</string>
+<string name="first_run_alert_cancel">ביי</string>
+    <string name="device_admin_desc">שירות בידוד אפליקציות</string><string name="allow_cross_profile_widgets">אפשר ווידג\'טים בפרופיל הראשי</string>
     <string name="install_app_to_profile_success">התקנת האפליקציה הסתיימה בפרופיל העבודה.</string>
-    <string name="setup_wizard_ready">מוכן?</string>
-    <string name="setup_wizard_ready_text">כעת אנו מוכנים להקים עבורך את Gatekeeper. אם המכשיר שלך פועל עם אנדרואיד 7 ומטה, אנא ודא תחילה שהמכשיר שלך <b>לא</b> במצב \'נא לא להפריע\', מכיוון שתצטרך <b>ללחוץ על הודעה</b> מאוחר יותר כדי לסיים תהליך ההגדרה.
-\n
-\nכשתהיה מוכן, לחץ על \"הבא\" כדי להתחיל בתהליך ההגדרה.</string>
-    <string name="setup_wizard_please_wait">נא להמתין…</string>
-    <string name="setup_wizard_please_wait_text">אנחנו מנסים לאתחל את פרופיל העבודה ולהגדיר את Gatekeeper במכשיר שלך.</string>
-    <string name="setup_wizard_failed">ההגדרה נכשלה</string>
-    <string name="setup_wizard_action_required">פעולה נדרשת</string>
-    <string name="setup_wizard_action_required_text">כעת אתה אמור לראות הודעה מ-Gatekeeper. <b>אנא לחץ על הודעה זו</b> כדי לסיים את תהליך ההגדרה.
-\n
-\nאם אינך רואה את ההתראה, ודא שהמכשיר שלך אינו במצב \'נא לא להפריע\' ונסה למשוך את מרכז ההתראות כלפי מטה.
-\n
-\nכדי לאפס את Gatekeeper ולהתחיל מחדש, אתה יכול לנקות את הנתונים של Gatekeeper בהגדרות.</string>
-    <string name="notifications_important">מקלט חשוב</string>
+<string name="notifications_important">מקלט חשוב</string>
     <string name="finish_provision_title">לחץ כאן כדי לסיים את הגדרת מקלט</string>
     <string name="finish_provision_desc">מזל טוב! אתה במרחק קליק אחד מסיום ההגדרה של Gatekeeper.</string>
     <string name="service_desc">Gatekeeper פועל כעת…</string>
@@ -51,24 +30,7 @@
     <string name="create_freeze_all_shortcut">צור קיצור דרך להקפאת אצווה</string>
     <string name="freeze_all_shortcut">הקפאה</string>
     <string name="install_app_to_profile">התקן APK לתוך Gatekeeper</string>
-    <string name="setup_wizard_permissions_text">כברירת מחדל, Gatekeeper לא יבקש הרשאות בודדות. עם זאת, לאחר שתמשיך בתהליך ההגדרה, Gatekeeper ינסה להגדיר פרופיל עבודה ולפיכך יהפוך ל<b>מנהל הפרופיל</b> של הפרופיל האמור.
-\n
-\nזה יעניק ל-Gatekeeper רשימה נרחבת של הרשאות בתוך הפרופיל, הדומה לזו של מנהל מכשיר, אם כי מוגבלת לפרופיל. להיות מנהל הפרופילים הכרחי עבור רוב הפונקציונליות של Gatekeeper.
-\n
-\nחלק מהתכונות המתקדמות של Gatekeeper עשויות לדרוש הרשאות נוספות <b>מחוץ</b> לפרופיל העבודה. בעת הצורך, Gatekeeper יבקש את ההרשאות הללו בנפרד כאשר תפעיל את התכונות המתאימות.</string>
-    <string name="setup_wizard_compatibility_text">Gatekeeper פותח ונבדק על נגזרות אנדרואיד דמויות AOSP. זה כולל AOSP (Android Open Source Project), Google Android (על פיקסלים), ו<b>רוב ה-ROMs המותאמים אישית מבוססי AOSP</b> כגון LineageOS. אם בטלפון שלך פועלת אחת מנגזרות האנדרואיד המפורטות למעלה, אז מזל טוב! Gatekeeper כנראה הולך לעבוד כראוי במכשיר שלך.
-\n
-\nספקי מכשירים מסוימים מציגים התאמות אישיות פולשניות מאוד לבסיס הקוד של אנדרואיד, וכתוצאה מכך התנגשויות, חוסר תאימות והתנהגות בלתי צפויה. חלק מה-ROMs המותאמים אישית יכולים גם להציג שינויים שוברי תאימות, אך בדרך כלל אלו מקרים נדירים יותר בהשוואה לאי תאימות שהוצגו על ידי ספקי הטלפון.
-\n
-\nGatekeeper הוא רק ממשק לתכונת פרופיל העבודה שמסופקת על ידי המערכת. אם התכונה שסופקה על ידי המערכת פגומה או לא סטנדרטית, <b>Gatekeeper לא הצליח לפתור את הבעיה בכוחות עצמו</b>. אם אתה משתמש כעת בגרסת אנדרואיד ששונתה על ידי הספק, שידוע שהיא מפרה את פרופילי העבודה, <b>הוזהרתם</b>. אתה יכול להמשיך בכל מקרה, אבל אין ערובה ששלטר יתנהג נכון בנסיבות אלה.</string>
-    <string name="setup_wizard_failed_text">אנו מצטערים להודיע לך שלא הצלחנו להקים עבורך את מקלט.
-\n
-\nאם למכשיר שלך כבר היה פרופיל עבודה, מהתקנה קודמת של Gatekeeper או מאפליקציה אחרת, תצטרך להסיר את הפרופיל הזה בהגדרות -&gt; חשבון לפני ש-Gatekeeper יוכל להמשיך.
-\n
-\nאחרת, אם לא ביטלת את ההגדרה באופן ידני, הסיבה לכשל נובעת לרוב ממערכת ששונתה מאוד, או התנגשות בין Gatekeeper ומנהלי פרופיל עבודה אחרים. למרבה הצער, אין הרבה מה שאנחנו יכולים לעשות בנידון.
-\n
-\nלחץ על \"הבא\" כדי לצאת.</string>
-    <string name="show_all">הצג את כל האפליקציות</string>
+<string name="show_all">הצג את כל האפליקציות</string>
     <string name="documents_ui">פתח את ממשק המשתמש של מסמכים</string>
     <string name="settings">הגדרות</string>
     <string name="settings_interaction">אינטראקציה</string>

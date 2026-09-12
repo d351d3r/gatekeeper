@@ -62,42 +62,4 @@
     <string name="create_freeze_all_shortcut">創建批量凍結快捷方式</string>
     <string name="settings_block_contacts_searching">阻止訪問聯繫人</string>
     <string name="settings_block_contacts_searching_desc">阻止主用戶中的應用訪問工作用戶的聯繫人資料。</string>
-    <string name="setup_wizard_welcome">歡迎來到 Gatekeeper</string>
-    <string name="setup_wizard_welcome_text">Gatekeeper 是一個幫助你在獨立的配置文件中運行其他 App 的應用程序。它基於 Android 的<b>工作檔案</b>功能實現。
-\n
-\n點擊 \"下一步\"，我們將向你提供更多關於 Gatekeeper 的信息，並帶領你完成設置。
-\n
-\n我們建議你仔細閱讀以下所有的頁面。</string>
-    <string name="setup_wizard_permissions_text">默認情況下，Gatekeeper不會要求任何個人權限。然而，一旦你繼續進行設置過程，Gatekeeper將嘗試設置一個工作檔案，併成爲此檔案的<b>檔案管理員</b>。
-\n
-\n這將授予Gatekeeper在配置文件內的大量權限，與設備管理員的權限相當，儘管只限於配置文件內。爲了實現Gatekeeper的大部分功能成爲檔案管理員是必要的。
-\n
-\nGatekeeper 的一些高級功能可能需要更多權限<b>外部</b>工作資料。當需要時，Gatekeeper將在你啓用相應的功能時單獨要求這些權限。</string>
-    <string name="setup_wizard_compatibility_text">Gatekeeper是在類似AOSP的安卓衍生品上開發和測試的。這包括AOSP（安卓開源項目），谷歌安卓（在Pixels上），以及<b>大多數基於AOSP的開源定製ROM</b>，如LineageOS。如果你的手機正在運行上面列出的安卓衍生品之一，那麼恭喜你！Gatekeeper可能會正常工作。
-\n
-\nGatekeeper可能會在你的設備上正確工作。 一些設備供應商在安卓代碼庫中引入了非常具有侵略性的定製，導致衝突、不兼容和意外行爲。一些定製的ROM也會引入破壞兼容性的變化，但一般來說，與手機供應商引入的不兼容問題相比，這些情況更少發生。
-\n
-\nSheler只是一個進入系統所提供的工作檔案功能的接口。如果系統提供的功能是壞的或不標準的，<b>Gatekeeper不可能自己神奇地解決這個問題</b>。如果你目前使用的是供應商修改過的Android版本，而該版本已知會破壞工作檔案，<b>你已經被警告了</b>。你可以繼續進行，但不能保證Gatekeeper在這些情況下的行爲是正常的。</string>
-    <string name="setup_wizard_action_required_text">您現在應該會看到來自 Gatekeeper 的通知。 <b> 請點擊該通知 </b> 完成設置過程。
-\n
-\n如果您沒有看到通知，請確保您的設備未處於“請勿打擾”模式並嘗試下拉通知中心。
-\n
-\n要重置 Gatekeeper 並重新開始，您可以在設置中清除 Gatekeeper 的數據。</string>
-    <string name="setup_wizard_permissions">關於權限的說明</string>
-    <string name="setup_wizard_compatibility">兼容性</string>
-    <string name="setup_wizard_failed">安裝失敗</string>
-    <string name="setup_wizard_please_wait_text">我們正在嘗試初始化工作檔案並在您的設備上設置 Gatekeeper。</string>
-    <string name="setup_wizard_please_wait">請稍等…</string>
-    <string name="setup_wizard_ready">準備好？</string>
-    <string name="setup_wizard_ready_text">我們現在已準備好爲您設置 Gatekeeper。如果您的設備運行的是 Android 7 或更低版本，請首先確保您的設備是 <b> 不是 </b> 請勿打擾模式，因爲您需要 <b> 點擊通知 </b> 稍後完成設置過程。
-\n
-\n準備好後，單擊“下一步”開始設置過程。</string>
-    <string name="setup_wizard_failed_text">我們很遺憾地通知您，我們無法爲您設置Gatekeeper。
-\n
-\n如果您的設備已經有工作配置文件，無論是之前安裝的Gatekeeper所創建或者其他應用程序創建，您都必須在設置 -&gt; 帳戶中刪除該配置文件，然後 Gatekeeper 才能繼續。
-\n
-\n如果您沒有手動取消設置，那麼失敗的最常見原因是系統被大量修改，或者 Gatekeeper 與其他工作配置文件管理器之間存在衝突。 不幸的是，我們對此無能爲力。
-\n
-\n單擊下一步退出。</string>
-    <string name="setup_wizard_action_required">需要採取的行動</string>
 </resources>

@@ -67,42 +67,4 @@
     <string name="app_installing">正在安装……</string>
     <string name="request_storage_manager">File Shuttle 需要访问 <b>全部文件</b> 的权限。请在接下来的对话框中对 <b>两个 Gatekeeper</b> (工作用户内 / 外) 都启用该权限。</string>
     <string name="settings_block_contacts_searching_desc">阻止主用户中的应用访问工作用户的联系人资料。</string>
-    <string name="setup_wizard_welcome">欢迎来到 Gatekeeper</string>
-    <string name="setup_wizard_permissions">关于权限的说明</string>
-    <string name="setup_wizard_please_wait">请稍等…</string>
-    <string name="setup_wizard_please_wait_text">我们正在尝试初始化工作档案并在您的设备上设置 Gatekeeper。</string>
-    <string name="setup_wizard_failed">安装失败</string>
-    <string name="setup_wizard_action_required">需要采取的行动</string>
-    <string name="setup_wizard_ready_text">我们现在已准备好为您设置 Gatekeeper。如果您的设备运行的是 Android 7 或更低版本，请首先确保您的设备是 <b> 不是 </b> 请勿打扰模式，因为您需要 <b> 点击通知 </b> 稍后完成设置过程。
-\n
-\n准备好后，单击“下一步”开始设置过程。</string>
-    <string name="setup_wizard_compatibility">兼容性</string>
-    <string name="setup_wizard_ready">准备好？</string>
-    <string name="setup_wizard_permissions_text">默认情况下，Gatekeeper不会要求任何个人权限。然而，一旦你继续进行设置过程，Gatekeeper将尝试设置一个工作档案，并成为此档案的<b>档案管理员</b>。
-\n
-\n这将授予Gatekeeper在配置文件内的大量权限，与设备管理员的权限相当，尽管只限于配置文件内。为了实现Gatekeeper的大部分功能成为档案管理员是必要的。
-\n
-\nGatekeeper 的一些高级功能可能需要更多权限<b>外部</b>工作资料。当需要时，Gatekeeper将在你启用相应的功能时单独要求这些权限。</string>
-    <string name="setup_wizard_failed_text">我们很遗憾地通知您，我们无法为您设置Gatekeeper。
-\n
-\n如果您的设备已经有工作配置文件，无论是之前安装的Gatekeeper所创建或者其他应用程序创建，您都必须在设置 -&gt; 帐户中删除该配置文件，然后 Gatekeeper 才能继续。
-\n
-\n如果您没有手动取消设置，那么失败的最常见原因是系统被大量修改，或者 Gatekeeper 与其他工作配置文件管理器之间存在冲突。 不幸的是，我们对此无能为力。
-\n
-\n单击下一步退出。</string>
-    <string name="setup_wizard_compatibility_text">Gatekeeper是在类似AOSP的安卓衍生品上开发和测试的。这包括AOSP（安卓开源项目），谷歌安卓（在Pixels上），以及<b>大多数基于AOSP的开源定制ROM</b>，如LineageOS。如果你的手机正在运行上面列出的安卓衍生品之一，那么恭喜你！Gatekeeper可能会正常工作。
-\n
-\nGatekeeper可能会在你的设备上正确工作。 一些设备供应商在安卓代码库中引入了非常具有侵略性的定制，导致冲突、不兼容和意外行为。一些定制的ROM也会引入破坏兼容性的变化，但一般来说，与手机供应商引入的不兼容问题相比，这些情况更少发生。
-\n
-\nSheler只是一个进入系统所提供的工作档案功能的接口。如果系统提供的功能是坏的或不标准的，<b>Gatekeeper不可能自己神奇地解决这个问题</b>。如果你目前使用的是供应商修改过的Android版本，而该版本已知会破坏工作档案，<b>你已经被警告了</b>。你可以继续进行，但不能保证Gatekeeper在这些情况下的行为是正常的。</string>
-    <string name="setup_wizard_welcome_text">Gatekeeper 是一个帮助你在独立的配置文件中运行其他 App 的应用程序。它基于 Android 的<b>工作档案</b>功能实现。
-\n
-\n点击 \"下一步\"，我们将向你提供更多关于 Gatekeeper 的信息，并带领你完成设置。
-\n
-\n我们建议你仔细阅读以下所有的页面。</string>
-    <string name="setup_wizard_action_required_text">您现在应该会看到来自 Gatekeeper 的通知。 <b> 请点击该通知 </b> 完成设置过程。
-\n
-\n如果您没有看到通知，请确保您的设备未处于“请勿打扰”模式并尝试下拉通知中心。
-\n
-\n要重置 Gatekeeper 并重新开始，您可以在设置中清除 Gatekeeper 的数据。</string>
 </resources>

@@ -48,6 +48,7 @@ object BackupPayload {
         LocalStorageManager.PREF_DONT_FREEZE_FOREGROUND,
         LocalStorageManager.PREF_AUTO_FREEZE_DELAY,
         LocalStorageManager.PREF_BLOCK_CONTACTS_SEARCHING,
+        LocalStorageManager.PREF_BLOCK_CALLER_ID,
         LocalStorageManager.PREF_PAYMENT_STUB,
         LocalStorageManager.PREF_ANTI_SPY_VPN_WATCH_ENABLED,
         LocalStorageManager.PREF_ANTI_SPY_FREEZE_ON_VPN,

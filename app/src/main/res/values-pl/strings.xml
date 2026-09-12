@@ -63,40 +63,4 @@
     <string name="settings_cross_profile_file_chooser_desc">Gdy włączone, możesz przeglądać / wyświetlać / wybierać / kopiować pliki w Gatekeeper z profilu głównego i na odwrót, TYLKO poprzez Documents UI (Nazwane Pliki albo Dokumenty w twoim launcherze) lub w aplikacjach z wsparciem Documents UI (otrzymają tylko tymczasowy dostęp do plików, które wybierzesz w Documents UI), wciąż utrzymując izolację systemu plików.</string>
     <string name="settings_dont_freeze_foreground_desc">NIE zamrażaj aplikacji na wierzchu (z widoczną aktywnością) gdy zablokujesz ekran. To może być przydatne dla np. odtwarzaczy muzyki, ale musisz je zamrozić ręcznie poprzez \"skrót do masowego zamrażania\".</string>
     <string name="request_usage_stats">Gatekeeper aby to zrobić wymaga uprawnienia <b>dostępu do danych o użyciu</b>. Proszę nadać uprawnienie <b>OBU Z DWÓCH</b> aplikacji Gatekeeper na liście pokazanej po naciśnięciu \"Ok\". Nie nadanie uprawnienia spowoduje, że funkcja nie będzie działać prawidłowo.</string>
-    <string name="setup_wizard_welcome">Witaj w Gatekeeper</string>
-    <string name="setup_wizard_welcome_text">Gatekeeper to aplikacja, która pozwala uruchamiać inne aplikacje w wyizolowanym profilu. Jest to możliwe dzięki funkcji Androida <b>profil roboczy</b>.
-\n
-\nNaciśnij \"Dalej\", by otrzymać więcej informacji o Gatekeeperze oraz by otrzymać wsparcie w konfigurowaniu aplikacji.
-\n
-\nZalecamy przeczytać wszystko uważnie.</string>
-    <string name="setup_wizard_permissions">Uprawnienia</string>
-    <string name="setup_wizard_permissions_text">Domyślnie Gatekeeper nie prosi o żadne uprawnienia. Jednak gdy skończysz konfigurację Gatekeeper spróbuje stworzyć profil roboczy i stać się menadżerem tego profilu.
-\n
-\nTo przyzna Gatekeeperowi obszerną listę uprawnień dotyczących profilu, porównywalnych do administratora urządzenia, jednak skupionych tylko na tym profilu. Bycie menadżerem profilu jest wymagane przez większość funkcji Gatekeepera.
-\n
-\nNiektóre zaawansowane funkcje Gatekeepera mogą wymagać więcej uprawnień <b>poza</b> profilem roboczym. Gdy zajdzie taka potrzeba, Gatekeeper poprosi o uprawnienia konieczne do działania wybranej funkcji.</string>
-    <string name="setup_wizard_compatibility">Kompatybilność</string>
-    <string name="setup_wizard_compatibility_text">Gatekeeper jest tworzony i testowany na pochodnych AOSP. Zaliczają się do nich: AOSP (Android Open Source Project), Google Android (na Pixelach oraz &lt;b&gt;większość opartych na AOSP otwartoźródłowych systemów,&lt;/b&gt; takich jak LineageOS. Jeśli na swoim telefonie masz jedną z wersji Androida wymienionych powyżej — gratulacje! Gatekeeper prawdopodobnie zadziała poprawnie na twoim urządzeniu.
-\n
-\nNiektórzy producenci urządzeń przeprowadzają bardzo inwazyjne zmiany w bazowym kodzie Androida, doprowadzając do konfliktów, niezgodności i nieprzewidywalnych zachowań. Niektóre systemy niezwiązane z producentami również mogą wprowadzać zmiany psujące kompatybilność, ale generalnie zdarza się to rzadziej niż problemy z modyfikacjami producentów.
-\n
-\nGatekeeper jest zaledwie interfejsem dla profilu roboczego zapewnionego przez system. Jeśli funkcja dostarczona przez system jest popsuta lub niestandardowa, &lt;b&gt;Gatekeeper tego magicznie nie naprawi./b&gt; Jeśli używasz zmodyfikowanej przez producenta wersji Androida, która znana jest z psucia profili roboczych, &lt;b&gt;otrzymałeś/aś ostrzeżenie.&lt;/b&gt; Oczywiście, możesz kontynuować, ale nie ma żadnej gwarancji, że Gatekeeper będzie funkcjonować poprawnie w takich warunkach.</string>
-    <string name="setup_wizard_failed_text">Przykro nam, ale nie udało nam się skonfigurować Gatekeepera dla ciebie.
-\n
-\nJeśli nie anulowałeś konfiguracji ręcznie, powodem niepowodzenia jest najczęściej mocno zmodyfikowany system lub konflikt pomiędzy Gatekeeperem a innymi menadżerami profilu roboczego. Niestety nie możemy z tym nic zrobić.
-\n
-\nNaciśnij Dalej by wyjść.</string>
-    <string name="setup_wizard_ready_text">Jesteśmy gotowi by skonfigurować Gatekeepera dla ciebie. Najpierw upewnij się, że urządzenie <b>nie jest</b> w trybie Nie Przeszkadzać, ponieważ konieczne będzie <b>kliknięcie na powiadomienie</b> w celu zakończenia konfiguracji.
-\n
-\nGdy będziesz gotowy/a, naciśnij \"Dalej\" by rozpocząć proces konfiguracji.</string>
-    <string name="setup_wizard_please_wait">Proszę czekać…</string>
-    <string name="setup_wizard_please_wait_text">Próbujemy przygotować profil roboczy i skonfigurować Gatekeeper na twoim urządzeniu.</string>
-    <string name="setup_wizard_failed">Konfiguracja nieudana</string>
-    <string name="setup_wizard_action_required">Wymagane działanie</string>
-    <string name="setup_wizard_action_required_text">Powinieneś teraz widzieć powiadomienie od Gatekeepera. <b>Naciśnij na to powiadomienie</b> by zakończyć proces konfiguracji.
-\n
-\nJeśli nie widzisz powiadomienia upewnij się, że nie masz włączonego trybu Nie Przeszkadzać lub spróbuj rozwinąć centrum powiadomień.
-\n
-\nBy zresetować Gatekeepera i zacząć od nowa możesz wyczyścić dane Gatekeepera w Ustawieniach.</string>
-    <string name="setup_wizard_ready">Gotowy/a?</string>
 </resources>

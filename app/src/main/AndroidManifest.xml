@@ -64,8 +64,9 @@
         </activity>
 
         <!-- Setup Wizard -->
+        <!-- Тема мастера теперь общая тема приложения: вендоренная SuwThemeMaterial ушла вместе с модулем. -->
         <activity android:name=".ui.SetupWizardActivity"
-            android:theme="@style/SuwThemeMaterial.DayNight"
+            android:theme="@style/AppTheme"
             android:launchMode="singleTask"
             android:exported="false"/>
 

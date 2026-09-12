@@ -142,8 +142,6 @@ APK, собранные CI из `main`, подписываются одним **
 ## Структура репозитория
 
 - `app/` — приложение (Kotlin, AIDL).
-- `libs/SetupWizardLibrary/` — библиотека мастера настройки, собирается из
-  исходников как модуль `:setup-wizard-lib`.
 - `tools/` — служебные скрипты: `testbench.sh` (стенд проверки на эмуляторе через
   ADB), `repackage-google-play.sh` (сборка варианта для Google Play без
   MANAGE_EXTERNAL_STORAGE).

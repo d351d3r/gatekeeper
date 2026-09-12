@@ -513,20 +513,35 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Магазин в рабочем профиле установлен, но заморожен: предложение не
-     * клонировать, а разморозить. Состояние подсказки фиксируем сразу после
-     * отправки -- обработчик UNFREEZE_APP сам снимет setApplicationHidden.
+     * клонировать, а разморозить. Идем биндером рабочего сервиса, а не реле:
+     * у UNFREEZE_APP нет кросс-профильного фильтра в enforceWorkProfilePolicies,
+     * поэтому системный форвардер его не резолвит и transferIntentToProfile
+     * всегда отказывает. Диалог показывается только при живом serviceWork,
+     * так что биндер здесь уже есть.
      */
     private fun unfreezeStoreInWork(store: ApplicationInfoWrapper) {
-        val forwardIntent = Intent(DummyActivity.UNFREEZE_APP)
-        if (!Utility.tryTransferIntentToProfile(this, forwardIntent)) {
+        val work = serviceWork ?: run {
             GatekeeperToast.show(this, getString(R.string.clone_fail_no_connection))
             return
         }
-        forwardIntent.putExtra("packageName", store.getPackageName())
-        forwardIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(forwardIntent)
-        storage?.setInt(LocalStorageManager.PREF_STORE_CLONE_HINT_STATE, StoreCloneHint.STATE_NEVER)
-        GatekeeperToast.show(this, getString(R.string.unfreeze_success, store.getLabel()))
+        Thread {
+            val unfrozen = runCatching { work.unfreezeApp(store) }.isSuccess
+            window.decorView.post {
+                if (!unfrozen) {
+                    GatekeeperToast.show(this, getString(R.string.clone_fail_no_connection))
+                    return@post
+                }
+                storage?.setInt(
+                    LocalStorageManager.PREF_STORE_CLONE_HINT_STATE,
+                    StoreCloneHint.STATE_NEVER,
+                )
+                GatekeeperToast.show(
+                    this,
+                    getString(R.string.unfreeze_success, store.getLabel()),
+                )
+                refreshAppLists()
+            }
+        }.start()
     }
 
     private fun cloneStoreIntoWork(store: ApplicationInfoWrapper) {

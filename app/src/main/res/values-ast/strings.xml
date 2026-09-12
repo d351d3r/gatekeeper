@@ -1,39 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="setup_wizard_permissions">Falemos de los permisos</string>
-    <string name="setup_wizard_compatibility">Compatibilidá</string>
-    <string name="provision_finished">Completóse la configuración de Gatekeeper y va reaniciase. Si Gatekeeper nun s\'anició automáticamente, pues volver llanzalu dende\'l llanzador.</string><string name="work_profile_not_found">Nun s\'atopó\'l perfil de trabayu. Volvi aniciar l\'aplicación pa volver fornir el perfil, por favor.</string><string name="first_run_alert_cancel">Marchar d\'equí</string>
+<string name="provision_finished">Completóse la configuración de Gatekeeper y va reaniciase. Si Gatekeeper nun s\'anició automáticamente, pues volver llanzalu dende\'l llanzador.</string><string name="work_profile_not_found">Nun s\'atopó\'l perfil de trabayu. Volvi aniciar l\'aplicación pa volver fornir el perfil, por favor.</string><string name="first_run_alert_cancel">Marchar d\'equí</string>
     <string name="first_run_alert_continue">Siguir</string>
-    <string name="device_admin_desc">Serviciu d\'aislamientu d\'aplicaciones</string><string name="setup_wizard_welcome">Afáyate en Gatekeeper</string>
-    <string name="setup_wizard_welcome_text">Gatekeeper ye una aplicación que t\'ayuda a executar aplicaciones nun perfil aisláu. Esto ye posible per duana de la carauterística <b>Perfil de trabayu</b> d\'Android.
-\n
-\nCalca «Siguiente» pa consiguir más información tocante a Gatekeeper y guiate pel procesu de configuración.
-\n
-\nSuxerímoste que lleas con atención les páxines que vienen darréu.</string>
-    <string name="setup_wizard_compatibility_text">Gatekeeper desendólcase pa y pruébase en derivaos d\'Android asemeyaos a AOSP. Estos derivaos inclúin a AOSP (Android Open Source Project), Google Android (en móviles Pixel) y <b>la mayoría de ROMs personalizaes basaes n\'AOSP</b> como LineageOS. Si esti preséu executa un deriváu d\'estos, entós ye mui probable que Gatekeeper funcione correutamente.
-\n
-\nDalgunos fabricantes y ROMs personalizaes introducen cambeos invasivos nel códigu d\'Android qu\'orixinen conflictos, incompatibilidaes y comportamientos inesperaos. Sicasí, nel casu de les ROMs personalizaes, ye raro que xurdan fallos.
-\n
-\nGatekeeper ye namás una interfaz pa la carauterística «Perfil de trabayu» fornida pol sistema. Si esta carauterística la forne un sistema incompatible o que nun ye estándar, <b>Gatekeeper nun pue funcionar máxicamente</b>. Si uses una versión d\'Android modificada pol fabricante y conocida por nun ser compatible con «Perfil de trabayu», <b>sentímoslo</b>. Pues siguir si quies, mas nun hai garantíes de que Gatekeeper se comporte correutamente baxo estes circunstancies.</string>
-    <string name="setup_wizard_ready">Prepárate</string>
-    <string name="setup_wizard_ready_text">Yá pues configurar Gatekeeper. Asegúrate primero de que\'l preséu <b>nun</b> ta nel mou «Nun molestar» porque tienes de <b>calcar nun avisu</b> namás finar el procesu de configuración.
-\n
-\nCuando quieras, calca «Siguiente» pa comenzar el procesu de configuración.</string>
-    <string name="setup_wizard_please_wait">Espera…</string>
-    <string name="setup_wizard_please_wait_text">Tamos aniciando\'l perfil de trabayu y configurando Gatekeeper nel preséu.</string>
-    <string name="setup_wizard_failed">La configuración falló</string>
-    <string name="setup_wizard_failed_text">Llamentamos informate de que nun fuimos a configurar Gatekeeper.
-\n
-\nSi nun encaboxesti la configuración, entós el problema ye qu\'hai incompatibilidaes col sistema o hai conflictos ente Gatekeeper y otros xestores del perfil de trabayu. Desafortunadamente, nun podemos facer muncho más.
-\n
-\nCalca «Siguiente» pa colar.</string>
-    <string name="setup_wizard_action_required">Cuasi acabemos</string>
-    <string name="setup_wizard_action_required_text">Agora habríes ver un avisu de Gatekeeper.<b>Calca nel avisu</b> pa finar el procesu de configuración, por favor.
-\n
-\nSi nun ves esti avisu, asegúrate de que\'l preséu nun ta nel mou «Nun molestar» y espande\'l centru d\'avisos.
-\n
-\nPa reafitar Gatekeeper y volver comenzar, pues llimpiar los datos de Gatekeeper n\'Axustes.</string>
-    <string name="notifications_important">Avisu importante</string>
+    <string name="device_admin_desc">Serviciu d\'aislamientu d\'aplicaciones</string><string name="notifications_important">Avisu importante</string>
     <string name="finish_provision_title">Calca equí pa finar la configuración de Gatekeeper</string>
     <string name="finish_provision_desc">¡Norabona! Tas a un calcu de finar la configuración de Gatekeeper.</string>
     <string name="service_title">Serviciu d\'aislamientu</string>
@@ -94,9 +63,4 @@
     <string name="request_storage_manager">Gatekeeper tien d\'acceder a <b>Tolos ficheros</b> pa la pasera de ficheros. Activa\'l permisu pa les instancies de Gatekeeper <b>DE LOS DOS PERFILES</b> nel diálogu qu\'apaez dempués de primir «D\'acuerdu».</string>
     <string name="miui_cannot_clone">Anguaño, en MIUI, nun ye posible la clonación de les aplicaciones que nun son del sistema a otru perfil. Clona la tienda d\'aplicaciones del sistema al perfil aisláu y dempués instala les aplicaciones dende ehí, por favor.</string>
     <string name="continue_anyway">Siguir de toes toes</string>
-    <string name="setup_wizard_permissions_text">Por defeutu, Gatekeeper nun pide nengún permisu. Por embargu, al siguir col procesu de configuración, Gatekeeper va configurar el perfil de trabayu y convertise nel <b>xestor d\'esi perfil</b>.
-\n
-\nEsto concede a Gatekeeper una llista estensa de permisos dientro del perfil, comparable al d\'un xestor del preséu, magar que aislaos nesi perfil. Ser el xestor del perfil ye un requirimientu pa la mayoría de funciones de Gatekeeper.
-\n
-\nDalgunes carauterístiques de Gatekeeper puen riquir más permisos <b>fuera</b> del perfil de trabayu. Cuando seya\'l momentu, Gatekeeper va pidir esos permisos per separtao al activar les carauterístiques correspondientes.</string>
 </resources>

@@ -148,8 +148,6 @@ Releases are published from `v*` tags — see
 ## Repository layout
 
 - `app/` — the application (Kotlin, AIDL).
-- `libs/SetupWizardLibrary/` — the setup-wizard library, built from source as
-  the `:setup-wizard-lib` module.
 - `tools/` — utility scripts: `testbench.sh` (emulator verification bench over
   ADB), `repackage-google-play.sh` (Google Play variant without
   MANAGE_EXTERNAL_STORAGE).
