@@ -7,15 +7,16 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
+
+env:
+  HAS_KEYSTORE: ${{ secrets.CI_RELEASE_KEYSTORE != '' }}
 
 jobs:
-  assemble:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - uses: actions/setup-java@v4
         with:
@@ -28,20 +29,60 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Test and assemble universal APK
-        run: ./gradlew :app:testDebugUnitTest :app:assembleDebug --stacktrace --no-daemon
-
-      - name: Write APK checksum
+      - name: Bump version code (main pushes only)
+        if: github.event_name == 'push' && !contains(github.event.head_commit.message, '[skip ci]')
         run: |
-          cd app/build/outputs/apk/debug
-          sha256sum Gatekeeper-*.apk > SHA256SUMS.txt
+          CODE=$(($(grep VERSION_CODE version.properties | cut -d= -f2) + 1))
+          sed -i "s/^VERSION_CODE=.*/VERSION_CODE=${CODE}/" version.properties
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Bump version code to ${CODE} [skip ci]"
+          git push
 
-      - name: Upload universal Android APK
+      - name: Resolve version code
+        run: echo "VERSION_CODE=$(grep VERSION_CODE version.properties | cut -d= -f2)" >> "$GITHUB_ENV"
+
+      - name: Run unit tests
+        run: ./gradlew :app:testDebugUnitTest --stacktrace --no-daemon
+
+      - name: Assemble arm64 debug APK
+        run: ./gradlew :app:assembleDebug -PversionCode=${VERSION_CODE} --stacktrace --no-daemon
+
+      - name: Decode release keystore
+        if: env.HAS_KEYSTORE == 'true'
+        run: echo "${{ secrets.CI_RELEASE_KEYSTORE }}" | base64 -d > /tmp/release.keystore
+
+      - name: Assemble arm64 release APK
+        run: |
+          SIGN_ARGS=""
+          if [ "$HAS_KEYSTORE" = "true" ]; then
+            SIGN_ARGS="-PciReleaseKeystore=/tmp/release.keystore \
+              -PciReleaseStorePassword=${{ secrets.CI_RELEASE_STORE_PASSWORD }} \
+              -PciReleaseKeyAlias=${{ secrets.CI_RELEASE_KEY_ALIAS }} \
+              -PciReleaseKeyPassword=${{ secrets.CI_RELEASE_KEY_PASSWORD }}"
+          fi
+          ./gradlew :app:assembleRelease -PversionCode=${VERSION_CODE} ${SIGN_ARGS} --stacktrace --no-daemon
+
+      - name: Write APK checksums
+        run: |
+          cd app/build/outputs/apk
+          sha256sum debug/*.apk release/*.apk > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Upload arm64 debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: gatekeeper-universal-debug-apk
+          name: gatekeeper-arm64-debug-apk
           path: |
-            app/build/outputs/apk/debug/Gatekeeper-*.apk
+            app/build/outputs/apk/debug/*-arm64-v8a-*.apk
             app/build/outputs/apk/debug/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload arm64 release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: gatekeeper-arm64-release-apk
+          path: app/build/outputs/apk/release/*-arm64-v8a-*.apk
           if-no-files-found: error
           retention-days: 30

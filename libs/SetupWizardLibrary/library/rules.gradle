@@ -11,8 +11,6 @@ apply plugin: 'com.android.library'
 
 android {
 
-    publishNonDefault true
-
     defaultConfig {
         vectorDrawables.useSupportLibrary = true
     }

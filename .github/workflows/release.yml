@@ -3,13 +3,13 @@ name: Release
 on:
   push:
     tags:
-      - 'v1.5.3-*'
+      - 'v*'
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Release tag (e.g. v1.5.3-235)'
+        description: 'Release tag (e.g. v1.5.3-350)'
         required: true
-        default: 'v1.5.3-235'
+        default: 'v1.5.3-350'
 
 permissions:
   contents: write
@@ -33,7 +33,6 @@ jobs:
 
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
           ref: ${{ steps.meta.outputs.tag }}
 
       - uses: actions/setup-java@v4
@@ -50,16 +49,16 @@ jobs:
         run: |
           CODE="${{ steps.meta.outputs.code }}"
           echo "Building versionCode ${CODE}"
-          sed -i "s/^VERSION_CODE=.*/VERSION_CODE=$((CODE - 1))/" version.properties
+          sed -i "s/^VERSION_CODE=.*/VERSION_CODE=${CODE}/" version.properties
           grep VERSION version.properties
 
-      - name: Assemble debug APK
+      - name: Assemble arm64 debug APK
         run: ./gradlew :app:assembleDebug --stacktrace --no-daemon
 
       - name: Locate APK
         id: apk
         run: |
-          APK=$(ls app/build/outputs/apk/debug/Gatekeeper-*.apk | head -1)
+          APK=$(ls Gatekeeper-*-debug.apk | head -1)
           echo "path=${APK}" >> "$GITHUB_OUTPUT"
           echo "name=$(basename "${APK}")" >> "$GITHUB_OUTPUT"
 

@@ -167,7 +167,7 @@ class AppListFragment : BaseFragment() {
             setPadding(pad, pad, pad, pad)
         }
 
-        val onSurface = MaterialColors.getColor(context, R.attr.colorOnSurface, Color.BLACK)
+        val onSurface = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurface, Color.BLACK)
 
         val title = TextView(context).apply {
             text = getString(R.string.app_context_menu_title, app.getLabel())
