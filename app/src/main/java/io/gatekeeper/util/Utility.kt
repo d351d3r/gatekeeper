@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // LocalBroadcastManager, pre-O shortcuts/notifications, pre-30 cross-profile APIs
+
 package io.gatekeeper.util
 
 import android.annotation.TargetApi

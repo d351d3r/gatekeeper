@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // legacy version-gated paths (LocalBroadcastManager)
+
 package io.gatekeeper.ui
 
 import android.Manifest

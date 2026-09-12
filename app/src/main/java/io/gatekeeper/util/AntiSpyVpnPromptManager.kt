@@ -69,6 +69,8 @@ object AntiSpyVpnPromptManager {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 val options = ActivityOptions.makeBasic()
+                // Constant deprecated in API 35, but it is still the mode this API 34+ setter takes.
+                @Suppress("DEPRECATION")
                 options.setPendingIntentBackgroundActivityStartMode(
                     ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
                 )

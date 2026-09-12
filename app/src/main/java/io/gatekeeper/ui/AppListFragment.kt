@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // legacy version-gated paths (LocalBroadcastManager)
+
 package io.gatekeeper.ui
 
 import android.app.Activity
@@ -172,7 +174,6 @@ class AppListFragment : BaseFragment() {
         val title = TextView(context).apply {
             text = getString(R.string.app_context_menu_title, app.getLabel())
             setTextAppearance(
-                context,
                 com.google.android.material.R.style.TextAppearance_Material3_TitleLarge
             )
             setTextColor(onSurface)
@@ -201,7 +202,6 @@ class AppListFragment : BaseFragment() {
                 minHeight = minRowHeight
                 gravity = Gravity.CENTER_VERTICAL
                 setTextAppearance(
-                    context,
                     com.google.android.material.R.style.TextAppearance_Material3_BodyLarge
                 )
                 setTextColor(onSurface)

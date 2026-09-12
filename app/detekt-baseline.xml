@@ -67,13 +67,14 @@
     <ID>MagicNumber:Utility.kt$Utility$512</ID>
     <ID>MagicNumber:Utility.kt$Utility$65536</ID>
     <ID>MagicNumber:Utility.kt$Utility$700L</ID>
+    <ID>MaxLineLength:FileShuttleService.kt$@file:Suppress("DEPRECATION")</ID>
     <ID>MaxLineLength:GatekeeperService.kt$GatekeeperService.&lt;no name provided&gt;$.</ID>
     <ID>MaxLineLength:MediaMirrorSelectionTest.kt$MediaMirrorSelectionTest$)</ID>
     <ID>NestedBlockDepth:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService$private fun performFreeze(trigger: AntiSpyTrigger)</ID>
     <ID>NestedBlockDepth:AppListFragment.kt$AppListFragment$private fun onAppMenuItemSelected(itemId: Int, app: ApplicationInfoWrapper, checked: Boolean)</ID>
     <ID>NestedBlockDepth:DummyActivity.kt$DummyActivity$private fun actionUnfreezeAllInList()</ID>
     <ID>NestedBlockDepth:MediaMirror.kt$MediaMirror$private fun copyOne( context: Context, service: IFileShuttleService, remote: MediaMirrorSelection.RemoteFile, relativeDir: String, ): Boolean</ID>
-    <ID>NestedBlockDepth:VpnTunnelDetector.kt$VpnTunnelDetector$private fun hasVpnNetworkTransport(context: Context): Boolean</ID>
+    <ID>NestedBlockDepth:VpnTunnelDetector.kt$VpnTunnelDetector$@Suppress("DEPRECATION") private fun hasVpnNetworkTransport(context: Context): Boolean</ID>
     <ID>ReturnCount:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$private fun runOneDummyCycle(context: Context): Int</ID>
     <ID>ReturnCount:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$private fun tryClearVpnBlocking(context: Context): Int</ID>
     <ID>ReturnCount:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$private fun waitForSignal(signal: AtomicBoolean, lock: Object, timeoutMs: Long): Boolean</ID>
@@ -118,10 +119,10 @@
     <ID>ReturnCount:Utility.kt$Utility$fun normalizeStringList(list: Array&lt;String&gt;?): Array&lt;String&gt;</ID>
     <ID>ReturnCount:Utility.kt$Utility$fun startServiceInManagedProfile(context: Context, intent: Intent): Boolean</ID>
     <ID>ReturnCount:Utility.kt$Utility$private fun unfreezeShortcutTargetsPackage(intent: Intent?, packageName: String): Boolean</ID>
+    <ID>ReturnCount:VpnTunnelDetector.kt$VpnTunnelDetector$@Suppress("DEPRECATION") private fun hasVpnNetworkTransport(context: Context): Boolean</ID>
     <ID>ReturnCount:VpnTunnelDetector.kt$VpnTunnelDetector$fun isDefaultNetworkTunneled(context: Context): Boolean</ID>
     <ID>ReturnCount:VpnTunnelDetector.kt$VpnTunnelDetector$private fun activeNetworkMissingNotVpnCapability(context: Context): Boolean</ID>
     <ID>ReturnCount:VpnTunnelDetector.kt$VpnTunnelDetector$private fun hasTunnelInterface(): Boolean</ID>
-    <ID>ReturnCount:VpnTunnelDetector.kt$VpnTunnelDetector$private fun hasVpnNetworkTransport(context: Context): Boolean</ID>
     <ID>ReturnCount:WorkProfileBatchFreeze.kt$WorkProfileBatchFreeze$fun freezeList(context: Context, list: Array&lt;String&gt;): Int</ID>
     <ID>ReturnCount:WorkProfileBatchFreeze.kt$WorkProfileBatchFreeze$private fun freezePackage( dpm: DevicePolicyManager, admin: ComponentName, context: Context, pkg: String, ): FreezeOutcome</ID>
     <ID>SwallowedException:FileShuttleConnection.kt$FileShuttleConnection$e: ExecutionException</ID>

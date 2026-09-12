@@ -324,7 +324,12 @@ class GatekeeperService : Service() {
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        stopForeground(true)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
         return false
     }
 

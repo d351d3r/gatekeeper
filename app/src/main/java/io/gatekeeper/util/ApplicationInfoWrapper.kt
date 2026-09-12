@@ -57,8 +57,10 @@ class ApplicationInfoWrapper private constructor() : Parcelable {
             object : Parcelable.Creator<ApplicationInfoWrapper> {
                 override fun createFromParcel(source: Parcel): ApplicationInfoWrapper {
                     val wrapper = ApplicationInfoWrapper()
-                    wrapper.info = source.readParcelable(
-                        ApplicationInfo::class.java.classLoader
+                    wrapper.info = androidx.core.os.ParcelCompat.readParcelable(
+                        source,
+                        ApplicationInfo::class.java.classLoader,
+                        ApplicationInfo::class.java
                     )
                     wrapper.label = source.readString()
                     wrapper.isHidden = source.readByte().toInt() != 0

@@ -59,6 +59,9 @@ object VpnTunnelDetector {
         return false
     }
 
+    // allNetworks / activeNetworkInfo are deprecated but remain the only synchronous
+    // snapshot API; this is a one-shot compatibility scan, not a subscription.
+    @Suppress("DEPRECATION")
     private fun hasVpnNetworkTransport(context: Context): Boolean {
         val cm = context.getSystemService(ConnectivityManager::class.java) ?: return false
 

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // MediaStore.Thumbnails — effective only pre-API 29; 29+ falls back to loadBitmapThumbnail
+
 package io.gatekeeper.services
 
 import android.app.Service

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // legacy version-gated paths (LocalBroadcastManager, CONNECTIVITY_ACTION)
+
 package io.gatekeeper.services
 
 import android.app.AlarmManager

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // legacy version-gated paths (pre-Q package installer/uninstaller)
+
 package io.gatekeeper.ui
 
 import android.Manifest
@@ -272,7 +274,9 @@ class DummyActivity : Activity() {
             if (intent.hasExtra("apk")) {
                 uri = Uri.fromFile(File(intent.getStringExtra("apk")!!))
             } else if (intent.hasExtra("direct_install_apk")) {
-                uri = intent.getParcelableExtra("direct_install_apk")
+                uri = androidx.core.content.IntentCompat.getParcelableExtra(
+                    intent, "direct_install_apk", Uri::class.java
+                )
             }
             StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder().build())
         }

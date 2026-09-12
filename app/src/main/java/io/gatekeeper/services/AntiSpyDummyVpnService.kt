@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // legacy version-gated paths (LocalBroadcastManager)
+
 package io.gatekeeper.services
 
 import android.content.Intent

@@ -24,6 +24,8 @@ object PendingIntents {
             return PendingIntent.getActivity(context, requestCode, intent, flags)
         }
         val options = ActivityOptions.makeBasic().apply {
+            // Constant deprecated in API 35, but it is still the mode this API 34+ setter takes.
+            @Suppress("DEPRECATION")
             setPendingIntentCreatorBackgroundActivityStartMode(
                 ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
             )

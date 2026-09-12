@@ -115,6 +115,7 @@ object AuthenticationUtility {
     private fun signedPayload(intent: Intent, timestamp: Long): String =
         AuthPayload.canonicalize(intent.action, timestamp, extractSignedExtras(intent))
 
+    @Suppress("DEPRECATION") // Bundle.get(String) has no typed replacement; values are canonicalized as raw types
     private fun extractSignedExtras(intent: Intent): List<Pair<String, String>> {
         val extras = intent.extras ?: return emptyList()
         return AuthPayload.SIGNED_EXTRA_KEYS.mapNotNull { key ->

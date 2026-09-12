@@ -17,4 +17,4 @@
 apply from: 'standalone-rules.gradle'
 
 android.compileSdk = 36
-android.namespace 'com.android.setupwizardlib'
+android.namespace = 'com.android.setupwizardlib'
