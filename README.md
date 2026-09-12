@@ -84,7 +84,7 @@ class can fix them:
   portable.
 - **Private Space** (Android 15+) solves a different problem than a work
   profile: hiding apps behind another lock, not sandboxing untrusted apps.
-  See USER_GUIDE for details.
+  See USER_GUIDE §13 for a detailed comparison.
 
 ## Requirements
 
