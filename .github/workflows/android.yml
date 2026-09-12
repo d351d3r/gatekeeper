@@ -9,9 +9,6 @@ on:
 permissions:
   contents: write
 
-env:
-  HAS_KEYSTORE: ${{ secrets.CI_RELEASE_KEYSTORE != '' }}
-
 jobs:
   gate:
     name: Lint, static analysis and tests
@@ -80,23 +77,24 @@ jobs:
       - name: Resolve version code
         run: echo "VERSION_CODE=$(grep VERSION_CODE version.properties | cut -d= -f2)" >> "$GITHUB_ENV"
 
-      - name: Assemble arm64 debug APK
-        run: ./gradlew :app:assembleDebug -PversionCode=${VERSION_CODE} --stacktrace --no-daemon
-
-      - name: Decode release keystore
-        if: env.HAS_KEYSTORE == 'true'
-        run: echo "${{ secrets.CI_RELEASE_KEYSTORE }}" | base64 -d > /tmp/release.keystore
-
-      - name: Assemble arm64 release APK
+      - name: Resolve signing key (main pushes only)
+        if: github.event_name == 'push'
         run: |
-          SIGN_ARGS=""
-          if [ "$HAS_KEYSTORE" = "true" ]; then
-            SIGN_ARGS="-PciReleaseKeystore=/tmp/release.keystore \
-              -PciReleaseStorePassword=${{ secrets.CI_RELEASE_STORE_PASSWORD }} \
-              -PciReleaseKeyAlias=${{ secrets.CI_RELEASE_KEY_ALIAS }} \
-              -PciReleaseKeyPassword=${{ secrets.CI_RELEASE_KEY_PASSWORD }}"
-          fi
-          ./gradlew :app:assembleRelease -PversionCode=${VERSION_CODE} ${SIGN_ARGS} --stacktrace --no-daemon
+          echo "${{ secrets.CI_RELEASE_KEYSTORE }}" | base64 -d > /tmp/project.keystore
+          echo "SIGN_ARGS=-PciKeystore=/tmp/project.keystore \
+            -PciStorePassword=${{ secrets.CI_RELEASE_STORE_PASSWORD }} \
+            -PciKeyAlias=${{ secrets.CI_RELEASE_KEY_ALIAS }} \
+            -PciKeyPassword=${{ secrets.CI_RELEASE_KEY_PASSWORD }}" >> "$GITHUB_ENV"
+
+      - name: Assemble arm64 debug APK
+        run: ./gradlew :app:assembleDebug -PversionCode=${VERSION_CODE} ${SIGN_ARGS} --stacktrace --no-daemon
+
+      # Debug и release подписываются одним приватным project-keystore из
+      # GitHub Secrets (только пуши в main): подпись у обоих артефактов одна
+      # и обновление поверх старого APK всегда ставится. У чужих PR секретов
+      # нет — сборка падает на публичный fallback-ключ из репо.
+      - name: Assemble arm64 release APK
+        run: ./gradlew :app:assembleRelease -PversionCode=${VERSION_CODE} ${SIGN_ARGS} --stacktrace --no-daemon
 
       - name: Write APK checksums
         run: |

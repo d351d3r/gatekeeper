@@ -126,9 +126,21 @@ Every push to `main` runs the pipeline in
    tests.
 2. **Build** — only after a green gate: a bot commits a `VERSION_CODE` bump and
    assembles **arm64-v8a debug and release APKs** with the new version number.
-   Artifacts and SHA-256 checksums are attached to the run. If the
-   `CI_RELEASE_KEYSTORE*` secrets are set, the release APK is signed with the
-   release key; otherwise it uses the debug certificate.
+   Artifacts and SHA-256 checksums are attached to the run.
+
+## Signing
+
+APKs built by CI from `main` share one **private project keystore**: the key
+lives in GitHub Secrets (`CI_RELEASE_KEYSTORE*`) and CI signs both debug and
+release with it, so either flavor always installs as an update over the other.
+Nobody outside the repo can sign with this key; fork and PR builds fall back to
+the public `app/gatekeeper.keystore` and produce a different signature (they
+will **not** install over CI builds).
+
+Keep your own private copy of the keystore: if both the local copy and the
+GitHub secret are lost, the signature is unrecoverable and every device must
+reinstall the app (export settings first — removing the app removes the work
+profile).
 
 Releases are published from `v*` tags — see
 [.github/workflows/release.yml](.github/workflows/release.yml).

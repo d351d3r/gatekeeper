@@ -125,3 +125,4 @@ repackage/*
 
 # Serena MCP cache
 .serena/
+.secrets-local/

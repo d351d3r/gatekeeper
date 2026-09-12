@@ -25,25 +25,22 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
-        // Фиксированный debug-keystore в репозитории: без этого каждый прогон
-        // CI генерирует свой эфемерный ~/.android/debug.keystore, и debug APK
-        // от разных сборок имеют разные подписи -- Android отказывается
-        // обновлять такой пакет ("конфликтует"). Debug-ключ не секретен.
-        debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-        }
-        // In CI the release APK is signed with a keystore supplied via -P properties
-        // (decoded from the CI_RELEASE_KEYSTORE secret). Local release builds fall
-        // back to the debug signing config.
-        release {
-            if (project.hasProperty('ciReleaseKeystore')) {
-                storeFile = file(project.property('ciReleaseKeystore'))
-                storePassword = project.property('ciReleaseStorePassword')
-                keyAlias = project.property('ciReleaseKeyAlias')
-                keyPassword = project.property('ciReleaseKeyPassword')
+        // Единая подпись debug и release: обе сборки идут одним ключом, поэтому
+        // Android всегда принимает новый APK поверх старого. Ключ приватный:
+        // CI передаёт его через -P ciKeystore* (расшифрованный из GitHub Secrets,
+        // только пуши в main). Локальные сборки и чужие PR -- публичным
+        // fallback-ключом из репо: подпись будет другой, см. README «Подпись».
+        projectKey {
+            if (project.hasProperty('ciKeystore')) {
+                storeFile = file(project.property('ciKeystore'))
+                storePassword = project.property('ciStorePassword')
+                keyAlias = project.property('ciKeyAlias')
+                keyPassword = project.property('ciKeyPassword')
+            } else {
+                storeFile file('gatekeeper.keystore')
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
             }
         }
     }
@@ -52,7 +49,10 @@ android {
             minifyEnabled = true
             shrinkResources = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig = signingConfigs.release.storeFile != null ? signingConfigs.release : signingConfigs.debug
+            signingConfig = signingConfigs.projectKey
+        }
+        debug {
+            signingConfig = signingConfigs.projectKey
         }
     }
     splits {
