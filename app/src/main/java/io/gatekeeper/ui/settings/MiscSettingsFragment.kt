@@ -3,7 +3,7 @@ package io.gatekeeper.ui.settings
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.preference.CheckBoxPreference
+import androidx.preference.SwitchPreferenceCompat
 import androidx.preference.Preference
 import io.gatekeeper.BuildConfig
 import io.gatekeeper.R
@@ -21,7 +21,7 @@ class MiscSettingsFragment : SettingsSubFragment() {
     }
 
     private fun bindContactsSearching() {
-        val pref = findPreference<CheckBoxPreference>(SETTINGS_BLOCK_CONTACTS_SEARCHING) ?: return
+        val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_BLOCK_CONTACTS_SEARCHING) ?: return
         pref.isChecked = manager.getBlockContactsSearchingEnabled()
         pref.setOnPreferenceChangeListener { _, newState ->
             manager.setBlockContactsSearchingEnabled(newState as Boolean)
@@ -30,7 +30,7 @@ class MiscSettingsFragment : SettingsSubFragment() {
     }
 
     private fun bindCallerId() {
-        val pref = findPreference<CheckBoxPreference>(SETTINGS_BLOCK_CALLER_ID) ?: return
+        val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_BLOCK_CALLER_ID) ?: return
         pref.isChecked = manager.getBlockCallerIdEnabled()
         pref.setOnPreferenceChangeListener { _, newState ->
             manager.setBlockCallerIdEnabled(newState as Boolean)
@@ -39,7 +39,7 @@ class MiscSettingsFragment : SettingsSubFragment() {
     }
 
     private fun bindPaymentStub() {
-        val pref = findPreference<CheckBoxPreference>(SETTINGS_PAYMENT_STUB) ?: return
+        val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_PAYMENT_STUB) ?: return
         pref.isChecked = manager.getPaymentStubEnabled()
         pref.setOnPreferenceChangeListener { _, newState ->
             manager.setPaymentStubEnabled(newState as Boolean)

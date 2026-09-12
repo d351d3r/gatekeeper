@@ -7,18 +7,18 @@
         android:selectable="false"
         android:title="@string/settings_anti_spy_routing" />
 
-    <androidx.preference.CheckBoxPreference
+    <androidx.preference.SwitchPreferenceCompat
         android:key="settings_anti_spy_enabled"
         android:title="@string/settings_anti_spy_enabled"
         android:summary="@string/settings_anti_spy_enabled_desc" />
 
-    <androidx.preference.CheckBoxPreference
+    <androidx.preference.SwitchPreferenceCompat
         android:dependency="settings_anti_spy_enabled"
         android:key="settings_anti_spy_freeze_on_vpn"
         android:title="@string/settings_anti_spy_freeze_on_vpn"
         android:summary="@string/settings_anti_spy_freeze_on_vpn_desc" />
 
-    <androidx.preference.CheckBoxPreference
+    <androidx.preference.SwitchPreferenceCompat
         android:dependency="settings_anti_spy_enabled"
         android:key="settings_anti_spy_freeze_on_screen_lock"
         android:title="@string/settings_anti_spy_freeze_on_screen_lock"
@@ -29,7 +29,7 @@
         android:key="settings_anti_spy_scope"
         android:title="@string/settings_anti_spy_scope" />
 
-    <androidx.preference.CheckBoxPreference
+    <androidx.preference.SwitchPreferenceCompat
         android:dependency="settings_anti_spy_enabled"
         android:key="settings_anti_spy_notify_only"
         android:title="@string/settings_anti_spy_notify_only"

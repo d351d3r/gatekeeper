@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.RemoteException
 import android.provider.Settings
-import androidx.preference.CheckBoxPreference
+import androidx.preference.SwitchPreferenceCompat
 import androidx.preference.DropDownPreference
 import androidx.preference.Preference
 import io.gatekeeper.R
@@ -24,7 +24,7 @@ class FreezeSettingsFragment : SettingsSubFragment() {
     }
 
     private fun bindAutoFreeze() {
-        val pref = findPreference<CheckBoxPreference>(SETTINGS_AUTO_FREEZE_SERVICE) ?: return
+        val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_AUTO_FREEZE_SERVICE) ?: return
         pref.isChecked = manager.getAutoFreezeServiceEnabled()
         pref.setOnPreferenceChangeListener { _, newState ->
             manager.setAutoFreezeServiceEnabled(newState as Boolean)
@@ -54,7 +54,7 @@ class FreezeSettingsFragment : SettingsSubFragment() {
     }
 
     private fun bindSkipForeground() {
-        val pref = findPreference<CheckBoxPreference>(SETTINGS_SKIP_FOREGROUND) ?: return
+        val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_SKIP_FOREGROUND) ?: return
         pref.isChecked = manager.getSkipForegroundEnabled()
         pref.setOnPreferenceChangeListener { _, newState ->
             onSkipForegroundChange(newState as Boolean)

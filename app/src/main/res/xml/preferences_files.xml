@@ -2,12 +2,12 @@
 <androidx.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <androidx.preference.CheckBoxPreference
+    <androidx.preference.SwitchPreferenceCompat
         android:key="settings_cross_profile_file_chooser"
         android:title="@string/settings_cross_profile_file_chooser"
         android:summary="@string/settings_cross_profile_file_chooser_desc" />
 
-    <androidx.preference.CheckBoxPreference
+    <androidx.preference.SwitchPreferenceCompat
         android:dependency="settings_cross_profile_file_chooser"
         android:key="settings_media_mirror"
         android:title="@string/settings_media_mirror"

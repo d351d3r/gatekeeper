@@ -2,7 +2,7 @@ package io.gatekeeper.ui.settings
 
 import android.os.Bundle
 import android.os.RemoteException
-import androidx.preference.CheckBoxPreference
+import androidx.preference.SwitchPreferenceCompat
 import androidx.preference.DropDownPreference
 import androidx.preference.Preference
 import io.gatekeeper.R
@@ -48,7 +48,7 @@ class AntiSpySettingsFragment : SettingsSubFragment() {
     }
 
     private fun bindCheckBox(key: String, checked: Boolean, apply: (Boolean) -> Unit) {
-        val pref = findPreference<CheckBoxPreference>(key) ?: return
+        val pref = findPreference<SwitchPreferenceCompat>(key) ?: return
         pref.isChecked = checked
         pref.setOnPreferenceChangeListener { _, newState ->
             apply(newState as Boolean)

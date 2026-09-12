@@ -2,17 +2,17 @@
 <androidx.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <androidx.preference.CheckBoxPreference
+    <androidx.preference.SwitchPreferenceCompat
         android:key="settings_block_contacts_searching"
         android:title="@string/settings_block_contacts_searching"
         android:summary="@string/settings_block_contacts_searching_desc" />
 
-    <androidx.preference.CheckBoxPreference
+    <androidx.preference.SwitchPreferenceCompat
         android:key="settings_block_caller_id"
         android:title="@string/settings_block_caller_id"
         android:summary="@string/settings_block_caller_id_desc" />
 
-    <androidx.preference.CheckBoxPreference
+    <androidx.preference.SwitchPreferenceCompat
         android:key="settings_payment_stub"
         android:title="@string/settings_payment_stub"
         android:summary="@string/settings_payment_stub_desc" />

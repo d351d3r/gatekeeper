@@ -4,7 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.RemoteException
 import android.provider.Settings
-import androidx.preference.CheckBoxPreference
+import androidx.preference.SwitchPreferenceCompat
 import io.gatekeeper.R
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.Utility
@@ -20,7 +20,7 @@ class FilesSettingsFragment : SettingsSubFragment() {
     }
 
     private fun bindFileChooser() {
-        val pref = findPreference<CheckBoxPreference>(SETTINGS_CROSS_PROFILE_FILE_CHOOSER)
+        val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_CROSS_PROFILE_FILE_CHOOSER)
             ?: return
         pref.isChecked = manager.getCrossProfileFileChooserEnabled()
         pref.setOnPreferenceChangeListener { _, newState ->
@@ -52,7 +52,7 @@ class FilesSettingsFragment : SettingsSubFragment() {
     }
 
     private fun bindMediaMirror() {
-        val pref = findPreference<CheckBoxPreference>(SETTINGS_MEDIA_MIRROR) ?: return
+        val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_MEDIA_MIRROR) ?: return
         pref.isChecked = LocalStorageManager.getInstance()
             .getBoolean(LocalStorageManager.PREF_MEDIA_MIRROR_ENABLED)
         pref.setOnPreferenceChangeListener { _, newState ->
@@ -63,7 +63,7 @@ class FilesSettingsFragment : SettingsSubFragment() {
     }
 
     private fun applyPlatformRestrictions() {
-        val pref = findPreference<CheckBoxPreference>(SETTINGS_CROSS_PROFILE_FILE_CHOOSER)
+        val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_CROSS_PROFILE_FILE_CHOOSER)
             ?: return
         val am = requireContext().getSystemService(android.app.ActivityManager::class.java)
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q || am?.isLowRamDevice == true) {
