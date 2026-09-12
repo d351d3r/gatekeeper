@@ -13,6 +13,7 @@ import androidx.preference.SwitchPreferenceCompat
 import io.gatekeeper.R
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.LocalStorageManager
+import io.gatekeeper.util.ScreenLockFreezeScope
 import io.gatekeeper.util.Utility
 
 /**
@@ -36,6 +37,7 @@ class FreezeSettingsFragment : SettingsSubFragment() {
             manager.getSkipForegroundEnabled(),
             this::onSkipForegroundChange,
         )
+        bindScope()
         bindDelay()
         bindBatchActions()
     }
@@ -43,6 +45,35 @@ class FreezeSettingsFragment : SettingsSubFragment() {
     override fun onResume() {
         super.onResume()
         fillAutoFreezeList()
+    }
+
+    private fun bindScope() {
+        val pref = findPreference<DropDownPreference>(SETTINGS_AUTO_FREEZE_SCOPE) ?: return
+        val titles = mapOf(
+            ScreenLockFreezeScope.SESSION to R.string.settings_auto_freeze_scope_session,
+            ScreenLockFreezeScope.AUTO_FREEZE_LIST to R.string.settings_auto_freeze_scope_list,
+            ScreenLockFreezeScope.WHOLE_WORK_PROFILE to R.string.settings_auto_freeze_scope_all,
+        )
+        pref.entries = ScreenLockFreezeScope.entries
+            .map { getString(titles.getValue(it)) }
+            .toTypedArray()
+        pref.entryValues = ScreenLockFreezeScope.entries
+            .map { it.stored.toString() }
+            .toTypedArray()
+        pref.value = manager.getAutoFreezeScope().stored.toString()
+        // «Пропускать активные» смотрит статистику использования -- она есть только у
+        // сеансовой области, для списков решение принимает WorkProfileBatchFreeze.
+        val skipForeground = findPreference<Preference>(SETTINGS_SKIP_FOREGROUND)
+        skipForeground?.isEnabled =
+            manager.getAutoFreezeScope() == ScreenLockFreezeScope.SESSION
+        pref.setOnPreferenceChangeListener { _, newState ->
+            manager.setAutoFreezeScope(
+                ScreenLockFreezeScope.fromStored((newState as String).toInt())
+            )
+            skipForeground?.isEnabled =
+                manager.getAutoFreezeScope() == ScreenLockFreezeScope.SESSION
+            true
+        }
     }
 
     private fun bindDelay() {
@@ -86,10 +117,12 @@ class FreezeSettingsFragment : SettingsSubFragment() {
     }
 
     private fun bindBatchActions() {
-        findPreference<Preference>(SETTINGS_UNFREEZE_ALL)
-            ?.setOnPreferenceClickListener { startBatch(DummyActivity.PUBLIC_UNFREEZE_ALL) }
-        findPreference<Preference>(SETTINGS_FREEZE_ALL)
-            ?.setOnPreferenceClickListener { startBatch(DummyActivity.PUBLIC_FREEZE_ALL) }
+        findPreference<Preference>(SETTINGS_UNFREEZE_ALL)?.setOnPreferenceClickListener {
+            startBatch(DummyActivity.PUBLIC_UNFREEZE_ALL)
+        }
+        findPreference<Preference>(SETTINGS_FREEZE_ALL)?.setOnPreferenceClickListener {
+            startBatch(DummyActivity.PUBLIC_FREEZE_ALL)
+        }
         findPreference<Preference>(SETTINGS_CREATE_FREEZE_ALL_SHORTCUT)
             ?.setOnPreferenceClickListener {
                 createShortcut(
@@ -133,7 +166,7 @@ class FreezeSettingsFragment : SettingsSubFragment() {
     }
 
     /** Список автозаморозки целиком: метки подтягиваем сервисом рабочего профиля. */
-    private fun fillAutoFreezeList() {
+    fun fillAutoFreezeList() {
         val category = findPreference<PreferenceCategory>(SETTINGS_AUTO_FREEZE_LIST) ?: return
         val packages = LocalStorageManager.getInstance()
             .getStringList(LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE)
@@ -168,7 +201,7 @@ class FreezeSettingsFragment : SettingsSubFragment() {
                 summary = pkg
                 isIconSpaceReserved = false
                 setOnPreferenceClickListener {
-                    confirmRemoveFromAutoFreeze(pkg, title.toString())
+                    confirmRemove(this@FreezeSettingsFragment, pkg, title.toString())
                     true
                 }
             }
@@ -176,28 +209,9 @@ class FreezeSettingsFragment : SettingsSubFragment() {
         }
     }
 
-    private fun confirmRemoveFromAutoFreeze(pkg: String, label: String) {
-        AlertDialog.Builder(requireContext())
-            .setTitle(R.string.settings_auto_freeze_remove_title)
-            .setMessage(getString(R.string.settings_auto_freeze_remove_message, label))
-            .setPositiveButton(R.string.ca_remove_action) { _, _ ->
-                val local = LocalStorageManager.getInstance()
-                val remaining = local
-                    .getStringList(LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE)
-                    .filterNot { it == pkg }
-                local.setStringList(
-                    LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE,
-                    remaining.toTypedArray(),
-                )
-                Utility.scheduleAppListRefresh(requireContext())
-                fillAutoFreezeList()
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
-    }
-
     companion object {
         private const val SETTINGS_AUTO_FREEZE_SERVICE = "settings_auto_freeze_service"
+        private const val SETTINGS_AUTO_FREEZE_SCOPE = "settings_auto_freeze_scope"
         private const val SETTINGS_AUTO_FREEZE_DELAY = "settings_auto_freeze_delay"
         private const val SETTINGS_SKIP_FOREGROUND = "settings_dont_freeze_foreground"
         private const val SETTINGS_FREEZE_ALL = "settings_freeze_all"
@@ -209,4 +223,25 @@ class FreezeSettingsFragment : SettingsSubFragment() {
         private const val SECONDS_IN_MINUTE = 60
         private val AUTO_FREEZE_DELAY_SECONDS = intArrayOf(0, 60, 2 * 60, 5 * 60)
     }
+}
+
+/** Диалог удаления из списка автозаморозки; вынесен из класса, чтобы экран не разрастался. */
+private fun confirmRemove(fragment: FreezeSettingsFragment, pkg: String, label: String) {
+    AlertDialog.Builder(fragment.requireContext())
+        .setTitle(R.string.settings_auto_freeze_remove_title)
+        .setMessage(fragment.getString(R.string.settings_auto_freeze_remove_message, label))
+        .setPositiveButton(R.string.ca_remove_action) { _, _ ->
+            val local = LocalStorageManager.getInstance()
+            val remaining = local
+                .getStringList(LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE)
+                .filterNot { it == pkg }
+            local.setStringList(
+                LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE,
+                remaining.toTypedArray(),
+            )
+            Utility.scheduleAppListRefresh(fragment.requireContext())
+            fragment.fillAutoFreezeList()
+        }
+        .setNegativeButton(android.R.string.cancel, null)
+        .show()
 }

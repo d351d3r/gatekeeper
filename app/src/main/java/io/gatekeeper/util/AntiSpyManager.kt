@@ -75,9 +75,6 @@ object AntiSpyManager {
                 LocalStorageManager.PREF_ANTI_SPY_FREEZE_ON_VPN,
                 AntiSpyWatchConfig.DEFAULT_FREEZE_ON_VPN
             ),
-            freezeOnScreenLock = LocalStorageManager.readBooleanFresh(
-                app, LocalStorageManager.PREF_ANTI_SPY_FREEZE_ON_SCREEN_LOCK, false
-            ),
             scope = AntiSpyFreezeScope.fromStored(
                 LocalStorageManager.readIntFresh(
                     app, LocalStorageManager.PREF_ANTI_SPY_FREEZE_SCOPE, -1

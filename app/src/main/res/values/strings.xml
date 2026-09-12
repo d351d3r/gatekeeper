@@ -151,8 +151,12 @@
     <string name="power_diagnostics_work_unavailable">The work profile is unavailable.</string>
     <string name="power_diagnostics_problem_detected">Battery restrictions may make Gatekeeper unreliable.</string>
     <string name="power_diagnostics_open">Check</string>
-    <string name="settings_auto_freeze_service">Auto Freeze Service</string>
-    <string name="settings_auto_freeze_service_desc">When the screen is locked, automatically freeze apps launched from \"Unfreeze &amp; Launch Shortcut\".</string>
+    <string name="settings_auto_freeze_service">Freeze on screen lock</string>
+    <string name="settings_auto_freeze_service_desc">When the screen is locked, automatically freeze the chosen scope of work apps.</string>
+    <string name="settings_auto_freeze_scope">What to freeze</string>
+    <string name="settings_auto_freeze_scope_session">Apps launched this session</string>
+    <string name="settings_auto_freeze_scope_list">Auto Freeze list</string>
+    <string name="settings_auto_freeze_scope_all">All third-party work apps</string>
     <string name="settings_auto_freeze_delay">Auto Freeze Delay</string>
     <string name="settings_dont_freeze_foreground">Skip Foreground Apps</string>
     <string name="settings_dont_freeze_foreground_desc">Do NOT freeze foreground apps (with visible activity) when you lock your screen. This can be useful for apps like music players, but you\'ll need to manually freeze them through \"Batch Freeze Shortcut\" afterwards.</string>
@@ -161,8 +165,6 @@
     <string name="settings_anti_spy_enabled_desc">Off by default: freezing kills notifications from messengers, banks and government apps. It is useless if work profile traffic does not go through the VPN -- there is nothing to hide, and the apps go silent for nothing.</string>
     <string name="settings_anti_spy_freeze_on_vpn">Trigger: VPN comes up</string>
     <string name="settings_anti_spy_freeze_on_vpn_desc">React when a tunnel is established.</string>
-    <string name="settings_anti_spy_freeze_on_screen_lock">Trigger: screen locked</string>
-    <string name="settings_anti_spy_freeze_on_screen_lock_desc">React when the screen turns off.</string>
     <string name="settings_anti_spy_scope">What to freeze</string>
     <string name="settings_anti_spy_scope_list">Auto Freeze list</string>
     <string name="settings_anti_spy_scope_all">All third-party work apps</string>

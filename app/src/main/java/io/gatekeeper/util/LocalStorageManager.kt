@@ -133,6 +133,10 @@ class LocalStorageManager private constructor(context: Context) {
         const val PREF_AUTO_FREEZE_SERVICE = "auto_freeze_service"
         const val PREF_DONT_FREEZE_FOREGROUND = "dont_freeze_foreground"
         const val PREF_AUTO_FREEZE_DELAY = "auto_freeze_delay"
+        /** Область заморозки по блокировке (ScreenLockFreezeScope): сеанс / список / все. */
+        const val PREF_AUTO_FREEZE_SCOPE = "auto_freeze_scope"
+        /** Разовый перенос anti_spy_freeze_on_screen_lock в единую модель (редизайн, шаг 5). */
+        const val PREF_SCREEN_LOCK_FREEZE_MIGRATED = "screen_lock_freeze_migrated"
         const val PREF_BLOCK_CONTACTS_SEARCHING = "block_contacts_searching"
         /** Парная к предыдущей политика: имя звонящего из книги профиля в личном журнале. */
         const val PREF_BLOCK_CALLER_ID = "block_caller_id"

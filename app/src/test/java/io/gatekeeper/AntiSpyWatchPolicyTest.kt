@@ -13,7 +13,8 @@ import org.junit.Test
 /**
  * Решение сторожа целиком выводится из настроек, поэтому проверяется отдельно от Android:
  * цена ошибки здесь -- погашенные без спроса уведомления мессенджера и банков
- * (`docs/antispy_settings_requirements.md`).
+ * (`docs/antispy_settings_requirements.md`). Триггер один -- подъём туннеля; заморозка по
+ * блокировке экрана переехала на экран «Заморозка» (ScreenLockFreezeScope).
  */
 class AntiSpyWatchPolicyTest {
     @Test
@@ -21,37 +22,28 @@ class AntiSpyWatchPolicyTest {
         val fresh = AntiSpyWatchConfig()
         assertFalse("функция обязана быть выключена по умолчанию", fresh.enabled)
         assertFalse("сторож не поднимается на настройках по умолчанию", fresh.watcherNeeded)
-        assertEquals(AntiSpyReaction.IGNORE, fresh.onVpnUp())
-        assertEquals(AntiSpyReaction.IGNORE, fresh.onScreenLock())
+        assertEquals(AntiSpyReaction.IGNORE, fresh.reaction)
     }
 
     @Test
-    fun masterSwitchOverridesEveryTrigger() {
-        val config = AntiSpyWatchConfig(
-            enabled = false,
-            freezeOnVpn = true,
-            freezeOnScreenLock = true,
-        )
+    fun masterSwitchOverridesTrigger() {
+        val config = AntiSpyWatchConfig(enabled = false, freezeOnVpn = true)
         assertFalse(config.watcherNeeded)
-        assertEquals(AntiSpyReaction.IGNORE, config.onVpnUp())
-        assertEquals(AntiSpyReaction.IGNORE, config.onScreenLock())
+        assertEquals(AntiSpyReaction.IGNORE, config.reaction)
     }
 
     @Test
-    fun triggersAreIndependent() {
-        val vpnOnly = AntiSpyWatchConfig(
-            enabled = true,
-            freezeOnVpn = true,
-            freezeOnScreenLock = false,
-            delaySeconds = 0,
-        )
-        assertEquals(AntiSpyReaction.FREEZE_NOW, vpnOnly.onVpnUp())
-        assertEquals(AntiSpyReaction.IGNORE, vpnOnly.onScreenLock())
+    fun vpnTriggerOffMeansNoReaction() {
+        val config = AntiSpyWatchConfig(enabled = true, freezeOnVpn = false, delaySeconds = 0)
+        assertFalse(config.watcherNeeded)
+        assertEquals(AntiSpyReaction.IGNORE, config.reaction)
+    }
 
-        val lockOnly = vpnOnly.copy(freezeOnVpn = false, freezeOnScreenLock = true)
-        assertEquals(AntiSpyReaction.IGNORE, lockOnly.onVpnUp())
-        assertEquals(AntiSpyReaction.FREEZE_NOW, lockOnly.onScreenLock())
-        assertTrue("один включенный триггер уже требует сторожа", lockOnly.watcherNeeded)
+    @Test
+    fun vpnTriggerOnReacts() {
+        val config = AntiSpyWatchConfig(enabled = true, freezeOnVpn = true, delaySeconds = 0)
+        assertTrue("включённый триггер требует сторожа", config.watcherNeeded)
+        assertEquals(AntiSpyReaction.FREEZE_NOW, config.reaction)
     }
 
     @Test
@@ -59,19 +51,20 @@ class AntiSpyWatchPolicyTest {
         val config = AntiSpyWatchConfig(
             enabled = true,
             freezeOnVpn = true,
-            freezeOnScreenLock = true,
             notifyOnly = true,
             delaySeconds = 30,
         )
-        assertEquals(AntiSpyReaction.NOTIFY_ONLY, config.onVpnUp())
-        assertEquals(AntiSpyReaction.NOTIFY_ONLY, config.onScreenLock())
+        assertEquals(AntiSpyReaction.NOTIFY_ONLY, config.reaction)
     }
 
     @Test
     fun positiveDelayGivesTheUserAChanceToCancel() {
         val delayed = AntiSpyWatchConfig(enabled = true, freezeOnVpn = true, delaySeconds = 20)
-        assertEquals(AntiSpyReaction.FREEZE_AFTER_DELAY, delayed.onVpnUp())
-        assertEquals(AntiSpyReaction.FREEZE_NOW, delayed.copy(delaySeconds = 0).onVpnUp())
+        assertEquals(AntiSpyReaction.FREEZE_AFTER_DELAY, delayed.reaction)
+        assertEquals(
+            AntiSpyReaction.FREEZE_NOW,
+            delayed.copy(delaySeconds = 0).reaction,
+        )
     }
 
     @Test

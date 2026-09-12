@@ -26,7 +26,6 @@ import io.gatekeeper.R
 import io.gatekeeper.util.AntiSpyDummyVpnDisconnector
 import io.gatekeeper.util.AntiSpyManager
 import io.gatekeeper.util.AntiSpyReaction
-import io.gatekeeper.util.AntiSpyTrigger
 import io.gatekeeper.util.AntiSpyVpnPromptManager
 import io.gatekeeper.util.AntiSpyWatchConfig
 import io.gatekeeper.util.AntiSpyWatchRestart
@@ -53,7 +52,6 @@ class AntiSpyVpnWatchService : Service() {
     private var foregroundSinceMs = 0L
     private var connectivityReceiver: BroadcastReceiver? = null
     private var freezeCompleteReceiver: BroadcastReceiver? = null
-    private var screenLockReceiver: BroadcastReceiver? = null
     private var vpnFreezeInFlight = false
     private var vpnFreezeDoneForSession = false
     /** Main :vpnwatch dispatches [Utility.requestVpnBatchFreeze] at most once per VPN-up session. */
@@ -61,8 +59,8 @@ class AntiSpyVpnWatchService : Service() {
     private var config = AntiSpyWatchConfig()
     /** Остановлены намеренно: будить себя будильником нельзя, это и был цикл перезапуска. */
     private var stopping = false
-    /** Триггер, по которому идет отсчет задержки перед заморозкой. */
-    private var pendingFreeze: AntiSpyTrigger? = null
+    /** Идёт отсчёт задержки перед заморозкой по подъёму туннеля. */
+    private var freezePending = false
 
     override fun onCreate() {
         super.onCreate()
@@ -122,17 +120,10 @@ class AntiSpyVpnWatchService : Service() {
             unregisterVpnCallbacks()
             connectivityReceiver = unregisterSafely(connectivityReceiver)
         }
-        if (config.freezeOnScreenLock) {
-            registerScreenLockReceiver()
-        } else {
-            screenLockReceiver = unregisterSafely(screenLockReceiver)
-        }
         // Уже идущий отсчет обязан подчиниться новой настройке: увидев отсчет, пользователь
         // идет именно в настройки, и заморозить его приложения после этого нельзя.
-        pendingFreeze?.let { trigger ->
-            if (config.reactTo(trigger) != AntiSpyReaction.FREEZE_AFTER_DELAY) {
-                dropPendingFreeze(byUser = false)
-            }
+        if (freezePending && config.reaction != AntiSpyReaction.FREEZE_AFTER_DELAY) {
+            dropPendingFreeze(byUser = false)
         }
     }
 
@@ -152,7 +143,7 @@ class AntiSpyVpnWatchService : Service() {
         ) {
             // Edge-based triggering misses VPN-already-up and network churn; keep retrying until
             // BatchFreezeService reports every auto-freeze app is hidden (foreground VPN client).
-            onTrigger(AntiSpyTrigger.VPN_UP)
+            handleVpnUpTrigger()
         }
         handler.postDelayed(pollRunnable, VPN_POLL_MS)
     }
@@ -216,21 +207,6 @@ class AntiSpyVpnWatchService : Service() {
             receiver,
             IntentFilter(Utility.ACTION_VPN_BATCH_FREEZE_SESSION_COMPLETE),
             "freeze-complete",
-        )
-    }
-
-    private fun registerScreenLockReceiver() {
-        if (screenLockReceiver != null) return
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                Log.i(TAG, "screen locked")
-                onTrigger(AntiSpyTrigger.SCREEN_LOCK)
-            }
-        }
-        screenLockReceiver = registerLocalReceiver(
-            receiver,
-            IntentFilter(Intent.ACTION_SCREEN_OFF),
-            "screen-off",
         )
     }
 
@@ -361,7 +337,7 @@ class AntiSpyVpnWatchService : Service() {
         if (isMainProfileWatcher()) {
             postVpnStateAlert(R.string.anti_spy_vpn_alert_connected_text)
         }
-        onTrigger(AntiSpyTrigger.VPN_UP)
+        handleVpnUpTrigger()
     }
 
     private fun isMainProfileWatcher(): Boolean = !AntiSpyManager.isWorkProfile(this)
@@ -373,32 +349,32 @@ class AntiSpyVpnWatchService : Service() {
         Utility.postUserAlert(this, VPN_STATE_NOTIFICATION_ID, title, text)
     }
 
-    private fun onTrigger(trigger: AntiSpyTrigger) {
-        when (config.reactTo(trigger)) {
-            AntiSpyReaction.IGNORE -> Log.d(TAG, "trigger $trigger is off")
-            AntiSpyReaction.NOTIFY_ONLY -> notifyInsteadOfFreezing(trigger)
+    private fun handleVpnUpTrigger() {
+        when (config.reaction) {
+            AntiSpyReaction.IGNORE -> Log.d(TAG, "vpn trigger is off")
+            AntiSpyReaction.NOTIFY_ONLY -> notifyInsteadOfFreezing()
             AntiSpyReaction.FREEZE_NOW -> {
-                pendingFreeze = trigger
+                freezePending = true
                 handler.removeCallbacks(freezeRunnable)
                 handler.post(freezeRunnable)
             }
-            AntiSpyReaction.FREEZE_AFTER_DELAY -> scheduleDelayedFreeze(trigger)
+            AntiSpyReaction.FREEZE_AFTER_DELAY -> scheduleDelayedFreeze()
         }
     }
 
-    private fun scheduleDelayedFreeze(trigger: AntiSpyTrigger) {
-        if (pendingFreeze != null) return
-        pendingFreeze = trigger
+    private fun scheduleDelayedFreeze() {
+        if (freezePending) return
+        freezePending = true
         postFreezePendingAlert()
         handler.postDelayed(freezeRunnable, config.delaySeconds * 1000L)
-        Log.i(TAG, "freeze in ${config.delaySeconds}s ($trigger)")
+        Log.i(TAG, "freeze in ${config.delaySeconds}s (vpn)")
     }
 
     private fun runPendingFreeze() {
-        val trigger = pendingFreeze ?: return
-        pendingFreeze = null
+        if (!freezePending) return
+        freezePending = false
         cancelNotification(FREEZE_PENDING_NOTIFICATION_ID)
-        performFreeze(trigger)
+        performFreeze()
     }
 
     /**
@@ -407,21 +383,19 @@ class AntiSpyVpnWatchService : Service() {
      * следующий такт опроса, и в мягком режиме пользователь получит уведомление.
      */
     private fun dropPendingFreeze(byUser: Boolean) {
-        val trigger = pendingFreeze ?: return
+        if (!freezePending) return
         handler.removeCallbacks(freezeRunnable)
-        pendingFreeze = null
+        freezePending = false
         cancelNotification(FREEZE_PENDING_NOTIFICATION_ID)
-        if (byUser && trigger == AntiSpyTrigger.VPN_UP) {
+        if (byUser) {
             vpnFreezeDoneForSession = true
         }
-        Log.i(TAG, "freeze dropped ($trigger, byUser=$byUser)")
+        Log.i(TAG, "freeze dropped (byUser=$byUser)")
     }
 
-    private fun notifyInsteadOfFreezing(trigger: AntiSpyTrigger) {
-        if (trigger == AntiSpyTrigger.VPN_UP) {
-            if (vpnFreezeDoneForSession) return
-            vpnFreezeDoneForSession = true
-        }
+    private fun notifyInsteadOfFreezing() {
+        if (vpnFreezeDoneForSession) return
+        vpnFreezeDoneForSession = true
         Utility.postUserAlert(
             this,
             VPN_STATE_NOTIFICATION_ID,
@@ -430,61 +404,63 @@ class AntiSpyVpnWatchService : Service() {
         )
     }
 
-    private fun performFreeze(trigger: AntiSpyTrigger) {
-        if (AntiSpyDummyVpnDisconnector.isSuppressingVpnReactions()) {
-            Log.d(TAG, "freeze skipped: dummy vpn cycle")
-            return
-        }
-        if (trigger == AntiSpyTrigger.VPN_UP) {
-            if (vpnFreezeDoneForSession) {
-                return
-            }
-            if (!VpnTunnelDetector.isVpnActive(this)) {
-                Log.d(TAG, "freeze cancelled: vpn no longer active")
-                vpnPresent = false
-                AntiSpyVpnPromptManager.onVpnSessionEnded()
-                return
-            }
-            VpnTunnelDetector.logDiagnostics(this)
-        }
-
+    private fun performFreeze() {
+        if (!canFreezeNow()) return
+        VpnTunnelDetector.logDiagnostics(this)
         if (vpnFreezeInFlight) return
         vpnFreezeInFlight = true
         try {
             if (isMainProfileWatcher()) {
-                if (trigger == AntiSpyTrigger.VPN_UP) {
-                    if (mainVpnBatchFreezeDispatched) return
-                    mainVpnBatchFreezeDispatched = true
-                }
-                Utility.requestVpnBatchFreeze(this)
-                Log.i(TAG, "batch-freeze requested from MAIN watcher ($trigger)")
-                postFreezeDiagnostic("MAIN: запрос заморозки ($trigger)")
-                return
-            }
-
-            if (trigger == AntiSpyTrigger.VPN_UP) {
-                Utility.requestVpnBatchFreeze(this)
-            }
-            val list = WorkProfileBatchFreeze.packagesForScope(this, config.scope)
-            if (list.isEmpty()) {
-                postFreezeDiagnostic("WORK: список пуст — открой Gatekeeper один раз")
-                return
-            }
-            val frozen = WorkProfileBatchFreeze.freezeList(this, list)
-            val stillVisible = WorkProfileBatchFreeze.countStillVisible(this, list)
-            Log.i(TAG, "freeze in work ($trigger): $frozen of ${list.size}, still=$stillVisible")
-            if (stillVisible > 0) {
-                postFreezeDiagnostic("WORK: не заморожено $stillVisible — повтор…")
-                return
-            }
-            postFreezeDiagnostic("WORK: заморожено $frozen из ${list.size}")
-            if (trigger == AntiSpyTrigger.VPN_UP) {
-                vpnFreezeDoneForSession = true
-                Utility.notifyVpnBatchFreezeSessionComplete(this, frozen > 0)
+                freezeFromMainWatcher()
+            } else {
+                freezeInWorkProfile()
             }
         } finally {
             handler.postDelayed({ vpnFreezeInFlight = false }, 1500L)
         }
+    }
+
+    /** Страховки перед любой заморозкой: сессия не закрыта, туннель ещё жив. */
+    private fun canFreezeNow(): Boolean = when {
+        AntiSpyDummyVpnDisconnector.isSuppressingVpnReactions() -> {
+            Log.d(TAG, "freeze skipped: dummy vpn cycle")
+            false
+        }
+        vpnFreezeDoneForSession -> false
+        !VpnTunnelDetector.isVpnActive(this) -> {
+            Log.d(TAG, "freeze cancelled: vpn no longer active")
+            vpnPresent = false
+            AntiSpyVpnPromptManager.onVpnSessionEnded()
+            false
+        }
+        else -> true
+    }
+
+    private fun freezeFromMainWatcher() {
+        if (mainVpnBatchFreezeDispatched) return
+        mainVpnBatchFreezeDispatched = true
+        Utility.requestVpnBatchFreeze(this)
+        Log.i(TAG, "batch-freeze requested from MAIN watcher")
+        postFreezeDiagnostic("MAIN: запрос заморозки")
+    }
+
+    private fun freezeInWorkProfile() {
+        Utility.requestVpnBatchFreeze(this)
+        val list = WorkProfileBatchFreeze.packagesForScope(this, config.scope)
+        if (list.isEmpty()) {
+            postFreezeDiagnostic("WORK: список пуст — открой Gatekeeper один раз")
+            return
+        }
+        val frozen = WorkProfileBatchFreeze.freezeList(this, list)
+        val stillVisible = WorkProfileBatchFreeze.countStillVisible(this, list)
+        Log.i(TAG, "freeze in work: $frozen of ${list.size}, still=$stillVisible")
+        if (stillVisible > 0) {
+            postFreezeDiagnostic("WORK: не заморожено $stillVisible — повтор…")
+            return
+        }
+        postFreezeDiagnostic("WORK: заморожено $frozen из ${list.size}")
+        vpnFreezeDoneForSession = true
+        Utility.notifyVpnBatchFreezeSessionComplete(this, frozen > 0)
     }
 
     /** Отсчет до заморозки виден пользователю и отменяется кнопкой -- иначе реакция мгновенная. */
@@ -556,11 +532,10 @@ class AntiSpyVpnWatchService : Service() {
         scheduleRestartIfNeeded()
         handler.removeCallbacks(freezeRunnable)
         handler.removeCallbacks(pollRunnable)
-        pendingFreeze = null
+        freezePending = false
         cancelNotification(FREEZE_PENDING_NOTIFICATION_ID)
         connectivityReceiver = unregisterSafely(connectivityReceiver)
         freezeCompleteReceiver = unregisterSafely(freezeCompleteReceiver)
-        screenLockReceiver = unregisterSafely(screenLockReceiver)
         unregisterVpnCallbacks()
         super.onDestroy()
     }

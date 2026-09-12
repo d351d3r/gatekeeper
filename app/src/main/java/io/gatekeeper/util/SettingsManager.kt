@@ -103,6 +103,22 @@ class SettingsManager private constructor(context: Context) {
         return ret
     }
 
+    /**
+     * Область заморозки по блокировке. Геттер -- точка входа разовой миграции из
+     * старого триггера сторожа VPN: вызывается и из UI, и из FreezeService.
+     */
+    fun setAutoFreezeScope(scope: ScreenLockFreezeScope) {
+        storage.setIntNow(LocalStorageManager.PREF_AUTO_FREEZE_SCOPE, scope.stored)
+        syncSettingsToProfileInt(LocalStorageManager.PREF_AUTO_FREEZE_SCOPE, scope.stored)
+    }
+
+    fun getAutoFreezeScope(): ScreenLockFreezeScope {
+        ScreenLockFreezeMigration.run(storage)
+        return ScreenLockFreezeScope.fromStored(
+            storage.getInt(LocalStorageManager.PREF_AUTO_FREEZE_SCOPE)
+        )
+    }
+
     fun setSkipForegroundEnabled(enabled: Boolean) {
         storage.setBoolean(LocalStorageManager.PREF_DONT_FREEZE_FOREGROUND, enabled)
         syncSettingsToProfileBool(LocalStorageManager.PREF_DONT_FREEZE_FOREGROUND, enabled)
@@ -123,9 +139,6 @@ class SettingsManager private constructor(context: Context) {
 
     fun setAntiSpyFreezeOnVpn(enabled: Boolean) =
         applyWatchBool(LocalStorageManager.PREF_ANTI_SPY_FREEZE_ON_VPN, enabled)
-
-    fun setAntiSpyFreezeOnScreenLock(enabled: Boolean) =
-        applyWatchBool(LocalStorageManager.PREF_ANTI_SPY_FREEZE_ON_SCREEN_LOCK, enabled)
 
     fun setAntiSpyNotifyOnly(enabled: Boolean) =
         applyWatchBool(LocalStorageManager.PREF_ANTI_SPY_NOTIFY_ONLY, enabled)

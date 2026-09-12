@@ -14,39 +14,28 @@ enum class AntiSpyFreezeScope(val stored: Int) {
     }
 }
 
-/** Событие, на которое реагирует сторож. */
-enum class AntiSpyTrigger { VPN_UP, SCREEN_LOCK }
-
+/** Реакция сторожа на подъём VPN-туннеля. */
 enum class AntiSpyReaction { IGNORE, NOTIFY_ONLY, FREEZE_AFTER_DELAY, FREEZE_NOW }
 
 /**
  * Настройки сторожа VPN. Заморозка гасит уведомления мессенджера и банков, поэтому решение
  * принимается только по явному выбору пользователя: главный переключатель выключен по
- * умолчанию, триггеры раздельные, область заморозки задана, а не унаследована от кнопки
- * автозаморозки (`docs/antispy_settings_requirements.md`).
+ * умолчанию, триггер один -- подъём туннеля. Заморозка по блокировке экрана переехала
+ * на экран «Заморозка» (единый владелец триггера, редизайн шаг 5).
  */
 data class AntiSpyWatchConfig(
     val enabled: Boolean = false,
     val freezeOnVpn: Boolean = DEFAULT_FREEZE_ON_VPN,
-    val freezeOnScreenLock: Boolean = false,
     val scope: AntiSpyFreezeScope = AntiSpyFreezeScope.AUTO_FREEZE_LIST,
     val notifyOnly: Boolean = false,
     val delaySeconds: Int = DEFAULT_DELAY_SECONDS,
 ) {
-    /** Держать процесс сторожа имеет смысл только при включенном триггере. */
-    val watcherNeeded: Boolean get() = enabled && (freezeOnVpn || freezeOnScreenLock)
+    /** Держать процесс сторожа имеет смысл только при включённом триггере. */
+    val watcherNeeded: Boolean get() = enabled && freezeOnVpn
 
-    fun onVpnUp(): AntiSpyReaction = decide(freezeOnVpn)
-
-    fun onScreenLock(): AntiSpyReaction = decide(freezeOnScreenLock)
-
-    fun reactTo(trigger: AntiSpyTrigger): AntiSpyReaction = when (trigger) {
-        AntiSpyTrigger.VPN_UP -> onVpnUp()
-        AntiSpyTrigger.SCREEN_LOCK -> onScreenLock()
-    }
-
-    private fun decide(triggerEnabled: Boolean): AntiSpyReaction = when {
-        !enabled || !triggerEnabled -> AntiSpyReaction.IGNORE
+    /** Решение по факту подъёма туннеля; выводится целиком из настроек. */
+    val reaction: AntiSpyReaction get() = when {
+        !enabled || !freezeOnVpn -> AntiSpyReaction.IGNORE
         notifyOnly -> AntiSpyReaction.NOTIFY_ONLY
         delaySeconds > 0 -> AntiSpyReaction.FREEZE_AFTER_DELAY
         else -> AntiSpyReaction.FREEZE_NOW

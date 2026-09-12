@@ -136,8 +136,12 @@
     <string name="settings_cross_profile_file_chooser">Перенос файлов</string>
     <string name="documents_ui">Открыть проводник</string>
     <string name="settings_interaction">Взаимодействие</string>
-    <string name="settings_auto_freeze_service">Служба автозаморозки</string>
-    <string name="settings_auto_freeze_service_desc">При блокировке экрана автоматически замораживать приложения, запущенные с помощью ярлыка \"Разморозить и запустить\".</string>
+    <string name="settings_auto_freeze_service">Заморозка при блокировке экрана</string>
+    <string name="settings_auto_freeze_service_desc">При блокировке экрана автоматически замораживать выбранную область приложений профиля.</string>
+    <string name="settings_auto_freeze_scope">Что морозить</string>
+    <string name="settings_auto_freeze_scope_session">Запущенные за сеанс</string>
+    <string name="settings_auto_freeze_scope_list">Список автозаморозки</string>
+    <string name="settings_auto_freeze_scope_all">Все сторонние приложения профиля</string>
     <string name="settings_auto_freeze_delay">Задержка автозаморозки</string>
     <string name="request_storage_manager">Gatekeeper необходим доступ ко <b>всем файлам</b> для переноса файлов. Пожалуйста, дайте разрешение приложениям Gatekeeper в <b>ОБОИХ</b> профилях (основном и рабочем) в диалогах, которые появятся после того, как вы нажмёте \"OK\".</string>
     <string name="settings_services">Службы</string>
@@ -159,8 +163,6 @@
     <string name="settings_anti_spy_enabled_desc">По умолчанию выключено: заморозка убивает уведомления мессенджеров, банков и госуслуг. Она бесполезна, если трафик рабочего профиля не идет через VPN -- скрывать нечего, а приложения замолкают зря.</string>
     <string name="settings_anti_spy_freeze_on_vpn">Триггер: поднялся VPN</string>
     <string name="settings_anti_spy_freeze_on_vpn_desc">Реагировать на появление туннеля.</string>
-    <string name="settings_anti_spy_freeze_on_screen_lock">Триггер: блокировка экрана</string>
-    <string name="settings_anti_spy_freeze_on_screen_lock_desc">Реагировать на выключение экрана.</string>
     <string name="settings_anti_spy_scope">Что морозить</string>
     <string name="settings_anti_spy_scope_list">Список автозаморозки</string>
     <string name="settings_anti_spy_scope_all">Все сторонние приложения профиля</string>

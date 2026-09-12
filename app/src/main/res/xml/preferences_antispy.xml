@@ -18,12 +18,6 @@
         android:title="@string/settings_anti_spy_freeze_on_vpn"
         android:summary="@string/settings_anti_spy_freeze_on_vpn_desc" />
 
-    <androidx.preference.SwitchPreferenceCompat
-        android:dependency="settings_anti_spy_enabled"
-        android:key="settings_anti_spy_freeze_on_screen_lock"
-        android:title="@string/settings_anti_spy_freeze_on_screen_lock"
-        android:summary="@string/settings_anti_spy_freeze_on_screen_lock_desc" />
-
     <androidx.preference.DropDownPreference
         android:dependency="settings_anti_spy_enabled"
         android:key="settings_anti_spy_scope"

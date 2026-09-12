@@ -16,43 +16,58 @@ import android.os.IBinder
 import io.gatekeeper.R
 import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.ui.DummyActivity
+import io.gatekeeper.util.ScreenLockFreezeScope
 import io.gatekeeper.util.SettingsManager
 import io.gatekeeper.util.Utility
+import io.gatekeeper.util.WorkProfileBatchFreeze
 import java.util.Date
 
-// This service simply registers a screen-off listener that will be called when the user
-// locks the screen. When this happens, this service will freeze all the apps that the
-// user launched through Unfreeze & Launch during the last session.
+// Экранный сторож: единственный владелец ACTION_SCREEN_OFF. Морозит выбранную
+// область (запущенные за сеанс / список автозаморозки / все сторонние) после
+// единой задержки. Сторож VPN больше экраном не занимается (редизайн, шаг 5).
 class FreezeService : Service() {
     private var usageStats: Map<String, UsageStats> = HashMap()
     private var screenLockTime: Long = -1
+    private var pendingScope: ScreenLockFreezeScope = ScreenLockFreezeScope.SESSION
     private lateinit var alarmManager: AlarmManager
 
     private val freezeWork: AlarmManager.OnAlarmListener = AlarmManager.OnAlarmListener {
         synchronized(FreezeService::class.java) {
             unregisterReceiver(unlockReceiver)
 
-            if (appToFreeze.isNotEmpty()) {
-                val dpm = getSystemService(DevicePolicyManager::class.java)
-                val adminComponent = ComponentName(this, GatekeeperDeviceAdminReceiver::class.java)
-                for (app in appToFreeze) {
-                    var shouldFreeze = true
-                    val stats = usageStats[app]
-                    if (stats != null &&
-                        screenLockTime - stats.lastTimeUsed <= APP_INACTIVE_TIMEOUT &&
-                        stats.totalTimeInForeground >= APP_INACTIVE_TIMEOUT
-                    ) {
-                        shouldFreeze = false
-                    }
-
-                    if (shouldFreeze) {
-                        dpm.setApplicationHidden(adminComponent, app, true)
-                    }
-                }
-                appToFreeze.clear()
+            val scope = pendingScope
+            if (scope == ScreenLockFreezeScope.SESSION) {
+                freezeSessionApps()
+            } else {
+                WorkProfileBatchFreeze.freezeList(
+                    this,
+                    WorkProfileBatchFreeze.packagesForScreenLockScope(this, scope),
+                )
             }
             stopSelf()
         }
+    }
+
+    /** Сеансовая область: только то, что запустили через «Разморозить и запустить». */
+    private fun freezeSessionApps() {
+        if (appToFreeze.isEmpty()) return
+        val dpm = getSystemService(DevicePolicyManager::class.java)
+        val adminComponent = ComponentName(this, GatekeeperDeviceAdminReceiver::class.java)
+        for (app in appToFreeze) {
+            var shouldFreeze = true
+            val stats = usageStats[app]
+            if (stats != null &&
+                screenLockTime - stats.lastTimeUsed <= APP_INACTIVE_TIMEOUT &&
+                stats.totalTimeInForeground >= APP_INACTIVE_TIMEOUT
+            ) {
+                shouldFreeze = false
+            }
+
+            if (shouldFreeze) {
+                dpm.setApplicationHidden(adminComponent, app, true)
+            }
+        }
+        appToFreeze.clear()
     }
 
     private val unlockReceiver = object : BroadcastReceiver() {
@@ -64,7 +79,9 @@ class FreezeService : Service() {
     private val lockReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             screenLockTime = Date().time
-            if (SettingsManager.getInstance().getSkipForegroundEnabled() &&
+            pendingScope = SettingsManager.getInstance().getAutoFreezeScope()
+            if (pendingScope == ScreenLockFreezeScope.SESSION &&
+                SettingsManager.getInstance().getSkipForegroundEnabled() &&
                 Utility.checkUsageStatsPermission(this@FreezeService)
             ) {
                 val usm = getSystemService(UsageStatsManager::class.java)

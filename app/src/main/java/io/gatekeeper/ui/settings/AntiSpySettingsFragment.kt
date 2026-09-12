@@ -31,13 +31,6 @@ class AntiSpySettingsFragment : SettingsSubFragment() {
             true
         }
         bindCheckBox(
-            SETTINGS_ANTI_SPY_FREEZE_ON_SCREEN_LOCK,
-            manager.getAntiSpyWatchConfig().freezeOnScreenLock,
-        ) { enabled ->
-            manager.setAntiSpyFreezeOnScreenLock(enabled)
-            true
-        }
-        bindCheckBox(
             SETTINGS_ANTI_SPY_NOTIFY_ONLY,
             manager.getAntiSpyWatchConfig().notifyOnly,
         ) { enabled ->
@@ -140,8 +133,6 @@ class AntiSpySettingsFragment : SettingsSubFragment() {
     companion object {
         private const val SETTINGS_ANTI_SPY_ENABLED = "settings_anti_spy_enabled"
         private const val SETTINGS_ANTI_SPY_FREEZE_ON_VPN = "settings_anti_spy_freeze_on_vpn"
-        private const val SETTINGS_ANTI_SPY_FREEZE_ON_SCREEN_LOCK =
-            "settings_anti_spy_freeze_on_screen_lock"
         private const val SETTINGS_ANTI_SPY_NOTIFY_ONLY = "settings_anti_spy_notify_only"
         private const val SETTINGS_ANTI_SPY_SCOPE = "settings_anti_spy_scope"
         private const val SETTINGS_ANTI_SPY_DELAY = "settings_anti_spy_delay"

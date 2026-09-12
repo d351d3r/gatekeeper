@@ -152,6 +152,22 @@ object WorkProfileBatchFreeze {
         freezeList(context, AntiSpyManager.getAutoFreezeList())
 
     /**
+     * Что морозит владелец триггера блокировки экрана (FreezeService) по выбранной
+     * области. Системные приложения профиля не трогаются ни при каком выборе: без них
+     * профиль перестает работать, а противник по модели угроз -- стороннее приложение
+     * (`docs/threat_model.md`).
+     */
+    fun packagesForScreenLockScope(
+        context: Context,
+        scope: ScreenLockFreezeScope,
+    ): Array<String> =
+        when (scope) {
+            ScreenLockFreezeScope.SESSION -> emptyArray()
+            ScreenLockFreezeScope.AUTO_FREEZE_LIST -> AntiSpyManager.getAutoFreezeList(context)
+            ScreenLockFreezeScope.WHOLE_WORK_PROFILE -> thirdPartyPackages(context)
+        }
+
+    /**
      * Что морозить по выбранной области. Системные приложения профиля не трогаются ни при
      * каком выборе: без них профиль перестает работать, а противник по модели угроз --
      * стороннее приложение (`docs/threat_model.md`).

@@ -9,6 +9,11 @@
 
     <androidx.preference.DropDownPreference
         android:dependency="settings_auto_freeze_service"
+        android:key="settings_auto_freeze_scope"
+        android:title="@string/settings_auto_freeze_scope" />
+
+    <androidx.preference.DropDownPreference
+        android:dependency="settings_auto_freeze_service"
         android:key="settings_auto_freeze_delay"
         android:title="@string/settings_auto_freeze_delay" />
 
