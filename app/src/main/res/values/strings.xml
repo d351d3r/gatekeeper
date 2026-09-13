@@ -545,7 +545,7 @@
     <string name="isolation_setup_advanced">Advanced settings</string>
     <string name="isolation_setup_done">Done</string>
     <string name="settings_anti_spy_what">How this works</string>
-    <string name="settings_anti_spy_what_desc">An app inside the profile can see that a VPN is up on the phone, even when the tunnel runs only in the personal part. Where the tunnel leads stays hidden, but the fact itself cannot be: that is how Android is built, not a shortcoming.\n\nThe watch follows the VPN state and freezes the chosen profile apps when it goes up or down. The point: an app that must not observe a network change is simply not running at that moment.</string>
+    <string name="settings_anti_spy_what_desc">An app inside the profile can see that a VPN is up on the phone, even when the tunnel runs only in the personal part. Where the tunnel leads stays hidden: the routing table and connection list are closed to it. The VPN being up on an Android device cannot be hidden.\n\nThe watch follows the VPN state and freezes the chosen profile apps when it goes up or down: an app that must not observe a network change is kept from running at that moment.</string>
     <string name="main_add_app">Add app</string>
     <string name="main_pick_app_title">Pick an app</string>
     <string name="app_list_empty_work">No apps in the work profile yet.\n\nTap \"Add\" below to install an app here from the personal profile.</string>
