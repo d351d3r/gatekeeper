@@ -168,6 +168,10 @@ class LocalStorageManager private constructor(context: Context) {
         /** Правила перенаправления ссылок в рабочий профиль (C2), в одном профиле — то, что применено. */
         const val PREF_CROSS_PROFILE_LINK_RULES = "cross_profile_link_rules"
 
+        /** Последние счетчики рабочего профиля для плитки и виджета (G6). */
+        const val PREF_WORK_APPS_TOTAL = "work_apps_total"
+        const val PREF_WORK_APPS_FROZEN = "work_apps_frozen"
+
         private const val LIST_DIVIDER = ","
         private const val PREFS_NAME = "prefs"
 

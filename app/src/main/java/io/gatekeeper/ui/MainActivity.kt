@@ -53,6 +53,7 @@ import io.gatekeeper.services.IStartActivityProxy
 import io.gatekeeper.services.KillerService
 import io.gatekeeper.util.AntiSpyLaunchGate
 import io.gatekeeper.util.AntiSpyManager
+import io.gatekeeper.util.WorkProfileStatus
 import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.AutoFreezeDefaults
 import io.gatekeeper.util.BackupPayload
@@ -501,6 +502,8 @@ class MainActivity : AppCompatActivity() {
         workAppsTotal = total
         workAppsFrozen = frozen
         updateStatusCard()
+        // Плитка и виджет спросить рабочий профиль сами не могут: кладем им факт.
+        WorkProfileStatus.store(this, total, frozen)
     }
 
     private fun updateStatusCard() {
@@ -512,10 +515,15 @@ class MainActivity : AppCompatActivity() {
         val running = workAppsTotal - workAppsFrozen
         findViewById<TextView>(R.id.main_status_counts).text =
             getString(R.string.status_counts, workAppsTotal, workAppsFrozen, running)
+        // Обе кнопки ходят через PUBLIC_FREEZE_ALL / PUBLIC_UNFREEZE_ALL, а те берут
+        // список автозаморозки, а не весь профиль. Обещать число всех работающих
+        // нельзя: нажмешь «Заморозить 19», а заморозится один.
+        val listSize = LocalStorageManager.getInstance()
+            .getStringList(LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE).size
         findViewById<MaterialButton>(R.id.main_status_freeze).text =
-            getString(R.string.action_freeze_n, running)
+            getString(R.string.action_freeze_list, listSize)
         findViewById<MaterialButton>(R.id.main_status_unfreeze).text =
-            getString(R.string.action_unfreeze_n, workAppsFrozen)
+            getString(R.string.action_unfreeze_list, listSize)
     }
 
     private fun buildView() {

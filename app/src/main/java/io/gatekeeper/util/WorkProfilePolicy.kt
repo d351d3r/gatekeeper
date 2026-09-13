@@ -14,6 +14,7 @@ import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.services.BatchFreezeService
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.ui.MainActivity
+import io.gatekeeper.widget.FreezeWidgetProvider
 
 /** Рабочий профиль вызывает действие, резолвящееся в личном. */
 private const val TO_PARENT = DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT
@@ -133,6 +134,15 @@ object WorkProfilePolicy {
 
         context.packageManager.setComponentEnabledSetting(
             ComponentName(context.applicationContext, MainActivity::class.java),
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+            0
+        )
+
+        // Виджет заморозки живет в личном профиле: счетчики туда кладет главный
+        // экран, которого здесь нет. Иначе он предлагается во вкладке «Рабочие»
+        // в списке виджетов и показывает пустое состояние.
+        context.packageManager.setComponentEnabledSetting(
+            ComponentName(context.applicationContext, FreezeWidgetProvider::class.java),
             PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
             0
         )

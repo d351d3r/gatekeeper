@@ -292,8 +292,8 @@
     <string name="status_profile_running">Профиль работает</string>
     <string name="status_profile_stopped">Профиль не отвечает</string>
     <string name="status_counts">%1$d приложений: %2$d заморожено, %3$d работают</string>
-    <string name="action_freeze_n">Заморозить %d</string>
-    <string name="action_unfreeze_n">Разморозить %d</string>
+    <string name="action_freeze_list">Заморозить (%d)</string>
+    <string name="action_unfreeze_list">Разморозить (%d)</string>
     <!-- Каналы уведомлений (G5) -->
     <string name="notif_channel_status">Работа в фоне</string>
     <string name="notif_channel_status_desc">Постоянная строка, которой Android обязывает приложение, пока Gatekeeper держит связь с рабочим профилем. Ее можно свернуть, но не убрать.</string>
@@ -378,4 +378,15 @@
     <string name="app_sheet_auto_freeze_desc">Замораживается вместе с остальным списком автозаморозки</string>
     <string name="app_sheet_shortcut_desc">Положит на рабочий стол значок, который разморозит и откроет приложение</string>
     <string name="app_sheet_uninstall_desc">Удалит приложение и его данные из этого профиля</string>
+    <!-- Виджет и плитка быстрых настроек (G6) -->
+    <string name="widget_description">Заморозить или разморозить рабочий профиль с рабочего стола</string>
+    <string name="widget_all_running">Профиль работает</string>
+    <string name="widget_partly_frozen">Профиль заморожен</string>
+    <string name="widget_unknown">Состояние неизвестно</string>
+    <string name="widget_unknown_hint">Откройте Gatekeeper один раз, чтобы виджет узнал состояние</string>
+    <string name="widget_open">Открыть Gatekeeper</string>
+    <string name="tile_name">Заморозка</string>
+    <string name="tile_subtitle_running">работают: %1$d</string>
+    <string name="tile_subtitle_frozen">заморожено: %1$d</string>
+    <string name="tile_label_with_state">%1$s: %2$s</string>
 </resources>

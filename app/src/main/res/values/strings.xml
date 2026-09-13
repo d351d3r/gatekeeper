@@ -319,8 +319,8 @@
     <string name="status_profile_running">The profile is running</string>
     <string name="status_profile_stopped">The profile is not responding</string>
     <string name="status_counts">%1$d apps: %2$d frozen, %3$d running</string>
-    <string name="action_freeze_n">Freeze %d</string>
-    <string name="action_unfreeze_n">Unfreeze %d</string>
+    <string name="action_freeze_list">Freeze (%d)</string>
+    <string name="action_unfreeze_list">Unfreeze (%d)</string>
     <!-- Notification channels (G5) -->
     <string name="notif_channel_status">Background work</string>
     <string name="notif_channel_status_desc">The permanent row Android requires while Gatekeeper keeps the link to the work profile. It can be collapsed, not hidden.</string>
@@ -403,4 +403,15 @@
     <string name="app_sheet_auto_freeze_desc">Freezes together with the rest of the auto-freeze list</string>
     <string name="app_sheet_shortcut_desc">Puts an icon on the home screen that unfreezes and opens the app</string>
     <string name="app_sheet_uninstall_desc">Removes the app and its data from this profile</string>
+    <!-- Widget and quick settings tile (G6) -->
+    <string name="widget_description">Freeze or unfreeze the work profile from the home screen</string>
+    <string name="widget_all_running">Profile is running</string>
+    <string name="widget_partly_frozen">Profile is frozen</string>
+    <string name="widget_unknown">State unknown</string>
+    <string name="widget_unknown_hint">Open Gatekeeper once so the widget learns the state</string>
+    <string name="widget_open">Open Gatekeeper</string>
+    <string name="tile_name">Freeze</string>
+    <string name="tile_subtitle_running">%1$d running</string>
+    <string name="tile_subtitle_frozen">%1$d frozen</string>
+    <string name="tile_label_with_state">%1$s: %2$s</string>
 </resources>

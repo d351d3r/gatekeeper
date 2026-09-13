@@ -61,6 +61,9 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
+    <!-- Виджет живет вне активности: RemoteViews берет ?attr отсюда. -->
+    <style name="Theme.Gatekeeper.Widget" parent="AppTheme.Base" />
+
     <style name="AppTheme.Override" parent="AppTheme.Base">
         <!-- Пусто; переопределяется квалификаторами ресурсов -->
     </style>

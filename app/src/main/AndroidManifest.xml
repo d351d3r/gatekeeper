@@ -149,6 +149,27 @@
             </intent-filter>
         </activity>
 
+        <!-- Виджет заморозки: состояние на столе вместо ярлыка без состояния (G6). -->
+        <receiver android:name=".widget.FreezeWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_freeze_info" />
+        </receiver>
+
+        <!-- Плитка в шторке: заморозить, не выходя из текущего приложения (G6). -->
+        <service android:name=".services.FreezeTileService"
+            android:label="@string/tile_name"
+            android:icon="@drawable/ic_freeze"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <receiver android:name=".receivers.AntiSpyBootReceiver"
             android:exported="true"
             android:enabled="true">
