@@ -11,11 +11,18 @@ import io.gatekeeper.util.AntiSpyWatchConfig
 import io.gatekeeper.util.VpnRoutingAdvice
 import io.gatekeeper.util.VpnTunnelDetector
 
-/** Экран «Сторож VPN»: включение, триггеры, область, задержка, банер маршрутизации. */
+/**
+ * Экран «Сторож VPN»: сверху закрепленный always-on (C6) -- настоящая защита
+ * профиля, снизу сторож с триггерами и задержкой -- реакция на чужой туннель.
+ * Порядок не случайный: если туннель закреплен, сторож нужен меньше.
+ */
 class AntiSpySettingsFragment : SettingsSubFragment() {
+
+    private val alwaysOn = AlwaysOnVpnSection(this)
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_antispy)
+        alwaysOn.bind()
         bindCheckBox(
             SETTINGS_ANTI_SPY_ENABLED,
             manager.getAntiSpyWatchConfig().enabled,
@@ -43,6 +50,7 @@ class AntiSpySettingsFragment : SettingsSubFragment() {
 
     override fun onResume() {
         super.onResume()
+        alwaysOn.refresh()
         updateRoutingBanner()
         updateScopeSummary()
         updateDelaySummary()

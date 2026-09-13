@@ -406,4 +406,14 @@
     <string name="settings_ca_scope_desc">Установленному здесь корневому CA доверяют браузеры внутри профиля. Большинство приложений пользовательским CA не доверяют начиная с Android 7, личный профиль не затрагивается. В профиле Android будет постоянно показывать уведомление «сеть может отслеживаться».</string>
     <string name="settings_ca_list_title">Установленные</string>
     <string name="settings_ca_install_short">Выберите файл .crt или .pem: отпечаток покажем до установки</string>
+    <!-- Закрепленный VPN профиля (C6) -->
+    <string name="settings_alwayson_title">Закрепленный VPN</string>
+    <string name="settings_anti_spy_group">Сторож VPN</string>
+    <string name="settings_alwayson_app">VPN-приложение профиля</string>
+    <string name="settings_alwayson_none">Не закреплен: трафик профиля идет туда, куда его отправит система</string>
+    <string name="settings_alwayson_lockdown">Запретить трафик мимо туннеля</string>
+    <string name="settings_alwayson_lockdown_desc">Пока туннель не поднят, рабочие приложения остаются вообще без сети. В этом и смысл: утечки в открытый интернет не будет, но и связи не будет, пока VPN не вернется.</string>
+    <string name="settings_alwayson_no_apps">Ни одно приложение профиля не умеет быть VPN</string>
+    <string name="settings_alwayson_unavailable">Рабочий профиль сейчас не отвечает</string>
+    <string name="settings_alwayson_failed">Профиль отказался закрепить этот VPN: %1$s</string>
 </resources>

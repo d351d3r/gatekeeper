@@ -369,6 +369,63 @@ class GatekeeperService : Service() {
                 false
             }
         }
+
+        /**
+         * Приложения профиля, умеющие быть VPN: у них есть сервис с
+         * android.net.VpnService. Список нужен личной стороне, чтобы предложить
+         * выбор, а спросить его она может только здесь -- пакеты профиля видны
+         * только изнутри профиля. Кодировка "пакет|имя", как у сертификатов.
+         */
+        override fun getVpnCapableApps(): List<String> {
+            check(isProfileOwner) { "Cannot list VPN apps without being profile owner" }
+            val pm = packageManager!!
+            return pm.queryIntentServices(Intent(VPN_SERVICE_ACTION), PackageManager.GET_META_DATA)
+                .filter { it.serviceInfo != null }
+                // Приложение вправе объявить, что always-on оно не поддерживает.
+                // Отсеиваем такие заранее: иначе пользователь выбирает вариант,
+                // который система все равно отвергнет.
+                .filter {
+                    it.serviceInfo.metaData?.getBoolean(VPN_SUPPORTS_ALWAYS_ON, true) ?: true
+                }
+                .mapNotNull { it.serviceInfo.applicationInfo }
+                // Свой AntiSpyDummyVpnService -- служебная заглушка, которой сторож
+                // сбивает чужой туннель. Закреплять ее как защиту профиля бессмысленно.
+                .filter { it.packageName != packageName }
+                .distinctBy { it.packageName }
+                .map { it.packageName + "|" + pm.getApplicationLabel(it) }
+                .sortedBy { it.substringAfter("|").lowercase() }
+        }
+
+        /** "" -- не закреплен; иначе "пакет|lockdown" (true/false). */
+        override fun getAlwaysOnVpnState(): String {
+            check(isProfileOwner) { "Cannot read always-on VPN without being profile owner" }
+            val pkg = policyManager!!.getAlwaysOnVpnPackage(adminComponent!!) ?: return ""
+            val lockdown = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                policyManager!!.isAlwaysOnVpnLockdownEnabled(adminComponent!!)
+            return "$pkg|$lockdown"
+        }
+
+        /**
+         * null -- успех. Иначе текст отказа: пакет не умеет always-on, его нет в
+         * профиле, или прошивка не дает закрепить туннель.
+         */
+        override fun setAlwaysOnVpn(packageName: String?, lockdown: Boolean): String? {
+            check(isProfileOwner) { "Cannot set always-on VPN without being profile owner" }
+            val target = packageName?.takeIf { it.isNotEmpty() }
+            return try {
+                policyManager!!.setAlwaysOnVpnPackage(adminComponent!!, target, lockdown)
+                null
+            } catch (e: PackageManager.NameNotFoundException) {
+                Log.w(TAG, "always-on VPN refused: $target", e)
+                e.message ?: target.orEmpty()
+            } catch (e: UnsupportedOperationException) {
+                Log.w(TAG, "always-on VPN unsupported", e)
+                e.message ?: "unsupported"
+            } catch (e: SecurityException) {
+                Log.w(TAG, "always-on VPN denied", e)
+                e.message ?: "denied"
+            }
+        }
     }
 
     private fun installExistingSystemApp(packageName: String): Boolean {
@@ -439,6 +496,8 @@ class GatekeeperService : Service() {
 
     companion object {
         private const val TAG = "GatekeeperService"
+        private const val VPN_SERVICE_ACTION = "android.net.VpnService"
+        private const val VPN_SUPPORTS_ALWAYS_ON = "android.net.VpnService.SUPPORTS_ALWAYS_ON"
         private const val NOTIFICATION_ID = 0x49a11
         private const val LIST_ICON_MAX_PX = 128
     }

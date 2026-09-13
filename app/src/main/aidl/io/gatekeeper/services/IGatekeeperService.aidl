@@ -42,4 +42,10 @@ interface IGatekeeperService {
     // и перестраивает фильтры через enforceWorkProfilePolicies; false = DPM отказал.
     // Вызывается только личным профилем у сервиса рабочего профиля.
     boolean setCrossProfileLinkRules(in List<String> rules);
+    // Always-on VPN профиля (C6): закрепить туннель внутри профиля и, по желанию,
+    // включить lockdown -- запрет любого трафика мимо туннеля. Вызывается только
+    // личным профилем у сервиса рабочего профиля.
+    List<String> getVpnCapableApps();
+    String getAlwaysOnVpnState();
+    String setAlwaysOnVpn(String packageName, boolean lockdown);
 }

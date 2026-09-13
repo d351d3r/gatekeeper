@@ -1,37 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.preference.Preference
-        android:key="settings_anti_spy_routing"
-        android:selectable="false"
-        android:title="@string/settings_anti_spy_routing" />
+    <androidx.preference.PreferenceCategory
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_alwayson_title">
 
-    <androidx.preference.SwitchPreferenceCompat
-        android:key="settings_anti_spy_enabled"
-        android:title="@string/settings_anti_spy_enabled"
-        android:summary="@string/settings_anti_spy_enabled_desc" />
+        <androidx.preference.Preference
+            android:key="settings_alwayson_app"
+            app:iconSpaceReserved="false"
+            android:title="@string/settings_alwayson_app"
+            android:summary="@string/settings_alwayson_none" />
 
-    <androidx.preference.SwitchPreferenceCompat
-        android:dependency="settings_anti_spy_enabled"
-        android:key="settings_anti_spy_freeze_on_vpn"
-        android:title="@string/settings_anti_spy_freeze_on_vpn"
-        android:summary="@string/settings_anti_spy_freeze_on_vpn_desc" />
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="settings_alwayson_lockdown"
+            app:iconSpaceReserved="false"
+            android:title="@string/settings_alwayson_lockdown"
+            android:summary="@string/settings_alwayson_lockdown_desc" />
 
-    <androidx.preference.DropDownPreference
-        android:dependency="settings_anti_spy_enabled"
-        android:key="settings_anti_spy_scope"
-        android:title="@string/settings_anti_spy_scope" />
+    </androidx.preference.PreferenceCategory>
 
-    <androidx.preference.SwitchPreferenceCompat
-        android:dependency="settings_anti_spy_enabled"
-        android:key="settings_anti_spy_notify_only"
-        android:title="@string/settings_anti_spy_notify_only"
-        android:summary="@string/settings_anti_spy_notify_only_desc" />
+    <androidx.preference.PreferenceCategory
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_anti_spy_group">
 
-    <androidx.preference.DropDownPreference
-        android:dependency="settings_anti_spy_enabled"
-        android:key="settings_anti_spy_delay"
-        android:title="@string/settings_anti_spy_delay" />
+        <androidx.preference.Preference
+            android:key="settings_anti_spy_routing"
+            app:iconSpaceReserved="false"
+            android:selectable="false"
+            android:title="@string/settings_anti_spy_routing" />
+
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="settings_anti_spy_enabled"
+            app:iconSpaceReserved="false"
+            android:title="@string/settings_anti_spy_enabled"
+            android:summary="@string/settings_anti_spy_enabled_desc" />
+
+        <androidx.preference.SwitchPreferenceCompat
+            android:dependency="settings_anti_spy_enabled"
+            android:key="settings_anti_spy_freeze_on_vpn"
+            app:iconSpaceReserved="false"
+            android:title="@string/settings_anti_spy_freeze_on_vpn"
+            android:summary="@string/settings_anti_spy_freeze_on_vpn_desc" />
+
+        <androidx.preference.DropDownPreference
+            android:dependency="settings_anti_spy_enabled"
+            android:key="settings_anti_spy_scope"
+            app:iconSpaceReserved="false"
+            android:title="@string/settings_anti_spy_scope" />
+
+        <androidx.preference.SwitchPreferenceCompat
+            android:dependency="settings_anti_spy_enabled"
+            android:key="settings_anti_spy_notify_only"
+            app:iconSpaceReserved="false"
+            android:title="@string/settings_anti_spy_notify_only"
+            android:summary="@string/settings_anti_spy_notify_only_desc" />
+
+        <androidx.preference.DropDownPreference
+            android:dependency="settings_anti_spy_enabled"
+            android:key="settings_anti_spy_delay"
+            app:iconSpaceReserved="false"
+            android:title="@string/settings_anti_spy_delay" />
+
+    </androidx.preference.PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

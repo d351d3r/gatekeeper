@@ -431,4 +431,14 @@
     <string name="settings_ca_scope_desc">A root CA installed here is trusted by browsers inside the profile. Most apps ignore user-installed CAs since Android 7, and the personal profile is never touched. Android will show a permanent \"network may be monitored\" notice in the profile.</string>
     <string name="settings_ca_list_title">Installed</string>
     <string name="settings_ca_install_short">Pick a .crt or .pem file; the fingerprint is shown before anything is installed</string>
+    <!-- Always-on VPN for the profile (C6) -->
+    <string name="settings_alwayson_title">Pinned VPN</string>
+    <string name="settings_anti_spy_group">VPN watch</string>
+    <string name="settings_alwayson_app">VPN app of the profile</string>
+    <string name="settings_alwayson_none">Not pinned: profile traffic goes wherever the system sends it</string>
+    <string name="settings_alwayson_lockdown">Block traffic outside the tunnel</string>
+    <string name="settings_alwayson_lockdown_desc">While the tunnel is down, work apps get no network at all. That is the point: no leak into the open internet, but also no connection until the VPN comes back.</string>
+    <string name="settings_alwayson_no_apps">No app inside the profile can act as a VPN</string>
+    <string name="settings_alwayson_unavailable">The work profile is not responding right now</string>
+    <string name="settings_alwayson_failed">The profile refused to pin that VPN: %1$s</string>
 </resources>

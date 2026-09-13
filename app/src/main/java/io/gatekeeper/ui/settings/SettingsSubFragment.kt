@@ -25,7 +25,7 @@ import io.gatekeeper.util.SettingsManager
  */
 abstract class SettingsSubFragment : PreferenceFragmentCompat() {
     protected val manager = SettingsManager.getInstance()
-    protected var serviceWork: IGatekeeperService? = null
+    internal var serviceWork: IGatekeeperService? = null
         private set
     protected var serviceMain: IGatekeeperService? = null
         private set
@@ -104,7 +104,7 @@ abstract class SettingsSubFragment : PreferenceFragmentCompat() {
     }
 
     /** Тост/диалог на UI-потоке, только пока фрагмент жив. */
-    protected fun postOnUi(block: () -> Unit) {
+    internal fun postOnUi(block: () -> Unit) {
         activity?.runOnUiThread {
             if (isAdded) block()
         }
