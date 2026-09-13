@@ -21,7 +21,6 @@
     <string name="app_installing">Installeren...</string>
     <string name="fragment_profile_main">Hoofd</string>
     <string name="fragment_profile_work">Gatekeeper</string>
-    <string name="list_item_disabled">[Bevroren] %s</string>
     <string name="batch_operation">Batchbewerking</string>
     <string name="clone_to_work_profile">Kloon naar Gatekeeper (Werkprofiel)</string>
     <string name="clone_to_main_profile">Kloon naar Hoofdprofiel</string>

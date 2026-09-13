@@ -4,7 +4,7 @@
     <string name="device_admin_desc">యాప్ ఐసోలేషన్ సర్వీస్</string><string name="launch_app_fail">యాప్ %sని ప్రారంభించలేరు, ఎందుకంటే దానికి GUI లేదు.</string>
     <string name="settings_dont_freeze_foreground_desc">మీ స్క్రీన్‌ను లాక్ చేయడం సమయంలో ముందంజ యాప్‌లను (కనిపించే కార్యకలాపం ఉన్న) ఫ్రిజ్ చేయకండి. ఇది సంగీత ప్లేయర్‌ల వంటి యాప్‌లకు ఉపయోగకరంగా ఉండవచ్చు, కానీ తర్వాత \"బ్యాచ్ ఫ్రిజ్ షార్ట్‌కట్\" ద్వారా వాటిని చేతితో ఫ్రిజ్ చేయాలి.</string>
     <string name="settings_cross_profile_file_chooser">ఫైల్ షట్ల్</string>
-    <string name="app_installing">ఇన్‌స్టాల్ చేయబడుతోంది...</string><string name="list_item_disabled">[ఫ్రోజెన్] %s</string>
+    <string name="app_installing">ఇన్‌స్టాల్ చేయబడుతోంది...</string>
 <string name="settings_block_contacts_searching_desc">కార్య ప్రొఫైల్‌లోని సంప్రదింపులకు ప్రధాన ప్రొఫైల్ నుండి యాక్సెస్‌ను తిరస్కరించండి.</string>
     <string name="payment_stub_description">చెల్లింపు సేవ స్టబ్ (ఉపయోగించవద్దు)</string>
 <string name="settings_interaction">ఇంటరాక్షన్</string>

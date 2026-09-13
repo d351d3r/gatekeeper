@@ -61,6 +61,5 @@
     <string name="request_storage_manager">Gatekeeper behöver åtkomst till <b>Alla filer</b> för File Shuttle. Vänligen aktivera behörigheten för <b>BÅDA TVÅ </b> Gatekeeper-appar som visas i dialogrutan efter att du tryckt på \"OK\".</string>
     <string name="service_auto_freeze_title">I väntan på automatisk frysning</string>
     <string name="service_auto_freeze_desc">Gatekeeper kommer att automatiskt frysa appar som startas från \"Tina upp &amp; Starta\" vid nästa skärmlåshändelse.</string>
-    <string name="list_item_disabled">[Frusen] %s</string>
     <string name="clone_to_work_profile">Klona till Gatekeeper (arbetsprofil)</string>
 </resources>

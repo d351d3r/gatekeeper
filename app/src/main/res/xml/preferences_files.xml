@@ -1,16 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.preference.Preference
+        android:key="settings_files_why"
+        app:iconSpaceReserved="false"
+        android:selectable="false"
+        android:title="@string/settings_files_why"
+        android:summary="@string/settings_files_why_desc" />
 
     <androidx.preference.SwitchPreferenceCompat
         android:key="settings_cross_profile_file_chooser"
+        app:iconSpaceReserved="false"
         android:title="@string/settings_cross_profile_file_chooser"
         android:summary="@string/settings_cross_profile_file_chooser_desc" />
 
     <androidx.preference.SwitchPreferenceCompat
         android:dependency="settings_cross_profile_file_chooser"
         android:key="settings_media_mirror"
+        app:iconSpaceReserved="false"
         android:title="@string/settings_media_mirror"
         android:summary="@string/settings_media_mirror_desc" />
+
+    <androidx.preference.Preference
+        android:key="settings_files_how"
+        app:iconSpaceReserved="false"
+        android:selectable="false"
+        android:title="@string/settings_files_how"
+        android:summary="@string/settings_files_how_desc" />
 
 </androidx.preference.PreferenceScreen>

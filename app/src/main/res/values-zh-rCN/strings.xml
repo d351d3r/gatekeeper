@@ -13,7 +13,6 @@
     <!-- Main UI -->
     <string name="fragment_profile_main">主用户</string>
     <string name="fragment_profile_work">Gatekeeper</string>
-    <string name="list_item_disabled">[已冻结] %s</string>
     <string name="batch_operation">批量操作</string>
     <!-- App Context Menu -->
     <string name="search">搜索</string>

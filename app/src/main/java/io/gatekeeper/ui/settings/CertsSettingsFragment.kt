@@ -6,6 +6,7 @@ import android.os.RemoteException
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
 import io.gatekeeper.R
 import io.gatekeeper.util.CaCertificates
 import io.gatekeeper.util.GatekeeperToast
@@ -24,35 +25,35 @@ class CertsSettingsFragment : SettingsSubFragment() {
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_certs)
-        findPreference<Preference>(SETTINGS_CA_INSTALL)
-            ?.setOnPreferenceClickListener { launchCertPicker() }
-        findPreference<Preference>(SETTINGS_CA_INSTALLED)
-            ?.setOnPreferenceClickListener { showInstalledCaCerts() }
+        findPreference<Preference>(SETTINGS_CA_INSTALL)?.setOnPreferenceClickListener {
+            try {
+                selectCertFile.launch(arrayOf("*/*"))
+            } catch (_: android.content.ActivityNotFoundException) {
+                GatekeeperToast.show(requireContext(), R.string.ca_read_failed)
+            }
+            true
+        }
     }
 
-    private fun launchCertPicker(): Boolean {
-        try {
-            selectCertFile.launch(arrayOf("*/*"))
-        } catch (_: android.content.ActivityNotFoundException) {
-            GatekeeperToast.show(requireContext(), R.string.ca_read_failed)
-        }
-        return true
+    override fun onResume() {
+        super.onResume()
+        refreshInstalled()
     }
 
     private fun onCertFileSelected(uri: Uri?) {
-        val bytes = uri?.let { readCertBytes(it) }
+        val bytes = uri?.let {
+            try {
+                requireContext().contentResolver.openInputStream(it)?.use { s -> s.readBytes() }
+            } catch (_: Exception) {
+                null
+            }
+        }
         val cert = bytes?.let(CaCertificates::parse)
         when {
             bytes == null -> GatekeeperToast.show(requireContext(), R.string.ca_read_failed)
             cert == null -> GatekeeperToast.show(requireContext(), R.string.ca_not_a_certificate)
             else -> showInstallDialog(bytes, cert)
         }
-    }
-
-    private fun readCertBytes(uri: Uri): ByteArray? = try {
-        requireContext().contentResolver.openInputStream(uri)?.use { it.readBytes() }
-    } catch (_: Exception) {
-        null
     }
 
     private fun showInstallDialog(bytes: ByteArray, cert: java.security.cert.X509Certificate) {
@@ -89,6 +90,7 @@ class CertsSettingsFragment : SettingsSubFragment() {
             }
             activity?.runOnUiThread {
                 if (!isAdded) return@runOnUiThread
+                refreshInstalled()
                 when (error) {
                     null -> GatekeeperToast.show(requireContext(), R.string.ca_install_success)
                     "" -> GatekeeperToast.show(requireContext(), R.string.ca_no_work_service)
@@ -100,11 +102,17 @@ class CertsSettingsFragment : SettingsSubFragment() {
         }.start()
     }
 
-    private fun showInstalledCaCerts(): Boolean {
+    /**
+     * Установленные сертификаты -- строками экрана, а не списком в диалоге: их
+     * отпечатки нужно сверять глазами, а диалог для этого приходится открывать.
+     * Состояние живет в рабочем профиле, поэтому спрашиваем его на каждый onResume.
+     */
+    private fun refreshInstalled() {
+        val category = findPreference<PreferenceCategory>(SETTINGS_CA_LIST) ?: return
         val work = serviceWork
         if (work == null) {
-            GatekeeperToast.show(requireContext(), R.string.ca_no_work_service)
-            return true
+            fillList(category, emptyList(), getString(R.string.ca_no_work_service))
+            return
         }
         Thread {
             val entries = try {
@@ -112,29 +120,48 @@ class CertsSettingsFragment : SettingsSubFragment() {
             } catch (_: RemoteException) {
                 null
             }
-            activity?.runOnUiThread {
-                if (!isAdded) return@runOnUiThread
-                if (entries == null) {
-                    GatekeeperToast.show(requireContext(), R.string.ca_no_work_service)
-                    return@runOnUiThread
+            postOnUi {
+                when {
+                    entries == null ->
+                        fillList(category, emptyList(), getString(R.string.ca_no_work_service))
+                    entries.isEmpty() ->
+                        fillList(category, emptyList(), getString(R.string.ca_installed_none))
+                    else ->
+                        fillList(category, entries.mapNotNull(CaCertificates::decodeInfo), null)
                 }
-                if (entries.isEmpty()) {
-                    AlertDialog.Builder(requireContext())
-                        .setTitle(R.string.settings_ca_installed)
-                        .setMessage(R.string.ca_installed_none)
-                        .show()
-                    return@runOnUiThread
-                }
-                val infos = entries.mapNotNull(CaCertificates::decodeInfo)
-                AlertDialog.Builder(requireContext())
-                    .setTitle(R.string.settings_ca_installed)
-                    .setItems(infos.map { certDetailsText(it) }.toTypedArray()) { _, which ->
-                        confirmRemoveCaCert(infos[which])
-                    }
-                    .show()
             }
         }.start()
-        return true
+    }
+
+    private fun fillList(
+        category: PreferenceCategory,
+        infos: List<CaCertificates.Info>,
+        placeholder: String?,
+    ) {
+        category.removeAll()
+        if (placeholder != null) {
+            category.addPreference(
+                Preference(requireContext()).apply {
+                    title = placeholder
+                    isSelectable = false
+                    isIconSpaceReserved = false
+                }
+            )
+            return
+        }
+        for (info in infos) {
+            category.addPreference(
+                Preference(requireContext()).apply {
+                    title = info.subject
+                    summary = info.sha256
+                    isIconSpaceReserved = false
+                    setOnPreferenceClickListener {
+                        confirmRemoveCaCert(info)
+                        true
+                    }
+                }
+            )
+        }
     }
 
     private fun confirmRemoveCaCert(info: CaCertificates.Info) {
@@ -164,12 +191,13 @@ class CertsSettingsFragment : SettingsSubFragment() {
                     requireContext(),
                     if (removed) R.string.ca_remove_success else R.string.ca_remove_failed
                 )
+                refreshInstalled()
             }
         }.start()
     }
 
     companion object {
         private const val SETTINGS_CA_INSTALL = "settings_ca_install"
-        private const val SETTINGS_CA_INSTALLED = "settings_ca_installed"
+        private const val SETTINGS_CA_LIST = "settings_ca_list"
     }
 }

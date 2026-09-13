@@ -22,7 +22,6 @@
     <string name="service_auto_freeze_now">Îngheață acum</string>
     <string name="app_installing">Se instalează ...</string>
     <string name="fragment_profile_main">Principal</string>
-    <string name="list_item_disabled">[S-a Inghetat] %s</string>
     <string name="clone_to_work_profile">Clonați la Gatekeeper (profilul de lucru)</string>
     <string name="uninstall_app">Dezinstalați</string>
     <string name="freeze_app">Îngheaţa</string>

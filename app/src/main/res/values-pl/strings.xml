@@ -12,7 +12,6 @@
     <string name="app_installing">Instalowanie...</string>
     <string name="fragment_profile_main">Główny</string>
     <string name="fragment_profile_work">Gatekeeper</string>
-    <string name="list_item_disabled">[Zamrożone] %s</string>
     <string name="notifications_important">Gatekeeper - ważne</string>
     <string name="batch_operation">Masowa operacja</string>
     <string name="clone_to_main_profile">Sklonuj do profilu głównego</string>

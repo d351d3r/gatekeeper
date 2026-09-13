@@ -27,7 +27,6 @@
     <string name="app_installing">Memasang...</string>
     <string name="fragment_profile_main">Utama</string>
     <string name="fragment_profile_work">Gatekeeper</string>
-    <string name="list_item_disabled">[Bekukan] %s</string>
     <string name="batch_operation">Kelompok operasi</string>
     <string name="clone_to_work_profile">Salin ke Gatekeeper (Profil Kerja)</string>
     <string name="clone_to_main_profile">Salin ke Profil Utama</string>

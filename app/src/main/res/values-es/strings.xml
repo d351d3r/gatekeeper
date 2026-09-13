@@ -29,7 +29,6 @@
     <string name="app_installing">Instalando...</string>
     <string name="fragment_profile_main">Principal</string>
     <string name="fragment_profile_work">Gatekeeper</string>
-    <string name="list_item_disabled">[Suspendida]%s</string>
     <string name="batch_operation">Operación en lote</string>
     <string name="clone_to_work_profile">Clonar a Gatekeeper (perfil de trabajo)</string>
     <string name="clone_to_main_profile">Clonar al perfil principal</string>

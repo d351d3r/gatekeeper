@@ -135,7 +135,7 @@
     <string name="settings_root_misc_desc">NFC payment stub, version, links</string>
     <string name="settings_interaction">Interaction</string>
     <string name="settings_cross_profile_file_chooser">File Shuttle</string>
-    <string name="settings_cross_profile_file_chooser_desc">When enabled, you\'ll be able to browse / view / pick / copy files in Gatekeeper from main profile and vice-versa, ONLY through Documents UI (named Files or Documents on your launcher) or apps with Documents UI support (they only gain temporary access to files you choose in Documents UI), while still pertaining the filesystem isolation.</string>
+    <string name="settings_cross_profile_file_chooser_desc">Off by default. When on, the other profile appears as a source in the file picker, and only the file you pick there crosses the border.</string>
     <string name="settings_block_contacts_searching">Hide work contacts from search</string>
     <string name="settings_block_contacts_searching_desc">The personal profile can no longer search or look up contacts stored in the work profile.</string>
     <string name="settings_block_caller_id">Hide caller names from the profile</string>
@@ -223,7 +223,7 @@
     <string name="install_unknown_sources_title">Allow installs from Gatekeeper</string>
     <string name="install_unknown_sources_message">Android requires a one-time permission before Gatekeeper can install apps into the work profile. Enable \"Allow from this source\" in the screen that opens, then start the clone again.</string>
     <string name="install_unknown_sources_open">Open settings</string>
-    <string name="settings_media_mirror">Auto-copy work screenshots and camera photos</string>
+    <string name="settings_media_mirror">Copy work photos to the gallery</string>
     <string name="settings_media_mirror_desc">Copies new screenshots (Pictures/Screenshots) and camera photos/videos (DCIM/Camera) from the work profile into your personal gallery. Runs whenever the File Shuttle connects (e.g. you open the Files app); files are copied, not moved. Deliberate isolation hole: these two folders only, everything else stays inside the work profile.</string>
     <string name="uninstall_fail_system_app">Cannot uninstall system apps in a profile that Gatekeeper has no control of.</string>
     <string name="unsupported_launcher">Cannot add shortcuts to your launcher. Please contact the developer for more information.</string>
@@ -414,4 +414,21 @@
     <string name="tile_subtitle_running">%1$d running</string>
     <string name="tile_subtitle_frozen">%1$d frozen</string>
     <string name="tile_label_with_state">%1$s: %2$s</string>
+    <!-- Backup screen (G7): what the file is and what it is not -->
+    <string name="settings_backup_group_scope">What the file holds</string>
+    <string name="settings_backup_group_actions">Actions</string>
+    <string name="settings_backup_contains">Inside</string>
+    <string name="settings_backup_contains_desc">Gatekeeper settings, the package names of both profiles and the auto-freeze list, as plain JSON you can read yourself.</string>
+    <string name="settings_backup_excludes">Not inside</string>
+    <string name="settings_backup_excludes_desc">No app data, no APKs, no accounts, no certificates. Restoring reinstalls the work apps from the personal profile as fresh copies: their logins and chats do not come back. The work profile itself is not restored either, and neither is the profile key.</string>
+    <!-- Files screen (G7): why the system share sheet cannot do this -->
+    <string name="settings_files_why">Why the usual Share does not work</string>
+    <string name="settings_files_why_desc">A work profile is a separate Android user. Apps on one side cannot see the other side\'s storage at all, so the system share sheet has nothing to offer: the profiles are not neighbouring folders, they are different users of the same phone.</string>
+    <string name="settings_files_how">How to move a file</string>
+    <string name="settings_files_how_desc">Open the file picker from the app that needs the file and choose Gatekeeper as the source: the other profile shows up there. Or use the transfer button on the top bar of the app list. The receiving app gets access to that one file and nothing else.</string>
+    <!-- Certificates screen (G7) -->
+    <string name="settings_ca_scope">Work profile only</string>
+    <string name="settings_ca_scope_desc">A root CA installed here is trusted by browsers inside the profile. Most apps ignore user-installed CAs since Android 7, and the personal profile is never touched. Android will show a permanent \"network may be monitored\" notice in the profile.</string>
+    <string name="settings_ca_list_title">Installed</string>
+    <string name="settings_ca_install_short">Pick a .crt or .pem file; the fingerprint is shown before anything is installed</string>
 </resources>

@@ -62,6 +62,5 @@
     <string name="app_installing">Εγκατάσταση...</string>
     <string name="fragment_profile_main">Κύριο</string>
     <string name="fragment_profile_work">Gatekeeper</string>
-    <string name="list_item_disabled">[Παγωμένο] %s</string>
     <string name="service_auto_freeze_desc">Το Gatekeeper θα παγώσει αυτόματα εφαρμογές που εκκινούνται με την επιλογή \"Ξεπάγωσε και τρέξε\" την επόμενη φορά που θα κλειδώσει η οθόνη της συσκευής.</string>
 </resources>

@@ -5,7 +5,6 @@
     <string name="service_desc">العازل يعمل الآن …</string>
     <string name="fragment_profile_main">الرئيسية</string>
     <string name="fragment_profile_work">العازل</string>
-    <string name="list_item_disabled">[مجمد] %s</string>
     <string name="clone_to_work_profile">نسخ إلى العازل (ملف العمل)</string>
     <string name="clone_to_main_profile">نسخ للملف الرئيسي</string>
     <string name="uninstall_app">إلغاء التثبيت</string>

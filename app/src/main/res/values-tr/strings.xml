@@ -21,7 +21,6 @@
     <string name="auto_freeze">Otomatik Dondur</string>
     <string name="show_all">Tüm Uygulamaları Göster</string>
     <string name="launch">Çalıştır</string>
-    <string name="list_item_disabled">[Dondurulmuş] %s</string>
     <string name="show_all_warning">Gizlenmiş uygulamalar üstünde değişikler yaparsanız çökmeler ve beklenmeyen hatalar meydana gelebilir. Ancak bu özellik, üretici tarafından özelleştirilmiş hatalı ROM\'larda iş profili için gerekli tüm sistem uygulamaları etkinleştirilmediğinde işinize yarayabilir. Devam ettiğiniz takdirde sorumluluk size aittir.</string>
     <string name="fragment_profile_main">Ana Profil</string>
     <string name="fragment_profile_work">İş Profili</string>

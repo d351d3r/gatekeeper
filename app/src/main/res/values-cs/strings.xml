@@ -32,7 +32,6 @@
     <string name="create_unfreeze_shortcut">Vytvořit zkratku Rozmrazit a/nebo spustit</string>
     <string name="search">Hledat</string>
     <string name="freeze_all">Dávkové zmrazení</string>
-    <string name="list_item_disabled">[Zamraženo] %s</string>
     <string name="freeze_all_shortcut">Zmrazit</string>
     <string name="install_app_to_profile_success">Instalace aplikace v pracovním profilu dokončena.</string>
     <string name="show_all">Zobrazit všechny aplikace</string>
