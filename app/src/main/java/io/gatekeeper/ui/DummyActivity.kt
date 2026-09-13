@@ -100,6 +100,7 @@ class DummyActivity : Activity() {
     private val fileShuttleFlow by lazy { FileShuttleFlow(this) }
     private val serviceRelayFlow by lazy { ServiceRelayFlow(this) }
     private val powerSettingsFlow by lazy { PowerSettingsFlow(this) }
+    private val profileRepairFlow by lazy { ProfileRepairFlow(this) }
 
     /** Внутренние аксессоры для выделенных флоу (WorkRelayHandlers, DummyBatchFlow и др.). */
     internal val isProfileOwnerInternal: Boolean
@@ -136,6 +137,7 @@ class DummyActivity : Activity() {
             VPN_SESSION_COMPLETE to dummyBatchFlow::handleVpnSessionComplete,
             OPEN_POWER_SETTINGS to powerSettingsFlow::handleOpenPowerSettings,
             OPEN_MAIN_APP to ::actionOpenMainApp,
+            REQUEST_REPAIR to profileRepairFlow::handleRequestRepair,
             PACKAGEINSTALLER_CALLBACK to { installFlow.handleCallback(intent) },
         )
     }
@@ -283,11 +285,15 @@ class DummyActivity : Activity() {
         const val PACKAGEINSTALLER_CALLBACK = ProfileActions.PACKAGEINSTALLER_CALLBACK
         const val OPEN_POWER_SETTINGS = ProfileActions.OPEN_POWER_SETTINGS
         const val OPEN_MAIN_APP = ProfileActions.OPEN_MAIN_APP
+        const val REQUEST_REPAIR = ProfileActions.REQUEST_REPAIR
         /** Extra FREEZE_ALL_IN_LIST: запуск от фоновой VPN-заморозки (иначе — ручной). */
         const val EXTRA_VPN_ORIGIN = "vpn_origin"
 
         private val ACTIONS_ALLOWED_WITHOUT_SIGNATURE = listOf(
             FINALIZE_PROVISION,
+            // Подписать нечем: запрос на перепривязку и посылается потому, что
+            // ключи разошлись. Гейт тут -- подтверждение человеком со сверкой кода.
+            REQUEST_REPAIR,
             TRY_START_SERVICE,
             PUBLIC_FREEZE_ALL,
             PUBLIC_UNFREEZE_ALL,

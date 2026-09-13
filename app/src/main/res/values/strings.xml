@@ -444,17 +444,34 @@
     <string name="action_freeze_empty">Freeze</string>
     <string name="action_unfreeze_empty">Unfreeze</string>
     <string name="status_counts_no_list">%1$d apps: %2$d frozen. Pick apps for the auto-freeze list to use these buttons</string>
-    <!-- Removal screen: the cost of uninstalling, said before it happens -->
+    <!-- Removal screen. Measured on AVD 16: while Gatekeeper owns the profile,
+         the system itself refuses to uninstall its work copy, so the screen states
+         what is protected rather than warning about a removal that cannot happen. -->
     <string name="settings_root_removal">Uninstalling Gatekeeper</string>
-    <string name="settings_root_removal_desc">What it takes with it, and what to do first</string>
-    <string name="settings_removal_group_cost">What uninstalling costs</string>
-    <string name="settings_removal_what">The work profile goes with the app</string>
-    <string name="settings_removal_what_desc">Android ties a work profile to the app that owns it. Remove Gatekeeper and the system removes the profile: every cloned app, its accounts, its chats and its files are deleted with it. There is no undo and no recycle bin.</string>
-    <string name="settings_removal_survives">What survives</string>
-    <string name="settings_removal_survives_desc">Only what lives outside the profile: your personal apps, and any file you copied out of the profile beforehand. A backup file holds settings and package names, not data.</string>
-    <string name="settings_removal_group_before">Before you uninstall</string>
+    <string name="settings_root_removal_desc">What is protected, what deletes everything, what to do first</string>
+    <string name="settings_removal_group_protected">What cannot happen by accident</string>
+    <string name="settings_removal_work_copy">The work copy cannot be uninstalled</string>
+    <string name="settings_removal_work_copy_desc">While Gatekeeper owns the work profile, Android refuses to remove its copy inside the profile: the button in system settings is greyed out and the request is rejected. A stray tap cannot take the profile with it.</string>
+    <string name="settings_removal_personal_copy">Removing the personal copy is safe</string>
+    <string name="settings_removal_personal_copy_desc">The profile, the cloned apps and their data stay where they are. Install Gatekeeper again and it reconnects to the live profile instead of building a new one.</string>
+    <string name="settings_removal_group_wipe">What does delete everything</string>
+    <string name="settings_removal_wipe">Remove work profile</string>
+    <string name="settings_removal_wipe_desc">A system entry, in settings under accounts, on the Work tab. It deletes the profile with every cloned app, its accounts, its chats and its files. No app can hide or block it, Gatekeeper included: that is reserved for a device owner. There is no undo and no recycle bin.</string>
+    <string name="settings_removal_group_before">Before you remove the profile</string>
     <string name="settings_removal_backup">Export the backup</string>
     <string name="settings_removal_backup_desc">Settings, the app lists and the auto-freeze list into a file you keep</string>
+    <string name="settings_removal_survives">What a backup does not hold</string>
+    <string name="settings_removal_survives_desc">No app data, no accounts, no files: only settings and package names. Copy anything you want to keep out of the profile first, with File Shuttle or the system file picker.</string>
     <string name="settings_removal_keep_profile">Keeping the profile across a reinstall</string>
     <string name="settings_removal_keep_profile_desc">The profile can outlive the app: its ownership may be handed to another app for the duration of the reinstall and handed back afterwards. Verified on a test bench, including a change of signing key. It needs a second, companion app, which this build does not ship yet.</string>
+    <!-- Re-pairing the personal copy to a live profile after its data was wiped -->
+    <string name="work_service_bind_repair">Reconnect</string>
+    <string name="repair_request_title">Reconnect to the work profile</string>
+    <string name="repair_request_message">The profile is alive but no longer recognises this copy. That happens when Gatekeeper is reinstalled here or its storage is cleared.\n\nA confirmation will appear in the work profile. Allow it only if it shows this code:\n\n%1$s</string>
+    <string name="repair_request_continue">Continue</string>
+    <string name="repair_declined">Not reconnected: the work profile did not confirm</string>
+    <string name="repair_confirm_title">Reconnect Gatekeeper?</string>
+    <string name="repair_confirm_message">Gatekeeper in the personal profile asks to take control of this work profile again.\n\nCode: %1$s\n\nAllow only if the personal profile is showing the same code right now. If it is not, something else is asking, and allowing would hand it the profile.</string>
+    <string name="repair_confirm_allow">Codes match, allow</string>
+    <string name="repair_confirm_deny">Deny</string>
 </resources>

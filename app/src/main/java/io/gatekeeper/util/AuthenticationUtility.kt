@@ -20,15 +20,14 @@ import javax.crypto.KeyGenerator
 // across the profile boundary. Gatekeeper will always trust the first key it receives.
 object AuthenticationUtility {
     fun signIntent(intent: Intent) {
-        var key = LocalStorageManager.getInstance().getString(LocalStorageManager.PREF_AUTH_KEY)
-        if (key == null || hexStringToByteArray(key) == null) {
-            if (intent.action !in BOOTSTRAP_ACTIONS) {
-                Log.w(TAG, "cross-profile action deferred until bootstrap: ${intent.action}")
-                return
-            }
-            key = generateKey()
-            LocalStorageManager.getInstance().setString(LocalStorageManager.PREF_AUTH_KEY, key)
+        val stored = LocalStorageManager.getInstance()
+            .getString(LocalStorageManager.PREF_AUTH_KEY)
+            ?.takeIf { hexStringToByteArray(it) != null }
+        if (stored == null && intent.action !in BOOTSTRAP_ACTIONS) {
+            Log.w(TAG, "cross-profile action deferred until bootstrap: ${intent.action}")
+            return
         }
+        val key = stored ?: currentKey()
 
         if (intent.action in BOOTSTRAP_ACTIONS) {
             intent.putExtra("auth_key", key)
@@ -73,6 +72,36 @@ object AuthenticationUtility {
         }
     }
 
+    /**
+     * Принять чужой ключ вместо своего; false -- ключ не годен по форме.
+     * Вызывается только после подтверждения человеком в рабочем профиле
+     * (ProfileRepairFlow): молчаливая смена ключа отдала бы реле любому
+     * приложению, умеющему послать форварднутый интент.
+     */
+    fun adoptKey(key: String): Boolean {
+        if (hexStringToByteArray(key) == null) return false
+        val storage = LocalStorageManager.getInstance()
+        storage.setString(LocalStorageManager.PREF_AUTH_KEY, key)
+        storage.setBoolean(LocalStorageManager.PREF_AUTH_BOOTSTRAPPED, true)
+        return true
+    }
+
+    /** Свой ключ для предъявления другой стороне; заводится, если его еще нет. */
+    fun currentKey(): String {
+        val storage = LocalStorageManager.getInstance()
+        val existing = storage.getString(LocalStorageManager.PREF_AUTH_KEY)
+        if (existing != null && hexStringToByteArray(existing) != null) return existing
+        val fresh = try {
+            val keyGen = KeyGenerator.getInstance("HmacSHA256")
+            keyGen.init(KEY_BITS)
+            bytesToHex(keyGen.generateKey().encoded)
+        } catch (e: NoSuchAlgorithmException) {
+            throw IllegalStateException("HmacSHA256 is unavailable", e)
+        }
+        storage.setString(LocalStorageManager.PREF_AUTH_KEY, fresh)
+        return fresh
+    }
+
     fun reset() {
         LocalStorageManager.getInstance().remove(LocalStorageManager.PREF_AUTH_KEY)
         LocalStorageManager.getInstance().remove(LocalStorageManager.PREF_AUTH_BOOTSTRAPPED)
@@ -81,14 +110,6 @@ object AuthenticationUtility {
     private fun canBootstrap(intent: Intent): Boolean =
         !LocalStorageManager.getInstance().getBoolean(LocalStorageManager.PREF_AUTH_BOOTSTRAPPED) &&
             intent.action in BOOTSTRAP_ACTIONS && intent.hasExtra("auth_key")
-
-    private fun generateKey(): String = try {
-        val keyGen = KeyGenerator.getInstance("HmacSHA256")
-        keyGen.init(256)
-        bytesToHex(keyGen.generateKey().encoded)
-    } catch (e: NoSuchAlgorithmException) {
-        throw IllegalStateException("HmacSHA256 is unavailable", e)
-    }
 
     private val hexArray = "0123456789ABCDEF".toCharArray()
 
@@ -140,6 +161,7 @@ object AuthenticationUtility {
     }
 
     private const val TAG = "AuthUtility"
+    private const val KEY_BITS = 256
     private const val CLOCK_SKEW_MS = 2_000L
     private const val MAX_AGE_MS = 30_000L
     private val BOOTSTRAP_ACTIONS = setOf(

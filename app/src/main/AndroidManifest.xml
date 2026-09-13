@@ -93,6 +93,7 @@
             <intent-filter>
                 <action android:name="io.gatekeeper.action.FINALIZE_PROVISION" />
                 <action android:name="io.gatekeeper.action.START_SERVICE" />
+                <action android:name="io.gatekeeper.action.REQUEST_REPAIR" />
                 <action android:name="io.gatekeeper.action.TRY_START_SERVICE" />
                 <action android:name="io.gatekeeper.action.INSTALL_PACKAGE" />
                 <action android:name="io.gatekeeper.action.UNINSTALL_PACKAGE" />

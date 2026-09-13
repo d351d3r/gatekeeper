@@ -52,6 +52,7 @@ import io.gatekeeper.services.IGatekeeperService
 import io.gatekeeper.services.IStartActivityProxy
 import io.gatekeeper.services.KillerService
 import io.gatekeeper.util.AntiSpyLaunchGate
+import io.gatekeeper.util.AuthenticationUtility
 import io.gatekeeper.util.AntiSpyManager
 import io.gatekeeper.util.WorkProfileStatus
 import io.gatekeeper.util.ApplicationInfoWrapper
@@ -59,6 +60,7 @@ import io.gatekeeper.util.AutoFreezeDefaults
 import io.gatekeeper.util.BackupPayload
 import io.gatekeeper.util.FileShuttleConnection
 import io.gatekeeper.util.LocalStorageManager
+import io.gatekeeper.util.PairingCode
 import io.gatekeeper.util.ProfileActions
 import io.gatekeeper.util.PowerDiagnostics
 import io.gatekeeper.util.ServiceLiveness
@@ -88,6 +90,15 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::tryStartWorkServiceCb)
     private val bindWorkService =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::bindWorkServiceCb)
+    private val requestRepair =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                workBindAttempts = 0
+                bindWorkService()
+            } else {
+                GatekeeperToast.show(this, R.string.repair_declined)
+            }
+        }
     private val antiSpyVpnPermission =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -442,7 +453,7 @@ class MainActivity : AppCompatActivity() {
         }
         pendingBindFailureReason = 0
         retryStartupProbeAfterFailure = false
-        AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this)
             .setTitle(R.string.work_service_bind_failed_title)
             .setMessage(WorkServiceBindFailure.messageOf(reason))
             .setCancelable(false)
@@ -456,7 +467,42 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             .setNegativeButton(R.string.work_service_bind_close) { _, _ -> finish() }
+        // Профиль жив, а реле молчит -- вероятнее всего разошлись ключи после
+        // переустановки личной копии. Даем выход, который не стоит профиля.
+        if (hasManagedProfile()) {
+            dialog.setNeutralButton(R.string.work_service_bind_repair) { _, _ -> offerProfileRepair() }
+        }
+        dialog.show()
+    }
+
+    /**
+     * Перепривязка личной копии к живому профилю. Код показывается здесь, до
+     * отправки: в рабочем профиле человек сверит его с тем, что покажет диалог
+     * подтверждения, и по несовпадению узнает чужой запрос (ProfileRepairFlow).
+     */
+    private fun offerProfileRepair() {
+        val key = AuthenticationUtility.currentKey()
+        AlertDialog.Builder(this)
+            .setTitle(R.string.repair_request_title)
+            .setMessage(getString(R.string.repair_request_message, PairingCode.of(key)))
+            .setPositiveButton(R.string.repair_request_continue) { _, _ -> sendRepairRequest(key) }
+            .setNegativeButton(android.R.string.cancel, null)
             .show()
+    }
+
+    private fun sendRepairRequest(key: String) {
+        val intent = Intent(DummyActivity.REQUEST_REPAIR).apply {
+            putExtra(ProfileRepairFlow.EXTRA_AUTH_KEY, key)
+            addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+        }
+        try {
+            Utility.transferIntentToProfile(this, intent)
+            requestRepair.launch(intent)
+        } catch (e: IllegalStateException) {
+            onWorkServiceBindFailed(WorkServiceBindFailure.NO_RESOLUTION, e)
+        } catch (e: ActivityNotFoundException) {
+            onWorkServiceBindFailed(WorkServiceBindFailure.NO_RESOLUTION, e)
+        }
     }
 
     /** Пункты меню, которым нужен сервис профиля: без него объясняем, а не разыменовываем null. */

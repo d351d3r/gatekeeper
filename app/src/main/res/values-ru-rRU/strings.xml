@@ -419,17 +419,34 @@
     <string name="action_freeze_empty">Заморозить</string>
     <string name="action_unfreeze_empty">Разморозить</string>
     <string name="status_counts_no_list">%1$d приложений: %2$d заморожено. Отметьте приложения в списке автозаморозки, чтобы кнопки заработали</string>
-    <!-- Экран удаления: цена названа до, а не после -->
+    <!-- Экран удаления. Замерено на AVD 16: пока Gatekeeper владеет профилем,
+         система сама отказывается удалять его рабочую копию, поэтому экран говорит,
+         что защищено, а не пугает удалением, которое невозможно. -->
     <string name="settings_root_removal">Удаление Gatekeeper</string>
-    <string name="settings_root_removal_desc">Что уйдет вместе с ним и что сделать заранее</string>
-    <string name="settings_removal_group_cost">Чего стоит удаление</string>
-    <string name="settings_removal_what">Рабочий профиль уходит вместе с приложением</string>
-    <string name="settings_removal_what_desc">Android привязывает рабочий профиль к приложению, которое им владеет. Удалите Gatekeeper -- система удалит профиль: все клоны, их аккаунты, переписка и файлы исчезнут вместе с ним. Отмены нет, корзины нет.</string>
-    <string name="settings_removal_survives">Что переживет удаление</string>
-    <string name="settings_removal_survives_desc">Только то, что лежит вне профиля: ваши личные приложения и файлы, которые вы заранее скопировали из профиля наружу. В файле резервной копии лежат настройки и имена пакетов, а не данные.</string>
-    <string name="settings_removal_group_before">Перед удалением</string>
+    <string name="settings_root_removal_desc">Что защищено, что удаляет все и что сделать заранее</string>
+    <string name="settings_removal_group_protected">Чего не случится по ошибке</string>
+    <string name="settings_removal_work_copy">Рабочую копию удалить нельзя</string>
+    <string name="settings_removal_work_copy_desc">Пока Gatekeeper владеет рабочим профилем, Android отказывается удалять его копию внутри профиля: кнопка в системных настройках гаснет, а запрос отклоняется. Случайный тап не унесет профиль с собой.</string>
+    <string name="settings_removal_personal_copy">Личную копию удалять безопасно</string>
+    <string name="settings_removal_personal_copy_desc">Профиль, клоны и их данные остаются на месте. Поставьте Gatekeeper заново, и он подключится к живому профилю, а не создаст новый.</string>
+    <string name="settings_removal_group_wipe">Что действительно удаляет все</string>
+    <string name="settings_removal_wipe">Удалить рабочий профиль</string>
+    <string name="settings_removal_wipe_desc">Системный пункт: настройки, раздел аккаунтов, вкладка «Рабочий». Он удаляет профиль со всеми клонами, аккаунтами, перепиской и файлами. Спрятать или запретить его не может ни одно приложение, Gatekeeper тоже: это право владельца устройства. Отмены нет, корзины нет.</string>
+    <string name="settings_removal_group_before">Перед удалением профиля</string>
     <string name="settings_removal_backup">Выгрузить резервную копию</string>
     <string name="settings_removal_backup_desc">Настройки, списки приложений и список автозаморозки в файл, который останется у вас</string>
+    <string name="settings_removal_survives">Чего в резервной копии нет</string>
+    <string name="settings_removal_survives_desc">Ни данных приложений, ни аккаунтов, ни файлов: только настройки и имена пакетов. Все, что хотите сохранить, скопируйте из профиля заранее -- через File Shuttle или системный выбор файлов.</string>
     <string name="settings_removal_keep_profile">Сохранить профиль при переустановке</string>
     <string name="settings_removal_keep_profile_desc">Профиль может пережить приложение: владение передается другому приложению на время переустановки и возвращается обратно. Проверено на стенде, в том числе со сменой ключа подписи. Нужен второй APK-компаньон, которого в этой сборке пока нет.</string>
+    <!-- Перепривязка личной копии к живому профилю после стирания ее данных -->
+    <string name="work_service_bind_repair">Перепривязать</string>
+    <string name="repair_request_title">Перепривязка к рабочему профилю</string>
+    <string name="repair_request_message">Профиль жив, но больше не узнает эту копию. Так бывает после переустановки Gatekeeper или очистки его данных.\n\nВ рабочем профиле появится подтверждение. Разрешайте, только если в нем тот же код:\n\n%1$s</string>
+    <string name="repair_request_continue">Продолжить</string>
+    <string name="repair_declined">Не перепривязано: рабочий профиль не подтвердил</string>
+    <string name="repair_confirm_title">Перепривязать Gatekeeper?</string>
+    <string name="repair_confirm_message">Gatekeeper из личного профиля просит снова получить управление этим рабочим профилем.\n\nКод: %1$s\n\nРазрешайте, только если сейчас личный профиль показывает такой же код. Если нет -- просит что-то другое, и разрешение отдаст ему профиль.</string>
+    <string name="repair_confirm_allow">Коды совпадают, разрешить</string>
+    <string name="repair_confirm_deny">Отклонить</string>
 </resources>

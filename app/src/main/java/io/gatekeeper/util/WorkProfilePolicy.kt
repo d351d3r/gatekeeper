@@ -29,6 +29,7 @@ private const val TO_WORK = DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED
  */
 private val RELAY_ACTION_FILTERS: List<Pair<String, Int>> = listOf(
     DummyActivity.START_SERVICE to TO_PARENT,
+    DummyActivity.REQUEST_REPAIR to TO_PARENT,
     DummyActivity.TRY_START_SERVICE to TO_PARENT,
     DummyActivity.UNFREEZE_AND_LAUNCH to TO_PARENT,
     DummyActivity.FREEZE_ALL_IN_LIST to TO_PARENT,
