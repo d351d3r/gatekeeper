@@ -27,6 +27,7 @@ import io.gatekeeper.util.FileProviderProxy
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.UriForwardProxy
 import io.gatekeeper.util.Notifications
+import io.gatekeeper.util.PackageSequence
 import io.gatekeeper.util.StatusNotification
 import io.gatekeeper.util.Utility
 import io.gatekeeper.util.WorkPackageWatcher
@@ -75,7 +76,14 @@ class GatekeeperService : Service() {
                 // canLaunch считаем один раз и несём в wrapper: подсказке C1 нужен
                 // фактический критерий доступности (FLAG_INSTALLED + launcher) даже
                 // в режиме showAll, где фильтр раньше его не вычислял.
-                data class ScanEntry(val info: ApplicationInfo, val canLaunch: Boolean)
+                // Скрытость спрашивается у DPM по одному пакету за вызов, поэтому она
+                // попадает в запись один раз: раньше тот же пакет опрашивался дважды --
+                // в фильтре и в сборке wrapper.
+                data class ScanEntry(
+                    val info: ApplicationInfo,
+                    val canLaunch: Boolean,
+                    val isHidden: Boolean,
+                )
 
                 val list = packageManager!!.getInstalledApplications(pmFlags)
                     .asSequence()
@@ -84,19 +92,19 @@ class GatekeeperService : Service() {
                         ScanEntry(
                             info,
                             packageManager!!.getLaunchIntentForPackage(info.packageName) != null,
+                            isHidden(info.packageName),
                         )
                     }
-                    .filter { (info, canLaunch) ->
+                    .filter { (info, canLaunch, isHidden) ->
                         val isSystem = info.flags and ApplicationInfo.FLAG_SYSTEM != 0
-                        val isHidden = isHidden(info.packageName)
                         val isInstalled = info.flags and ApplicationInfo.FLAG_INSTALLED != 0
                         showAll || (!isSystem && isInstalled) || isHidden || canLaunch
                     }
-                    .map { (info, canLaunch) ->
+                    .map { (info, canLaunch, isHidden) ->
                         ApplicationInfoWrapper(info)
                             .setCanLaunch(canLaunch)
                             .loadLabel(packageManager!!)
-                            .setHidden(isHidden(info.packageName))
+                            .setHidden(isHidden)
                     }
                     .sortedWith { x, y ->
                         when {
@@ -421,6 +429,15 @@ class GatekeeperService : Service() {
          * на Android 14+ запуск activity из фонового сервиса рубит Background
          * Activity Launch, даже через AlarmManager (замерено на AVD 16).
          */
+        /** Дешевая замена перечислению списка для наблюдателя с личной стороны. */
+        override fun getPackageChangeSequence(since: Int): Int {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                return PackageSequence.UNSUPPORTED
+            }
+            val from = since.coerceAtLeast(PackageSequence.FROM_SCRATCH)
+            return packageManager!!.getChangedPackages(from)?.sequenceNumber ?: from
+        }
+
         override fun takeNewWorkPackages(): List<String> {
             check(isProfileOwner) { "Only the work profile tracks new packages" }
             val storage = LocalStorageManager.getInstance()
