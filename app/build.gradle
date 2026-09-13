@@ -47,6 +47,14 @@ android {
                 keyAlias releaseKeyAlias
                 keyPassword releaseKeyPassword
             }
+            // v1 (JAR) не нужен: он для устройств до Android 7, а minSdk 24 -- это
+            // как раз 7.0. v3 добавляет право сменить ключ подписи в будущем без
+            // переустановки у пользователей (Android 9+); включать его имеет смысл
+            // только до первых установок, потом поздно. Менять ключ все равно
+            // придется старым ключом, так что от потери ключа это не страхует.
+            enableV1Signing = false
+            enableV2Signing = true
+            enableV3Signing = true
         }
     }
     buildTypes {
@@ -119,7 +127,9 @@ afterEvaluate {
         dependsOn('fixAidlGeneratedComments')
     }
 
-    // Copy the built arm64 APK to the repo root with a versioned, human-readable name.
+    // Copy the built arm64 APK to the repo root under the same name the release
+    // publishes, so a file here and a file downloaded from GitHub are comparable.
+    // The version code is not in the name: one version name means one build.
     ['Debug', 'Release'].each { bt ->
         tasks.named("assemble${bt}").configure {
             doLast {
@@ -130,7 +140,7 @@ afterEvaluate {
                     copy {
                         from apk
                         into rootProject.projectDir
-                        rename { "Gatekeeper-${versionName}-(${versionCode})-${bt.toLowerCase()}.apk" }
+                        rename { "gatekeeper-${versionName}-${bt.toLowerCase()}.apk" }
                     }
                 }
             }

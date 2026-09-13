@@ -146,7 +146,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
-          name: Gatekeeper ${{ env.VERSION_NAME }} (${{ env.VERSION_CODE }})
+          name: Gatekeeper ${{ env.VERSION_NAME }}
           body_path: release-notes.md
           files: |
             ${{ steps.sig.outputs.apk }}

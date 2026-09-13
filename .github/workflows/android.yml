@@ -71,18 +71,17 @@ jobs:
 
       # Подписанный релиз собирает только release.yml по тегу: ключ не должен
       # разъезжаться по всем прогонам, а debug-артефакта хватает для проверки сборки.
+      # Берем копию из корня, а не сырой вывод сборки: у нее то же имя, что у файла
+      # в релизе, и в SHA256SUMS.txt попадает имя файла, а не путь внутри build.
       - name: Write APK checksums
-        run: |
-          cd app/build/outputs/apk
-          sha256sum debug/*.apk > SHA256SUMS.txt
-          cat SHA256SUMS.txt
+        run: sha256sum gatekeeper-*-debug.apk | tee SHA256SUMS.txt
 
       - name: Upload arm64 debug APK
         uses: actions/upload-artifact@v7
         with:
           name: gatekeeper-arm64-debug-apk
           path: |
-            app/build/outputs/apk/debug/*-arm64-v8a-*.apk
-            app/build/outputs/apk/debug/SHA256SUMS.txt
+            gatekeeper-*-debug.apk
+            SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 30
