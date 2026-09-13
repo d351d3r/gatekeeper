@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Строки политик изоляции берутся по имени через Resources.getIdentifier
+    ("isolation_<ключ>" и "..._desc", см. IsolationSettingsFragment и
+    IsolationSetupActivity). Статический анализ такую ссылку не видит, поэтому
+    shrinkResources вырезал все 23 строки политик из release-сборки, и экран
+    изоляции оставался без переключателей. Это правило их сохраняет.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@string/isolation_*" />
