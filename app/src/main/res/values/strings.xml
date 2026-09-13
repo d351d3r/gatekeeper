@@ -474,4 +474,10 @@
     <string name="repair_confirm_message">Gatekeeper in the personal profile asks to take control of this work profile again.\n\nCode: %1$s\n\nAllow only if the personal profile is showing the same code right now. If it is not, something else is asking, and allowing would hand it the profile.</string>
     <string name="repair_confirm_allow">Codes match, allow</string>
     <string name="repair_confirm_deny">Deny</string>
+    <string name="notif_channel_files">Work files</string>
+    <string name="notif_channel_files_desc">Offers to connect to the other profile when a file manager asks for its files and the link is down</string>
+    <string name="file_shuttle_notice_title">Connect to the other profile?</string>
+    <string name="file_shuttle_notice_text">A file manager asked for files from the other profile. Tap to open the link, then repeat the action there.</string>
+    <string name="settings_files_manager">Browsing from a file manager</string>
+    <string name="settings_files_manager_desc">A file manager that can add a storage location through the system picker (MiXplorer, Total Commander) keeps access to the other profile permanently: add the location, pick Gatekeeper, and it stays in its list. The first time it opens the folder after an idle spell, the link is down and it reports no access -- a notification then offers to raise the link, and repeating the action inside the file manager works.</string>
 </resources>

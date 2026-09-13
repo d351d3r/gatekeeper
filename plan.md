@@ -571,6 +571,52 @@ Gatekeeper — нет, и диалог прямо велит отказать п
 Отсюда экран «Удаление Gatekeeper» в настройках говорит, что защищено, а не
 пугает удалением, которого не бывает.
 
+### E-12. Рабочий профиль не открывался из стороннего файлового менеджера — исправлено 13.09.2026
+
+**Запрос.** Смотреть рабочий профиль из любого файлового менеджера, например MiXplorer.
+
+**Что оказалось не так в диагнозе.** Сначала чинилась не та дверь: системная
+вкладка «Work» в DocumentsUI, которая отвечает «Your IT admin doesn't allow you
+to access work files from a personal app». Кросс-профильные фильтры на
+`OPEN_DOCUMENT_TREE` / `GET_CONTENT` в обе стороны ее не сдвинули, и правка была
+откачена. Она и не нужна: `CrossProfileDocumentsProvider` живет **в личном
+профиле** и ходит в рабочий по биндеру через `FileShuttleService`. Системная
+вкладка другого профиля тут ни при чем.
+
+**Замеры на AVD 16.**
+
+| Условие | Результат |
+|---|---|
+| File Shuttle выключен | Корня Gatekeeper в выборе файлов нет: `CrossProfileDocumentsProvider` в `disabledComponents` |
+| File Shuttle включен (нужен All Files в обоих профилях) | Компонент включен в user 0 и user 11, корень «Gatekeeper» есть в «Open from» |
+| Заход в корень без сессии | DocumentsUI рисует «To view this directory, sign in to Gatekeeper» + SIGN IN |
+| После SIGN IN | Дерево рабочего профиля: Alarms, Android, DCIM, Download, Pictures и далее |
+| Запрос от uid 2000 без гранта | `SecurityException: ... requires that you obtain access using ACTION_OPEN_DOCUMENT or related APIs` |
+
+Последняя строка -- главная: провайдер закрыт для произвольного приложения, и
+система сама называет поддерживаемый путь -- грант через системный выбор. То
+есть `MANAGE_DOCUMENTS` изоляцию держит, а файловому менеджеру достаточно один
+раз добавить хранилище через `OPEN_DOCUMENT_TREE`.
+
+**Что мешало.** Без живой сессии провайдер бросает `AuthenticationRequiredException`
+с `PendingIntent` внутри. Развернуть его в кнопку умеет только системный
+DocumentsUI; обычному клиенту SAF оно достается как `SecurityException`, и
+сделать с ним нечего -- поднять связь неоткуда, а запуск activity из провайдера
+рубит Background Activity Launch.
+
+**Фикс.** `FileShuttleNotice`: когда зовет клиент без `MANAGE_DOCUMENTS`,
+провайдер дополнительно показывает уведомление с тем же действием (канал
+`gatekeeper.files`). Проверено сквозняком: запрос без сессии -> исключение и
+уведомление «Connect to the other profile?» -> тап -> сессия поднята -> повтор
+запроса вернул листинг рабочего профиля (Android, Download, Music, Podcasts,
+Ringtones, Alarms, Notifications, Pictures).
+
+**Чего замер не покрыл.** Сквозного прохода именно сторонним приложением с
+выданным tree-URI на стенде нет: третьих приложений на AVD не установлено, а
+`adb shell` там root и проверки прав обходит. Судя по отказу для uid 2000,
+путь ровно тот, что называет система, но подтверждать это надо MiXplorer на
+живом телефоне.
+
 ## Блок F. Пересмотр «невозможного» (ресерч 13.09.2026)
 
 Полный разбор с командами и ссылками — `.ai/ui-redesign/platform-walls-research.md`.

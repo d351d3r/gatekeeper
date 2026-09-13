@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import io.gatekeeper.R
 import io.gatekeeper.util.FileShuttleConnection
+import io.gatekeeper.util.FileShuttleNotice
 import io.gatekeeper.util.GatekeeperToast
 
 /**
@@ -42,6 +43,9 @@ class FileShuttleAuthActivity : Activity() {
     }
 
     private fun done(bound: Boolean) {
+        // Предложение подключиться выполнено: файловому менеджеру, который его не показал
+        // бы сам, оно больше не нужно.
+        if (bound) FileShuttleNotice.clear(this)
         // Единственный сигнал, по которому клиент SAF перечитывает каталог, если он
         // отправлял действие через startIntentSenderForResult.
         setResult(if (bound) RESULT_OK else RESULT_CANCELED)

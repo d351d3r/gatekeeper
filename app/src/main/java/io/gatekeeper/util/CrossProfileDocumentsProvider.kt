@@ -203,6 +203,9 @@ class CrossProfileDocumentsProvider : DocumentsProvider() {
         if (FileShuttleConnection.peek() != null) {
             throw FileNotFoundException(context.getString(R.string.file_shuttle_read_failed))
         }
+        // Действие внутри исключения умеет показать только системный выбор файлов.
+        // Обычному файловому менеджеру предлагаем то же действие уведомлением.
+        FileShuttleNotice.offerConnection(context, callingPackage)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             throw FileNotFoundException(context.getString(R.string.file_shuttle_unavailable))
         }

@@ -30,4 +30,11 @@
         android:title="@string/settings_files_how"
         android:summary="@string/settings_files_how_desc" />
 
+    <androidx.preference.Preference
+        android:key="settings_files_manager"
+        app:iconSpaceReserved="false"
+        android:selectable="false"
+        android:title="@string/settings_files_manager"
+        android:summary="@string/settings_files_manager_desc" />
+
 </androidx.preference.PreferenceScreen>

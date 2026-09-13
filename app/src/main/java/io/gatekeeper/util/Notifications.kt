@@ -35,6 +35,9 @@ object Notifications {
     /** Проблемы: приложение не смогло сделать то, о чем его просили. */
     const val CHANNEL_WARNING = "gatekeeper.warning"
 
+    /** Файлы другого профиля: связь нужно поднять, а спросить об этом больше негде. */
+    const val CHANNEL_FILES = "gatekeeper.files"
+
     private const val VPN_AUTO_FREEZE_SUCCESS_NOTIFICATION_ID = 0xe49d3
     private const val REQUEST_OPEN_MAIN = 0x6d61
 
@@ -78,6 +81,11 @@ object Notifications {
         CHANNEL_WARNING to ChannelSpec(
             R.string.notif_channel_warning,
             R.string.notif_channel_warning_desc,
+            NotificationManager.IMPORTANCE_HIGH,
+        ),
+        CHANNEL_FILES to ChannelSpec(
+            R.string.notif_channel_files,
+            R.string.notif_channel_files_desc,
             NotificationManager.IMPORTANCE_HIGH,
         ),
     )
@@ -161,7 +169,8 @@ object Notifications {
     }
 
     @Suppress("DEPRECATION")
-    private fun newBuilder(context: Context, channel: String): Notification.Builder {
+    /** Видна соседям по пакету: свой контент-интент строится у них (FileShuttleNotice). */
+    internal fun newBuilder(context: Context, channel: String): Notification.Builder {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ensureChannel(context, channel)
             return Notification.Builder(context, channel)
