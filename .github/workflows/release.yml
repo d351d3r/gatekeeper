@@ -111,9 +111,13 @@ jobs:
         id: sig
         run: |
           APKSIGNER=$(ls "${ANDROID_HOME}"/build-tools/*/apksigner | sort -V | tail -1)
-          APK=$(ls app/build/outputs/apk/release/*-arm64-v8a-*.apk | head -1)
+          BUILT=$(ls app/build/outputs/apk/release/*-arm64-v8a-*.apk | head -1)
+          # Имя ассета -- то, что видит скачавший: приложение и версия, а не
+          # внутреннее имя модуля сборки. Копия лежит в корне рабочей копии, чтобы
+          # в SHA256SUMS.txt попало имя файла, а не путь внутри build.
+          APK="gatekeeper-${VERSION_NAME}-release.apk"
+          cp "${BUILT}" "${APK}"
           echo "apk=${APK}" >> "$GITHUB_OUTPUT"
-          echo "name=$(basename "${APK}")" >> "$GITHUB_OUTPUT"
           "${APKSIGNER}" verify --print-certs "${APK}" | tee certs.txt
           FP=$(grep -m1 -i 'SHA-256 digest' certs.txt | awk '{print $NF}')
           echo "fingerprint=${FP}" >> "$GITHUB_OUTPUT"
