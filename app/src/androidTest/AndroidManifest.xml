@@ -49,6 +49,14 @@
             </intent-filter>
         </receiver>
 
+        <!--
+            Точка входа обратного хода, которая поднимает холодный процесс:
+            манифестный ресивер по am broadcast в нём не стартует.
+        -->
+        <activity
+            android:name="io.gatekeeper.TransferBackActivity"
+            android:exported="true" />
+
         <receiver
             android:name="io.gatekeeper.TransferBackReceiver"
             android:exported="true">

@@ -31,6 +31,12 @@ Product direction and platform boundaries: [PRODUCT.md](PRODUCT.md).
   when the user opened the app list anyway.
 - **Updating from earlier builds requires recreating the work profile** (the device
   admin component changed) and re-pinning shortcuts / re-granting SAF folders.
+  That is a past migration, not a platform rule: on a stand, profile ownership
+  transfers to another app and back, and the profile survives a full reinstall of
+  Gatekeeper under a different signing key
+  (`.ai/ui-redesign/platform-walls-research.md`, section 9a). Using that needs a
+  small companion APK to hold ownership during the reinstall, and the product does
+  not ship one yet.
 
 ## Features
 
