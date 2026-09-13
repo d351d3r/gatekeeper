@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_diag_list"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_diag_list_title" />
+
+    <androidx.preference.Preference
+        android:key="settings_diag_vendor_note"
+        app:iconSpaceReserved="false"
+        android:selectable="false"
+        android:title="@string/settings_diag_vendor_note"
+        android:summary="@string/settings_diag_vendor_note_desc" />
+
+</androidx.preference.PreferenceScreen>

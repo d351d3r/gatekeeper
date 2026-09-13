@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="first_run_alert_cancel">Beenden</string>
+    <string name="first_run_alert_continue">Fortsetzen</string><string name="device_admin_desc">App-Isolations-Dienst</string><string name="notifications_important">Gatekeeper - Achtung</string>
+    <string name="finish_provision_title">Klicken Sie hier, um die Installation von Gatekeeper abzuschliessen</string>
+    <string name="finish_provision_desc">Glückwunsch! Nur noch ein Klick und die Installation von Gatekeeper ist abgeschlossen.</string>
+    <string name="service_title">Gatekeeper-Dienst</string>
+    <string name="service_desc">Gatekeeper läuft jetzt …</string>
+    <string name="service_auto_freeze_title">Auto-Frost ausstehend</string>
+    <string name="service_auto_freeze_desc">Bei der nächsten Bildschirmsperre wird Gatekeeper die Apps automatisch einfrosten, die durch \"Auftauen &amp; Starten\" gestartet wurden.</string>
+    <string name="service_auto_freeze_now">Froste jetzt ein</string>
+    <string name="app_installing">Wird installiert...</string>
+    <string name="fragment_profile_main">Persönlich</string>
+    <string name="fragment_profile_work">Gatekeeper</string>
+    <string name="list_item_disabled">[Eingefrostet] %s</string>
+    <string name="batch_operation">Stapelverabeitung</string>
+    <string name="clone_to_work_profile">Klone zu Gatekeeper (Arbeits-Profil)</string>
+    <string name="clone_to_main_profile">Klone zum persönlichen Profil</string>
+    <string name="uninstall_app">Deinstallieren</string>
+    <string name="freeze_app">Einfrosten</string>
+    <string name="unfreeze_app">Auftauen</string>
+    <string name="launch">Starten</string>
+    <string name="create_unfreeze_shortcut">Erzeuge eine Verknüpfung für Auftauen und/oder Starten</string>
+    <string name="auto_freeze">Auto-Frost</string>
+    <string name="allow_cross_profile_widgets">Erlaube Widgets im persönlichen Profil</string>
+    <string name="search">Suche</string>
+    <string name="freeze_all">Alle einfrosten</string>
+    <string name="create_freeze_all_shortcut">Verknüpfung zum Einfrosten aller Apps erzeugen</string>
+    <string name="freeze_all_shortcut">Alle Apps Einfrosten</string>
+    <string name="install_app_to_profile">Ein APK in Gatekeeper installieren</string>
+    <string name="install_app_to_profile_success">Die Installation der App im Arbeits-Profil wurde abgeschlossen.</string>
+    <string name="show_all">Zeige alle Apps</string>
+    <string name="show_all_warning">Die Nutzung von Apps, die in der Liste ausgeblendet sind, kann zu Abstürzen und allem möglichen unerwartetem Verhalten führen. Dieses Feature kann aber nützlich sein, wenn vom Hersteller fehlerhaft angepasste ROMs nicht alle notwendigen System-Apps für das Arbeits-Profil zur Verfügung stellen. Wenn sie fortfahren, handeln Sie auf eigenes Risiko.</string>
+    <string name="settings">Einstellungen</string>
+    <string name="settings_interaction">Interaktion</string>
+    <string name="settings_cross_profile_file_chooser">Datei-Shuttle</string>
+    <string name="settings_cross_profile_file_chooser_desc">Datei-Shuttle ermöglicht den Zugriff auf Dateien des persönlichen Profils vom Arbeitsprofil und umgekehrt. Sie können Dateien durchsuchen, ansehen, auswählen und kopieren. Dazu können der systemeigene Dateimanager oder auch Apps mit Dateizugriff benutzt werden. Diese Apps erhalten lediglich temporären Zugriff auf die ausgewählten Dateien, die eigentliche Dateisystem-Isolation bleibt bestehen.</string>
+    <string name="settings_services">Dienste</string>
+    <string name="settings_auto_freeze_service">Auto-Frost Dienst</string>
+    <string name="settings_auto_freeze_service_desc">Bei Bildschirmsperre automatisch Apps einfrosten, die über die Verknüpfung für \"Auftauen &amp; Starten\" gestartet wurden.</string>
+    <string name="settings_auto_freeze_delay">Auto-Frost Verzögerung</string>
+    <string name="settings_dont_freeze_foreground">Apps, die im Vordergrund laufen nicht einfrosten</string>
+    <string name="settings_dont_freeze_foreground_desc">Apps, die im Vordergrund mit sichtbarer Aktivität laufen, NICHT bei Bildschirmsperre einfrosten. Dies kann für Apps wie Music-Player nützlich sein. Nachträglich können diese über die Verknüpfung \"Batch Freeze Shortcut\" manuell eingefrostet werden.</string>
+    <string name="settings_about">Über das Programm</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_source_code">Quelltext</string><string name="provision_finished">Die Einrichtung von Gatekeeper ist abgeschlossen. Das Programm wird jetzt neu gestartet. Sollte Gatekeeper nicht automatisch starten, rufen Sie das Programm erneut manuell über das Gatekeeper-Symbol auf.</string><string name="work_profile_not_found">Das Arbeits-Profil wurde nicht gefunden. Bitte starten Sie die App nochmals, um das Profil erneut bereitzustellen.</string>
+    <string name="clone_success">Die Anwendung \"%s\" wurde erfolgreich geklont</string>
+    <string name="uninstall_success">Die Anwendung \"%s\" wurde erfolgreich deinstalliert</string>
+    <string name="freeze_success">Die Anwendung \"%s\" wurde erfolgreich eingefrostet</string>
+    <string name="unfreeze_success">Die Anwendung \"%s\" wurde erfolgreich aufgetaut</string>
+    <string name="clone_fail_system_app">Das Klonen von System-Apps in ein Profil, auf das Gatekeeper keinen Zugriff hat ist fehlgeschlagen.</string>
+    <string name="uninstall_fail_system_app">Die Deinstallation von System-Apps in einem Profil, auf das Gatekeeper keinen Zugriff hat, ist fehlgeschlagen.</string>
+    <string name="unsupported_launcher">Das Hinzufügen einer Verknüpfung zu Ihrem Startprogramm ist fehlgeschlagen. Bitte kontaktieren sie den Entwickler, um weitere Informationen zu erhalten.</string>
+    <string name="app_context_menu_title">Aktionen für %s</string>
+    <string name="freeze_all_success">Alle Anwendungen aus der \"Auto-Frost\" Liste wurden erfolgreich eingefrostet.</string>
+    <string name="shortcut_create_success">Eine Verknüpfung wurde Ihrem Startprogramm hinzugefügt.</string>
+    <string name="request_usage_stats">Gatekeeper benötigt Zugriffsrechte auf <b>Nutzungs-Statistiken</b>. Bitte erteilen Sie die nötigen Zugriffsrechte für <b>BEIDE</b> Gatekeeper Apps, die nach Klick auf \"OK\" im folgenden Dialog angezeigt werden. Bei Nichterteilung der Zugriffsrechte kann diese Programmfunktion nicht korrekt ausgeführt werden.</string>
+    <string name="launch_app_fail">Die Anwendung %s konnte nicht gestartet werden, das sie keine grafische Benutzeroberfläche hat.</string>
+    <string name="request_storage_manager">Gatekeeper benötigt Zugriff auf <b>Alle Dateien</b> um Datei-Shuttle anbieten zu können. Bitte erteilen Sie die notwendigen Zugriffsrechte für <b>BEIDE</b> (persönliches Profil / Arbeitsprofil) Gatekeeper-Apps, die nach dem Klick auf \"OK\" in der nachfolgenden Meldung angezeigt werden.</string>
+    <string name="miui_cannot_clone">Das Klonen von Nicht-System-Apps in das Arbeits-Profil ist derzeit unter MIUI nicht möglich. Bitte klonen sie den App-Store Ihres Systems (z.B. <b>Play Store</b>) in ihr Arbeits-Profil und installieren sie ihre benötigten Anwendungen von dort aus.</string>
+    <string name="continue_anyway">Trotzdem fortsetzen</string><string name="documents_ui">Datei-Manager-Oberfläche</string>
+    <string name="settings_block_contacts_searching">Blockiere Suche nach Kontakten</string>
+    <string name="settings_block_contacts_searching_desc">Zugriff vom persönlichen Profil zu den Kontakten im Arbeitsprofil blockieren.</string>
+<string name="allow_cross_profile_interaction">Profilübergreifende Interaktion erlauben</string>
+    <string name="payment_stub_description">Zahlungsdienst Platzhalter (NICHT VERWENDEN)</string>
+    <string name="settings_payment_stub">Zahlungsdienst-Platzhalter</string>
+    <string name="settings_payment_stub_desc">Richten Sie einen unechten NFC Zahlungsdienst im Hauptprofil ein, so dass die kontaktlosen Zahlungsoptionen unter Einstellungen - NFC aktiviert werden. So kann ein Zahlungsanbieter im Arbeitsprofil eingerichtet und gewählt werden. Damit wird ein Fehler in Android umgangen, der es unmöglich macht, im Arbeitsprofil einen Zahlungsanbieter auszuwählen, wenn kein Zahlungsdienst im Hauptprofil verfügbar ist.</string>
+</resources>

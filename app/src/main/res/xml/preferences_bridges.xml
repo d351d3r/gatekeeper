@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_bridges_widgets"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_bridges_widgets_title">
+
+        <androidx.preference.Preference
+            android:key="settings_bridges_widgets_note"
+            app:iconSpaceReserved="false"
+            android:selectable="false"
+            android:summary="@string/settings_bridges_widgets_desc" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_bridges_interaction"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_bridges_interaction_title">
+
+        <androidx.preference.Preference
+            android:key="settings_bridges_interaction_note"
+            app:iconSpaceReserved="false"
+            android:selectable="false"
+            android:summary="@string/settings_bridges_interaction_desc" />
+
+    </androidx.preference.PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>

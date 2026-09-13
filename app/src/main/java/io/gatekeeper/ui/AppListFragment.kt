@@ -1,0 +1,572 @@
+@file:Suppress("DEPRECATION") // legacy version-gated paths (LocalBroadcastManager)
+
+package io.gatekeeper.ui
+
+import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.Icon
+import android.os.Build
+import android.os.Bundle
+import android.os.IBinder
+import android.os.RemoteException
+import android.util.TypedValue
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
+import io.gatekeeper.util.GatekeeperToast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import io.gatekeeper.R
+import io.gatekeeper.services.IAppInstallCallback
+import io.gatekeeper.services.IGetAppsCallback
+import io.gatekeeper.services.ILoadIconCallback
+import io.gatekeeper.services.IGatekeeperService
+import io.gatekeeper.util.AntiSpyLaunchGate
+import io.gatekeeper.util.AntiSpyManager
+import io.gatekeeper.util.ApplicationInfoWrapper
+import io.gatekeeper.util.AutoFreezeDefaults
+import io.gatekeeper.util.AutoFreezePolicy
+import io.gatekeeper.util.CloneOutcome
+import io.gatekeeper.util.LocalStorageManager
+import io.gatekeeper.util.UnfreezeShortcuts
+import io.gatekeeper.util.ProfileNotifier
+import io.gatekeeper.util.Utility
+
+class AppListFragment : BaseFragment() {
+    private var service: IGatekeeperService? = null
+    private var isRemote = false
+    private var refreshing = false
+    private var refreshPending = false
+    private var defaultIcon: Drawable? = null
+    private var selectedApp: ApplicationInfoWrapper? = null
+
+    private val crossProfileWidgetProviders = HashSet<String>()
+    private val crossProfilePackages = HashSet<String>()
+    private var knownWorkProfilePackages: Set<String>? = null
+
+    private var list: RecyclerView? = null
+    private var adapter: AppListAdapter? = null
+    private var swipeRefresh: SwipeRefreshLayout? = null
+    private var actionMode: ActionMode? = null
+
+    private val refreshReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            refresh()
+        }
+    }
+
+    private val searchReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            var query = intent.getStringExtra("text")
+            if ("" == query) {
+                query = null
+            }
+            adapter!!.setSearchQuery(query)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        defaultIcon = requireActivity().packageManager.defaultActivityIcon
+        val serviceBinder = requireArguments().getBinder("service")
+        service = IGatekeeperService.Stub.asInterface(serviceBinder)
+        isRemote = requireArguments().getBoolean("is_remote")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(refreshReceiver, IntentFilter(BROADCAST_REFRESH))
+        LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(
+                searchReceiver,
+                IntentFilter(MainActivity.BROADCAST_SEARCH_FILTER_CHANGED)
+            )
+        refresh()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        selectedApp = null
+        LocalBroadcastManager.getInstance(requireContext())
+            .unregisterReceiver(refreshReceiver)
+        LocalBroadcastManager.getInstance(requireContext())
+            .unregisterReceiver(searchReceiver)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val view = inflater.inflate(R.layout.fragment_list, container, false)
+
+        list = view.findViewById(R.id.fragment_list_recycler_view)
+        swipeRefresh = view.findViewById(R.id.fragment_swipe_refresh)
+        adapter = AppListAdapter(service!!, defaultIcon!!).apply {
+            setContextMenuHandler(this@AppListFragment::showAppActionDialog)
+            if (isRemote) {
+                setWorkProfile(true)
+                allowMultiSelect()
+                setActionModeHandler(this@AppListFragment::createMultiSelectActionMode)
+                setActionModeCancelHandler {
+                    actionMode?.finish()
+                }
+            }
+        }
+        list!!.adapter = adapter
+        list!!.layoutManager = LinearLayoutManager(activity)
+        list!!.setHasFixedSize(true)
+
+        swipeRefresh!!.setOnRefreshListener { refresh() }
+
+        return view
+    }
+
+    private fun showAppActionDialog(app: ApplicationInfoWrapper, anchor: View) {
+        selectedApp = app
+        val entries = AppMenuEntries.build(
+            app,
+            isRemote,
+            crossProfileWidgetProviders,
+            crossProfilePackages,
+        )
+        if (entries.isEmpty()) {
+            selectedApp = null
+            return
+        }
+        AppActionSheet(requireContext(), layoutInflater).show(
+            app,
+            entries,
+            adapter?.cachedIcon(app.getPackageName()),
+            { entry -> onAppMenuItemSelected(entry.itemId, app, entry.checked) },
+            { selectedApp = null },
+        )
+    }
+
+    private fun onAppMenuItemSelected(itemId: Int, app: ApplicationInfoWrapper, checked: Boolean) {
+        when (itemId) {
+            MENU_ITEM_CLONE -> cloneApp(app)
+            MENU_ITEM_UNINSTALL -> installOrUninstall(app, false)
+            MENU_ITEM_FREEZE -> freezeAppFromMenu(app)
+            MENU_ITEM_UNFREEZE -> unfreezeAppFromMenu(app)
+            MENU_ITEM_LAUNCH -> launchAppFromMenu(app)
+            MENU_ITEM_CREATE_UNFREEZE_SHORTCUT -> loadIconAndAddUnfreezeShortcut(app, null)
+            MENU_ITEM_AUTO_FREEZE -> toggleAutoFreezeFromMenu(app, checked)
+            MENU_ITEM_ALLOW_CROSS_PROFILE_WIDGET -> toggleCrossProfileWidget(app, checked)
+            MENU_ITEM_ALLOW_CROSS_PROFILE_INTERACTION -> toggleCrossProfileInteraction(app, checked)
+        }
+    }
+
+    private fun cloneApp(app: ApplicationInfoWrapper) {
+        val cloneAction = Runnable {
+            if (Utility.isMIUI() && !app.isSystem()) {
+                AlertDialog.Builder(requireContext())
+                    .setMessage(R.string.miui_cannot_clone)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setNegativeButton(R.string.continue_anyway) { _, _ ->
+                        installOrUninstall(app, true)
+                    }
+                    .show()
+            } else {
+                installOrUninstall(app, true)
+            }
+        }
+        if (!isRemote) {
+            (activity as MainActivity).runAfterVpnGateCleared(
+                app.getPackageName(),
+                forceGate = true,
+                cloneAction
+            )
+        } else {
+            cloneAction.run()
+        }
+    }
+
+    private fun freezeAppFromMenu(app: ApplicationInfoWrapper) {
+        AntiSpyManager.syncAutoFreezeListToWorkProfile(requireContext())
+        try {
+            service!!.freezeApp(app)
+        } catch (_: RemoteException) {
+        }
+        GatekeeperToast.show(
+            requireContext(),
+            getString(R.string.freeze_success, app.getLabel()),
+        )
+        refresh()
+    }
+
+    private fun unfreezeAppFromMenu(app: ApplicationInfoWrapper) {
+        val unfreezeAction = Runnable {
+            try {
+                service!!.unfreezeApp(app)
+            } catch (_: RemoteException) {
+            }
+            GatekeeperToast.show(
+                requireContext(),
+                getString(R.string.unfreeze_success, app.getLabel()),
+            )
+            refresh()
+        }
+        if (AutoFreezePolicy.isInAutoFreezeList(app.getPackageName())) {
+            (activity as MainActivity).runAfterVpnGateCleared(
+                app.getPackageName(),
+                forceGate = false,
+                unfreezeAction
+            )
+        } else {
+            unfreezeAction.run()
+        }
+    }
+
+    private fun launchAppFromMenu(app: ApplicationInfoWrapper) {
+        val intent = Intent(DummyActivity.UNFREEZE_AND_LAUNCH).apply {
+            component = ComponentName(requireContext(), DummyActivity::class.java)
+            putExtra("packageName", app.getPackageName())
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        DummyActivity.registerSameProcessRequest(intent)
+        startActivity(intent)
+    }
+
+    private fun toggleAutoFreezeFromMenu(app: ApplicationInfoWrapper, checked: Boolean) {
+        if (!checked) {
+            AutoFreezeDefaults.enableForWorkProfile(
+                requireContext(),
+                app.getPackageName(),
+                clearOptOut = true
+            )
+        } else {
+            LocalStorageManager.getInstance().removeFromStringList(
+                LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE, app.getPackageName()
+            )
+            AutoFreezeDefaults.optOutOfAutoFreeze(app.getPackageName())
+            AntiSpyManager.syncAutoFreezeListToWorkProfile(requireContext())
+            if (app.isHidden()) {
+                try {
+                    service!!.unfreezeApp(app)
+                } catch (_: RemoteException) {
+                }
+                GatekeeperToast.show(
+                    requireContext(),
+                    getString(R.string.unfreeze_success, app.getLabel()),
+                )
+            }
+        }
+        LocalBroadcastManager.getInstance(requireContext())
+            .sendBroadcast(Intent(BROADCAST_REFRESH))
+    }
+
+    private fun toggleCrossProfileWidget(app: ApplicationInfoWrapper, checked: Boolean) {
+        val newState = !checked
+        try {
+            if (service!!.setCrossProfileWidgetProviderEnabled(app.getPackageName(), newState)) {
+                if (newState) {
+                    crossProfileWidgetProviders.add(app.getPackageName())
+                } else {
+                    crossProfileWidgetProviders.remove(app.getPackageName())
+                }
+            }
+        } catch (_: RemoteException) {
+        }
+    }
+
+    private fun toggleCrossProfileInteraction(app: ApplicationInfoWrapper, checked: Boolean) {
+        val newState = !checked
+        if (newState) {
+            crossProfilePackages.add(app.getPackageName())
+        } else {
+            crossProfilePackages.remove(app.getPackageName())
+        }
+        try {
+            service!!.setCrossProfilePackages(ArrayList(crossProfilePackages))
+        } catch (_: RemoteException) {
+        }
+    }
+
+    private fun requestAppListRefresh(followUpAfterInstall: Boolean = false) {
+        (activity as? MainActivity)?.scheduleAppListRefresh(followUpAfterInstall)
+            ?: ProfileNotifier.scheduleAppListRefresh(requireContext())
+    }
+
+    fun refresh() {
+        if (adapter == null) return
+        if (refreshing) {
+            refreshPending = true
+            return
+        }
+        if (adapter!!.isMultiSelectMode()) {
+            swipeRefresh!!.isRefreshing = false
+            return
+        }
+        refreshing = true
+        swipeRefresh!!.isRefreshing = true
+
+        try {
+            service!!.getApps(object : IGetAppsCallback.Stub() {
+                override fun callback(apps: MutableList<ApplicationInfoWrapper>) {
+                    if (isRemote) {
+                        crossProfileWidgetProviders.clear()
+                        crossProfilePackages.clear()
+
+                        try {
+                            crossProfileWidgetProviders.addAll(service!!.crossProfileWidgetProviders)
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                crossProfilePackages.addAll(service!!.crossProfilePackages)
+                            }
+                        } catch (_: RemoteException) {
+                        }
+                    }
+
+                    var autoFreezePackages: Set<String>? = null
+                    if (isRemote) {
+                        val currentPackages = apps.map { it.getPackageName() }
+                        val currentSet = HashSet(currentPackages)
+                        if (knownWorkProfilePackages != null) {
+                            val removed = knownWorkProfilePackages!!.filter { it !in currentSet }
+                            for (pkg in removed) {
+                                UnfreezeShortcuts.removeLauncherShortcutsEverywhere(requireContext(), pkg)
+                                LocalStorageManager.getInstance().removeFromStringList(
+                                    LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE,
+                                    pkg
+                                )
+                                AutoFreezeDefaults.clearWorkProfilePackageTracking(pkg)
+                            }
+                        }
+                        Utility.deleteMissingApps(
+                            LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE,
+                            apps
+                        )
+                        knownWorkProfilePackages = currentSet
+                        AntiSpyManager.syncAutoFreezeListToWorkProfile(
+                            requireContext(),
+                            force = false
+                        )
+                        AutoFreezePolicy.migrateLegacyFrozenWithoutAutoFreeze(service!!, apps)
+                        autoFreezePackages = HashSet(
+                            LocalStorageManager.getInstance()
+                                .getStringList(LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE)
+                                .toList()
+                        )
+                    }
+                    val freezePackages = autoFreezePackages
+                    if (isRemote && freezePackages != null) {
+                        AutoFreezePolicy.sortWorkProfileApps(apps, freezePackages)
+                    }
+                    runOnUiThread {
+                        if (!isAdded) {
+                            refreshing = false
+                            return@runOnUiThread
+                        }
+                        swipeRefresh!!.isRefreshing = false
+                        adapter!!.setData(apps)
+                        if (isRemote) {
+                            (activity as? MainActivity)?.onWorkAppsLoaded(
+                                apps.size,
+                                apps.count { it.isHidden() },
+                            )
+                        }
+                        if (freezePackages != null) {
+                            adapter!!.setAutoFreezePackages(freezePackages)
+                        }
+                        refreshing = false
+                        if (refreshPending) {
+                            refreshPending = false
+                            refresh()
+                        }
+                    }
+                }
+            }, (activity as MainActivity).showAll)
+        } catch (_: RemoteException) {
+            refreshing = false
+            swipeRefresh!!.isRefreshing = false
+        }
+    }
+
+    fun createMultiSelectActionMode(): Boolean {
+        actionMode = (activity as AppCompatActivity).startSupportActionMode(object : ActionMode.Callback {
+            override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+                menu.add(Menu.NONE, MENU_ITEM_CREATE_UNFREEZE_SHORTCUT, Menu.NONE, R.string.create_unfreeze_shortcut)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+                return true
+            }
+
+            override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+                mode.title = getString(R.string.batch_operation)
+                return true
+            }
+
+            override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+                val selectedList = adapter!!.getSelectedItems() ?: return false
+
+                when (item.itemId) {
+                    MENU_ITEM_CREATE_UNFREEZE_SHORTCUT -> {
+                        loadIconAndAddUnfreezeShortcut(selectedList[0], selectedList)
+                        mode.finish()
+                        return true
+                    }
+                }
+                return false
+            }
+
+            override fun onDestroyActionMode(mode: ActionMode) {
+                actionMode = null
+                adapter!!.cancelMultiSelectMode()
+            }
+        })
+        return true
+    }
+
+    fun installOrUninstall(app: ApplicationInfoWrapper, isInstall: Boolean) {
+        selectedApp = null
+        val callback = object : IAppInstallCallback.Stub() {
+            override fun callback(result: Int) {
+                runOnUiThread { installAppCallback(result, app, isInstall) }
+            }
+        }
+
+        try {
+            if (isInstall) {
+                (activity as MainActivity).getOtherService(isRemote)
+                    .installApp(app, callback)
+            } else {
+                service!!.uninstallApp(app, callback)
+            }
+        } catch (_: RemoteException) {
+            // Профиль-приёмник недоступен (Work Mode выключен, процесс убит, реле не прошло):
+            // молчать нельзя -- пользователь только что попросил операцию.
+            installAppCallback(CloneOutcome.RESULT_NO_PROFILE_CONNECTION, app, isInstall)
+        }
+    }
+
+    fun installAppCallback(result: Int, app: ApplicationInfoWrapper, isInstall: Boolean) {
+        if (result == Activity.RESULT_OK) {
+            var message = getString(if (isInstall) R.string.clone_success else R.string.uninstall_success)
+            message = String.format(message, app.getLabel())
+            GatekeeperToast.show(requireContext(), message)
+            if (isInstall && !isRemote) {
+                AutoFreezeDefaults.enableForWorkProfile(
+                    requireContext(),
+                    app.getPackageName(),
+                    clearOptOut = true
+                )
+            }
+            if (!isInstall && isRemote) {
+                UnfreezeShortcuts.removeLauncherShortcutsEverywhere(
+                    requireContext(),
+                    app.getPackageName()
+                )
+                LocalStorageManager.getInstance().removeFromStringList(
+                    LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE,
+                    app.getPackageName()
+                )
+                AutoFreezeDefaults.clearWorkProfilePackageTracking(app.getPackageName())
+            }
+            requestAppListRefresh(followUpAfterInstall = isInstall && !isRemote)
+        } else {
+            GatekeeperToast.show(requireContext(), cloneFailureText(result, app, isInstall))
+        }
+    }
+
+    /**
+     * Фаза 19: каждый отказ установки/удаления обязан объяснить себя. Коды --
+     * либо наши (проверки до PackageInstaller), либо RESULT_FIRST_USER + STATUS_...
+     * от PackageInstaller; расшифровка -- [CloneOutcome.reasonOf].
+     */
+    private fun cloneFailureText(result: Int, app: ApplicationInfoWrapper, isInstall: Boolean): String {
+        val label = app.getLabel()
+        return when (CloneOutcome.reasonOf(result)) {
+            CloneOutcome.Reason.SUCCESS -> getString(R.string.clone_fail_generic, label, result)
+            CloneOutcome.Reason.ALREADY_IN_PROFILE ->
+                getString(R.string.clone_fail_already_installed, label)
+            CloneOutcome.Reason.SYSTEM_APP_UNAVAILABLE -> getString(
+                if (isInstall) R.string.clone_fail_system_app else R.string.uninstall_fail_system_app
+            )
+            CloneOutcome.Reason.NO_PROFILE_CONNECTION ->
+                getString(R.string.clone_fail_no_connection)
+            CloneOutcome.Reason.CANCELLED_BY_USER ->
+                getString(R.string.clone_fail_cancelled, label)
+            CloneOutcome.Reason.BLOCKED ->
+                getString(R.string.clone_fail_blocked, label)
+            CloneOutcome.Reason.CONFLICT ->
+                getString(R.string.clone_fail_conflict, label)
+            CloneOutcome.Reason.INCOMPATIBLE ->
+                getString(R.string.clone_fail_incompatible, label)
+            CloneOutcome.Reason.INVALID_APK ->
+                getString(R.string.clone_fail_invalid, label)
+            CloneOutcome.Reason.OUT_OF_SPACE ->
+                getString(R.string.clone_fail_storage, label)
+            CloneOutcome.Reason.ABORTED ->
+                getString(R.string.clone_fail_aborted, label)
+            CloneOutcome.Reason.UNKNOWN ->
+                getString(R.string.clone_fail_generic, label, result)
+        }
+    }
+
+    fun loadIconAndAddUnfreezeShortcut(
+        app: ApplicationInfoWrapper,
+        linkedApps: List<ApplicationInfoWrapper>?
+    ) {
+        try {
+            service!!.loadIcon(app, object : ILoadIconCallback.Stub() {
+                override fun callback(icon: Bitmap) {
+                    runOnUiThread { addUnfreezeShortcut(app, linkedApps, icon) }
+                }
+            })
+        } catch (_: RemoteException) {
+        }
+    }
+
+    fun addUnfreezeShortcut(
+        app: ApplicationInfoWrapper,
+        linkedApps: List<ApplicationInfoWrapper>?,
+        icon: Bitmap
+    ) {
+        val linkedPackages = linkedApps?.joinToString(",") { it.getPackageName() }
+        val launchIntent = UnfreezeShortcuts.buildLaunchIntent(
+            requireContext(), app.getPackageName(), linkedPackages
+        )
+        val id = UnfreezeShortcuts.shortcutId(app.getPackageName(), linkedPackages)
+        Utility.createLauncherShortcut(
+            requireContext(), launchIntent,
+            Icon.createWithBitmap(icon), id,
+            app.getLabel() ?: app.getPackageName()
+        )
+        UnfreezeShortcuts.register(
+            app.getPackageName(),
+            id,
+            app.getLabel() ?: app.getPackageName(),
+            linkedPackages
+        )
+    }
+
+    companion object {
+        const val BROADCAST_REFRESH = "io.gatekeeper.broadcast.REFRESH"
+
+
+        fun newInstance(service: IGatekeeperService, isRemote: Boolean): AppListFragment {
+            return AppListFragment().apply {
+                arguments = Bundle().apply {
+                    putBinder("service", service.asBinder())
+                    putBoolean("is_remote", isRemote)
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,46 @@
+package io.gatekeeper.util
+
+object ProfileActions {
+    private const val PREFIX = "io.gatekeeper.action."
+
+    const val FINALIZE_PROVISION = PREFIX + "FINALIZE_PROVISION"
+    const val START_SERVICE = PREFIX + "START_SERVICE"
+    const val TRY_START_SERVICE = PREFIX + "TRY_START_SERVICE"
+    const val INSTALL_PACKAGE = PREFIX + "INSTALL_PACKAGE"
+    const val UNINSTALL_PACKAGE = PREFIX + "UNINSTALL_PACKAGE"
+    const val UNFREEZE_AND_LAUNCH = PREFIX + "UNFREEZE_AND_LAUNCH"
+    const val PUBLIC_UNFREEZE_AND_LAUNCH = PREFIX + "PUBLIC_UNFREEZE_AND_LAUNCH"
+    const val UNFREEZE_APP = PREFIX + "UNFREEZE_APP"
+    const val PUBLIC_FREEZE_ALL = PREFIX + "PUBLIC_FREEZE_ALL"
+    const val PUBLIC_UNFREEZE_ALL = PREFIX + "PUBLIC_UNFREEZE_ALL"
+    const val SHOW_TOAST = PREFIX + "SHOW_TOAST"
+    const val REFRESH_MAIN_APP_LIST = PREFIX + "REFRESH_MAIN_APP_LIST"
+    const val FREEZE_ALL_IN_LIST = PREFIX + "FREEZE_ALL_IN_LIST"
+    const val UNFREEZE_ALL_IN_LIST = PREFIX + "UNFREEZE_ALL_IN_LIST"
+    const val REMOVE_UNFREEZE_SHORTCUT = PREFIX + "REMOVE_UNFREEZE_SHORTCUT"
+
+    /**
+     * Та же операция в обратную сторону. Два действия вместо одного в обе стороны:
+     * иначе форварднутый интент резолвится на той стороне дважды -- в свою
+     * DummyActivity и в форвардер обратно -- и пользователь получает системный
+     * выбор профиля вместо тихого удаления ярлыка. Тот же прием, что у
+     * START_FILE_SHUTTLE / START_FILE_SHUTTLE_2.
+     */
+    const val REMOVE_UNFREEZE_SHORTCUT_2 = PREFIX + "REMOVE_UNFREEZE_SHORTCUT_2"
+    const val START_FILE_SHUTTLE = PREFIX + "START_FILE_SHUTTLE"
+    const val START_FILE_SHUTTLE_2 = PREFIX + "START_FILE_SHUTTLE_2"
+    const val SYNCHRONIZE_PREFERENCE = PREFIX + "SYNCHRONIZE_PREFERENCE"
+    const val SYNC_ANTI_SPY_VPN_WATCH = PREFIX + "SYNC_ANTI_SPY_VPN_WATCH"
+    /** Поднять/остановить FreezeService по факту настроек единой заморозки по блокировке. */
+    const val SYNC_FREEZE_SERVICE = PREFIX + "SYNC_FREEZE_SERVICE"
+    const val VPN_SESSION_COMPLETE = PREFIX + "VPN_SESSION_COMPLETE"
+    const val PACKAGEINSTALLER_CALLBACK = PREFIX + "PACKAGEINSTALLER_CALLBACK"
+    const val BATCH_FREEZE_ALL = PREFIX + "BATCH_FREEZE_ALL"
+    const val BATCH_UNFREEZE_ALL = PREFIX + "BATCH_UNFREEZE_ALL"
+    const val SHOW_BATCH_TOAST = PREFIX + "SHOW_BATCH_TOAST"
+    const val REFRESH_APP_LISTS = PREFIX + "REFRESH_APP_LISTS"
+    const val OPEN_POWER_SETTINGS = PREFIX + "OPEN_POWER_SETTINGS"
+
+    /** Нажатие на уведомление рабочего профиля: главный экран есть только в личном. */
+    const val OPEN_MAIN_APP = PREFIX + "OPEN_MAIN_APP"
+}

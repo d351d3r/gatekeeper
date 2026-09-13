@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="first_run_alert_cancel">Tot ziens</string>
+    <string name="first_run_alert_continue">Ga verder</string><string name="notifications_important">Gatekeeper belangrijk</string>
+    <string name="finish_provision_title">Druk hier om het instellen van Gatekeeper te voltooien</string>
+    <string name="finish_provision_desc">Gefeliciteerd! Je bent een klik verwijderd om het instellen van Gatekeeper te voltooien.</string>
+    <string name="device_admin_desc">App isolatiedienst</string>
+    <string name="service_title">Gatekeeper Service</string>
+    <string name="service_desc">Gatekeeper is nu actief …</string>
+    <string name="auto_freeze">Bevries automatisch</string>
+    <string name="allow_cross_profile_widgets">Widgets toestaan in Hoofdprofiel</string>
+    <string name="search">Zoeken</string>
+    <string name="freeze_all">Reeks Bevriezen</string>
+    <string name="create_freeze_all_shortcut">Creëer Reeks Bevriezing Snelkoppeling</string>
+    <string name="freeze_all_shortcut">Bevriezen</string>
+    <string name="install_app_to_profile">Installeer APK in Gatekeeper</string>
+    <string name="show_all">Toon Alle Apps</string>
+    <string name="install_app_to_profile_success">Installatie applicatie voltooid in werkprofiel.</string><string name="service_auto_freeze_desc">Gatekeeper zal automatisch apps invriezen die zijn gestart vanuit \"Ontdooien &amp; Start\" bij de volgende schermvergrendelingsgebeurtenis.</string>
+    <string name="create_unfreeze_shortcut">Snelkoppeling voor ontdooien en/of starten maken</string>
+<string name="service_auto_freeze_now">Nu bevriezen</string>
+    <string name="app_installing">Installeren...</string>
+    <string name="fragment_profile_main">Hoofd</string>
+    <string name="fragment_profile_work">Gatekeeper</string>
+    <string name="list_item_disabled">[Bevroren] %s</string>
+    <string name="batch_operation">Batchbewerking</string>
+    <string name="clone_to_work_profile">Kloon naar Gatekeeper (Werkprofiel)</string>
+    <string name="clone_to_main_profile">Kloon naar Hoofdprofiel</string>
+    <string name="uninstall_app">Verwijderen</string>
+    <string name="freeze_app">Bevriezen</string>
+    <string name="unfreeze_app">Ontdooien</string>
+    <string name="launch">Starten</string>
+    <string name="settings_interaction">Interactie</string>
+    <string name="settings_block_contacts_searching">Blokkeer contacten zoeken</string>
+    <string name="settings_services">Diensten</string>
+    <string name="service_auto_freeze_title">Auto-bevriezen in afwachting</string>
+    <string name="settings">Intellingen</string>
+    <string name="settings_block_contacts_searching_desc">Verbied de toegang van het hoofdprofiel tot contacten in het werkprofiel.</string>
+</resources>

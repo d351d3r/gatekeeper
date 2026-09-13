@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="freeze_all_shortcut">قفل</string>
+    <string name="install_app_to_profile_success">نصب اپلیکیشن داخل پروفایل کاری تمام شد.</string>
+    <string name="show_all">نمایش تمام برنامه‌ها</string>
+    <string name="settings">تنظیمات</string>
+    <string name="settings_interaction">تعامل</string>
+    <string name="settings_cross_profile_file_chooser">شاتل فایل</string>
+    <string name="first_run_alert_cancel">خدانگهدار</string>
+    <string name="first_run_alert_continue">ادامه</string><string name="service_auto_freeze_desc">Gatekeeper برنامه‌های باز شده از \"شکستن قفل و باز کردن\" را در دستور قفل صفحه‌ی بعدی به طور خودکار قفل می‌کند.</string>
+    <string name="create_freeze_all_shortcut">ساخت میانبر قفل گروهی</string>
+    <string name="install_app_to_profile">نصب APK داخل شلتر</string>
+    <string name="show_all_warning">دستکاری برنامه‌هایی که داخل لیست نمایش داده نشده‌اند می‌تواند باعث خروج از برنامه و انواع دیگر مشکلات شود. البته این قابلیت می‌تواند در زمان وجود رام دستکاری شده توسط سازنده مفید شود اگر همه‌ی برنامه‌های سیستمی فعال نشده‌اند. اگر ادامه دهید، مسئولیت آن با خود شماست.</string>
+    <string name="documents_ui">باز کردن بخش مستندات</string>
+    <string name="settings_cross_profile_file_chooser_desc">اگر فعال شود تنها از طریق Documents UI (فایل‌ها و مستندات دارای نام داخل لانچر) یا برنامه‌های دارای قابلیت Documents UI (به مدت موقت به فایل هایی که انتخاب میکنید دسترسی میگیرند) می‌توانید از طریق Gatekeeper، فایل های پروفایل اصلی را ببنید / انتخاب کنید و یا کپی کنید، در عین اینکه ساختار ایزوله را حفظ می‌کنیم.</string>
+    <string name="settings_dont_freeze_foreground_desc">در زمان قفل شدن صفحه، برنامه‌های پس‌زمینه‌ی قابل مشاهده را قفل نکن. این قابلیت برای برنامه‌های پخش موسیقی می‌تواند مفید باشد، اما ممکن است لازم باشد به طور دستی از \"میانبر قفل جمعی\" آنها را قفل کنید.</string>
+    <string name="clone_fail_system_app">امکان کپی برنامه‌های سیستمی به یک پروفایل که شلتر کنترلی بر آن ندارد نیست.</string>
+    <string name="request_usage_stats">برای اینکار، شلتر نیازمند دسترسی <b>Usage Stats</b> است. لطفا پس از کلیک کردن روی \"Ok\" داخل دیالوگ، این دسترسی را برای <b>هر دوی</b> اپ‌های شلتر فعال کنید. اگر اینکار انجام نگیرد این قابلیت به درستی کار نخواهد نکرد.</string>
+    <string name="request_storage_manager">شلتر برای شاتل فایل نیازمند دسترسی به <b>All Files</b> دارد. لطفا این دسترسی را برای <b>هر دوی</b> برنامه‌های شلتر که با زدن روی \"Ok\" داخل دیالوگ نمایش داده می‌شود فعال کنید.</string>
+    <string name="device_admin_desc">سرویس ایزوله‌سازی برنامه</string>
+<string name="notifications_important">پیام مهم Gatekeeper</string>
+    <string name="finish_provision_title">اینجا کلیک کنید تا راه‌اندازی Gatekeeper تکمیل شود</string>
+    <string name="finish_provision_desc">تبریک می‌گوییم! تنها یک کلیک با تکمیل راه‌اندازی Gatekeeper فاصله دارید.</string>
+    <string name="service_title">سرویس Gatekeeper</string>
+    <string name="service_desc">Gatekeeper در حال اجرا است …</string>
+    <string name="service_auto_freeze_title">منتظر قفل خودکار هستیم</string>
+    <string name="service_auto_freeze_now">قفل کن</string>
+    <string name="app_installing">در حال نصب...</string>
+    <string name="fragment_profile_main">اصلی</string>
+    <string name="fragment_profile_work">شلتر</string>
+    <string name="list_item_disabled">%s قفل شده</string>
+    <string name="batch_operation">عملیات جمعی</string>
+    <string name="clone_to_work_profile">کپی به شلتر (Work Profile)</string>
+    <string name="clone_to_main_profile">کپی به پروفایل اصلی</string>
+    <string name="uninstall_app">حذف نصب</string>
+    <string name="freeze_app">قفل</string>
+    <string name="unfreeze_app">رفع قفل</string>
+    <string name="launch">راه اندازی</string>
+    <string name="auto_freeze">قفل خودکار</string>
+    <string name="allow_cross_profile_widgets">آزاد کردن ویجت‌ها در پروفایل اصلی</string>
+    <string name="search">جستجو</string>
+    <string name="freeze_all">قفل جمعی</string>
+    <string name="create_unfreeze_shortcut">ساخت میانبر رفع قفل و یا اجرا کردن</string>
+    <string name="settings_block_contacts_searching">بستن جستجوی مخاطبین</string>
+    <string name="settings_block_contacts_searching_desc">گرفتن دسترسی مخاطبین از پروفایل اصلی داخل پروفایل کاری.</string>
+    <string name="settings_services">سرویس‌ها</string>
+    <string name="settings_auto_freeze_service">سرویس قفل خودکار</string>
+    <string name="settings_auto_freeze_service_desc">در زمان قفل بودن صفحه، به طور خودکار برنامه‌های باز شده از \"میانبر رفع قفل و باز کردن\" را قفل کن.</string>
+    <string name="settings_auto_freeze_delay">تاخیر قفل خودکار</string>
+    <string name="settings_dont_freeze_foreground">رد کردن برنامه‌های ‎پیش‌زمینه</string>
+    <string name="settings_about">درباره</string>
+    <string name="settings_version">نسخه</string>
+    <string name="settings_source_code">سورس کد</string><string name="provision_finished">راه‌اندازی شلتر انجام شد. اکنون شلتر را ریستارت میکنیم. اگر برنامه به طور خودکار باز نشد، دوباره آن را باز کنید.</string><string name="work_profile_not_found">پروفایل کاری یافت نشد. لطفا برنامه را ریستارت کنید تا پروفایل دوباره آماده شود.</string>
+    <string name="uninstall_success">برنامه %s با موفقیت حذف شده است</string>
+    <string name="freeze_success">برنامه %s با موفقیت قفل شده است</string>
+    <string name="clone_success">برنامه %s با موفقیت کپی شده است</string>
+    <string name="unfreeze_success">برنامه %s با موفقیت رفع قفل شده است</string>
+    <string name="uninstall_fail_system_app">امکان حذف برنامه‌های سیستمی داخل یک پروفایل که شلتر کنترلی بر آن ندارد نیست.</string>
+    <string name="unsupported_launcher">امکان اضافه کردن میانبر به لانچر شما نیست. لطفا با توسعه‌دهنده تماس بگیرید.</string>
+    <string name="app_context_menu_title">عملیات‌ها برای %s</string>
+    <string name="freeze_all_success">همه‌ی برنامه‌های داخل \"قفل خودکار\" با موفقیت قفل شدند.</string>
+    <string name="shortcut_create_success">میانبر داخل لانچر شما ساخته شد.</string>
+    <string name="launch_app_fail">امکان باز کردن برنامه‌ی %s نیست زیرا رابط کاربری ندارد.</string>
+    <string name="miui_cannot_clone">کپی کردن برنامه‌های سیستمی به پروفایل دیگر در حال حاضر در MIUI امکان‌پذیر نیست. لطفا اپلیکیشن فروشگاه برنامه‌های سیستم خود (مانند <b>Play Store</b>) را به یک پروفایل دیگر کپی کنید سپس برنامه‌ها را از آنجا نصب کنید.</string>
+    <string name="continue_anyway">ادامه دادن</string>
+</resources>

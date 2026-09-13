@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="settings_payment_stub"
+        android:title="@string/settings_payment_stub"
+        android:summary="@string/settings_payment_stub_desc" />
+
+    <androidx.preference.Preference
+        android:key="settings_version"
+        android:title="@string/settings_version" />
+
+    <androidx.preference.Preference
+        android:key="settings_user_guide"
+        android:title="@string/settings_user_guide"
+        android:summary="@string/settings_user_guide_desc" />
+
+    <androidx.preference.Preference
+        android:key="settings_known_problems"
+        android:title="@string/settings_known_problems"
+        android:summary="@string/settings_known_problems_desc" />
+
+    <androidx.preference.Preference
+        android:key="settings_source_code"
+        android:title="@string/settings_source_code"
+        android:summary="@string/settings_source_code_desc" />
+
+</androidx.preference.PreferenceScreen>

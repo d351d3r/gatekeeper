@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.preference.Preference
+        android:key="settings_root_freeze"
+        android:icon="@drawable/ic_freeze"
+        android:title="@string/settings_root_freeze"
+        android:summary="@string/settings_root_freeze_off"
+        app:fragment="io.gatekeeper.ui.settings.FreezeSettingsFragment" />
+
+    <androidx.preference.Preference
+        android:key="settings_root_antispy"
+        android:icon="@drawable/ic_visibility"
+        android:title="@string/settings_root_antispy"
+        android:summary="@string/settings_root_antispy_off"
+        app:fragment="io.gatekeeper.ui.settings.AntiSpySettingsFragment" />
+
+    <androidx.preference.Preference
+        android:key="settings_root_files"
+        android:icon="@drawable/ic_file_shuttle"
+        android:title="@string/settings_root_files"
+        android:summary="@string/settings_root_files_off"
+        app:fragment="io.gatekeeper.ui.settings.FilesSettingsFragment" />
+
+    <androidx.preference.Preference
+        android:key="settings_root_links"
+        android:icon="@drawable/ic_link"
+        android:title="@string/settings_root_links"
+        android:summary="@string/settings_cross_profile_link_rules_none"
+        app:fragment="io.gatekeeper.ui.settings.LinksSettingsFragment" />
+
+    <androidx.preference.Preference
+        android:key="settings_root_contacts"
+        android:icon="@drawable/ic_person"
+        android:title="@string/settings_root_contacts"
+        android:summary="@string/settings_root_contacts_open"
+        app:fragment="io.gatekeeper.ui.settings.ContactsSettingsFragment" />
+
+    <androidx.preference.Preference
+        android:key="settings_root_bridges"
+        android:icon="@drawable/ic_widgets"
+        android:title="@string/settings_root_bridges"
+        android:summary="@string/settings_root_bridges_none"
+        app:fragment="io.gatekeeper.ui.settings.BridgesSettingsFragment" />
+
+    <androidx.preference.Preference
+        android:key="settings_root_certs"
+        android:icon="@drawable/ic_verified_user"
+        android:title="@string/settings_root_certs"
+        android:summary="@string/settings_root_certs_none"
+        app:fragment="io.gatekeeper.ui.settings.CertsSettingsFragment" />
+
+    <androidx.preference.Preference
+        android:key="settings_root_backup"
+        android:icon="@drawable/ic_backup"
+        android:title="@string/settings_root_backup"
+        android:summary="@string/settings_root_backup_desc"
+        app:fragment="io.gatekeeper.ui.settings.BackupSettingsFragment" />
+
+    <androidx.preference.Preference
+        android:key="settings_root_accesses"
+        android:icon="@drawable/ic_key"
+        android:title="@string/settings_root_accesses"
+        android:summary="@string/settings_root_accesses_desc"
+        app:fragment="io.gatekeeper.ui.settings.PermissionsSettingsFragment" />
+
+    <androidx.preference.Preference
+        android:key="settings_root_diagnostics"
+        android:icon="@drawable/ic_battery_alert"
+        android:title="@string/settings_root_diagnostics"
+        android:summary="@string/settings_root_diagnostics_desc"
+        app:fragment="io.gatekeeper.ui.settings.DiagnosticsSettingsFragment" />
+
+    <androidx.preference.Preference
+        android:key="settings_root_misc"
+        android:icon="@drawable/ic_more_horiz"
+        android:title="@string/settings_root_misc"
+        android:summary="@string/settings_root_misc_desc"
+        app:fragment="io.gatekeeper.ui.settings.MiscSettingsFragment" />
+
+</androidx.preference.PreferenceScreen>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="device_admin_desc">Сервіс ізоляції додатку</string><string name="first_run_alert_cancel">Закрити</string>
+    <string name="first_run_alert_continue">Продовжити</string>
+<string name="fragment_profile_work">Gatekeeper</string>
+</resources>
