@@ -29,6 +29,7 @@ import io.gatekeeper.util.UriForwardProxy
 import io.gatekeeper.util.Notifications
 import io.gatekeeper.util.StatusNotification
 import io.gatekeeper.util.Utility
+import io.gatekeeper.util.WorkPackageWatcher
 import io.gatekeeper.util.WorkProfilePolicy
 import io.gatekeeper.util.VpnTunnelDetector
 
@@ -64,6 +65,11 @@ class GatekeeperService : Service() {
 
         override fun getApps(callback: IGetAppsCallback, showAll: Boolean) {
             Thread {
+                // Список открыли -- заодно догоняем пакеты, поставленные в профиль
+                // мимо нас: манифест-ресивер PACKAGE_ADDED не доставляется (F3).
+                if (isProfileOwner) {
+                    WorkPackageWatcher.scan(this@GatekeeperService)
+                }
                 val pmFlags = PackageManager.MATCH_DISABLED_COMPONENTS or
                     PackageManager.MATCH_UNINSTALLED_PACKAGES
                 // canLaunch считаем один раз и несём в wrapper: подсказке C1 нужен
@@ -409,6 +415,22 @@ class GatekeeperService : Service() {
          * null -- успех. Иначе текст отказа: пакет не умеет always-on, его нет в
          * профиле, или прошивка не дает закрепить туннель.
          */
+        /**
+         * Забрать новые пакеты профиля и очистить очередь (F3). Забирает личная
+         * сторона: список автозаморозки хранится у неё. Реле для этого не годится --
+         * на Android 14+ запуск activity из фонового сервиса рубит Background
+         * Activity Launch, даже через AlarmManager (замерено на AVD 16).
+         */
+        override fun takeNewWorkPackages(): List<String> {
+            check(isProfileOwner) { "Only the work profile tracks new packages" }
+            val storage = LocalStorageManager.getInstance()
+            val pending = storage.getStringList(LocalStorageManager.PREF_PENDING_NEW_PACKAGES)
+            if (pending.isNotEmpty()) {
+                storage.setStringList(LocalStorageManager.PREF_PENDING_NEW_PACKAGES, emptyArray())
+            }
+            return pending.toList()
+        }
+
         override fun setAlwaysOnVpn(packageName: String?, lockdown: Boolean): String? {
             check(isProfileOwner) { "Cannot set always-on VPN without being profile owner" }
             val target = packageName?.takeIf { it.isNotEmpty() }
@@ -477,6 +499,9 @@ class GatekeeperService : Service() {
     }
 
     private fun setForeground() {
+        if (isProfileOwner) {
+            WorkPackageWatcher.scan(this)
+        }
         startForeground(
             NOTIFICATION_ID,
             Notifications.buildNotification(

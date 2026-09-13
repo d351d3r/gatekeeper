@@ -36,42 +36,6 @@ private fun vpnBatchFreezeReceiverIntent(context: Context): Intent =
         component = ComponentName(context, AntiSpyVpnFreezeReceiver::class.java)
     }
 
-/** AlarmManager one-shot wakeup delivering [intent] as an Activity. */
-private fun scheduleActivityWakeup(
-    context: Context,
-    intent: Intent,
-    requestCode: Int,
-    delayMs: Long,
-): Boolean {
-    val pi = PendingIntents.activity(
-        context,
-        requestCode,
-        intent,
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-    )
-    val am = context.getSystemService(AlarmManager::class.java) ?: return false
-    am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + delayMs, pi)
-    return true
-}
-
-/** AlarmManager one-shot wakeup delivering [intent] as a Broadcast. */
-private fun scheduleBroadcastWakeup(
-    context: Context,
-    intent: Intent,
-    requestCode: Int,
-    delayMs: Long,
-): Boolean {
-    val pi = PendingIntent.getBroadcast(
-        context,
-        requestCode,
-        intent,
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-    )
-    val am = context.getSystemService(AlarmManager::class.java) ?: return false
-    am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + delayMs, pi)
-    return true
-}
-
 private fun sendVpnBatchFreezeBroadcast(context: Context) {
     try {
         context.sendBroadcast(vpnBatchFreezeReceiverIntent(context))
@@ -244,7 +208,7 @@ object CrossProfileScheduler {
         try {
             val intent = freezeAllInListIntent(normalized, vpnOrigin)
             Utility.transferIntentToProfile(context, intent)
-            if (scheduleActivityWakeup(context, intent, REQ_FREEZE_ALL_ACTIVITY, WAKEUP_DELAY_MS)) {
+            if (AlarmWakeups.activity(context, intent, REQ_FREEZE_ALL_ACTIVITY, WAKEUP_DELAY_MS)) {
                 Log.i(SCHEDULER_TAG, "scheduled work-profile freeze for ${normalized.size} apps")
             }
         } catch (e: SecurityException) {
@@ -273,7 +237,7 @@ object CrossProfileScheduler {
     /** Schedule [AntiSpyVpnFreezeReceiver] in the default app process (same user). */
     private fun scheduleVpnBatchFreezeInAppProcess(context: Context) {
         try {
-            if (scheduleBroadcastWakeup(
+            if (AlarmWakeups.broadcast(
                     context,
                     vpnBatchFreezeReceiverIntent(context),
                     REQ_VPN_BATCH_RECEIVER,
@@ -294,7 +258,7 @@ object CrossProfileScheduler {
         try {
             val intent = vpnBatchFreezeReceiverIntent(context)
             Utility.transferIntentToProfile(context, intent)
-            if (scheduleBroadcastWakeup(context, intent, REQ_VPN_BATCH_ON_MAIN, WAKEUP_DELAY_MS)) {
+            if (AlarmWakeups.broadcast(context, intent, REQ_VPN_BATCH_ON_MAIN, WAKEUP_DELAY_MS)) {
                 Log.i(SCHEDULER_TAG, "scheduled VPN batch freeze on main profile")
             }
         } catch (e: SecurityException) {
@@ -333,7 +297,7 @@ object CrossProfileScheduler {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             }
             Utility.transferIntentToProfile(context, intent)
-            if (scheduleActivityWakeup(context, intent, REQ_VPN_SESSION_COMPLETE, WAKEUP_DELAY_MS)) {
+            if (AlarmWakeups.activity(context, intent, REQ_VPN_SESSION_COMPLETE, WAKEUP_DELAY_MS)) {
                 Log.i(SCHEDULER_TAG, "scheduled VPN session complete on main profile")
             }
         } catch (e: SecurityException) {

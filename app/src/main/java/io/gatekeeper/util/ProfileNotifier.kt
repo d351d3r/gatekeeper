@@ -25,6 +25,7 @@ private const val REFRESH_FOLLOWUP_LATE_MS = 4500L
 private const val REQ_REFRESH_MAIN_BASE = 0xE49E8
 private const val REQ_REFRESH_RECEIVER = 0xE49E9
 private const val REQ_TOAST_BASE = 0xE49E6
+internal const val REQ_NEW_PACKAGES = 0xE49EA
 
 private val APP_LIST_REFRESH_FOLLOWUP_DELAYS_MS =
     longArrayOf(APP_LIST_REFRESH_DELAY_MS, REFRESH_FOLLOWUP_SLOW_MS, REFRESH_FOLLOWUP_LATE_MS)
@@ -59,47 +60,13 @@ private fun toastIntent(context: Context, fromWork: Boolean, toastResId: Int): I
     }
 
 /** AlarmManager one-shot wakeup delivering [intent] as an Activity. */
-private fun scheduleActivityWakeup(
-    context: Context,
-    intent: Intent,
-    requestCode: Int,
-    delayMs: Long,
-): Boolean {
-    val pi = PendingIntents.activity(
-        context,
-        requestCode,
-        intent,
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-    )
-    val am = context.getSystemService(AlarmManager::class.java) ?: return false
-    am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + delayMs, pi)
-    return true
-}
-
-/** AlarmManager one-shot wakeup delivering [intent] as a Broadcast. */
-private fun scheduleBroadcastWakeup(
-    context: Context,
-    intent: Intent,
-    requestCode: Int,
-    delayMs: Long,
-): Boolean {
-    val pi = PendingIntent.getBroadcast(
-        context,
-        requestCode,
-        intent,
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-    )
-    val am = context.getSystemService(AlarmManager::class.java) ?: return false
-    am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + delayMs, pi)
-    return true
-}
-
 /**
  * Доставка уведомлений «обнови списки приложений / покажи тост» на личную
  * сторону после кросс-профильной заморозки/разморозки: AlarmManager-вейкапы
  * через релей + локальные broadcast'ы в текущем процессе. Вынесено из Utility.
  */
 object ProfileNotifier {
+
     /** Refresh app lists after a cross-profile freeze/unfreeze DummyActivity finishes. */
     fun scheduleAppListRefresh(
         context: Context,
@@ -138,7 +105,7 @@ object ProfileNotifier {
     /** Work profile → personal: run [AppListRefreshReceiver] in the default app process. */
     fun scheduleAppListRefreshReceiverOnMainProfile(context: Context) {
         try {
-            if (scheduleBroadcastWakeup(
+            if (AlarmWakeups.broadcast(
                     context,
                     appListRefreshReceiverIntent(context),
                     REQ_REFRESH_RECEIVER,
@@ -210,7 +177,7 @@ object ProfileNotifier {
             var requestCode = REQ_REFRESH_MAIN_BASE
             for (delay in APP_LIST_REFRESH_DELIVERY_DELAYS_MS) {
                 val intent = refreshMainAppListIntent(app, fromWork)
-                scheduleActivityWakeup(app, intent, requestCode++, delay)
+                AlarmWakeups.activity(app, intent, requestCode++, delay)
             }
             Log.i(
                 NOTIFIER_TAG,
@@ -246,7 +213,7 @@ object ProfileNotifier {
             var requestCode = REQ_TOAST_BASE
             for (delay in delaysMs) {
                 val intent = toastIntent(app, fromWork, toastResId)
-                scheduleActivityWakeup(app, intent, requestCode++, delay)
+                AlarmWakeups.activity(app, intent, requestCode++, delay)
             }
             Log.i(
                 NOTIFIER_TAG,

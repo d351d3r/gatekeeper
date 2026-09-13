@@ -48,4 +48,7 @@ interface IGatekeeperService {
     List<String> getVpnCapableApps();
     String getAlwaysOnVpnState();
     String setAlwaysOnVpn(String packageName, boolean lockdown);
+    // Новые приложения профиля для списка автозаморозки (F3). Забрать и очистить:
+    // список живет в личном профиле, а видит установки только рабочий.
+    List<String> takeNewWorkPackages();
 }

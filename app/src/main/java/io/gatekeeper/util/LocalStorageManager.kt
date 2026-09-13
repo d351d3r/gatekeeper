@@ -169,6 +169,10 @@ class LocalStorageManager private constructor(context: Context) {
         const val PREF_CROSS_PROFILE_LINK_RULES = "cross_profile_link_rules"
 
         /** Последние счетчики рабочего профиля для плитки и виджета (G6). */
+        /** Догон по номеру последовательности для новых пакетов профиля (F3). */
+        const val PREF_PACKAGE_CHANGE_SEQUENCE = "package_change_sequence"
+        const val PREF_KNOWN_WORK_PACKAGES = "known_work_packages"
+        const val PREF_PENDING_NEW_PACKAGES = "pending_new_packages"
         const val PREF_WORK_APPS_TOTAL = "work_apps_total"
         const val PREF_WORK_APPS_FROZEN = "work_apps_frozen"
 
