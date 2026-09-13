@@ -686,9 +686,13 @@ class MainActivity : AppCompatActivity() {
         if (serviceMain != null && serviceWork != null && !servicesAlive()) {
             doOnDestroy()
             restarting = true
-            val intent = intent
+            // Перезапуск явным интентом, а не принятым: экран экспортирован, и чужой
+            // интент без компонента система при повторной отправке разрешила бы куда
+            // угодно. Из принятого нужен только action -- больше отсюда ничего не
+            // читается (extras разбирает ресивер, а не activity).
+            val restart = Intent(this, MainActivity::class.java).setAction(intent.action)
             finish()
-            startActivity(intent)
+            startActivity(restart)
             return
         }
         workListPoller.start()

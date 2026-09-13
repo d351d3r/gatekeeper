@@ -1,5 +1,6 @@
 package io.gatekeeper.util
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -11,7 +12,10 @@ import io.gatekeeper.ui.DummyActivity
 
 class SettingsManager private constructor(context: Context) {
     private val storage: LocalStorageManager = LocalStorageManager.getInstance()
-    private val context: Context = context
+    // Синглтон переживает любую activity, поэтому держим контекст приложения:
+    // ссылка на activity отсюда пережила бы ее саму. Все три startActivity ниже
+    // ставят FLAG_ACTIVITY_NEW_TASK, так что контекста приложения им достаточно.
+    private val context: Context = context.applicationContext
 
     // Настройка уже сохранена локально, поэтому недоехавшая синхронизация разводит профили
     // молча: тумблер включен, а в другом профиле ничего не изменилось. Имя настройки в логе --
@@ -208,6 +212,9 @@ class SettingsManager private constructor(context: Context) {
     companion object {
         private const val TAG = "SettingsManager"
 
+        // Утечки тут нет: конструктор кладет в поле контекст приложения, а он живет
+        // столько же, сколько процесс. Линт смотрит на тип поля, а не на то, что в нем.
+        @SuppressLint("StaticFieldLeak")
         private var instance: SettingsManager? = null
 
         fun initialize(context: Context) {
