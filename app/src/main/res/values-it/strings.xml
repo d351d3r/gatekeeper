@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="first_run_alert_cancel">Ciao</string>
+    <string name="first_run_alert_continue">Continua</string>
+    <string name="device_admin_desc">Servizio di isolazione app</string><string name="notifications_important">Notifiche importanti</string>
+    <string name="finish_provision_title">Premi qui per finire la configurazione di Gatekeeper</string>
+    <string name="finish_provision_desc">Congratulazioni! Ti manca solo un passo per finire la configurazione di Gatekeeper.</string>
+    <string name="service_title">Servizio Gatekeeper</string>
+    <string name="service_desc">Gatekeeper in esecuzione …</string>
+    <string name="service_auto_freeze_title">Congelamento automatico in attesa</string><string name="service_auto_freeze_now">Congela adesso</string>
+    <string name="app_installing">Installazione...</string>
+    <string name="fragment_profile_main">Pagina principale</string>
+    <string name="fragment_profile_work">Gatekeeper</string>
+    <string name="clone_to_work_profile">Clona in Gatekeeper (Profilo di Lavoro)</string>
+    <string name="clone_to_main_profile">Clona nel Profilo principale</string>
+    <string name="uninstall_app">Disinstalla</string>
+    <string name="freeze_app">Congela</string>
+    <string name="unfreeze_app">Scongela</string>
+    <string name="launch">Avvia</string>
+    <string name="auto_freeze">Auto-congela</string>
+    <string name="allow_cross_profile_widgets">Permetti i widget nel profilo principale</string>
+    <string name="search">Cerca</string>
+    <string name="freeze_all">Congela in massa</string>
+    <string name="freeze_all_shortcut">Congela</string>
+    <string name="show_all">Mostra tutte le app</string>
+    <string name="settings">Impostazioni</string>
+    <string name="documents_ui">Apri interfaccia dei documenti</string>
+    <string name="settings_interaction">Interazione</string>
+    <string name="settings_cross_profile_file_chooser">Shuttle dei file</string><string name="settings_block_contacts_searching">Blocca la ricerca dei contatti</string>
+    <string name="settings_block_contacts_searching_desc">Impedisci l\'accesso dal profilo principale ai contatti dentro il profilo lavorativo.</string>
+    <string name="settings_services">Servizi</string>
+    <string name="settings_auto_freeze_service">Servizio di auto-congelamento</string>
+    <string name="settings_auto_freeze_service_desc">Quando lo schermo è bloccato, congela automaticamente le app avviate da \"Scorciatoia scongela e avvia\".</string>
+    <string name="settings_auto_freeze_delay">Ritardo di auto-congelamento</string>
+    <string name="settings_dont_freeze_foreground">Tralascia le app in primo piano</string>
+    <string name="settings_version">Versione</string>
+    <string name="settings_source_code">Codice sorgente</string><string name="work_profile_not_found">Profilo di lavoro non trovato. Si prega di riavviare l\'app per ricreare il profilo.</string><string name="clone_success">Applicazione \"%s\" clonata correttamente</string>
+    <string name="uninstall_success">App \"%s\" disinstallata correttamente</string>
+    <string name="freeze_success">App \"%s\" congelata correttamente</string>
+    <string name="unfreeze_success">App \"%s\" scongelata correttamente</string>
+    <string name="clone_fail_system_app">Non è possibile clonare le app di sistema su un profilo di cui Gatekeeper non ha controllo.</string>
+    <string name="unsupported_launcher">Non è possibile aggiungere una scorciatoia. Si prega di contattare lo sviluppatore per maggiori informazioni.</string>
+    <string name="app_context_menu_title">Operazioni per %s</string>
+    <string name="freeze_all_success">Tutte le app nella lista \"Auto-congela\" sono state congelate correttamente.</string>
+    <string name="shortcut_create_success">Scorciatoia creata correttamente nel launcher.</string>
+    <string name="launch_app_fail">Non è possibile avviare l\'app %s perché non ha alcuna interfaccia utente.</string>
+    <string name="continue_anyway">Continua comunque</string><string name="show_all_warning">Manipolare le app nascoste dalla lista può causare crash e ogni tipo di comportamento inaspettato. Tuttavia, questa funzionalità può essere utile quando le ROM personalizzate in modo errato non attivano in modo predefinito tutte le app di sistema necessarie nel profilo lavorativo. Se continui, ti assumi la responsabilità delle tue azioni.</string>
+    <string name="provision_finished">Configurazione di Gatekeeper completata. Gatekeeper verrà riavviato. Se Gatekeeper non si avvia automaticamente, riaprilo a mano.</string>
+    <string name="miui_cannot_clone">La clonazione di app non di sistema su un altro profilo attualmente non è possibile su MIUI. Si prega di clonare il negozio delle app (es. <b>Play Store</b>) nell\'altro profilo e poi installarle da lì.</string>
+    <string name="service_auto_freeze_desc">Gatekeeper congelerà automaticamente le app avviate da \"Scongela e avvia\" al prossimo blocco schermo.</string>
+    <string name="settings_cross_profile_file_chooser_desc">Quando attivo, potrai sfogliare / vedere / selezionare / copiare i file in Gatekeeper dal profilo principale e viceversa, SOLO tramite l\'interfaccia dei documenti (chiamata File o Documenti nel tuo launcher) o tramite le app con il supporto all\'interfaccia dei documenti (ottengono accesso solo temporaneo ai file che scegli), mantenendo al contempo l\'isolamento del filesystem.</string>
+    <string name="uninstall_fail_system_app">Non è possibile disinstallare le app di sistema in un profilo di cui Gatekeeper non ha controllo.</string>
+    <string name="batch_operation">Operazione in massa</string>
+    <string name="create_unfreeze_shortcut">Crea una scorciatoia di scongelamento e/o avvio</string>
+    <string name="create_freeze_all_shortcut">Crea una scorciatoia di congelamento in massa</string>
+    <string name="install_app_to_profile">Installa l\'APK in Gatekeeper</string>
+    <string name="settings_dont_freeze_foreground_desc">NON congelare le app in primo piano (con attività visibile) quando si blocca lo schermo. Ciò può essere utile per app come i riproduttori musicali, ma poi dovrai congelarle a mano tramite \"Scorciatoia di congelamento in massa\".</string>
+    <string name="request_usage_stats">Gatekeeper ha bisogno dell\'autorizzazione <b>Statistiche d\'uso</b> per farlo. Attiva l\'autorizzazione per <b>ENTRAMBE</b> le app di Gatekeeper mostrate nella finestra dopo aver premuto \"Ok\". Altrimenti questa funzione non funzionerà correttamente.</string>
+    <string name="install_app_to_profile_success">L\'installazione dell\'app nel profilo lavorativo è finita.</string>
+    <string name="settings_about">Al riguardo</string>
+    <string name="request_storage_manager">Gatekeeper ha bisogno dell\'accesso a <b>Tutti i file</b> per lo Shuttle dei file. Attiva l\'autorizzazione per <b>ENTRAMBE</b> le app di Gatekeeper (Personale / Lavorativo) mostrate nella finestra dopo aver premuto \"Ok\".</string>
+</resources>

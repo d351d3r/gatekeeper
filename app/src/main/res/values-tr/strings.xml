@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="settings">Ayarlar</string>
+    <string name="settings_version">Sürüm</string>
+    <string name="settings_about">Hakkında</string>
+<string name="settings_source_code">Kaynak Kodu</string>
+    <string name="settings_services">Hizmetler</string>
+<string name="search">Ara</string>
+    <string name="freeze_all_shortcut">Dondur</string><string name="clone_success">\"%s\" uygulaması başarıyla klonlandı</string>
+    <string name="uninstall_success">\"%s\" uygulaması başarıyla kaldırıldı</string>
+    <string name="first_run_alert_continue">Devam et</string>
+    <string name="first_run_alert_cancel">İptal</string>
+    <string name="device_admin_desc">Uygulama İzolasyon Hizmeti</string><string name="notifications_important">Gatekeeper (Önemli)</string>
+    <string name="service_title">Gatekeeper Hizmeti</string>
+    <string name="service_desc">Gatekeeper şu an çalışıyor…</string>
+    <string name="uninstall_app">Kaldır</string>
+    <string name="app_installing">Yükleniyor...</string>
+    <string name="freeze_app">Dondur</string>
+    <string name="unfreeze_app">Aktifleştir</string>
+    <string name="create_unfreeze_shortcut">Aktifleştir ve/veya Çalıştır Kısayolu Oluştur</string>
+    <string name="auto_freeze">Otomatik Dondur</string>
+    <string name="show_all">Tüm Uygulamaları Göster</string>
+    <string name="launch">Çalıştır</string>
+    <string name="show_all_warning">Gizlenmiş uygulamalar üstünde değişikler yaparsanız çökmeler ve beklenmeyen hatalar meydana gelebilir. Ancak bu özellik, üretici tarafından özelleştirilmiş hatalı ROM\'larda iş profili için gerekli tüm sistem uygulamaları etkinleştirilmediğinde işinize yarayabilir. Devam ettiğiniz takdirde sorumluluk size aittir.</string>
+    <string name="fragment_profile_main">Ana Profil</string>
+    <string name="fragment_profile_work">İş Profili</string>
+    <string name="allow_cross_profile_widgets">Ana Profilde Widget\'lara İzin Ver</string>
+    <string name="clone_to_work_profile">İş profiline klonla</string>
+    <string name="clone_to_main_profile">Ana profile klonla</string>
+    <string name="settings_auto_freeze_service">Otomatik Dondurma Hizmeti</string>
+    <string name="settings_auto_freeze_delay">Otomatik Dondurma Gecikme Süresi</string><string name="freeze_all_success">\"Otomatik Dondur\" listesindeki tüm uygulamalar başarıyla donduruldu.</string>
+    <string name="launch_app_fail">%s uygulaması grafiksel arayüze sahip olmadığı için açılamadı.</string>
+    <string name="install_app_to_profile">İş profiline APK dosyası kurun</string>
+    <string name="batch_operation">Çoklu İşlem</string>
+    <string name="install_app_to_profile_success">Uygulama iş profiline yüklendi.</string>
+    <string name="finish_provision_title">Gatekeeper kurulumunu tamamlamak için buraya tıklayın</string>
+    <string name="settings_interaction">Etkileşim</string>
+    <string name="documents_ui">Dosya Gezginini aç</string>
+    <string name="finish_provision_desc">Tebrikler! Gatekeeper kurulumu bitmek üzere.</string>
+    <string name="service_auto_freeze_now">Şimdi Dondur</string>
+    <string name="create_freeze_all_shortcut">Çoklu Dondur Kısayolu Oluştur</string>
+    <string name="freeze_all">Çoklu Dondur</string>
+    <string name="settings_block_contacts_searching">Rehber Erişimini Engelle</string>
+    <string name="freeze_success">\"%s\" uygulaması başarıyla donduruldu</string>
+    <string name="unfreeze_success">\"%s\" uygulaması başarıyla aktifleştirildi</string>
+    <string name="app_context_menu_title">%s için İşlemler</string>
+    <string name="shortcut_create_success">Kısayol, ana ekrana eklendi.</string>
+    <string name="unsupported_launcher">Ana ekran uygulamanıza kısayol eklenemiyor. Detaylı bilgi için lütfen geliştirici ile iletişime geçin.</string>
+    <string name="continue_anyway">Devam et</string>
+<string name="settings_block_contacts_searching_desc">Ana profilin iş profiline bağlı olan rehbere erişimini engelle.</string>
+    <string name="service_auto_freeze_title">Bekleyen otomatik dondurma</string>
+    <string name="service_auto_freeze_desc">Ekranınızı kilitlediğinizde \"Aktifleştir &amp; Çalıştır\" seçeneği üzerinden başlatılan uygulamalar otomatik olarak dondurulacaktır.</string>
+    <string name="settings_cross_profile_file_chooser">Dosya Köprüsü</string>
+    <string name="settings_auto_freeze_service_desc">Ekranınızı kilitlediğinizde, \"Aktifleştir &amp; Çalıştır\" kısayolu üzerinden başlatılan uygulamalar otomatik olarak dondurulacaktır.</string><string name="miui_cannot_clone">MIUI yüklü cihazlarda sistem dışı uygulamaların klonlanması henüz mümkün değildir. Lütfen sisteminizde yüklü olan uygulama mağazasını (örn. <b>Google Play Store</b>) iş profilinize klonlayın ve sistem dışı uygulamaları bu klon mağaza üzerinden yükleyin.</string>
+    <string name="clone_fail_system_app">Gatekeeper, yetkisi dışında kalan bir profile sistem uygulamalarını klonlayamaz.</string>
+    <string name="uninstall_fail_system_app">Gatekeeper, yetkisi dışında kalan bir profilden sistem uygulamalarını kaldıramaz.</string>
+    <string name="work_profile_not_found">İş profili bulunamadı. İş profilini tekrar atamak için lütfen Gatekeeper\'ı yeniden başlatın.</string>
+<string name="settings_dont_freeze_foreground">Önplandaki Uygulamalar Dondurulmasın</string>
+    <string name="provision_finished">Kurulum tamamlandı. Gatekeeper yeniden başlatılıyor. Eğer otomatik başlatma gerçekleşmezse, lütfen Gatekeeper\'ı ana ekran uygulamanız üzerinden tekrar başlatın.</string>
+    <string name="settings_dont_freeze_foreground_desc">Ekranınızı kilitlediğinizde önplanda çalışan ve görünür etkinliğe sahip olan uygulamalar dondurulmaz. Bu özellik sayesinde müzik çalar gibi uygulamaları daha rahat bir şekilde kullanabilirsiniz ancak sonrasında bu uygulamaları \"Çoklu Dondurma Kısayolu\" üzerinden dondurmanız gerekir.</string>
+    <string name="settings_cross_profile_file_chooser_desc">Etkinleştirildiğinde iki profil arasında dosya göz atma, görüntüleme, seçme ve kopyalama işlemleri yapılabilir hale gelir. Bu işlemler, dosya sistemi izolasyonunu bozmadan, YALNIZCA Dosya Gezgini (sisteminizde Dosyalar veya Belgeler olarak adlandırılır) veya Dosya Gezgini özelliğine sahip uygulamalar üzerinden yapılır (bu özelliğe sahip uygulamaların seçtiğiniz dosyalara erişimi geçicidir).</string>
+    <string name="request_storage_manager">Dosya Köprüsü özelliğini kullanmak için Gatekeeper\'ın <b>Tüm Dosyalara</b> erişmesi gerekiyor. Lütfen \"Tamam\" seçeneğine tıkladıktan sonra <b>İKİ Gatekeeper UYGULAMASINA DA</b> (Kişisel / İş) bu izni verin.</string>
+    <string name="request_usage_stats">Bu özelliği kullanmak için Gatekeeper\'ın <b>Kullanım Erişimi</b> iznine ihtiyacı var. Lütfen \"Tamam\" seçeneğine tıkladıktan sonra <b>İKİ Gatekeeper UYGULAMASINA DA</b> (Kişisel / İş) bu izni verin, aksi takdirde söz konusu özellik düzgün bir şekilde çalışmayabilir.</string>
+</resources>

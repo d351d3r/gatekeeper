@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.preference.Preference
+        android:key="settings_ca_scope"
+        app:iconSpaceReserved="false"
+        android:selectable="false"
+        android:title="@string/settings_ca_scope"
+        android:summary="@string/settings_ca_scope_desc" />
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_ca_list"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_ca_list_title" />
+
+    <androidx.preference.Preference
+        android:key="settings_ca_install"
+        android:icon="@drawable/ic_add"
+        android:title="@string/settings_ca_install"
+        android:summary="@string/settings_ca_install_short" />
+
+</androidx.preference.PreferenceScreen>

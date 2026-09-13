@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources><string name="first_run_alert_cancel">Tchau</string>
+    <string name="first_run_alert_continue">Continuar</string>
+    <string name="device_admin_desc">Serviço de isolamento</string><string name="notifications_important">Importante (Gatekeeper)</string>
+    <string name="finish_provision_title">Clique aqui para concluir a configuração do Gatekeeper</string>
+    <string name="finish_provision_desc">Parabéns! Você está a um clique para concluir a configuração do Gatekeeper.</string>
+    <string name="service_title">Serviço do Gatekeeper</string>
+    <string name="service_desc">O Gatekeeper está funcionando …</string>
+    <string name="service_auto_freeze_title">Auto-suspensão pendente</string>
+    <string name="service_auto_freeze_desc">O Gatekeeper automaticamente suspenderá os apps executados via \"Reativar e Iniciar\" no próximo intento de bloqueio da tela.</string>
+    <string name="service_auto_freeze_now">Suspender agora</string>
+    <string name="app_installing">Instalando...</string>
+    <string name="fragment_profile_main">Principal</string>
+    <string name="fragment_profile_work">Gatekeeper</string>
+    <string name="batch_operation">Operação em grupo</string>
+    <string name="clone_to_work_profile">Clonar ao Gatekeeper (Perfil de trabalho)</string>
+    <string name="clone_to_main_profile">Clonar ao Perfil Principal</string>
+    <string name="uninstall_app">Desinstalar</string>
+    <string name="freeze_app">Suspender</string>
+    <string name="unfreeze_app">Reativar</string>
+    <string name="launch">Iniciar</string>
+    <string name="create_unfreeze_shortcut">Criar um atalho de Reativar e/ou Iniciar</string>
+    <string name="auto_freeze">Auto-Suspender</string>
+    <string name="allow_cross_profile_widgets">Permitir os widgets no Perfil Principal</string>
+    <string name="search">Pesquisar</string>
+    <string name="freeze_all">Suspensão em grupo</string>
+    <string name="create_freeze_all_shortcut">Criar um atalho para Suspensão em grupo</string>
+    <string name="freeze_all_shortcut">Suspender</string>
+    <string name="install_app_to_profile">Instalar APK no Gatekeeper</string>
+    <string name="install_app_to_profile_success">A instalação do app no perfil de trabalho foi concluída.</string>
+    <string name="show_all">Mostrar todos os apps</string>
+    <string name="show_all_warning">Administrar os apps que não estão visíveis na lista pode causar todo tipo de comportamentos inesperados e falhas. Entretanto, este recurso pode ser útil quando as ROMs personalizadas defeituosas, por padrão não descobrem todos os apps do sistema no Perfil de trabalho. Se continuar, esteja ciente disto.</string>
+    <string name="settings">Configurações</string>
+    <string name="settings_cross_profile_file_chooser">Transferência de arquivos</string>
+    <string name="settings_cross_profile_file_chooser_desc">Quando ativado, você será capaz de explorar / ver / escolher e copiar os arquivos de Perfil principal no Gatekeeper e vice-versa, SOMENTE via a interface de Documentos (Arquivos ou Documentos em seu lançador) ou apps com suporte à Interface de Documentos (recebem acesso temporário aos arquivos que você escolher via interface de Documentos), enquanto ainda pertencendo ao isolamento do sistema de arquivos.</string>
+    <string name="settings_services">Serviços</string>
+    <string name="settings_auto_freeze_service">Serviço de Auto-Suspensão</string>
+    <string name="settings_auto_freeze_service_desc">Quando a tela for bloqueada, suspende automaticamente os apps executados de \"Atalho de Reativar e Iniciar\".</string>
+    <string name="settings_auto_freeze_delay">Atraso de Auto-Suspensão</string>
+    <string name="settings_dont_freeze_foreground">Ignorar os apps em primeiro plano</string>
+    <string name="settings_dont_freeze_foreground_desc">NÃO suspenda os apps em primeiro plano (com atividade visível) quando a tela for bloqueada. Isto pode ser útil para os apps como reprodutor de música, mas será necessário suspendê-los manualmente através do \"Atalho de suspensão em grupo\".</string>
+    <string name="settings_about">Sobre</string>
+    <string name="settings_version">Versão</string>
+    <string name="settings_source_code">Código-fonte</string><string name="provision_finished">Configuração do Gatekeeper concluída. Reiniciando o Gatekeeper. Se o Gatekeeper não iniciar automaticamente, você pode executá-lo novamente do seu lançador.</string><string name="work_profile_not_found">Perfil de trabalho não foi encontrado. Por favor reinicie o app para verificar o perfil de novo.</string>
+    <string name="uninstall_success">O app \"%s\" foi desinstalado com sucesso</string>
+    <string name="freeze_success">O app \"%s\" foi suspenso com sucesso</string>
+    <string name="unfreeze_success">O app \"%s\" foi reativado com sucesso</string>
+    <string name="clone_fail_system_app">Não é possível clonar os apps do sistema ao perfil sobre qual o Gatekeeper não tem controle.</string>
+    <string name="uninstall_fail_system_app">Não é possível desinstalar os apps de sistema do perfil sobre qual o Gatekeeper não tem controle.</string>
+    <string name="unsupported_launcher">Não é possível adicionar os atalhos ao seu lançador. Entre em contato com o desenvolvedor para mais detalhes.</string>
+    <string name="app_context_menu_title">Operações para %s</string>
+    <string name="freeze_all_success">Todos os apps na lista de \"Auto-Suspensão\" foram suspensos com sucesso.</string>
+    <string name="shortcut_create_success">Atalho foi criado no seu lançador.</string>
+    <string name="request_usage_stats">O Gatekeeper precisa de permissão para <b>Estatísticas de uso</b> para fazer isto. Por favor ative a permissão para <b>AMBOS</b> os apps do Gatekeeper que aparecerão no diálogo após clicar no \"Ok\". Se isso não for feito, este recurso não funcionará corretamente.</string>
+    <string name="launch_app_fail">Não podia iniciar o app %s porque não tem interface.</string>
+    <string name="miui_cannot_clone">A clonagem de apps fora do sistema para outro perfil não é suportado no MIUI. Por favor, clone a loja de apps do seu sistema (p.ex. a <b>Play Store</b>) ao outro perfil e depois instale os apps a partir daí.</string>
+    <string name="settings_interaction">Interação</string><string name="clone_success">O app \"%s\" foi clonado com sucesso</string>
+    <string name="documents_ui">Abrir interface de Documentos</string>
+    <string name="settings_block_contacts_searching">Bloquear a pesquisa em contatos</string>
+    <string name="settings_block_contacts_searching_desc">Negar o acesso do perfil principal aos contatos no perfil de trabalho.</string><string name="request_storage_manager">O Gatekeeper precisa ter acesso a <b>Todos os arquivos</b> para poder usar a Transferência de arquivos. Por favor ative a permissão para <b>AMBOS</b> (Pessoal / Trabalho) apps do Gatekeeper que aparecerão no diálogo após clicar no \"Ok\".</string>
+    <string name="continue_anyway">Quero continuar</string>
+</resources>

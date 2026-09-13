@@ -1,0 +1,21 @@
+<device-admin xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+        Без этого элемента Gatekeeper не может быть ЦЕЛЬЮ передачи владения
+        профилем: transferOwnership отказывает, если целевой DPC её не объявил
+        (Android 9+). Нужно для сценария F1: передать владение компаньону,
+        переустановить Gatekeeper со сменой подписи, вернуть владение обратно,
+        не пересоздавая профиль и не теряя клоны.
+    -->
+    <support-transfer-ownership />
+    <!--
+        Политики, которые владелец профиля обязан объявить заранее: без записи
+        здесь вызов отвечает "did not specify uses-policy for: ..." даже там,
+        где платформа его разрешает. Замерено на AVD 16 пробником политик.
+        force-lock нужен для setMaximumTimeToLock, а disable-keyguard-features
+        для скрытия содержимого уведомлений профиля с экрана блокировки.
+    -->
+    <uses-policies>
+        <force-lock />
+        <disable-keyguard-features />
+    </uses-policies>
+</device-admin>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="service_title">Servicio Gatekeeper</string>
+    <string name="service_desc">Gatekeeper se esta ejecutando actualmente…</string>
+    <string name="service_auto_freeze_title">Suspensión automática pendiente</string>
+    <string name="first_run_alert_cancel">Adiós</string>
+    <string name="first_run_alert_continue">Continuar</string>
+    <string name="device_admin_desc">Servicio de aislamiento de aplicaciones</string><string name="notifications_important">Importante</string>
+    <string name="finish_provision_title">Haz click aquí para finalizar la configuración de Gatekeeper</string>
+    <string name="show_all_warning">Manipular aplicaciones ocultas en la lista podría causar fallos y toda clase de comportamientos inesperados. Sin embargo, esta característica podría ser de utilidad cuando las ROMs personalizadas del fabricante no habilitan todas las aplicaciones del sistema necesarias dentro del perfil de trabajo por defecto. Si continuas, estas por tu cuenta.</string>
+    <string name="documents_ui">Abrir interfaz de documentos</string>
+    <string name="settings">Configuraciones</string>
+    <string name="settings_interaction">Interacción</string>
+    <string name="settings_cross_profile_file_chooser">Pasarela de archivos</string>
+    <string name="finish_provision_desc">Felicitaciones! Se encuentra a un click de terminar la configuración de Gatekeeper.</string>
+    <string name="provision_finished">Configuración de Gatekeeper completa. Reiniciando Gatekeeper a continuación. Si Gatekeeper no se inicia de manera automática puedes iniciarlo nuevamente desde tu lanzador de aplicaciones.</string><string name="work_profile_not_found">Perfil de trabajo no encontrado. Por favor reinicia la aplicación para aprovisionar el perfil.</string>
+    <string name="clone_success">Aplicación \"%s\" clonada exitosamente</string>
+    <string name="uninstall_success">Aplicación \"%s\" desinstalada exitosamente</string>
+    <string name="freeze_success">Aplicación \"%s\" suspendida exitosamente</string>
+    <string name="unfreeze_success">Aplicación \"%s\" reiniciada exitosamente</string>
+    <string name="service_auto_freeze_desc">Gatekeeper va a suspender de manera automática las aplicaciones iniciadas con \"Descongelar e iniciar\" en el siguiente bloqueo de pantalla.</string>
+    <string name="clone_fail_system_app">No se pueden clonar aplicaciones del sistema a un perfil del cual Gatekeeper no tiene el control.</string>
+    <string name="freeze_all_success">Todas las aplicaciones en la lista de \"suspensión automática\" han sido suspendidas exitosamente.</string>
+    <string name="miui_cannot_clone">Clonar aplicaciones que no son del sistema a otro perfil actualmente no es posible en MIUI. Por favor clona la tienda de aplicaciones del sistema (ej: <b>Play Store</b>) dentro del otro perfil e instala aplicaciones desde ahí.</string>
+<string name="uninstall_fail_system_app">No se pueden desinstalar aplicaciones del sistema en un perfil del cual Gatekeeper no tiene control.</string>
+    <string name="unsupported_launcher">No se pueden agregar accesos directos a tu lanzador de aplicaciones. Por favor contacta al desarrollador para mas información.</string>
+    <string name="app_context_menu_title">Operaciones para \"%s\"</string>
+<string name="service_auto_freeze_now">Suspender ahora</string>
+    <string name="app_installing">Instalando...</string>
+    <string name="fragment_profile_main">Principal</string>
+    <string name="fragment_profile_work">Gatekeeper</string>
+    <string name="batch_operation">Operación en lote</string>
+    <string name="clone_to_work_profile">Clonar a Gatekeeper (perfil de trabajo)</string>
+    <string name="clone_to_main_profile">Clonar al perfil principal</string>
+    <string name="uninstall_app">Desinstalar</string>
+    <string name="freeze_app">Suspender</string>
+    <string name="unfreeze_app">Reanudar</string>
+    <string name="launch">Iniciar</string>
+    <string name="create_unfreeze_shortcut">Crear un acceso directo para suspender y/o iniciar</string>
+    <string name="auto_freeze">Auto suspender</string>
+    <string name="allow_cross_profile_widgets">Permitir Widgets en el perfil principal</string>
+    <string name="settings_cross_profile_file_chooser_desc">Cuando esta habilitado, seras capaz de buscar / ver / seleccionar / copiar archivos dentro de Gatekeeper del perfil principal y viceversa. Únicamente a través de la interfaz de documentos (llamada Archivos o Documentos en tu lanzador de aplicaciones) o aplicaciones con soporte para interfaz de archivos (únicamente obtienen acceso temporal a los archivos que escogiste en la interfaz de documentos), mientras aun pertenecen al sistema de archivos aislado.</string>
+    <string name="settings_block_contacts_searching">Bloquear búsqueda de contactos</string>
+    <string name="settings_block_contacts_searching_desc">Denegar acceso del perfil principal a los contactos dentro del perfil de trabajo.</string>
+    <string name="settings_services">Servicios</string>
+    <string name="settings_auto_freeze_delay">Retraso de la suspensión automática</string>
+    <string name="settings_dont_freeze_foreground_desc">NO suspendas aplicaciones en el fondo (con actividad visible) cuando bloquees la pantalla. Esto puede ser útil para aplicaciones como reproductores de música, pero vas a necesitar suspenderlas a través de \"Acceso directo a suspensión por lote\" más tarde.</string>
+    <string name="settings_version">Versión</string>
+    <string name="settings_source_code">Código fuente</string><string name="shortcut_create_success">Acceso directo creado en tu lanzador de aplicaciones.</string>
+    <string name="request_usage_stats">Gatekeeper necesita el permiso <b> Estadísticas de uso</b> para hacer esto. Por favor habilita el permiso para <b>AMBAS</b> de las aplicaciones Gatekeeper mostradas en la ventana siguiente a que presiones \"Ok\". No hacerlo causara que esta característica no funcione adecuadamente.</string>
+    <string name="launch_app_fail">No se puede lanzar la aplicación %s por que no tiene interfaz gráfica.</string>
+    <string name="request_storage_manager">Gatekeeper necesita acceder a <b>Todos los archivos</b> para el selector de archivos. Por favor habilita el permiso para <b>AMBAS</b> aplicaciones Gatekeeper (Personal / Trabajo) en la ventana siguiente al presionar \"Ok\".</string>
+    <string name="continue_anyway">Continuar de todos modos</string>
+<string name="search">Buscar</string>
+    <string name="freeze_all">Suspensión en lote</string>
+    <string name="create_freeze_all_shortcut">Crear un acceso directo a suspensión en lote</string>
+    <string name="freeze_all_shortcut">Suspender</string>
+    <string name="install_app_to_profile">Instalar APK dentro de Gatekeeper</string>
+    <string name="install_app_to_profile_success">Instalación de aplicación en perfil de trabajo finalizada.</string>
+    <string name="show_all">Mostrar todas las aplicaciones</string>
+    <string name="settings_auto_freeze_service">Servicio de auto suspensión</string>
+    <string name="settings_auto_freeze_service_desc">Cuando la pantalla esta bloqueada, automáticamente suspende las aplicaciones iniciadas con \"Acceso directo a Reanudar e iniciar\".</string>
+    <string name="settings_dont_freeze_foreground">Omitir aplicaciones de fondo</string>
+    <string name="settings_about">Acerca de</string>
+</resources>

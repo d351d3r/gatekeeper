@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Ничего из данных приложения не уезжает наружу: ни в облачную копию, ни при
+    переносе на новый телефон. Причина не в осторожности вообще, а в конкретном
+    файле: в настройках лежит общий HMAC-ключ, которым подписывается реле между
+    профилями. Копия ключа на другом устройстве означает чужое приложение,
+    способное отдавать команды рабочему профилю.
+
+    Рабочий профиль все равно не переносится ни копией, ни переносом, так что
+    сохранять от него нечего. Резервная копия настроек у пользователя своя,
+    через экспорт в файл.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+        <exclude domain="device_root" />
+        <exclude domain="device_file" />
+        <exclude domain="device_database" />
+        <exclude domain="device_sharedpref" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+        <exclude domain="device_root" />
+        <exclude domain="device_file" />
+        <exclude domain="device_database" />
+        <exclude domain="device_sharedpref" />
+    </device-transfer>
+</data-extraction-rules>

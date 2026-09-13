@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <!--
+            Второе приложение с теми же строками действий. Тестовый APK это отдельный пакет
+            (io.gatekeeper.test), и его достаточно, чтобы воспроизвести перехват
+            кросс-профильного реле (D4a), ничего больше на стенд ставить не надо.
+
+            Приоритет не задан намеренно: положительный приоритет локального кандидата
+            вытесняет системный форвардер из резолва целиком, и сцена получилась бы другой,
+            не перехват, а отсутствие реле.
+
+            Перехватывается только START_SERVICE. TRY_START_SERVICE оставлен настоящему
+            реле специально: так на стенде воспроизводится ровно D3, когда проверка профиля
+            проходит, а привязка возвращается без результата.
+        -->
+        <activity
+            android:name="io.gatekeeper.ImpostorRelayActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="io.gatekeeper.action.START_SERVICE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <!--
+                Приложение под тестом видит чужие пакеты по своему queries с
+                android.intent.action.MAIN; без этого фильтра тестовый APK для него невидим
+                и перехват не воспроизводится.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
+        <!--
+            F1: цель передачи владения профилем. Отдельный пакет с отдельной подписью,
+            объявивший support-transfer-ownership, играет роль «Owner Companion».
+        -->
+        <receiver
+            android:name="io.gatekeeper.TransferTargetAdminReceiver"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/transfer_target_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+                <action android:name="android.app.action.TRANSFER_OWNERSHIP_COMPLETE" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+            Точка входа обратного хода, которая поднимает холодный процесс:
+            манифестный ресивер по am broadcast в нём не стартует.
+        -->
+        <activity
+            android:name="io.gatekeeper.TransferBackActivity"
+            android:exported="true" />
+
+        <receiver
+            android:name="io.gatekeeper.TransferBackReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="io.gatekeeper.test.TRANSFER_BACK" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>

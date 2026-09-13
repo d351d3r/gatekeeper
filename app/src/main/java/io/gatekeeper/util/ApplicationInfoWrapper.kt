@@ -1,0 +1,88 @@
+package io.gatekeeper.util
+
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Parcel
+import android.os.Parcelable
+
+class ApplicationInfoWrapper private constructor() : Parcelable {
+    private var info: ApplicationInfo? = null
+    private var label: String? = null
+    private var isHidden: Boolean = false
+    private var canLaunch: Boolean = false
+
+    constructor(info: ApplicationInfo) : this() {
+        this.info = info
+    }
+
+    fun loadLabel(pm: PackageManager): ApplicationInfoWrapper {
+        label = pm.getApplicationLabel(info!!).toString()
+        return this
+    }
+
+    // Only used from GatekeeperService
+    fun setHidden(hidden: Boolean): ApplicationInfoWrapper {
+        isHidden = hidden
+        return this
+    }
+
+    // Only used from GatekeeperService
+    fun setCanLaunch(launchable: Boolean): ApplicationInfoWrapper {
+        canLaunch = launchable
+        return this
+    }
+
+    fun getPackageName(): String = info!!.packageName
+
+    fun getLabel(): String? = label
+
+    fun getSourceDir(): String = info!!.sourceDir
+
+    fun getSplitApks(): Array<String>? = info!!.splitSourceDirs
+
+    // NOTE: This does not relate to the app-wide "freezing" feature
+    fun getEnabled(): Boolean = info!!.enabled
+
+    fun isHidden(): Boolean = isHidden
+
+    /** Есть launcher-активити, способная принять implicit MAIN/LAUNCHER. */
+    fun canLaunch(): Boolean = canLaunch
+
+    fun getInfo(): ApplicationInfo? = info
+
+    fun isSystem(): Boolean = (info!!.flags and ApplicationInfo.FLAG_SYSTEM) != 0
+
+    fun isInstalled(): Boolean = (info!!.flags and ApplicationInfo.FLAG_INSTALLED) != 0
+
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.writeParcelable(info, flags)
+        dest.writeString(label)
+        dest.writeByte((if (isHidden) 1 else 0).toByte())
+        dest.writeByte((if (canLaunch) 1 else 0).toByte())
+    }
+
+    override fun describeContents(): Int = info!!.packageName.hashCode()
+
+    companion object {
+        @JvmField
+        val CREATOR: Parcelable.Creator<ApplicationInfoWrapper> =
+            object : Parcelable.Creator<ApplicationInfoWrapper> {
+                override fun createFromParcel(source: Parcel): ApplicationInfoWrapper {
+                    val wrapper = ApplicationInfoWrapper()
+                    wrapper.info = androidx.core.os.ParcelCompat.readParcelable(
+                        source,
+                        ApplicationInfo::class.java.classLoader,
+                        ApplicationInfo::class.java
+                    )
+                    wrapper.label = source.readString()
+                    wrapper.isHidden = source.readByte().toInt() != 0
+                    wrapper.canLaunch = source.readByte().toInt() != 0
+                    return wrapper
+                }
+
+                override fun newArray(size: Int): Array<ApplicationInfoWrapper?> =
+                    arrayOfNulls(size)
+            }
+    }
+}

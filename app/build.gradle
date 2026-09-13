@@ -1,0 +1,179 @@
+apply plugin: 'com.android.application'
+apply plugin: 'io.gitlab.arturbosch.detekt'
+
+def versionPropsFile = rootProject.file('version.properties')
+def versionProps = new Properties()
+if (versionPropsFile.canRead()) {
+    versionPropsFile.withInputStream { versionProps.load(it) }
+} else {
+    versionProps['VERSION_NAME'] = '0.0.1'
+    versionProps['VERSION_CODE'] = '1'
+}
+
+// Ключ релиза: сначала окружение (CI), потом -P/gradle.properties. Пусто -- ключа нет.
+def releaseKeystorePath = System.getenv('GATEKEEPER_KEYSTORE') ?:
+    project.findProperty('gatekeeperKeystore')
+def releaseStorePassword = System.getenv('GATEKEEPER_STORE_PASSWORD') ?:
+    project.findProperty('gatekeeperStorePassword')
+def releaseKeyAlias = System.getenv('GATEKEEPER_KEY_ALIAS') ?:
+    project.findProperty('gatekeeperKeyAlias')
+def releaseKeyPassword = System.getenv('GATEKEEPER_KEY_PASSWORD') ?:
+    project.findProperty('gatekeeperKeyPassword')
+
+// CI passes -PversionCode=<n> to pin the build number; otherwise version.properties is used.
+def versionCodeValue = (project.findProperty('versionCode') ?: versionProps.getProperty('VERSION_CODE', '1')).toInteger()
+
+android {
+    compileSdk 36
+    buildToolsVersion = '36.0.0'
+    defaultConfig {
+        applicationId "io.gatekeeper"
+        minSdkVersion 24
+        targetSdkVersion 36
+        versionCode versionCodeValue
+        versionName versionProps.getProperty('VERSION_NAME', '0.0.1')
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    signingConfigs {
+        // Ключ релиза приходит только снаружи: переменные окружения (CI) или
+        // ~/.gradle/gradle.properties (локально). В репозитории ключа нет и быть
+        // не должно -- APK, подписанный ключом из публичного репозитория, может
+        // обновить кто угодно. Если ключа нет, assembleRelease падает (см. ниже),
+        // а не собирает молча неподписанный или чужой артефакт.
+        release {
+            if (releaseKeystorePath) {
+                storeFile file(releaseKeystorePath)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+            // v1 (JAR) не нужен: он для устройств до Android 7, а minSdk 24 -- это
+            // как раз 7.0. v3 добавляет право сменить ключ подписи в будущем без
+            // переустановки у пользователей (Android 9+); включать его имеет смысл
+            // только до первых установок, потом поздно. Менять ключ все равно
+            // придется старым ключом, так что от потери ключа это не страхует.
+            enableV1Signing = false
+            enableV2Signing = true
+            enableV3Signing = true
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (releaseKeystorePath) {
+                signingConfig = signingConfigs.release
+            }
+        }
+        // debug остаётся на стандартном debug-ключе Android: он у каждой машины
+        // свой. Поверх релизной сборки debug не встанет, и наоборот -- это разные
+        // подписи, а не сбой.
+    }
+    splits {
+        abi {
+            enable = true
+            reset()
+            include 'arm64-v8a'
+            universalApk = false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lint {
+        disable 'MissingTranslation', 'ExtraTranslation', 'GoogleAppIndexingWarning', 'InvalidFragmentVersionForActivityResult'
+    }
+    buildFeatures {
+        aidl = true
+        buildConfig = true
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+    namespace = 'io.gatekeeper'
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    baseline = file('detekt-baseline.xml')
+}
+
+afterEvaluate {
+    tasks.register('fixAidlGeneratedComments') {
+        doLast {
+            def aidlOut = layout.buildDirectory.dir('generated/aidl_source_output_dir').get().asFile
+            if (!aidlOut.exists()) return
+            aidlOut.eachFileRecurse { f ->
+                if (f.name.endsWith('.java')) {
+                    def lines = f.readLines()
+                    if (!lines.isEmpty() && lines[0].startsWith('/*')) {
+                        def end = lines.findIndexOf { it.contains('*/') }
+                        if (end >= 0) {
+                            f.text = lines.drop(end + 1).join('\n')
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    tasks.matching { it.name == 'compileDebugAidl' || it.name == 'compileReleaseAidl' }.configureEach {
+        finalizedBy('fixAidlGeneratedComments')
+    }
+
+    tasks.matching { it.name.endsWith('JavaWithJavac') || it.name.endsWith('Kotlin') }.configureEach {
+        dependsOn('fixAidlGeneratedComments')
+    }
+
+    // Copy the built arm64 APK to the repo root under the same name the release
+    // publishes, so a file here and a file downloaded from GitHub are comparable.
+    // The version code is not in the name: one version name means one build.
+    ['Debug', 'Release'].each { bt ->
+        tasks.named("assemble${bt}").configure {
+            doLast {
+                def apkDir = layout.buildDirectory.dir("outputs/apk/${bt.toLowerCase()}").get().asFile
+                def versionName = android.defaultConfig.versionName
+                def versionCode = android.defaultConfig.versionCode
+                apkDir.listFiles()?.findAll { it.name.endsWith('.apk') }?.each { apk ->
+                    copy {
+                        from apk
+                        into rootProject.projectDir
+                        rename { "gatekeeper-${versionName}-${bt.toLowerCase()}.apk" }
+                    }
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.activity:activity:1.13.0'
+    implementation 'androidx.fragment:fragment:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.8.0'
+    implementation 'androidx.preference:preference:1.2.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.2'
+    implementation 'com.google.android.material:material:1.14.0'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0'
+    testImplementation 'junit:junit:4.13.2'
+    // JVM-вариант org.json для unit-тестов сериализации бэкапа (на устройстве -- фреймворковый).
+    testImplementation 'org.json:json:20240303'
+    androidTestImplementation 'androidx.test:core:1.7.0'
+    androidTestImplementation 'androidx.test:runner:1.7.0'
+    androidTestImplementation 'androidx.test:rules:1.7.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
+}
+
+gradle.taskGraph.whenReady { graph ->
+    if (graph.hasTask(':app:assembleRelease') && !releaseKeystorePath) {
+        throw new GradleException(
+            'Release build requires a signing key. Set GATEKEEPER_KEYSTORE, ' +
+            'GATEKEEPER_STORE_PASSWORD, GATEKEEPER_KEY_ALIAS and GATEKEEPER_KEY_PASSWORD ' +
+            '(environment variables in CI, ~/.gradle/gradle.properties locally). ' +
+            'See README "Signing".'
+        )
+    }
+}

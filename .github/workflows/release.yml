@@ -1,0 +1,154 @@
+name: Release
+
+# Подписанный релиз собирается только здесь и только по тегу. Ключ живёт в
+# секретах репозитория, в дереве его нет: APK, подписанный ключом из репозитория,
+# может обновить кто угодно.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build (e.g. v0.0.1)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve tag
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.meta.outputs.tag }}
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # Единственный источник версии -- version.properties. Тег обязан совпадать
+      # с ним, иначе на GitHub окажется релиз с одним номером, а в APK другой.
+      - name: Check tag against version.properties
+        run: |
+          NAME=$(grep '^VERSION_NAME=' version.properties | cut -d= -f2)
+          CODE=$(grep '^VERSION_CODE=' version.properties | cut -d= -f2)
+          echo "version.properties: ${NAME} (${CODE})"
+          if [ "${{ steps.meta.outputs.tag }}" != "v${NAME}" ]; then
+            echo "Tag ${{ steps.meta.outputs.tag }} does not match version name ${NAME}." >&2
+            echo "Set VERSION_NAME in version.properties or retag." >&2
+            exit 1
+          fi
+          echo "VERSION_NAME=${NAME}" >> "$GITHUB_ENV"
+          echo "VERSION_CODE=${CODE}" >> "$GITHUB_ENV"
+
+      - name: Check signing secrets are present
+        run: |
+          missing=""
+          [ -n "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" ] || missing="${missing} RELEASE_KEYSTORE_BASE64"
+          [ -n "${{ secrets.RELEASE_STORE_PASSWORD }}" ] || missing="${missing} RELEASE_STORE_PASSWORD"
+          [ -n "${{ secrets.RELEASE_KEY_ALIAS }}" ] || missing="${missing} RELEASE_KEY_ALIAS"
+          [ -n "${{ secrets.RELEASE_KEY_PASSWORD }}" ] || missing="${missing} RELEASE_KEY_PASSWORD"
+          if [ -n "${missing}" ]; then
+            echo "Missing repository secrets:${missing}" >&2
+            echo "See README \"Signing\" for how to create the key and add the secrets." >&2
+            exit 1
+          fi
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > "${RUNNER_TEMP}/release.keystore"
+          test -s "${RUNNER_TEMP}/release.keystore"
+
+      # Несовпадение пароля и кейстора иначе всплывает стектрейсом Gradle на третьей
+      # минуте прогона. keytool отвечает за секунду и говорит прямо, что не сходится.
+      # Пароль уходит в stdin, а не в аргументы: аргументы видны в списке процессов.
+      - name: Check the key opens with these secrets
+        env:
+          STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+        run: |
+          KS="${RUNNER_TEMP}/release.keystore"
+          if ! printf '%s\n' "${STORE_PASSWORD}" | keytool -list -keystore "${KS}" -storetype PKCS12 >/dev/null 2>&1; then
+            echo "RELEASE_STORE_PASSWORD does not open RELEASE_KEYSTORE_BASE64." >&2
+            echo "Both secrets have to come from the same keystore file." >&2
+            exit 1
+          fi
+          if ! printf '%s\n' "${STORE_PASSWORD}" | keytool -list -keystore "${KS}" -storetype PKCS12 -alias "${KEY_ALIAS}" >/dev/null 2>&1; then
+            echo "RELEASE_KEY_ALIAS names no key in this keystore." >&2
+            exit 1
+          fi
+          echo "Keystore opens and the alias is in it."
+
+      - name: Assemble signed release APK
+        env:
+          GATEKEEPER_KEYSTORE: ${{ runner.temp }}/release.keystore
+          GATEKEEPER_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          GATEKEEPER_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          GATEKEEPER_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: ./gradlew :app:assembleRelease --stacktrace --no-daemon
+
+      # Отпечаток ключа печатается в лог и уходит в описание релиза: по нему
+      # видно, что все релизы подписаны одним ключом, ещё до установки APK.
+      - name: Verify signature and record fingerprint
+        id: sig
+        run: |
+          APKSIGNER=$(ls "${ANDROID_HOME}"/build-tools/*/apksigner | sort -V | tail -1)
+          BUILT=$(ls app/build/outputs/apk/release/*-arm64-v8a-*.apk | head -1)
+          # Имя ассета -- то, что видит скачавший: приложение и версия, а не
+          # внутреннее имя модуля сборки. Копия лежит в корне рабочей копии, чтобы
+          # в SHA256SUMS.txt попало имя файла, а не путь внутри build.
+          APK="gatekeeper-${VERSION_NAME}-release.apk"
+          cp "${BUILT}" "${APK}"
+          echo "apk=${APK}" >> "$GITHUB_OUTPUT"
+          "${APKSIGNER}" verify --print-certs "${APK}" | tee certs.txt
+          FP=$(grep -m1 -i 'SHA-256 digest' certs.txt | awk '{print $NF}')
+          echo "fingerprint=${FP}" >> "$GITHUB_OUTPUT"
+          sha256sum "${APK}" | tee SHA256SUMS.txt
+
+      - name: Remove keystore
+        if: always()
+        run: rm -f "${RUNNER_TEMP}/release.keystore"
+
+      - name: Write release notes
+        run: |
+          NOTES="RELEASE_NOTES_${{ steps.meta.outputs.tag }}.md"
+          if [ -f "${NOTES}" ]; then
+            cp "${NOTES}" release-notes.md
+          else
+            printf '## Gatekeeper %s (%s)\n\n' "${VERSION_NAME}" "${VERSION_CODE}" > release-notes.md
+            printf 'Signed release APK, arm64-v8a.\n\n' >> release-notes.md
+          fi
+          printf '\nSigning certificate SHA-256: `%s`\n' "${{ steps.sig.outputs.fingerprint }}" >> release-notes.md
+          printf '\nAPK SHA-256:\n\n```\n' >> release-notes.md
+          cat SHA256SUMS.txt >> release-notes.md
+          printf '```\n' >> release-notes.md
+          cat release-notes.md
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: Gatekeeper ${{ env.VERSION_NAME }}
+          body_path: release-notes.md
+          files: |
+            ${{ steps.sig.outputs.apk }}
+            SHA256SUMS.txt
+          make_latest: true

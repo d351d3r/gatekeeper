@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Значки на фирменной панели тинтуются одним цветом brandBarOn. Цвет в имени файла
+    не зашит: набор один, отличается только тинт на месте применения.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/main_menu_search"
+        android:icon="@drawable/ic_search"
+        android:title="@string/search"
+        app:iconTint="?attr/colorOnSurface"
+        app:showAsAction="always|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+
+
+    <item
+        android:id="@+id/main_menu_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/settings"
+        app:iconTint="?attr/colorOnSurface"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/main_menu_freeze_all"
+        android:icon="@drawable/ic_freeze"
+        app:iconTint="?attr/colorOnSurface"
+        android:title="@string/freeze_all" />
+
+    <item
+        android:id="@+id/main_menu_unfreeze_all"
+        android:icon="@drawable/ic_lock_open"
+        app:iconTint="?attr/colorOnSurface"
+        android:title="@string/unfreeze_all" />
+
+
+
+    <item
+        android:id="@+id/main_menu_install_app_to_profile"
+        android:icon="@drawable/ic_add"
+        app:iconTint="?attr/colorOnSurface"
+        android:title="@string/install_app_to_profile" />
+
+    <item
+        android:id="@+id/main_menu_documents_ui"
+        android:icon="@drawable/ic_upload"
+        app:iconTint="?attr/colorOnSurface"
+        android:title="@string/file_shuttle_action" />
+
+    <item
+        android:id="@+id/main_menu_show_all"
+        android:title="@string/show_all"
+        android:checkable="true"
+        android:checked="false" />
+</menu>

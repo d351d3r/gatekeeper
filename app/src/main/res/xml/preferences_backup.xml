@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.preference.PreferenceCategory
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_backup_group_scope">
+
+        <androidx.preference.Preference
+            android:key="settings_backup_contains"
+            app:iconSpaceReserved="false"
+            android:selectable="false"
+            android:title="@string/settings_backup_contains"
+            android:summary="@string/settings_backup_contains_desc" />
+
+        <androidx.preference.Preference
+            android:key="settings_backup_excludes"
+            app:iconSpaceReserved="false"
+            android:selectable="false"
+            android:title="@string/settings_backup_excludes"
+            android:summary="@string/settings_backup_excludes_desc" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_backup_group_actions">
+
+        <androidx.preference.Preference
+            android:key="settings_backup_export"
+            android:icon="@drawable/ic_upload"
+            android:title="@string/export_backup"
+            android:summary="@string/settings_backup_export_desc" />
+
+        <androidx.preference.Preference
+            android:key="settings_backup_import"
+            android:icon="@drawable/ic_download"
+            android:title="@string/import_backup"
+            android:summary="@string/settings_backup_import_desc" />
+
+    </androidx.preference.PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>

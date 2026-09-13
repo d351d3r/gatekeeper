@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.preference.Preference
+        android:key="settings_links_warning"
+        app:iconSpaceReserved="false"
+        android:selectable="false"
+        android:title="@string/settings_links_warning"
+        android:summary="@string/settings_links_warning_desc" />
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_links_list"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_links_list_title" />
+
+    <androidx.preference.Preference
+        android:key="settings_links_add"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_links_add"
+        android:summary="@string/settings_links_add_desc" />
+
+</androidx.preference.PreferenceScreen>

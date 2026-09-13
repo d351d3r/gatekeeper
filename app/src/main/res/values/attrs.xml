@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Две роли, которых нет в палитре Material 3: успех и предупреждение.
+    Без них предупреждение приходится рисовать colorError, и «на этой прошивке
+    APK иногда зависает» выглядит так же тревожно, как «профиль потерян».
+    Динамический цвет (DynamicColors) эти атрибуты не трогает, и правильно:
+    смысл роли не зависит от обоев.
+-->
+<resources>
+    <attr name="colorSuccess" format="color" />
+    <attr name="colorOnSuccess" format="color" />
+    <attr name="colorSuccessContainer" format="color" />
+    <attr name="colorOnSuccessContainer" format="color" />
+    <attr name="colorWarning" format="color" />
+    <attr name="colorOnWarning" format="color" />
+    <attr name="colorWarningContainer" format="color" />
+    <attr name="colorOnWarningContainer" format="color" />
+</resources>

@@ -1,0 +1,5 @@
+<device-admin xmlns:android="http://schemas.android.com/apk/res/android">
+    <support-transfer-ownership />
+    <uses-policies>
+    </uses-policies>
+</device-admin>

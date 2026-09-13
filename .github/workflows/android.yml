@@ -1,0 +1,87 @@
+name: Android CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  gate:
+    name: Lint, static analysis and tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Lint
+        run: ./gradlew :app:lintDebug --stacktrace --no-daemon
+
+      - name: Static analysis (detekt)
+        run: ./gradlew :app:detekt --stacktrace --no-daemon
+
+      - name: Unit tests
+        run: ./gradlew :app:testDebugUnitTest --stacktrace --no-daemon
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gatekeeper-lint-report
+          path: app/build/reports/lint-results-debug.html
+          if-no-files-found: ignore
+          retention-days: 14
+
+  build:
+    name: Assemble arm64 debug APK
+    needs: gate
+    if: always() && (needs.gate.result == 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # Версию не двигаем автоматически: номер версии -- решение человека,
+      # а не побочный эффект пуша. Правится в version.properties руками.
+      - name: Assemble arm64 debug APK
+        run: ./gradlew :app:assembleDebug --stacktrace --no-daemon
+
+      # Подписанный релиз собирает только release.yml по тегу: ключ не должен
+      # разъезжаться по всем прогонам, а debug-артефакта хватает для проверки сборки.
+      # Берем копию из корня, а не сырой вывод сборки: у нее то же имя, что у файла
+      # в релизе, и в SHA256SUMS.txt попадает имя файла, а не путь внутри build.
+      - name: Write APK checksums
+        run: sha256sum gatekeeper-*-debug.apk | tee SHA256SUMS.txt
+
+      - name: Upload arm64 debug APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: gatekeeper-arm64-debug-apk
+          path: |
+            gatekeeper-*-debug.apk
+            SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30

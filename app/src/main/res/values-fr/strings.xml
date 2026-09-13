@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="service_auto_freeze_now">Geler Maintenant</string>
+    <string name="notifications_important">Gatekeeper Important</string>
+    <string name="first_run_alert_continue">Continuer</string>
+    <string name="device_admin_desc">Service d\'isolation d\'application</string>
+    <string name="finish_provision_title">Cliquez ici pour finir de configurer Gatekeeper</string>
+    <string name="finish_provision_desc">Félicitations ! Vous êtes à un clic de finir de configurer Gatekeeper.</string>
+    <string name="service_title">Service Gatekeeper</string>
+    <string name="service_desc">Gatekeeper est en fonctionnement…</string>
+    <string name="service_auto_freeze_title">Gel automatique en attente</string>
+    <string name="service_auto_freeze_desc">Gatekeeper va geler automatiquement les applications chargées depuis \"Dégeler &amp; Lancer\" sur le prochain verrouillage d\'écran.</string>
+    <string name="app_installing">Installation...</string>
+    <string name="batch_operation">Opération par lots</string>
+    <string name="clone_to_work_profile">Cloner vers Gatekeeper (Profil Professionnel)</string>
+    <string name="uninstall_app">Désinstaller</string>
+    <string name="freeze_all_shortcut">Geler</string>
+    <string name="fragment_profile_main">Profil Principal</string>
+    <string name="fragment_profile_work">Gatekeeper</string>
+    <string name="clone_to_main_profile">Cloner vers le Profil Principal</string>
+    <string name="freeze_app">Geler</string>
+    <string name="unfreeze_app">Dégeler</string>
+    <string name="launch">Lancer</string>
+    <string name="auto_freeze">Gel Automatique</string>
+    <string name="allow_cross_profile_widgets">Autoriser les Widgets dans le Profil Principal</string>
+    <string name="search">Chercher</string>
+    <string name="freeze_all">Gel par lots</string>
+    <string name="create_freeze_all_shortcut">Créer un Raccourci de Gel par Lots</string>
+    <string name="create_unfreeze_shortcut">Créer un Raccourci de Dégel et/ou de Lancement</string>
+    <string name="install_app_to_profile">Installer un APK dans Gatekeeper</string>
+    <string name="install_app_to_profile_success">Installation de l\'application terminée dans le Profil Professionnel.</string><string name="show_all_warning">Manipuler des applications qui ne sont pas visibles dans la liste pourrait causer des plantages et toutes sortes de comportements inattendus. Cependant, cette fonctionnalité peut être utile quand des ROMs personnalisées fautives n\'activent pas toutes les applications systèmes nécessaires dans le Profil Professionnel par défaut. Ne continuez que si vous êtes sûr de vous.</string>
+    <string name="settings_cross_profile_file_chooser_desc">Si activé, vous pourrez parcourir / afficher / sélectionner / copier des fichiers dans Gatekeeper depuis le Profil Principal et vice-versa. UNIQUEMENT via l\'application Documents (nommée Fichiers ou Documents dans votre lanceur d\'applications) ou via des applications supportant la gestion de Documents (elles n\'obtiennent qu\'un accès temporaire aux fichiers à choisir), tout en concervant l\'isolation du système de fichiers.</string>
+    <string name="settings_dont_freeze_foreground_desc">Ne PAS geler les applications en premier plan (avec une activité visible) quand l\'écran est verrouillé. Cela peut être utile pour des applications telles que des lecteurs de musique, mais vous devrez ensuite les geler depuis \"Raccourci de Gel par Lots\".</string>
+    <string name="provision_finished">Configuration de Gatekeeper complète. L\'application redémarre. Si Gatekeeper ne redémarre pas automatiquement, vous pouvez le lancer depuis votre Lanceur d\'Applications.</string>
+    <string name="show_all">Afficher Toutes les Applications</string>
+    <string name="settings">Paramètres</string>
+    <string name="settings_interaction">Interaction</string>
+    <string name="settings_block_contacts_searching">Bloquer la recherche de contacts</string>
+    <string name="settings_block_contacts_searching_desc">Refuser au Profil Principal l\'accès aux contacts à l\'intérieur du Profil Professionnel.</string>
+    <string name="settings_services">Services</string>
+    <string name="settings_auto_freeze_service">Service de gel automatique</string>
+    <string name="settings_auto_freeze_service_desc">Lorsque l\'écran est verrouillé, gèle automatiquement les applications lancées à partir de \"Raccourcis de Dégel &amp; Lancement\".</string>
+    <string name="settings_auto_freeze_delay">Délai de gel automatique</string>
+    <string name="settings_dont_freeze_foreground">Ignorer les applications au premier plan</string>
+    <string name="settings_about">À propos</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_source_code">Code Source</string><string name="work_profile_not_found">Profil Professionnel introuvable. Veuillez redémarrer l\'application pour réapprovisionner le Profil.</string><string name="clone_success">Application \"%s\" clonée avec succès</string>
+    <string name="freeze_success">Application \"%s\" gelée avec succès</string>
+    <string name="uninstall_success">Application \"%s\" désinstallée avec succès</string>
+    <string name="unfreeze_success">Application \"%s\" dégelée avec succès</string>
+    <string name="clone_fail_system_app">Impossible de cloner des applications système vers un profil sur lequel Gatekeeper n\'a aucun contrôle.</string>
+    <string name="uninstall_fail_system_app">Impossible de désinstaller les applications système dans un profil sur lequel Gatekeeper n\'a aucun contrôle.</string>
+    <string name="documents_ui">Ouvrir la Navigation de Documents</string><string name="unsupported_launcher">Impossible d\'ajouter de raccourcis à votre lanceur d\'applications. Veuillez contacter le développeur pour plus d\'informations.</string>
+    <string name="first_run_alert_cancel">Au revoir</string><string name="app_context_menu_title">Opérations pour %s</string>
+    <string name="freeze_all_success">Toutes les applications de la liste \"Gel Automatique\" ont été gelées avec succès.</string>
+    <string name="shortcut_create_success">Raccourci créé sur votre lanceur d\'applications.</string>
+    <string name="request_usage_stats">Gatekeeper à besoin de la permission <b>Statistiques d\'Usage</b> pour faire ça. S\'il vous plaît activez la permission pour <b>LES DEUX</b> applications Gatekeeper dans la boite de dialogue affichée après avoir appuyé sur \"Ok\". Sinon cette fonctionnalité de pourra pas fonctionner correctement.</string>
+    <string name="launch_app_fail">Impossible de lancer l\'application %s car elle n\'a pas d\'interface graphique.</string>
+    <string name="request_storage_manager">Gatekeeper doit accéder à <b>Tous les Fichiers</b> pour la Navigation de Fichiers. Veuillez activer l\'autorisation pour <b>LES DEUX</b> applications Gatekeeper (personnelle / professionnelle) dans la boîte de dialogue affichée après avoir appuyé sur \"Ok\".</string>
+    <string name="miui_cannot_clone">Le clonage d\'applications non système vers un autre profil n\'est actuellement pas possible sur MIUI. Veuillez cloner la boutique d\'applications de votre système (par exemple, &lt;b&gt;Play Store&lt;/b&gt;) dans l\'autre profil, puis installer les applications à partir de là.<b>Play Store</b>) into the other profile and then install apps from there.</string>
+    <string name="continue_anyway">Continuer quand même</string>
+    <string name="settings_cross_profile_file_chooser">Navigation de Documents</string>
+</resources>

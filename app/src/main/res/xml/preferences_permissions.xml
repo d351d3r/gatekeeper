@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.preference.PreferenceCategory
+        android:key="settings_perm_list"
+        android:title="@string/settings_perm_list_title" />
+
+</androidx.preference.PreferenceScreen>

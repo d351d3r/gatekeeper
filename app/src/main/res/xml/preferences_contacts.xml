@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.preference.PreferenceCategory
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_contacts_group_closed">
+
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="settings_block_contacts_searching"
+            app:iconSpaceReserved="false"
+            android:title="@string/settings_block_contacts_searching"
+            android:summary="@string/settings_block_contacts_searching_desc" />
+
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="settings_block_caller_id"
+            app:iconSpaceReserved="false"
+            android:title="@string/settings_block_caller_id"
+            android:summary="@string/settings_block_caller_id_desc" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_contacts_group_share">
+
+        <androidx.preference.Preference
+            android:key="settings_contacts_share_vcard"
+            app:iconSpaceReserved="false"
+            android:selectable="false"
+            android:title="@string/settings_contacts_share_vcard"
+            android:summary="@string/settings_contacts_share_vcard_desc" />
+
+        <androidx.preference.Preference
+            android:key="settings_contacts_share_account"
+            app:iconSpaceReserved="false"
+            android:selectable="false"
+            android:title="@string/settings_contacts_share_account"
+            android:summary="@string/settings_contacts_share_account_desc" />
+
+    </androidx.preference.PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>

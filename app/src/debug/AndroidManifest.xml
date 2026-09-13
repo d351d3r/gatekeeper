@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Только для debug-сборки. Приемник существует, чтобы на стенде выяснить,
+    какие политики владельца профиля реально дают вызвать на личном (не
+    корпоративном) рабочем профиле: javadoc этих двух случаев не различает.
+    В release-сборку не попадает.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        Только для пробника. В релизе Gatekeeper не просит INTERNET и поэтому
+        сам по себе не может перечислить сетевые интерфейсы. Обычный клон
+        (мессенджер, банк) это разрешение имеет, и мерить его возможности надо
+        с ним, иначе замер говорит про Gatekeeper, а не про клона.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application>
+        <receiver
+            android:name="io.gatekeeper.debug.PolicyProbeReceiver"
+            android:exported="true"
+            android:enabled="true" />
+        <receiver
+            android:name="io.gatekeeper.debug.LeakProbeReceiver"
+            android:exported="true"
+            android:enabled="true" />
+    </application>
+</manifest>
