@@ -93,6 +93,14 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::tryStartWorkServiceCb)
     private val bindWorkService =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult(), this::bindWorkServiceCb)
+
+    // Выбор пресета -- for-result, чтобы продолжить онбординг тем же заходом: иначе
+    // экран «Доступы» ждал бы следующего запуска (bindWorkServiceCb по возврату не
+    // перевызывается), и «сначала пресет, потом разрешения» рвалось на два сеанса.
+    private val isolationSetup =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            continueOnboardingAfterIsolation()
+        }
     private val requestRepair =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -374,8 +382,15 @@ class MainActivity : AppCompatActivity() {
     private fun askIsolationPresetIfNeeded(): Boolean {
         val asked = storage?.getBoolean(LocalStorageManager.PREF_ISOLATION_PRESET_CHOSEN) ?: true
         if (asked) return false
-        startActivity(Intent(this, IsolationSetupActivity::class.java))
+        isolationSetup.launch(Intent(this, IsolationSetupActivity::class.java))
         return true
+    }
+
+    /** Продолжение онбординга после выбора пресета: разрешения, затем обычные подсказки. */
+    private fun continueOnboardingAfterIsolation() {
+        if (!showAccessesOnce() && !storeCloneFlow.maybePrompt(serviceMain, serviceWork)) {
+            maybeShowFileShuttleHint()
+        }
     }
 
     /**
@@ -598,33 +613,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Обе кнопки ходят через PUBLIC_FREEZE_ALL / PUBLIC_UNFREEZE_ALL, а те берут
-     * список автозаморозки, а не весь профиль: обещать число всех работающих нельзя.
-     * Пустой список гасит кнопки -- «Заморозить (0)» выглядит как сбой, и нажатие
-     * все равно ничего не сделает.
+     * Кнопки массовой заморозки ходят через PUBLIC_FREEZE_ALL / PUBLIC_UNFREEZE_ALL,
+     * а те берут список автозаморозки, а не весь профиль. Пустой список -- это не
+     * две серые кнопки (читались как поломка), а одна «Настроить автозаморозку»,
+     * ведущая туда, где список наполняется.
      */
     private fun fillStatusCard() {
         val listSize = LocalStorageManager.getInstance()
             .getStringList(LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE).size
-        val freeze = findViewById<MaterialButton>(R.id.main_status_freeze)
-        val unfreeze = findViewById<MaterialButton>(R.id.main_status_unfreeze)
+        val buttons = findViewById<View>(R.id.main_status_buttons)
+        val setup = findViewById<MaterialButton>(R.id.main_status_setup)
         val counts = findViewById<TextView>(R.id.main_status_counts)
-        freeze.isEnabled = listSize > 0
-        unfreeze.isEnabled = listSize > 0
-        if (listSize == 0) {
-            freeze.text = getString(R.string.action_freeze_empty)
-            unfreeze.text = getString(R.string.action_unfreeze_empty)
-            counts.text =
-                getString(R.string.status_counts_no_list, workAppsTotal, workAppsFrozen)
-        } else {
-            freeze.text = getString(R.string.action_freeze_list, listSize)
-            unfreeze.text = getString(R.string.action_unfreeze_list, listSize)
+        val hasList = listSize > 0
+        buttons.isVisible = hasList
+        setup.isVisible = !hasList
+        if (hasList) {
+            findViewById<MaterialButton>(R.id.main_status_freeze).text =
+                getString(R.string.action_freeze_list, listSize)
+            findViewById<MaterialButton>(R.id.main_status_unfreeze).text =
+                getString(R.string.action_unfreeze_list, listSize)
             counts.text = getString(
                 R.string.status_counts,
                 workAppsTotal,
                 workAppsFrozen,
                 workAppsTotal - workAppsFrozen,
             )
+        } else {
+            counts.text =
+                getString(R.string.status_counts_no_list, workAppsTotal, workAppsFrozen)
         }
     }
 
@@ -635,6 +651,9 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<MaterialButton>(R.id.main_status_unfreeze).setOnClickListener {
             batchShortcutFlow.unfreezeAll()
+        }
+        findViewById<MaterialButton>(R.id.main_status_setup).setOnClickListener {
+            openSettingsScreen(SCREEN_FREEZE)
         }
 
         pager.adapter = object : FragmentStateAdapter(this) {
@@ -949,14 +968,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.main_menu_unfreeze_all -> {
-                batchShortcutFlow.unfreezeAll()
-                true
-            }
-            R.id.main_menu_freeze_all -> {
-                batchShortcutFlow.freezeAll()
-                true
-            }
             R.id.main_menu_settings -> {
                 openSettings()
                 true
@@ -1126,6 +1137,9 @@ class MainActivity : AppCompatActivity() {
 
         /** Ключ строки корня настроек с разрешениями. */
         private const val SCREEN_ACCESSES = "settings_root_accesses"
+
+        /** Ключ строки корня настроек с заморозкой. */
+        private const val SCREEN_FREEZE = "settings_root_freeze"
 
         private const val TAG = "MainActivity"
         private const val FILE_SHUTTLE_HINT_DELAY_MS = 1500L

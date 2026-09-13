@@ -68,7 +68,13 @@
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="?attr/colorOnSurfaceVariant" />
 
+        <!--
+            Две кнопки, когда в списке автозаморозки кто-то есть; иначе одна
+            «Настроить автозаморозку» вместо двух серых disabled-кнопок, которые
+            читались как поломка. Переключает MainActivity.fillStatusCard.
+        -->
         <LinearLayout
+            android:id="@+id/main_status_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
@@ -99,6 +105,19 @@
                 app:cornerRadius="20dp" />
 
         </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/main_status_setup"
+            android:maxLines="1"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="14dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:visibility="gone"
+            android:text="@string/status_setup_auto_freeze"
+            app:cornerRadius="20dp" />
 
     </LinearLayout>
 

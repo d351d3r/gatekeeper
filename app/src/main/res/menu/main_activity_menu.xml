@@ -22,20 +22,6 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/main_menu_freeze_all"
-        android:icon="@drawable/ic_freeze"
-        app:iconTint="?attr/colorOnSurface"
-        android:title="@string/freeze_all" />
-
-    <item
-        android:id="@+id/main_menu_unfreeze_all"
-        android:icon="@drawable/ic_lock_open"
-        app:iconTint="?attr/colorOnSurface"
-        android:title="@string/unfreeze_all" />
-
-
-
-    <item
         android:id="@+id/main_menu_install_app_to_profile"
         android:icon="@drawable/ic_add"
         app:iconTint="?attr/colorOnSurface"
@@ -49,6 +35,8 @@
 
     <item
         android:id="@+id/main_menu_show_all"
+        android:icon="@drawable/ic_apps"
+        app:iconTint="?attr/colorOnSurface"
         android:title="@string/show_all"
         android:checkable="true"
         android:checked="false" />

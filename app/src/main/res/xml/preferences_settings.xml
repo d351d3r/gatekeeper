@@ -18,7 +18,7 @@
             android:key="settings_root_antispy"
             android:icon="@drawable/ic_visibility"
             android:title="@string/settings_root_antispy"
-            android:summary="@string/settings_root_antispy_off"
+            android:summary="@string/settings_root_antispy_desc"
             app:fragment="io.gatekeeper.ui.settings.AntiSpySettingsFragment" />
 
         <androidx.preference.Preference

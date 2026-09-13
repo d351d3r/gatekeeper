@@ -113,14 +113,12 @@ class AppListAdapter(
 
                 val info = list[itemIndex]
                 title.text = info.getLabel()
-                // Состояние есть только у приложения профиля. В списке личных
-                // «Работает, уведомления приходят» описывало бы то, чего нет:
-                // заморозки у личной копии не бывает.
-                if (workProfile) {
+                // Подпись только у замороженных: у работающих она повторяла одно и
+                // то же на каждой строке и была шумом. Состояние есть лишь у
+                // приложения профиля -- у личной копии заморозки не бывает.
+                if (workProfile && info.isHidden()) {
                     state.visibility = View.VISIBLE
-                    state.setText(
-                        if (info.isHidden()) R.string.row_state_frozen else R.string.row_state_running
-                    )
+                    state.setText(R.string.row_state_frozen)
                 } else {
                     state.visibility = View.GONE
                 }
@@ -257,7 +255,14 @@ class AppListAdapter(
             )
         }
         notifyDataSetChanged()
+        listChangedListener?.invoke()
     }
+
+    /** true, пока в списке действует фильтр поиска: пустой список тогда значит «не найдено». */
+    fun hasSearchQuery(): Boolean = searchQuery != null
+
+    /** Дергается после каждой пересборки списка -- фрагмент по нему показывает пустое состояние. */
+    var listChangedListener: (() -> Unit)? = null
 
     override fun getItemCount(): Int = list.size
 

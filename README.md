@@ -5,38 +5,8 @@ system user with its own data, accounts, permissions, and lifecycle. Cloned apps
 look and behave like ordinary phone apps, but they cannot see the owner's
 personal environment.
 
-**Repository:** [d351d3r/gatekeeper](https://github.com/d351d3r/gatekeeper)
-
 Product direction and platform boundaries: [PRODUCT.md](PRODUCT.md).
 Русская версия: [README_RU.md](README_RU.md).
-
-## What's new in 0.0.1
-
-- **Work-profile media auto-copy** — new screenshots and camera photos/videos from
-  the work profile appear in the personal gallery whenever File Shuttle connects
-  (disabled by default). Catch-up-by-watermark model: no persistent service, files
-  that appeared while the connection was down are picked up on the next connect,
-  duplicates are skipped. Work → personal only. Details:
-  [docs/feature_media_mirror.md](docs/feature_media_mirror.md).
-- **Work-profile root CA certificates** — install a root CA into the work profile
-  only: the SHA-256 fingerprint is shown before install, installed certificates are
-  listed and removable in one tap. Browsers honor the user CA store, most apps
-  (targetSdk 24+) do not. Details:
-  [docs/feature_ca_certs.md](docs/feature_ca_certs.md).
-- **The auto-freeze list is now fully manual** — apps installed by stores inside
-  the work profile are no longer added to the list automatically; toggle the
-  snowflake per app. The background auto-add mechanism was reverted: on stock
-  Android 16 `PACKAGE_ADDED` receivers are not delivered, and work-to-parent
-  cross-profile sends resolve no recipients — the mechanism could only ever fire
-  when the user opened the app list anyway.
-- **Updating from earlier builds requires recreating the work profile** (the device
-  admin component changed) and re-pinning shortcuts / re-granting SAF folders.
-  That is a past migration, not a platform rule: on a stand, profile ownership
-  transfers to another app and back, and the profile survives a full reinstall of
-  Gatekeeper under a different signing key
-  (`.ai/ui-redesign/platform-walls-research.md`, section 9a). Using that needs a
-  small companion APK to hold ownership during the reinstall, and the product does
-  not ship one yet.
 
 ## Features
 
@@ -104,9 +74,6 @@ class can fix them:
 - A device with a working Work Profile implementation (AOSP-like ROMs work best;
   heavily vendor-modified firmware may break profile features).
 
-Tested on Samsung Galaxy S24 Ultra (SM-S928B/DS) and Galaxy Tab S9 FE+
-(SM-X616B), and exercised on an AOSP 16 emulator during development.
-
 ## Building
 
 Requires JDK 17 and the Android SDK (compileSdk 36, build-tools 36.0.0).
@@ -123,69 +90,11 @@ The finished APK is copied to the repository root as
 comes from [version.properties](version.properties) and can be overridden:
 `./gradlew :app:assembleDebug -PversionCode=400`.
 
-Run the same checks as CI before building:
+Checks before building:
 
 ```sh
 ./gradlew :app:lintDebug :app:detekt :app:testDebugUnitTest
 ```
-
-## CI
-
-Every push to `main` runs the pipeline in
-[.github/workflows/android.yml](.github/workflows/android.yml):
-
-1. **Gate** — Android lint → detekt static analysis (baseline-locked) → unit
-   tests.
-2. **Build** — only after a green gate: a bot commits a `VERSION_CODE` bump and
-   assembles **arm64-v8a debug and release APKs** with the new version number.
-   Artifacts and SHA-256 checksums are attached to the run.
-
-## Signing
-
-The release key never lives in this repository. A key committed to a repository
-is a key anyone can sign with, which means anyone can push an update over your
-install. The build reads it from the outside and **fails** without it:
-`assembleRelease` stops with a message instead of quietly producing an unsigned
-or foreign-signed APK.
-
-Create the key once and keep it somewhere you will still have in five years:
-
-```bash
-keytool -genkeypair -v -keystore gatekeeper-release.keystore -storetype PKCS12 \
-  -alias gatekeeper -keyalg RSA -keysize 4096 -validity 10000
-```
-
-For local release builds, put the coordinates in `~/.gradle/gradle.properties`
-(outside the repository, never in the project tree):
-
-```properties
-gatekeeperKeystore=/absolute/path/gatekeeper-release.keystore
-gatekeeperStorePassword=...
-gatekeeperKeyAlias=gatekeeper
-gatekeeperKeyPassword=...
-```
-
-For CI, add four repository secrets:
-
-```bash
-base64 -i gatekeeper-release.keystore | gh secret set RELEASE_KEYSTORE_BASE64
-gh secret set RELEASE_STORE_PASSWORD
-gh secret set RELEASE_KEY_ALIAS --body gatekeeper
-gh secret set RELEASE_KEY_PASSWORD
-```
-
-Signed releases are built only from `v*` tags, by
-[.github/workflows/release.yml](.github/workflows/release.yml). The tag must
-match `VERSION_NAME` in `version.properties`, the workflow refuses to run
-without the secrets, and it prints the signing certificate SHA-256 into the
-release notes so every release can be checked against the previous one.
-Pushes to `main` build an unsigned debug APK only, on the standard Android debug
-key: a debug APK will **not** install over a release APK and vice versa.
-
-**If the keystore is lost, it cannot be recovered.** Every device has to
-uninstall and reinstall the app, and uninstalling Gatekeeper removes the work
-profile with everything inside it. Export your settings first, and keep a backup
-of the keystore in a second place.
 
 ## Repository layout
 
@@ -201,7 +110,3 @@ of the keystore in a second place.
 Delete the work profile in system **Settings** first, then uninstall Gatekeeper
 normally. Removing only the launcher icon does not remove the work profile or
 the cloned apps.
-
-## License
-
-GPL-3.0-or-later — see [LICENSE](LICENSE).

@@ -5,11 +5,11 @@
     <string name="service_desc">Рабочий профиль на связи. Нажмите, чтобы открыть список приложений.</string>
     <string name="fragment_profile_main">Основной</string>
     <string name="fragment_profile_work">Рабочий</string>
-    <string name="row_state_frozen">Заморожено, фон выключен</string>
+    <string name="row_state_frozen">Заморожено, фон и уведомления выключены</string>
     <string name="row_state_running">Работает, уведомления приходят</string>
     <string name="row_badge_autofreeze">в автозаморозке</string>
-    <string name="clone_to_work_profile">Клонировать в Gatekeeper</string>
-    <string name="clone_to_main_profile">Клонировать в осн. профиль</string>
+    <string name="clone_to_work_profile">Клонировать в рабочий профиль</string>
+    <string name="clone_to_main_profile">Клонировать в личный профиль</string>
     <string name="uninstall_app">Удалить</string>
     <string name="freeze_app">Заморозить</string><string name="unfreeze_app">Разморозить</string>
     <string name="launch">Запустить</string>
@@ -48,7 +48,7 @@
     <string name="anti_spy_vpn_prompt_yes">Да, заморозить всё</string>
     <string name="anti_spy_vpn_prompt_no">Нет</string>
     <string name="anti_spy_vpn_prompt_permission_title">Нужен доступ к VPN для Anti Spy</string>
-    <string name="anti_spy_vpn_prompt_permission_text">Gatekeeper нужно один раз разрешить VPN в основном профиле, чтобы прерывать сторонний VPN перед запросом на заморозку. Откройте Gatekeeper, разрешите VPN и повторите.</string>
+    <string name="anti_spy_vpn_prompt_permission_text">Gatekeeper нужно один раз разрешить VPN в личном профиле, чтобы прерывать сторонний VPN перед запросом на заморозку. Откройте Gatekeeper, разрешите VPN и повторите.</string>
     <string name="anti_spy_vpn_prompt_failed_title">Не удалось прервать VPN</string>
     <string name="anti_spy_vpn_prompt_failed_text">Сторонний VPN всё ещё активен. Откройте Gatekeeper, проверьте разрешение VPN или отключите VPN вручную перед групповой заморозкой.</string>
     <string name="freeze_all_shortcut">Заморозить</string>
@@ -56,9 +56,8 @@
     <string name="settings_root_freeze">Заморозка</string>
     <string name="settings_root_freeze_off">Выключена: приложения не замораживаются при блокировке</string>
     <string name="settings_root_freeze_on">При блокировке экрана: %1$s</string>
-    <string name="settings_root_antispy">Заморозка при включении VPN</string>
-    <string name="settings_root_antispy_off">Выключена</string>
-    <string name="settings_root_antispy_on">Включена</string>
+    <string name="settings_root_antispy">VPN профиля</string>
+    <string name="settings_root_antispy_desc">Закрепленный VPN и заморозка при его включении</string>
     <string name="settings_root_files">Файлы и медиа</string>
     <string name="settings_root_files_off">Обмен между профилями выключен</string>
     <string name="settings_root_files_on">Обмен между профилями включён</string>
@@ -77,19 +76,19 @@
     <string name="settings_perm_all_files">Доступ ко всем файлам</string>
     <string name="settings_perm_reason_all_files">обмен файлами с рабочим профилем не работает</string>
     <string name="settings_perm_usage_stats">Статистика использования</string>
-    <string name="settings_perm_reason_usage_stats">«Пропускать активные приложения» не сработает</string>
+    <string name="settings_perm_reason_usage_stats">«Пропускать активные приложения» при заморозке не сработает</string>
     <string name="settings_perm_overlay">Поверх других приложений</string>
     <string name="settings_perm_reason_overlay">окно быстрой заморозки не покажется</string>
     <string name="settings_perm_install_unknown">Установка из неизвестных источников</string>
     <string name="settings_perm_reason_install_unknown">клонирование APK в профиль заблокировано</string>
     <string name="settings_perm_battery">Исключение из оптимизации батареи</string>
-    <string name="settings_perm_reason_battery">фоновые службы убиваются системой</string>
-    <string name="settings_perm_vpn">Согласие VPN</string>
-    <string name="settings_perm_reason_vpn">заморозка при включении VPN не сможет поднять заглушку туннеля</string>
+    <string name="settings_perm_reason_battery">система выгружает фоновые службы Gatekeeper</string>
+    <string name="settings_perm_vpn">Доступ к VPN</string>
+    <string name="settings_perm_reason_vpn">заморозка при включении VPN не сработает</string>
     <string name="settings_auto_freeze_list">Список автозаморозки</string>
-    <string name="settings_auto_freeze_list_empty">Список пуст: отмечайте приложения снежинкой в списке приложений</string>
+    <string name="settings_auto_freeze_list_empty">Список пуст. Откройте приложение в списке и включите «Автозаморозка»</string>
     <string name="settings_auto_freeze_remove_title">Убрать из автозаморозки?</string>
-    <string name="settings_auto_freeze_remove_message">«%1$s» больше не будет замораживаться автоматически. Вернуть его можно снежинкой в списке приложений.</string>
+    <string name="settings_auto_freeze_remove_message">«%1$s» больше не будет замораживаться автоматически. Вернуть можно там же: откройте приложение и включите «Автозаморозка».</string>
     <string name="settings_backup_export_desc">Настройки, списки приложений обоих профилей и список автозаморозки в JSON-файл</string>
     <string name="settings_backup_import_desc">Применить настройки из файла и предложить восстановить недостающие рабочие приложения</string>
     <plurals name="settings_root_certs_count">
@@ -109,7 +108,7 @@
     <string name="settings_known_problems">Известные проблемы</string>
     <string name="settings_known_problems_desc">Ограничения платформы и повадки прошивок, с обходными путями</string>
     <string name="settings_user_guide_url" translatable="false">https://github.com/d351d3r/gatekeeper/blob/main/USER_GUIDE.md</string>
-    <string name="settings_source_code">Исходный код</string><string name="settings_source_code_desc">Задачи, релизы и сам код</string><string name="provision_finished">Настройка Gatekeeper завершена. Перезапускам Gatekeeper. Если Gatekeeper не откроется сам, запустите его из вашего лаучнера.</string><string name="work_profile_not_found">Рабочий профиль не найден. Перезапустите приложение, чтобы пересоздать профиль.</string>
+    <string name="settings_source_code">Исходный код</string><string name="settings_source_code_desc">Задачи, релизы и сам код</string><string name="provision_finished">Настройка Gatekeeper завершена. Перезапускаем Gatekeeper. Если Gatekeeper не откроется сам, запустите его из вашего лаунчера.</string><string name="work_profile_not_found">Рабочий профиль не найден. Перезапустите приложение, чтобы пересоздать профиль.</string>
     <string name="clone_success">Приложение \"%s\" успешно клонировано</string>
     <string name="uninstall_success">Приложение \"%s\" успешно удалено</string>
     <string name="freeze_success">Приложение \"%s\" успешно заморожено</string>
@@ -147,7 +146,7 @@
     <string name="miui_install_apk_warning">На MIUI/HyperOS установка APK внутри рабочего профиля часто зависает на экране системного установщика (известная проблема прошивки). Рекомендуется: клонируйте магазин приложений (например, Play Маркет, RuStore или GetApps) в рабочий профиль и устанавливайте приложения через него. Продолжить в любом случае?</string>
     <string name="finish_provision_title">Нажмите, чтобы завершить настройку Gatekeeper</string>
     <string name="app_installing">Установка...</string>
-    <string name="allow_cross_profile_widgets">Виджеты в осн. профиле</string>
+    <string name="allow_cross_profile_widgets">Виджеты на личном столе</string>
     <string name="search">Поиск</string>
     <string name="service_auto_freeze_title">Ожидание автозаморозки</string>
     <string name="service_auto_freeze_now">Заморозить</string>
@@ -166,8 +165,8 @@
     <string name="request_storage_manager">Gatekeeper необходим доступ ко <b>всем файлам</b> для переноса файлов. Пожалуйста, дайте разрешение приложениям Gatekeeper в <b>ОБОИХ</b> профилях (основном и рабочем) в диалогах, которые появятся после того, как вы нажмёте \"OK\".</string>
     <string name="settings_services">Службы</string>
     <string name="power_diagnostics_unknown">Неизвестно</string>
-    <string name="power_diagnostics_settings_unavailable">В этои системе нет такого экрана настроек.</string>
-    <string name="power_diagnostics_work_unavailable">Рабочии профиль недоступен.</string>
+    <string name="power_diagnostics_settings_unavailable">В этой системе нет такого экрана настроек.</string>
+    <string name="power_diagnostics_work_unavailable">Рабочий профиль недоступен.</string>
     <string name="power_diagnostics_problem_detected">Ограничения батареи могут мешать работе Gatekeeper.</string>
     <string name="power_diagnostics_open">Проверить</string>
     <string name="settings_anti_spy">Заморозка при включении VPN</string>
@@ -195,7 +194,7 @@
     <string name="continue_anyway">Всё равно продолжить</string>
     <string name="notifications_important">Gatekeeper: важное</string>
     <string name="finish_provision_desc">Поздравляем! Вы в одном шаге от завершения настройки Gatekeeper.</string>
-    <string name="install_app_to_profile">Установить APK в Gatekeeper</string>
+    <string name="install_app_to_profile">Установить APK из файла</string>
     <string name="install_app_to_profile_success">Приложение установлено в рабочий профиль.</string>
     <string name="settings_block_contacts_searching">Скрыть контакты профиля от поиска</string><string name="settings_block_contacts_searching_desc">Личный профиль больше не сможет искать и подтягивать контакты, сохраненные в рабочем профиле.</string>
     <string name="settings_block_caller_id">Скрыть имя звонящего из профиля</string>
@@ -234,10 +233,10 @@
     <string name="request_usage_stats">Для этого Gatekeeper необходим доступ к <b>истории использования приложений</b>. Пожалуйста, дайте разрешение приложениям Gatekeeper в <b>ОБОИХ</b> профилях (основном и рабочем) в диалогах, которые появятся после того, как вы нажмёте \"OK\". В противном случае эта возможность не будет работать правильно.</string>
     <string name="launch_app_fail">Невозможно запустить приложение %s, так как оно не имеет графического интерфейса.</string>
     <string name="service_auto_freeze_desc">Gatekeeper автоматически заморозит приложения, запущенные с помощью \"Разморозить и запустить\" при следующей блокировке экрана.</string>
-<string name="payment_stub_description">Заглушка платёжных сервисов (НЕ ИСПОЛЬЗОВАТЬ)</string>
+<string name="payment_stub_description">Gatekeeper (заглушка NFC)</string>
     <string name="allow_cross_profile_interaction">Разрешить работу между профилями</string>
-    <string name="settings_payment_stub_desc">Чтобы получить возможность выбрать платёжное приложение внутри рабочего профиля в Настройки - NFC, включите фальшивый платёжный сервис NFC в основном профиле. Это временное решение ошибки Android, из-за которой невозможно выбрать платёжное приложение внутри рабочего профиля, если в основном профиле таких нет.</string>
-    <string name="settings_payment_stub">Заглушка платёжных сервисов</string>
+    <string name="settings_payment_stub_desc">Чтобы выбрать платежное приложение внутри рабочего профиля в Настройки - NFC, включите фальшивый платежный сервис NFC в личном профиле. Это временное решение ошибки Android, из-за которой нельзя выбрать платежное приложение внутри рабочего профиля, если в личном таких нет.</string>
+    <string name="settings_payment_stub">Заглушка платежных сервисов</string>
     <string name="settings_cross_profile_link_rules">Ссылки в рабочем профиле</string>
     <string name="settings_cross_profile_link_rules_dialog">Домены через запятую, напр. .ru, .su, example.com. Внимание: браузер рабочего профиля увидит каждую подходящую ссылку, включая личные.</string>
     <string name="settings_cross_profile_link_rules_none">Правил нет: ссылки открываются в текущем профиле</string>
@@ -273,7 +272,7 @@
     <string name="wizard_retry">Повторить</string>
     <string name="wizard_exit">Выйти</string>
     <string name="wizard_check_title">Создание рабочего профиля</string>
-    <string name="wizard_check_text">Android заведет на телефоне второго пользователя со своим хранилищем и своими аккаунтами. Приложения, которые вы туда поставите, работают как обычно, но не видят, что стоит на остальном телефоне. Любое из них можно заморозить одним нажатием: значок пропадет, в фоне оно работать не будет.\n\nНасколько отгородить профиль, выберете сразу после создания.</string>
+    <string name="wizard_check_text">Android заведет на телефоне второго пользователя со своим хранилищем и своими аккаунтами. Приложения, которые вы туда поставите, работают как обычно, но не видят, что стоит на остальном телефоне. Любое из них можно заморозить одним нажатием: значок пропадет, уведомления и фоновая работа прекратятся.\n\nУровень изоляции профиля выберете сразу после создания.</string>
     <string name="wizard_check_android">Android %1$s, рабочий профиль поддерживается</string>
     <string name="wizard_check_slot_free">Профиль свободен: другого менеджера профиля нет</string>
     <string name="wizard_check_slot_busy">Профиль занят: удалите существующий рабочий профиль в системных настройках</string>
@@ -290,7 +289,7 @@
     <string name="wizard_failed_text">Частые причины: на устройстве уже есть рабочий профиль от другого приложения или от прошлой установки - Android разрешает только один; прошивка режет создание профилей; настройку отменили в системном экране.\n\nЧто делать: откройте Настройки, раздел Аккаунты, удалите существующий рабочий профиль и нажмите «Повторить». Удаление профиля стирает его приложения и данные, личная часть телефона не затрагивается.</string>
     <string name="status_profile_running">Профиль работает</string>
     <string name="status_profile_stopped">Профиль не отвечает</string>
-    <string name="status_counts">%1$d приложений: %2$d заморожено, %3$d работают</string>
+    <string name="status_counts">Приложений: %1$d, заморожено: %2$d, работает: %3$d</string>
     <string name="action_freeze_list">Заморозить (%d)</string>
     <string name="action_unfreeze_list">Разморозить (%d)</string>
     <!-- Каналы уведомлений (G5) -->
@@ -415,9 +414,8 @@
     <string name="settings_alwayson_no_apps">Ни одно приложение профиля не умеет быть VPN</string>
     <string name="settings_alwayson_unavailable">Рабочий профиль сейчас не отвечает</string>
     <string name="settings_alwayson_failed">Профиль отказался закрепить этот VPN: %1$s</string>
-    <string name="action_freeze_empty">Заморозить</string>
-    <string name="action_unfreeze_empty">Разморозить</string>
-    <string name="status_counts_no_list">%1$d приложений: %2$d заморожено. Отметьте приложения в списке автозаморозки, чтобы кнопки заработали</string>
+    <string name="status_counts_no_list">Приложений: %1$d, заморожено: %2$d. Массовая заморозка действует на список автозаморозки.</string>
+    <string name="status_setup_auto_freeze">Настроить автозаморозку</string>
     <!-- Экран удаления. Замерено на AVD 16: пока Gatekeeper владеет профилем,
          система сама отказывается удалять его рабочую копию, поэтому экран говорит,
          что защищено, а не пугает удалением, которое невозможно. -->
@@ -461,7 +459,7 @@
     <string name="isolation_preset_convenient">Удобный</string>
     <string name="isolation_preset_convenient_desc">Работают: контакты, буфер обмена, перенос файлов, уведомления. Запретов нет.</string>
     <string name="isolation_preset_isolated">Изолированный</string>
-    <string name="isolation_preset_isolated_desc">Включено: запрет буфера обмена между профилями, скрытие содержимого профиля от ассистента и системных подсказок, отключение облачной копии данных, отказ во всех запросах разрешений, запрет геолокации, автозаполнения, печати, Bluetooth-обмена, смены аккаунтов, настройки VPN и отладки внутри профиля, запрет трансляции уведомлений на связанные устройства.\n\nРаботают: камера, микрофон, звонки, установка приложений, уведомления.</string>
+    <string name="isolation_preset_isolated_desc">Максимальные запреты для приложений профиля: буфер обмена между профилями, геолокация, автозаполнение, смена аккаунтов, настройка VPN, отладка и другое. Полный список и переключатели - в «Дополнительной настройке».\n\nРаботают: камера, микрофон, звонки, установка приложений, уведомления.</string>
     <string name="isolation_preset_custom">Настроено вручную</string>
     <string name="isolation_preset_custom_desc">Набор не совпадает ни с одним уровнем. Выберите уровень, чтобы вернуться к нему.</string>
     <string name="isolation_switches_group">Дополнительная настройка</string>
@@ -523,6 +521,9 @@
     <string name="isolation_setup_done">Готово</string>
     <string name="settings_anti_spy_what">Как это работает</string>
     <string name="settings_anti_spy_what_desc">Приложение внутри профиля видит, что на телефоне поднят VPN, даже если туннель работает только в личной части. Куда ведет туннель, оно не узнает, но сам факт скрыть нельзя - это устройство Android, а не недоработка.\n\nФункция следит за состоянием VPN и, когда тот включается или выключается, замораживает выбранные приложения профиля. Смысл: приложение, которому нельзя видеть смену сети, в этот момент просто не работает.</string>
-    <string name="main_add_app">Добавить</string>
+    <string name="main_add_app">Добавить приложение</string>
     <string name="main_pick_app_title">Выберите приложение</string>
+    <string name="app_list_empty_work">В рабочем профиле пока нет приложений.\n\nНажмите «Добавить» внизу, чтобы поставить сюда приложение из личного профиля.</string>
+    <string name="app_list_empty_pick">В личном профиле нет приложений для клонирования.</string>
+    <string name="app_list_empty_search">Ничего не найдено</string>
 </resources>

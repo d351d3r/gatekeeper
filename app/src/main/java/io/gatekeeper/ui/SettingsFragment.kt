@@ -114,16 +114,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             },
         )
         setSummary(
-            ROOT_ANTISPY,
-            getString(
-                if (manager.getAntiSpyWatchConfig().enabled) {
-                    R.string.settings_root_antispy_on
-                } else {
-                    R.string.settings_root_antispy_off
-                }
-            ),
-        )
-        setSummary(
             ROOT_FILES,
             getString(
                 if (manager.getCrossProfileFileChooserEnabled()) {
@@ -223,7 +213,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         private const val ROOT_ACCESSES = "settings_root_accesses"
 
         private const val ROOT_FREEZE = "settings_root_freeze"
-        private const val ROOT_ANTISPY = "settings_root_antispy"
         private const val ROOT_FILES = "settings_root_files"
         private const val ROOT_LINKS = "settings_root_links"
         private const val ROOT_CERTS = "settings_root_certs"

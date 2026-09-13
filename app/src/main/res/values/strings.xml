@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name" translatable="false">Gatekeeper</string>
-    <string name="first_run_alert_cancel">Bye</string>
+    <string name="first_run_alert_cancel">Exit</string>
     <string name="first_run_alert_continue">Continue</string>
     <string name="device_admin_label" translatable="false">Gatekeeper</string>
     <string name="device_admin_desc">App Isolation Service</string>
-    <string name="payment_stub_description">Payment Service Stub (DO NOT USE)</string>
+    <string name="payment_stub_description">Gatekeeper (NFC stub)</string>
 
     <!-- Setup Wizard -->
 <!-- Notifications -->
@@ -21,14 +21,14 @@
     <!-- Main UI -->
     <string name="fragment_profile_main">Main</string>
     <string name="fragment_profile_work">Gatekeeper</string>
-    <string name="row_state_frozen">Frozen, no background work</string>
+    <string name="row_state_frozen">Frozen, no background or notifications</string>
     <string name="row_state_running">Running, notifications arrive</string>
     <string name="row_badge_autofreeze">auto-freeze</string>
     <string name="batch_operation">Batch operation</string>
 
     <!-- App Context Menu -->
-    <string name="clone_to_work_profile">Clone to Gatekeeper (Work Profile)</string>
-    <string name="clone_to_main_profile">Clone to Main Profile</string>
+    <string name="clone_to_work_profile">Clone to work profile</string>
+    <string name="clone_to_main_profile">Clone to personal profile</string>
     <string name="uninstall_app">Uninstall</string>
     <string name="freeze_app">Freeze</string>
     <string name="unfreeze_app">Unfreeze</string>
@@ -55,7 +55,7 @@
     <string name="anti_spy_vpn_prompt_permission_text">Gatekeeper needs VPN permission once in the main profile to interrupt external VPN before the freeze prompt. Open Gatekeeper and allow VPN access, then try again.</string>
     <string name="anti_spy_vpn_prompt_failed_title">Could not interrupt VPN</string>
     <string name="anti_spy_vpn_prompt_failed_text">External VPN is still active. Open Gatekeeper, ensure VPN permission is granted, or turn VPN off manually before batch-freezing.</string>
-    <string name="allow_cross_profile_widgets">Allow Widgets in Main Profile</string>
+    <string name="allow_cross_profile_widgets">Widgets on the personal home screen</string>
     <string name="allow_cross_profile_interaction">Allow Cross-Profile Interaction</string>
 
     <!-- Action Bar Options Menu -->
@@ -78,7 +78,7 @@
         <item quantity="other">%1$d frozen now</item>
     </plurals>
     <string name="settings_batch_frozen_none">Nothing is frozen</string>
-    <string name="install_app_to_profile">Install APK into Gatekeeper</string>
+    <string name="install_app_to_profile">Install APK from a file</string>
     <string name="install_app_to_profile_success">Application installation finished in work profile.</string>
     <string name="show_all">Show All Apps</string>
     <string name="show_all_warning">Manipulating apps that are hidden from the list could cause crashes and all sorts of unexpected behavior. However, this feature can be useful when faulty vendor-customized ROMs does not enable all necessary system apps in work profile by default. If you continue, you are on your own.</string>
@@ -89,9 +89,8 @@
     <string name="settings_root_freeze">Freeze</string>
     <string name="settings_root_freeze_off">Off: apps are not frozen on screen lock</string>
     <string name="settings_root_freeze_on">On screen lock: %1$s</string>
-    <string name="settings_root_antispy">Freeze when a VPN comes up</string>
-    <string name="settings_root_antispy_off">Off</string>
-    <string name="settings_root_antispy_on">On</string>
+    <string name="settings_root_antispy">Profile VPN</string>
+        <string name="settings_root_antispy_desc">Pinned VPN and freeze when it comes up</string>
     <string name="settings_root_files">Files and media</string>
     <string name="settings_root_files_off">Cross-profile exchange off</string>
     <string name="settings_root_files_on">Cross-profile exchange on</string>
@@ -116,13 +115,13 @@
     <string name="settings_perm_install_unknown">Install unknown apps</string>
     <string name="settings_perm_reason_install_unknown">cloning APKs into the profile is blocked</string>
     <string name="settings_perm_battery">Battery optimization exemption</string>
-    <string name="settings_perm_reason_battery">background services get killed</string>
-    <string name="settings_perm_vpn">VPN consent</string>
-    <string name="settings_perm_reason_vpn">the VPN freeze cannot bring up its stub tunnel</string>
+    <string name="settings_perm_reason_battery">the system unloads Gatekeeper background services</string>
+    <string name="settings_perm_vpn">VPN access</string>
+    <string name="settings_perm_reason_vpn">freeze on VPN will not work</string>
     <string name="settings_auto_freeze_list">Auto-freeze list</string>
-    <string name="settings_auto_freeze_list_empty">List is empty: mark apps with the snowflake in the app list</string>
+    <string name="settings_auto_freeze_list_empty">List is empty. Open an app in the list and turn on "Auto-freeze"</string>
     <string name="settings_auto_freeze_remove_title">Remove from auto-freeze?</string>
-    <string name="settings_auto_freeze_remove_message">"%1$s" will no longer be frozen automatically. You can add it back with the snowflake in the app list.</string>
+    <string name="settings_auto_freeze_remove_message">"%1$s" will no longer be frozen automatically. Add it back the same way: open the app and turn on "Auto-freeze".</string>
     <string name="settings_backup_export_desc">Settings, app lists of both profiles and the auto-freeze list into a JSON file</string>
     <string name="settings_backup_import_desc">Apply settings from a file and offer to restore missing work apps</string>
     <plurals name="settings_root_certs_count">
@@ -300,7 +299,7 @@
     <string name="wizard_retry">Retry</string>
     <string name="wizard_exit">Exit</string>
     <string name="wizard_check_title">Creating a work profile</string>
-    <string name="wizard_check_text">Android will set up a second user on the phone, with its own storage and its own accounts. Apps you put there run as usual but cannot see what is installed on the rest of the phone. Any of them can be frozen in one tap: the icon goes, and it stops running in the background.\n\nHow far to wall the profile off is the next question, right after it is created.</string>
+    <string name="wizard_check_text">Android will set up a second user on the phone, with its own storage and its own accounts. Apps you put there run as usual but cannot see what is installed on the rest of the phone. Any of them can be frozen in one tap: the icon goes, and its notifications and background work stop.\n\nYou will choose the profile\'s isolation level right after it is created.</string>
     <string name="wizard_check_android">Android %1$s, work profile supported</string>
     <string name="wizard_check_slot_free">The profile slot is free: no other profile manager</string>
     <string name="wizard_check_slot_busy">The profile slot is taken: remove the existing work profile in system settings</string>
@@ -317,7 +316,7 @@
     <string name="wizard_failed_text">Common causes: the device already has a work profile from another app or an earlier install - Android allows only one; the firmware blocks profile creation; the setup was cancelled on the system screen.\n\nWhat to do: open Settings, Accounts, remove the existing work profile and tap Retry. Removing the profile erases its apps and their data; the personal side is untouched.</string>
     <string name="status_profile_running">The profile is running</string>
     <string name="status_profile_stopped">The profile is not responding</string>
-    <string name="status_counts">%1$d apps: %2$d frozen, %3$d running</string>
+    <string name="status_counts">Apps: %1$d, frozen: %2$d, running: %3$d</string>
     <string name="action_freeze_list">Freeze (%d)</string>
     <string name="action_unfreeze_list">Unfreeze (%d)</string>
     <!-- Notification channels (G5) -->
@@ -440,9 +439,8 @@
     <string name="settings_alwayson_no_apps">No app inside the profile can act as a VPN</string>
     <string name="settings_alwayson_unavailable">The work profile is not responding right now</string>
     <string name="settings_alwayson_failed">The profile refused to pin that VPN: %1$s</string>
-    <string name="action_freeze_empty">Freeze</string>
-    <string name="action_unfreeze_empty">Unfreeze</string>
-    <string name="status_counts_no_list">%1$d apps: %2$d frozen. Pick apps for the auto-freeze list to use these buttons</string>
+    <string name="status_counts_no_list">Apps: %1$d, frozen: %2$d. Batch freeze acts on the auto-freeze list.</string>
+    <string name="status_setup_auto_freeze">Set up auto-freeze</string>
     <!-- Removal screen. Measured on AVD 16: while Gatekeeper owns the profile,
          the system itself refuses to uninstall its work copy, so the screen states
          what is protected rather than warning about a removal that cannot happen. -->
@@ -486,7 +484,7 @@
     <string name="isolation_preset_convenient">Convenient</string>
     <string name="isolation_preset_convenient_desc">Working: contacts, clipboard, file transfer, notifications. Nothing is blocked.</string>
     <string name="isolation_preset_isolated">Isolated</string>
-    <string name="isolation_preset_isolated_desc">On: clipboard blocked between profiles, profile content hidden from the assistant and system suggestions, cloud backup off, every permission request refused, location, autofill, printing, Bluetooth sharing, account changes, VPN setup and debugging blocked inside the profile, notification streaming to linked devices blocked.\n\nWorking: camera, microphone, calls, installing apps, notifications.</string>
+    <string name="isolation_preset_isolated_desc">Maximum restrictions for profile apps: clipboard between profiles, location, autofill, account changes, VPN setup, debugging and more are off. Full list and switches are in "Advanced settings".\n\nWorking: camera, microphone, calls, installing apps, notifications.</string>
     <string name="isolation_preset_custom">Set by hand</string>
     <string name="isolation_preset_custom_desc">The set matches neither level. Pick one to return to it.</string>
     <string name="isolation_switches_group">Advanced settings</string>
@@ -548,6 +546,9 @@
     <string name="isolation_setup_done">Done</string>
     <string name="settings_anti_spy_what">How this works</string>
     <string name="settings_anti_spy_what_desc">An app inside the profile can see that a VPN is up on the phone, even when the tunnel runs only in the personal part. Where the tunnel leads stays hidden, but the fact itself cannot be: that is how Android is built, not a shortcoming.\n\nThe watch follows the VPN state and freezes the chosen profile apps when it goes up or down. The point: an app that must not observe a network change is simply not running at that moment.</string>
-    <string name="main_add_app">Add</string>
+    <string name="main_add_app">Add app</string>
     <string name="main_pick_app_title">Pick an app</string>
+    <string name="app_list_empty_work">No apps in the work profile yet.\n\nTap \"Add\" below to install an app here from the personal profile.</string>
+    <string name="app_list_empty_pick">No apps in the personal profile to clone.</string>
+    <string name="app_list_empty_search">Nothing found</string>
 </resources>

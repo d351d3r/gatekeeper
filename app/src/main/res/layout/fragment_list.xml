@@ -16,4 +16,22 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <!--
+        Пустое состояние поверх списка: без него профиль без приложений и поиск
+        без совпадений выглядели как пустой экран без объяснения. Текст ставит
+        AppListFragment; видимость переключается по числу видимых строк.
+    -->
+    <TextView
+        android:id="@+id/fragment_list_empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingStart="40dp"
+        android:paddingEnd="40dp"
+        android:gravity="center"
+        android:lineSpacingMultiplier="1.2"
+        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:visibility="gone" />
+
 </FrameLayout>

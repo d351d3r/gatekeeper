@@ -62,6 +62,7 @@ class AppListFragment : BaseFragment() {
     private var list: RecyclerView? = null
     private var adapter: AppListAdapter? = null
     private var swipeRefresh: SwipeRefreshLayout? = null
+    private var emptyView: android.widget.TextView? = null
     private var actionMode: ActionMode? = null
 
     private val refreshReceiver = object : BroadcastReceiver() {
@@ -118,8 +119,10 @@ class AppListFragment : BaseFragment() {
 
         list = view.findViewById(R.id.fragment_list_recycler_view)
         swipeRefresh = view.findViewById(R.id.fragment_swipe_refresh)
+        emptyView = view.findViewById(R.id.fragment_list_empty)
         adapter = AppListAdapter(service!!, defaultIcon!!).apply {
             setContextMenuHandler(this@AppListFragment::showAppActionDialog)
+            listChangedListener = { updateEmptyState() }
             if (isRemote) {
                 setWorkProfile(true)
                 allowMultiSelect()
@@ -136,6 +139,28 @@ class AppListFragment : BaseFragment() {
         swipeRefresh!!.setOnRefreshListener { refresh() }
 
         return view
+    }
+
+    /**
+     * Пустое состояние вместо голого экрана: профиль без приложений зовет к кнопке
+     * «Добавить», а пустой результат поиска говорит, что совпадений нет. Считаем по
+     * числу видимых строк, а не по полному списку -- поиск может скрыть все.
+     */
+    private fun updateEmptyState() {
+        val empty = emptyView ?: return
+        val current = adapter ?: return
+        if (current.itemCount > 0) {
+            empty.visibility = View.GONE
+        } else {
+            empty.setText(
+                when {
+                    current.hasSearchQuery() -> R.string.app_list_empty_search
+                    isRemote -> R.string.app_list_empty_work
+                    else -> R.string.app_list_empty_pick
+                }
+            )
+            empty.visibility = View.VISIBLE
+        }
     }
 
     private fun showAppActionDialog(app: ApplicationInfoWrapper, anchor: View) {
