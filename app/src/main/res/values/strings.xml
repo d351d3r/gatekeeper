@@ -444,4 +444,17 @@
     <string name="action_freeze_empty">Freeze</string>
     <string name="action_unfreeze_empty">Unfreeze</string>
     <string name="status_counts_no_list">%1$d apps: %2$d frozen. Pick apps for the auto-freeze list to use these buttons</string>
+    <!-- Removal screen: the cost of uninstalling, said before it happens -->
+    <string name="settings_root_removal">Uninstalling Gatekeeper</string>
+    <string name="settings_root_removal_desc">What it takes with it, and what to do first</string>
+    <string name="settings_removal_group_cost">What uninstalling costs</string>
+    <string name="settings_removal_what">The work profile goes with the app</string>
+    <string name="settings_removal_what_desc">Android ties a work profile to the app that owns it. Remove Gatekeeper and the system removes the profile: every cloned app, its accounts, its chats and its files are deleted with it. There is no undo and no recycle bin.</string>
+    <string name="settings_removal_survives">What survives</string>
+    <string name="settings_removal_survives_desc">Only what lives outside the profile: your personal apps, and any file you copied out of the profile beforehand. A backup file holds settings and package names, not data.</string>
+    <string name="settings_removal_group_before">Before you uninstall</string>
+    <string name="settings_removal_backup">Export the backup</string>
+    <string name="settings_removal_backup_desc">Settings, the app lists and the auto-freeze list into a file you keep</string>
+    <string name="settings_removal_keep_profile">Keeping the profile across a reinstall</string>
+    <string name="settings_removal_keep_profile_desc">The profile can outlive the app: its ownership may be handed to another app for the duration of the reinstall and handed back afterwards. Verified on a test bench, including a change of signing key. It needs a second, companion app, which this build does not ship yet.</string>
 </resources>

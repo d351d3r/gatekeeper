@@ -74,6 +74,13 @@
         app:fragment="io.gatekeeper.ui.settings.DiagnosticsSettingsFragment" />
 
     <androidx.preference.Preference
+        android:key="settings_root_removal"
+        android:icon="@drawable/ic_delete"
+        android:title="@string/settings_root_removal"
+        android:summary="@string/settings_root_removal_desc"
+        app:fragment="io.gatekeeper.ui.settings.RemovalSettingsFragment" />
+
+    <androidx.preference.Preference
         android:key="settings_root_misc"
         android:icon="@drawable/ic_more_horiz"
         android:title="@string/settings_root_misc"

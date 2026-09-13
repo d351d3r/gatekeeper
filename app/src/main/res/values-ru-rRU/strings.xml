@@ -419,4 +419,17 @@
     <string name="action_freeze_empty">Заморозить</string>
     <string name="action_unfreeze_empty">Разморозить</string>
     <string name="status_counts_no_list">%1$d приложений: %2$d заморожено. Отметьте приложения в списке автозаморозки, чтобы кнопки заработали</string>
+    <!-- Экран удаления: цена названа до, а не после -->
+    <string name="settings_root_removal">Удаление Gatekeeper</string>
+    <string name="settings_root_removal_desc">Что уйдет вместе с ним и что сделать заранее</string>
+    <string name="settings_removal_group_cost">Чего стоит удаление</string>
+    <string name="settings_removal_what">Рабочий профиль уходит вместе с приложением</string>
+    <string name="settings_removal_what_desc">Android привязывает рабочий профиль к приложению, которое им владеет. Удалите Gatekeeper -- система удалит профиль: все клоны, их аккаунты, переписка и файлы исчезнут вместе с ним. Отмены нет, корзины нет.</string>
+    <string name="settings_removal_survives">Что переживет удаление</string>
+    <string name="settings_removal_survives_desc">Только то, что лежит вне профиля: ваши личные приложения и файлы, которые вы заранее скопировали из профиля наружу. В файле резервной копии лежат настройки и имена пакетов, а не данные.</string>
+    <string name="settings_removal_group_before">Перед удалением</string>
+    <string name="settings_removal_backup">Выгрузить резервную копию</string>
+    <string name="settings_removal_backup_desc">Настройки, списки приложений и список автозаморозки в файл, который останется у вас</string>
+    <string name="settings_removal_keep_profile">Сохранить профиль при переустановке</string>
+    <string name="settings_removal_keep_profile_desc">Профиль может пережить приложение: владение передается другому приложению на время переустановки и возвращается обратно. Проверено на стенде, в том числе со сменой ключа подписи. Нужен второй APK-компаньон, которого в этой сборке пока нет.</string>
 </resources>
