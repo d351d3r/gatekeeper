@@ -136,20 +136,50 @@ Every push to `main` runs the pipeline in
 
 ## Signing
 
-APKs built by CI from `main` share one **private project keystore**: the key
-lives in GitHub Secrets (`CI_RELEASE_KEYSTORE*`) and CI signs both debug and
-release with it, so either flavor always installs as an update over the other.
-Nobody outside the repo can sign with this key; fork and PR builds fall back to
-the public `app/gatekeeper.keystore` and produce a different signature (they
-will **not** install over CI builds).
+The release key never lives in this repository. A key committed to a repository
+is a key anyone can sign with, which means anyone can push an update over your
+install. The build reads it from the outside and **fails** without it:
+`assembleRelease` stops with a message instead of quietly producing an unsigned
+or foreign-signed APK.
 
-Keep your own private copy of the keystore: if both the local copy and the
-GitHub secret are lost, the signature is unrecoverable and every device must
-reinstall the app (export settings first — removing the app removes the work
-profile).
+Create the key once and keep it somewhere you will still have in five years:
 
-Releases are published from `v*` tags — see
-[.github/workflows/release.yml](.github/workflows/release.yml).
+```bash
+keytool -genkeypair -v -keystore gatekeeper-release.keystore -storetype PKCS12 \
+  -alias gatekeeper -keyalg RSA -keysize 4096 -validity 10000
+```
+
+For local release builds, put the coordinates in `~/.gradle/gradle.properties`
+(outside the repository, never in the project tree):
+
+```properties
+gatekeeperKeystore=/absolute/path/gatekeeper-release.keystore
+gatekeeperStorePassword=...
+gatekeeperKeyAlias=gatekeeper
+gatekeeperKeyPassword=...
+```
+
+For CI, add four repository secrets:
+
+```bash
+base64 -i gatekeeper-release.keystore | gh secret set RELEASE_KEYSTORE_BASE64
+gh secret set RELEASE_STORE_PASSWORD
+gh secret set RELEASE_KEY_ALIAS --body gatekeeper
+gh secret set RELEASE_KEY_PASSWORD
+```
+
+Signed releases are built only from `v*` tags, by
+[.github/workflows/release.yml](.github/workflows/release.yml). The tag must
+match `VERSION_NAME` in `version.properties`, the workflow refuses to run
+without the secrets, and it prints the signing certificate SHA-256 into the
+release notes so every release can be checked against the previous one.
+Pushes to `main` build an unsigned debug APK only, on the standard Android debug
+key: a debug APK will **not** install over a release APK and vice versa.
+
+**If the keystore is lost, it cannot be recovered.** Every device has to
+uninstall and reinstall the app, and uninstalling Gatekeeper removes the work
+profile with everything inside it. Export your settings first, and keep a backup
+of the keystore in a second place.
 
 ## Repository layout
 

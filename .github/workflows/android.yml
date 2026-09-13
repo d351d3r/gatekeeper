@@ -64,42 +64,17 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Bump version code (main pushes only)
-        if: github.event_name == 'push' && !contains(github.event.head_commit.message, '[skip ci]')
-        run: |
-          CODE=$(($(grep VERSION_CODE version.properties | cut -d= -f2) + 1))
-          sed -i "s/^VERSION_CODE=.*/VERSION_CODE=${CODE}/" version.properties
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "Bump version code to ${CODE} [skip ci]"
-          git push
-
-      - name: Resolve version code
-        run: echo "VERSION_CODE=$(grep VERSION_CODE version.properties | cut -d= -f2)" >> "$GITHUB_ENV"
-
-      - name: Resolve signing key (main pushes only)
-        if: github.event_name == 'push'
-        run: |
-          echo "${{ secrets.CI_RELEASE_KEYSTORE }}" | base64 -d > /tmp/project.keystore
-          echo "SIGN_ARGS=-PciKeystore=/tmp/project.keystore \
-            -PciStorePassword=${{ secrets.CI_RELEASE_STORE_PASSWORD }} \
-            -PciKeyAlias=${{ secrets.CI_RELEASE_KEY_ALIAS }} \
-            -PciKeyPassword=${{ secrets.CI_RELEASE_KEY_PASSWORD }}" >> "$GITHUB_ENV"
-
+      # Версию не двигаем автоматически: номер версии -- решение человека,
+      # а не побочный эффект пуша. Правится в version.properties руками.
       - name: Assemble arm64 debug APK
-        run: ./gradlew :app:assembleDebug -PversionCode=${VERSION_CODE} ${SIGN_ARGS} --stacktrace --no-daemon
+        run: ./gradlew :app:assembleDebug --stacktrace --no-daemon
 
-      # Debug и release подписываются одним приватным project-keystore из
-      # GitHub Secrets (только пуши в main): подпись у обоих артефактов одна
-      # и обновление поверх старого APK всегда ставится. У чужих PR секретов
-      # нет — сборка падает на публичный fallback-ключ из репо.
-      - name: Assemble arm64 release APK
-        run: ./gradlew :app:assembleRelease -PversionCode=${VERSION_CODE} ${SIGN_ARGS} --stacktrace --no-daemon
-
+      # Подписанный релиз собирает только release.yml по тегу: ключ не должен
+      # разъезжаться по всем прогонам, а debug-артефакта хватает для проверки сборки.
       - name: Write APK checksums
         run: |
           cd app/build/outputs/apk
-          sha256sum debug/*.apk release/*.apk > SHA256SUMS.txt
+          sha256sum debug/*.apk > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
       - name: Upload arm64 debug APK
@@ -109,13 +84,5 @@ jobs:
           path: |
             app/build/outputs/apk/debug/*-arm64-v8a-*.apk
             app/build/outputs/apk/debug/SHA256SUMS.txt
-          if-no-files-found: error
-          retention-days: 30
-
-      - name: Upload arm64 release APK
-        uses: actions/upload-artifact@v7
-        with:
-          name: gatekeeper-arm64-release-apk
-          path: app/build/outputs/apk/release/*-arm64-v8a-*.apk
           if-no-files-found: error
           retention-days: 30

@@ -131,19 +131,50 @@ cd gatekeeper
 
 ## Подпись
 
-APK, собранные CI из `main`, подписываются одним **приватным project-keystore**:
-ключ лежит в GitHub Secrets (`CI_RELEASE_KEYSTORE*`), CI подписывает им и debug,
-и release, поэтому оба артефакта взаимозаменяемы и всегда ставятся поверх
-старого APK. Посторонний этим ключом подписать ничего не может; сборки форков и
-чужих PR падают на публичный fallback-ключ `app/gatekeeper.keystore` — у них
-другая подпись, поверх CI-сборок они **не** установятся.
+Ключа релиза в репозитории нет и не будет. Ключ, лежащий в репозитории, — это
+ключ, которым может подписать кто угодно, а значит кто угодно может выкатить
+обновление поверх твоей установки. Сборка берёт ключ снаружи и **падает** без
+него: `assembleRelease` останавливается с сообщением, а не собирает молча
+неподписанный или чужой APK.
 
-Храни свою приватную копию keystore: если потеряешь и её, и секрет GitHub,
-подпись невосстановима — на каждом устройстве приложение придётся удалить и
-поставить заново (сначала экспортируй настройки: удаление приложения сносит
-рабочий профиль).
+Ключ создаётся один раз и хранится там, где он будет и через пять лет:
 
-Релизы публикуются тегами `v*` — см. [.github/workflows/release.yml](.github/workflows/release.yml).
+```bash
+keytool -genkeypair -v -keystore gatekeeper-release.keystore -storetype PKCS12 \
+  -alias gatekeeper -keyalg RSA -keysize 4096 -validity 10000
+```
+
+Для локальной релизной сборки координаты кладутся в `~/.gradle/gradle.properties`
+(вне репозитория, никогда не в дерево проекта):
+
+```properties
+gatekeeperKeystore=/абсолютный/путь/gatekeeper-release.keystore
+gatekeeperStorePassword=...
+gatekeeperKeyAlias=gatekeeper
+gatekeeperKeyPassword=...
+```
+
+Для CI заводятся четыре секрета репозитория:
+
+```bash
+base64 -i gatekeeper-release.keystore | gh secret set RELEASE_KEYSTORE_BASE64
+gh secret set RELEASE_STORE_PASSWORD
+gh secret set RELEASE_KEY_ALIAS --body gatekeeper
+gh secret set RELEASE_KEY_PASSWORD
+```
+
+Подписанный релиз собирается только по тегу `v*`, воркфлоу
+[.github/workflows/release.yml](.github/workflows/release.yml). Тег обязан
+совпадать с `VERSION_NAME` из `version.properties`, без секретов воркфлоу
+отказывается работать, а SHA-256 сертификата подписи печатается в описание
+релиза — так каждый релиз можно сверить с предыдущим. Пуш в `main` собирает
+только debug-APK на стандартном отладочном ключе Android: debug поверх release
+**не** встанет, и наоборот.
+
+**Потерянный keystore не восстанавливается.** На каждом устройстве приложение
+придётся удалить и поставить заново, а удаление Gatekeeper сносит рабочий
+профиль со всем содержимым. Сначала экспортируй настройки, а копию keystore
+держи во втором месте.
 
 ## Структура репозитория
 

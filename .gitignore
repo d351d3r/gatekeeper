@@ -62,8 +62,11 @@ captures/
 .idea/caches
 
 # Keystore files
-# Uncomment the following line if you do not want to check your keystore files in.
-#*.jks
+# Ключи подписи в репозитории не хранятся ни при каких условиях: APK, подписанный
+# ключом из репозитория, может обновить кто угодно.
+*.jks
+*.keystore
+*.p12
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild

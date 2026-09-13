@@ -1,5 +1,8 @@
 name: Release
 
+# Подписанный релиз собирается только здесь и только по тегу. Ключ живёт в
+# секретах репозитория, в дереве его нет: APK, подписанный ключом из репозитория,
+# может обновить кто угодно.
 on:
   push:
     tags:
@@ -7,9 +10,8 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Release tag (e.g. v1.5.3-350)'
+        description: 'Tag to build (e.g. v0.0.1)'
         required: true
-        default: 'v1.5.3-350'
 
 permissions:
   contents: write
@@ -26,10 +28,7 @@ jobs:
           else
             TAG="${GITHUB_REF_NAME}"
           fi
-          CODE="${TAG##*-}"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "code=${CODE}" >> "$GITHUB_OUTPUT"
-          echo "title=Gatekeeper 1.5.3 (${CODE})" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v7
         with:
@@ -45,22 +44,64 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Pin version code from tag
+      # Единственный источник версии -- version.properties. Тег обязан совпадать
+      # с ним, иначе на GitHub окажется релиз с одним номером, а в APK другой.
+      - name: Check tag against version.properties
         run: |
-          CODE="${{ steps.meta.outputs.code }}"
-          echo "Building versionCode ${CODE}"
-          sed -i "s/^VERSION_CODE=.*/VERSION_CODE=${CODE}/" version.properties
-          grep VERSION version.properties
+          NAME=$(grep '^VERSION_NAME=' version.properties | cut -d= -f2)
+          CODE=$(grep '^VERSION_CODE=' version.properties | cut -d= -f2)
+          echo "version.properties: ${NAME} (${CODE})"
+          if [ "${{ steps.meta.outputs.tag }}" != "v${NAME}" ]; then
+            echo "Tag ${{ steps.meta.outputs.tag }} does not match version name ${NAME}." >&2
+            echo "Set VERSION_NAME in version.properties or retag." >&2
+            exit 1
+          fi
+          echo "VERSION_NAME=${NAME}" >> "$GITHUB_ENV"
+          echo "VERSION_CODE=${CODE}" >> "$GITHUB_ENV"
 
-      - name: Assemble arm64 debug APK
-        run: ./gradlew :app:assembleDebug --stacktrace --no-daemon
-
-      - name: Locate APK
-        id: apk
+      - name: Check signing secrets are present
         run: |
-          APK=$(ls Gatekeeper-*-debug.apk | head -1)
-          echo "path=${APK}" >> "$GITHUB_OUTPUT"
+          missing=""
+          [ -n "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" ] || missing="${missing} RELEASE_KEYSTORE_BASE64"
+          [ -n "${{ secrets.RELEASE_STORE_PASSWORD }}" ] || missing="${missing} RELEASE_STORE_PASSWORD"
+          [ -n "${{ secrets.RELEASE_KEY_ALIAS }}" ] || missing="${missing} RELEASE_KEY_ALIAS"
+          [ -n "${{ secrets.RELEASE_KEY_PASSWORD }}" ] || missing="${missing} RELEASE_KEY_PASSWORD"
+          if [ -n "${missing}" ]; then
+            echo "Missing repository secrets:${missing}" >&2
+            echo "See README \"Signing\" for how to create the key and add the secrets." >&2
+            exit 1
+          fi
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > "${RUNNER_TEMP}/release.keystore"
+          test -s "${RUNNER_TEMP}/release.keystore"
+
+      - name: Assemble signed release APK
+        env:
+          GATEKEEPER_KEYSTORE: ${{ runner.temp }}/release.keystore
+          GATEKEEPER_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          GATEKEEPER_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          GATEKEEPER_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: ./gradlew :app:assembleRelease --stacktrace --no-daemon
+
+      # Отпечаток ключа печатается в лог и уходит в описание релиза: по нему
+      # видно, что все релизы подписаны одним ключом, ещё до установки APK.
+      - name: Verify signature and record fingerprint
+        id: sig
+        run: |
+          APKSIGNER=$(ls "${ANDROID_HOME}"/build-tools/*/apksigner | sort -V | tail -1)
+          APK=$(ls app/build/outputs/apk/release/*-arm64-v8a-*.apk | head -1)
+          echo "apk=${APK}" >> "$GITHUB_OUTPUT"
           echo "name=$(basename "${APK}")" >> "$GITHUB_OUTPUT"
+          "${APKSIGNER}" verify --print-certs "${APK}" | tee certs.txt
+          FP=$(grep -m1 -i 'SHA-256 digest' certs.txt | awk '{print $NF}')
+          echo "fingerprint=${FP}" >> "$GITHUB_OUTPUT"
+          sha256sum "${APK}" | tee SHA256SUMS.txt
+
+      - name: Remove keystore
+        if: always()
+        run: rm -f "${RUNNER_TEMP}/release.keystore"
 
       - name: Write release notes
         run: |
@@ -68,20 +109,22 @@ jobs:
           if [ -f "${NOTES}" ]; then
             cp "${NOTES}" release-notes.md
           else
-            cat > release-notes.md <<EOF
-          ## Gatekeeper 1.5.3 (${{ steps.meta.outputs.code }})
-
-          Debug APK built from tag \`${{ steps.meta.outputs.tag }}\`.
-
-          See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md).
-          EOF
+            printf '## Gatekeeper %s (%s)\n\n' "${VERSION_NAME}" "${VERSION_CODE}" > release-notes.md
+            printf 'Signed release APK, arm64-v8a.\n\n' >> release-notes.md
           fi
+          printf '\nSigning certificate SHA-256: `%s`\n' "${{ steps.sig.outputs.fingerprint }}" >> release-notes.md
+          printf '\nAPK SHA-256:\n\n```\n' >> release-notes.md
+          cat SHA256SUMS.txt >> release-notes.md
+          printf '```\n' >> release-notes.md
+          cat release-notes.md
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
-          name: ${{ steps.meta.outputs.title }}
+          name: Gatekeeper ${{ env.VERSION_NAME }} (${{ env.VERSION_CODE }})
           body_path: release-notes.md
-          files: ${{ steps.apk.outputs.path }}
+          files: |
+            ${{ steps.sig.outputs.apk }}
+            SHA256SUMS.txt
           make_latest: true
