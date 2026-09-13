@@ -46,7 +46,7 @@ jobs:
           retention-days: 14
 
   build:
-    name: Bump version and assemble arm64 APKs
+    name: Assemble arm64 debug APK
     needs: gate
     if: always() && (needs.gate.result == 'success')
     runs-on: ubuntu-latest
