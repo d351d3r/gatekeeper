@@ -77,6 +77,26 @@ jobs:
           echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > "${RUNNER_TEMP}/release.keystore"
           test -s "${RUNNER_TEMP}/release.keystore"
 
+      # Несовпадение пароля и кейстора иначе всплывает стектрейсом Gradle на третьей
+      # минуте прогона. keytool отвечает за секунду и говорит прямо, что не сходится.
+      # Пароль уходит в stdin, а не в аргументы: аргументы видны в списке процессов.
+      - name: Check the key opens with these secrets
+        env:
+          STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+        run: |
+          KS="${RUNNER_TEMP}/release.keystore"
+          if ! printf '%s\n' "${STORE_PASSWORD}" | keytool -list -keystore "${KS}" -storetype PKCS12 >/dev/null 2>&1; then
+            echo "RELEASE_STORE_PASSWORD does not open RELEASE_KEYSTORE_BASE64." >&2
+            echo "Both secrets have to come from the same keystore file." >&2
+            exit 1
+          fi
+          if ! printf '%s\n' "${STORE_PASSWORD}" | keytool -list -keystore "${KS}" -storetype PKCS12 -alias "${KEY_ALIAS}" >/dev/null 2>&1; then
+            echo "RELEASE_KEY_ALIAS names no key in this keystore." >&2
+            exit 1
+          fi
+          echo "Keystore opens and the alias is in it."
+
       - name: Assemble signed release APK
         env:
           GATEKEEPER_KEYSTORE: ${{ runner.temp }}/release.keystore
