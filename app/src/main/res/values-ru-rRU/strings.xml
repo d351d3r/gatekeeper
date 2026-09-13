@@ -416,4 +416,7 @@
     <string name="settings_alwayson_no_apps">Ни одно приложение профиля не умеет быть VPN</string>
     <string name="settings_alwayson_unavailable">Рабочий профиль сейчас не отвечает</string>
     <string name="settings_alwayson_failed">Профиль отказался закрепить этот VPN: %1$s</string>
+    <string name="action_freeze_empty">Заморозить</string>
+    <string name="action_unfreeze_empty">Разморозить</string>
+    <string name="status_counts_no_list">%1$d приложений: %2$d заморожено. Отметьте приложения в списке автозаморозки, чтобы кнопки заработали</string>
 </resources>

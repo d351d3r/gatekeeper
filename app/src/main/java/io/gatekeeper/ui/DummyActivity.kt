@@ -120,7 +120,6 @@ class DummyActivity : Activity() {
             FINALIZE_PROVISION to provisionFlow::handleFinalizeProvision,
             UNFREEZE_AND_LAUNCH to unfreezeLaunchFlow::handleUnfreezeAndLaunch,
             PUBLIC_UNFREEZE_AND_LAUNCH to unfreezeLaunchFlow::handleUnfreezeAndLaunch,
-            UNFREEZE_APP to unfreezeLaunchFlow::handleUnfreezeApp,
             PUBLIC_FREEZE_ALL to dummyBatchFlow::handlePublicFreezeAll,
             PUBLIC_UNFREEZE_ALL to dummyBatchFlow::handlePublicUnfreezeAll,
             SHOW_TOAST to ::actionShowToast,
@@ -263,7 +262,6 @@ class DummyActivity : Activity() {
         const val UNINSTALL_PACKAGE = ProfileActions.UNINSTALL_PACKAGE
         const val UNFREEZE_AND_LAUNCH = ProfileActions.UNFREEZE_AND_LAUNCH
         const val PUBLIC_UNFREEZE_AND_LAUNCH = ProfileActions.PUBLIC_UNFREEZE_AND_LAUNCH
-        const val UNFREEZE_APP = ProfileActions.UNFREEZE_APP
         const val PUBLIC_FREEZE_ALL = ProfileActions.PUBLIC_FREEZE_ALL
         const val PUBLIC_UNFREEZE_ALL = ProfileActions.PUBLIC_UNFREEZE_ALL
         const val SHOW_TOAST = ProfileActions.SHOW_TOAST
@@ -311,8 +309,7 @@ class DummyActivity : Activity() {
         private val ACTIONS_ALLOWED_WITHOUT_SIGNATURE_SAME_PROCESS = listOf(
             INSTALL_PACKAGE,
             UNINSTALL_PACKAGE,
-            UNFREEZE_AND_LAUNCH,
-            UNFREEZE_APP
+            UNFREEZE_AND_LAUNCH
         )
 
         private const val REQUEST_PERMISSION_POST_NOTIFICATIONS = 3

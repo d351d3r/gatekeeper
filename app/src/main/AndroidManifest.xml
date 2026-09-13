@@ -98,7 +98,6 @@
                 <action android:name="io.gatekeeper.action.UNINSTALL_PACKAGE" />
                 <action android:name="io.gatekeeper.action.UNFREEZE_AND_LAUNCH" />
                 <action android:name="io.gatekeeper.action.PUBLIC_UNFREEZE_AND_LAUNCH" />
-                <action android:name="io.gatekeeper.action.UNFREEZE_APP" />
                 <action android:name="io.gatekeeper.action.PUBLIC_FREEZE_ALL" />
                 <action android:name="io.gatekeeper.action.PUBLIC_UNFREEZE_ALL" />
                 <action android:name="io.gatekeeper.action.SHOW_TOAST" />

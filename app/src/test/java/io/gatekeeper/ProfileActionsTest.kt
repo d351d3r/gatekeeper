@@ -13,7 +13,7 @@ class ProfileActionsTest {
             ProfileActions.FINALIZE_PROVISION, ProfileActions.START_SERVICE,
             ProfileActions.TRY_START_SERVICE, ProfileActions.INSTALL_PACKAGE,
             ProfileActions.UNINSTALL_PACKAGE, ProfileActions.UNFREEZE_AND_LAUNCH,
-            ProfileActions.PUBLIC_UNFREEZE_AND_LAUNCH, ProfileActions.UNFREEZE_APP,
+            ProfileActions.PUBLIC_UNFREEZE_AND_LAUNCH,
             ProfileActions.PUBLIC_FREEZE_ALL, ProfileActions.PUBLIC_UNFREEZE_ALL,
             ProfileActions.SHOW_TOAST, ProfileActions.REFRESH_MAIN_APP_LIST,
             ProfileActions.FREEZE_ALL_IN_LIST, ProfileActions.UNFREEZE_ALL_IN_LIST,

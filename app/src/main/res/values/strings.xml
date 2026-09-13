@@ -441,4 +441,7 @@
     <string name="settings_alwayson_no_apps">No app inside the profile can act as a VPN</string>
     <string name="settings_alwayson_unavailable">The work profile is not responding right now</string>
     <string name="settings_alwayson_failed">The profile refused to pin that VPN: %1$s</string>
+    <string name="action_freeze_empty">Freeze</string>
+    <string name="action_unfreeze_empty">Unfreeze</string>
+    <string name="status_counts_no_list">%1$d apps: %2$d frozen. Pick apps for the auto-freeze list to use these buttons</string>
 </resources>

@@ -510,20 +510,40 @@ class MainActivity : AppCompatActivity() {
         val card = findViewById<View>(R.id.main_status_card) ?: return
         val onWorkTab = findViewById<ViewPager2>(R.id.main_pager)?.currentItem == 1
         card.visibility = if (onWorkTab && workAppsTotal > 0) View.VISIBLE else View.GONE
-        if (card.visibility != View.VISIBLE) return
+        if (card.visibility == View.VISIBLE) {
+            fillStatusCard()
+        }
+    }
 
-        val running = workAppsTotal - workAppsFrozen
-        findViewById<TextView>(R.id.main_status_counts).text =
-            getString(R.string.status_counts, workAppsTotal, workAppsFrozen, running)
-        // Обе кнопки ходят через PUBLIC_FREEZE_ALL / PUBLIC_UNFREEZE_ALL, а те берут
-        // список автозаморозки, а не весь профиль. Обещать число всех работающих
-        // нельзя: нажмешь «Заморозить 19», а заморозится один.
+    /**
+     * Обе кнопки ходят через PUBLIC_FREEZE_ALL / PUBLIC_UNFREEZE_ALL, а те берут
+     * список автозаморозки, а не весь профиль: обещать число всех работающих нельзя.
+     * Пустой список гасит кнопки -- «Заморозить (0)» выглядит как сбой, и нажатие
+     * все равно ничего не сделает.
+     */
+    private fun fillStatusCard() {
         val listSize = LocalStorageManager.getInstance()
             .getStringList(LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE).size
-        findViewById<MaterialButton>(R.id.main_status_freeze).text =
-            getString(R.string.action_freeze_list, listSize)
-        findViewById<MaterialButton>(R.id.main_status_unfreeze).text =
-            getString(R.string.action_unfreeze_list, listSize)
+        val freeze = findViewById<MaterialButton>(R.id.main_status_freeze)
+        val unfreeze = findViewById<MaterialButton>(R.id.main_status_unfreeze)
+        val counts = findViewById<TextView>(R.id.main_status_counts)
+        freeze.isEnabled = listSize > 0
+        unfreeze.isEnabled = listSize > 0
+        if (listSize == 0) {
+            freeze.text = getString(R.string.action_freeze_empty)
+            unfreeze.text = getString(R.string.action_unfreeze_empty)
+            counts.text =
+                getString(R.string.status_counts_no_list, workAppsTotal, workAppsFrozen)
+        } else {
+            freeze.text = getString(R.string.action_freeze_list, listSize)
+            unfreeze.text = getString(R.string.action_unfreeze_list, listSize)
+            counts.text = getString(
+                R.string.status_counts,
+                workAppsTotal,
+                workAppsFrozen,
+                workAppsTotal - workAppsFrozen,
+            )
+        }
     }
 
     private fun buildView() {

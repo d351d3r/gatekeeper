@@ -9,8 +9,8 @@ import io.gatekeeper.util.GatekeeperToast
 import io.gatekeeper.util.ProfileNotifier
 
 /**
- * Релей «разморозить и запустить»: UNFREEZE_AND_LAUNCH / PUBLIC_UNFREEZE_AND_LAUNCH
- * и UNFREEZE_APP. Личная сторона гейтит запуск anti-spy (VPN-циклы) и перебрасывает
+ * Релей «разморозить и запустить»: UNFREEZE_AND_LAUNCH и
+ * PUBLIC_UNFREEZE_AND_LAUNCH. Личная сторона гейтит запуск anti-spy (VPN-циклы) и перебрасывает
  * действие в рабочий профиль; рабочая сторона (профиль-оунер) имеет DPM-привилегии
  * и исполняет разморозку + запуск + регистрацию обратной заморозки. Вынесено
  * из DummyActivity.
@@ -32,14 +32,6 @@ class UnfreezeLaunchFlow(private val activity: DummyActivity) {
             return
         }
         unfreezeAndLaunchAsProfileOwner()
-    }
-
-    fun handleUnfreezeApp() {
-        if (!isProfileOwner) {
-            unfreezeAppFromPersonal()
-            return
-        }
-        unfreezeAppAsProfileOwner()
     }
 
     /** Рабочая сторона, публичный шорткат: перебросить обратно в личный профиль. */
@@ -114,41 +106,6 @@ class UnfreezeLaunchFlow(private val activity: DummyActivity) {
                 registerAppToFreeze(packages[i])
             }
         }
-    }
-
-    /** Личная сторона UNFREEZE_APP: гейт anti-spy, затем форвард в рабочий профиль. */
-    private fun unfreezeAppFromPersonal() {
-        val packageName = intent.getStringExtra("packageName") ?: run {
-            activity.finish()
-            return
-        }
-        if (!antiSpyFlow.ensureVpnPermissionThenLaunch()) {
-            return
-        }
-        val proceed = {
-            antiSpyFlow.forwardUnfreezeAppToWorkProfile(packageName)
-            activity.finish()
-        }
-        if (AntiSpyLaunchGate.shouldApplyVpnGate(packageName)) {
-            antiSpyFlow.runGate(packageName, proceed) { handleUnfreezeApp() }
-        } else {
-            proceed()
-        }
-    }
-
-    /** Рабочая сторона UNFREEZE_APP: просто снять скрытие и обновить список. */
-    private fun unfreezeAppAsProfileOwner() {
-        val packageName = intent.getStringExtra("packageName") ?: run {
-            activity.finish()
-            return
-        }
-        activity.policyManagerInternal.setApplicationHidden(
-            activity.adminComponent(),
-            packageName,
-            false,
-        )
-        ProfileNotifier.scheduleAppListRefresh(activity)
-        activity.finish()
     }
 
     private fun restartAntiSpyGate() {

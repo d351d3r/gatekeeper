@@ -105,11 +105,4 @@ class AntiSpyLaunchFlow(private val activity: Activity) {
         activity.startActivity(forwardIntent)
     }
 
-    /** Personal -> work: просто разморозить пакет. */
-    fun forwardUnfreezeAppToWorkProfile(packageName: String) {
-        val forwardIntent = Intent(DummyActivity.UNFREEZE_APP)
-        if (!Utility.tryTransferIntentToProfile(activity, forwardIntent)) return
-        forwardIntent.putExtra("packageName", packageName)
-        activity.startActivity(forwardIntent)
-    }
 }
