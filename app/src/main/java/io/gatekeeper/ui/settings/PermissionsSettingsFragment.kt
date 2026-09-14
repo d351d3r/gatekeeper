@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.os.RemoteException
 import android.provider.Settings
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
@@ -22,6 +23,13 @@ import io.gatekeeper.util.Utility
  * каждого из них конкретная функция мертва, и это написано прямо в строке.
  */
 class PermissionsSettingsFragment : SettingsSubFragment() {
+
+    // Согласие VPN нужно запрашивать через startActivityForResult: ConfirmDialog,
+    // запущенный обычным startActivity (как остальные системные экраны выдачи),
+    // сразу сам отменяется и согласие не выдается. Обновляем список по возврату.
+    private val vpnConsent = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { fillPermissions() }
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_permissions)
@@ -45,7 +53,13 @@ class PermissionsSettingsFragment : SettingsSubFragment() {
                 // экран читался отчетом, хотя каждая строка открывает выдачу.
                 setIcon(if (granted) R.drawable.ic_check else R.drawable.ic_warning)
                 setOnPreferenceClickListener {
-                    openSettings(entry.intent())
+                    if (entry.key == PERM_VPN) {
+                        VpnService.prepare(requireContext())
+                            ?.let(vpnConsent::launch)
+                            ?: fillPermissions()
+                    } else {
+                        openSettings(entry.intent())
+                    }
                     true
                 }
             }
@@ -131,7 +145,7 @@ class PermissionsSettingsFragment : SettingsSubFragment() {
         )
         add(
             PermEntry(
-                key = "perm_vpn",
+                key = PERM_VPN,
                 reasonRes = R.string.settings_perm_reason_vpn,
                 titleRes = R.string.settings_perm_vpn,
                 granted = { VpnService.prepare(requireContext()) == null },
@@ -195,5 +209,6 @@ class PermissionsSettingsFragment : SettingsSubFragment() {
 
     companion object {
         private const val SETTINGS_PERM_LIST = "settings_perm_list"
+        private const val PERM_VPN = "perm_vpn"
     }
 }
