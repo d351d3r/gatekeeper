@@ -1,5 +1,6 @@
 package io.gatekeeper.util
 
+import android.Manifest
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
@@ -127,12 +128,34 @@ private fun buildLinkViewFilter(rule: String): IntentFilter =
  */
 object WorkProfilePolicy {
 
+    /**
+     * POST_NOTIFICATIONS для рабочей копии выдаем как владелец профиля, без диалога.
+     * Иначе система спрашивает разрешение на уведомления второй раз (первый запрос --
+     * в личном профиле), и пользователь жмет «Разрешить» дважды за одно и то же.
+     * В личном профиле так выдать нельзя: там владельца нет, запрос остается один.
+     */
+    private fun grantWorkNotifications(
+        context: Context,
+        manager: DevicePolicyManager,
+        adminComponent: ComponentName,
+    ) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        manager.setPermissionGrantState(
+            adminComponent,
+            context.packageName,
+            Manifest.permission.POST_NOTIFICATIONS,
+            DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED,
+        )
+    }
+
     fun enforceWorkProfilePolicies(context: Context) {
         val manager = context.getSystemService(DevicePolicyManager::class.java)
         val adminComponent = ComponentName(
             context.applicationContext,
             GatekeeperDeviceAdminReceiver::class.java
         )
+
+        grantWorkNotifications(context, manager, adminComponent)
 
         context.packageManager.setComponentEnabledSetting(
             ComponentName(context.applicationContext, MainActivity::class.java),
