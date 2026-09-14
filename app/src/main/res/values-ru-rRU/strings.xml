@@ -102,7 +102,7 @@
     <string name="settings_root_diagnostics">Диагностика</string>
     <string name="settings_root_diagnostics_desc">Батарея, фон, связь с профилем</string>
     <string name="settings_root_misc">Прочее</string>
-    <string name="settings_root_misc_desc">Заглушка оплаты NFC, версия, ссылки</string>
+    <string name="settings_root_misc_desc">NFC-оплата профиля, версия, ссылки</string>
     <string name="settings_about">О программе</string>
     <string name="settings_version">Версия</string>
     <string name="settings_user_guide">Руководство</string>
@@ -239,6 +239,8 @@
     <string name="allow_cross_profile_interaction">Разрешить работу между профилями</string>
     <string name="settings_payment_stub_desc">Чтобы выбрать платежное приложение внутри рабочего профиля в Настройки - NFC, включите фальшивый платежный сервис NFC в личном профиле. Это временное решение ошибки Android, из-за которой нельзя выбрать платежное приложение внутри рабочего профиля, если в личном таких нет.</string>
     <string name="settings_payment_stub">Заглушка платежных сервисов</string>
+    <string name="settings_payment_wall">NFC-оплата из рабочего профиля</string>
+    <string name="settings_payment_wall_desc">На Android 13 и новее платеж по умолчанию задает роль «Кошелек» на все устройство (Настройки, раздел «По умолчанию»). Приложение рабочего профиля кошельком на личном телефоне назначить нельзя: платформа этого не разрешает. Поэтому оплата в одно касание из профиля недоступна -- работает, только пока платежное приложение профиля открыто на переднем плане. Прежняя заглушка на Android 13+ ничего не меняет.</string>
     <string name="settings_cross_profile_link_rules">Ссылки в рабочем профиле</string>
     <string name="settings_cross_profile_link_rules_dialog">Домены через запятую, напр. .ru, .su, example.com. Внимание: браузер рабочего профиля увидит каждую подходящую ссылку, включая личные.</string>
     <string name="settings_cross_profile_link_rules_none">Правил нет: ссылки открываются в текущем профиле</string>

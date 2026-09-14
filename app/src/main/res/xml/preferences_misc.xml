@@ -2,10 +2,22 @@
 <androidx.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!--
+        До Android 13 работает заглушка (свитч). На 13+ платежка по умолчанию это
+        роль «Кошелек» на все устройство, приложение рабочего профиля ей быть не может,
+        заглушка мертва, поэтому вместо свитча показываем честную инфо-строку.
+        Переключает MiscSettingsFragment по версии.
+    -->
     <androidx.preference.SwitchPreferenceCompat
         android:key="settings_payment_stub"
         android:title="@string/settings_payment_stub"
         android:summary="@string/settings_payment_stub_desc" />
+
+    <androidx.preference.Preference
+        android:key="settings_payment_wall"
+        android:selectable="false"
+        android:title="@string/settings_payment_wall"
+        android:summary="@string/settings_payment_wall_desc" />
 
     <androidx.preference.Preference
         android:key="settings_version"
