@@ -68,6 +68,8 @@
     <string name="settings_root_backup_desc">Настройки и списки приложений в файл</string>
     <string name="settings_root_accesses">Разрешения</string>
     <string name="settings_root_accesses_desc">Выдано %1$d из %2$d</string>
+    <string name="settings_perm_intro">Эти доступы нужны для полной работы. Без них Gatekeeper работает, но часть функций недоступна. Выдать можно сейчас или позже - в Настройки, раздел «Разрешения».</string>
+    <string name="settings_perm_done">Готово</string>
     <string name="settings_perm_list_title">Нажмите строку, чтобы открыть системный экран выдачи</string>
     <string name="settings_perm_granted">Выдано</string>
     <string name="settings_perm_missing">Не выдано: %1$s</string>

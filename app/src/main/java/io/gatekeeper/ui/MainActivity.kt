@@ -405,7 +405,7 @@ class MainActivity : AppCompatActivity() {
         val shown = storage?.getBoolean(LocalStorageManager.PREF_ACCESSES_SHOWN) ?: true
         if (shown) return false
         storage?.setBoolean(LocalStorageManager.PREF_ACCESSES_SHOWN, true)
-        openSettingsScreen(SCREEN_ACCESSES)
+        openSettingsScreen(SCREEN_ACCESSES, onboarding = true)
         return true
     }
 
@@ -995,7 +995,7 @@ class MainActivity : AppCompatActivity() {
     private fun openSettings() = openSettingsScreen(null)
 
     /** [screenKey] -- ключ строки корня настроек, которую открыть сразу; null -- корень. */
-    private fun openSettingsScreen(screenKey: String?) {
+    private fun openSettingsScreen(screenKey: String?, onboarding: Boolean = false) {
         val work = requireWorkService() ?: return
         val main = serviceMain ?: return
         startActivity(Intent(this, SettingsActivity::class.java).apply {
@@ -1007,6 +1007,7 @@ class MainActivity : AppCompatActivity() {
                 },
             )
             if (screenKey != null) putExtra(SettingsActivity.EXTRA_OPEN_SCREEN, screenKey)
+            if (onboarding) putExtra(SettingsActivity.EXTRA_ONBOARDING, true)
         })
     }
 

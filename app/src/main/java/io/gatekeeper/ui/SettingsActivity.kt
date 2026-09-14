@@ -86,5 +86,8 @@ class SettingsActivity : AppCompatActivity(),
 
         /** Ключ строки внутри открытого экрана, к которой проматывать. */
         const val EXTRA_SCROLL_TO = "scroll_to"
+
+        /** Экран открыт шагом первой настройки: показываем кнопку «Готово» внизу. */
+        const val EXTRA_ONBOARDING = "onboarding"
     }
 }

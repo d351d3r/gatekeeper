@@ -33,6 +33,23 @@ class PermissionsSettingsFragment : SettingsSubFragment() {
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_permissions)
+        // Шаг первой настройки открывает этот экран без явного выхода: без кнопки внизу
+        // человек упирается и не понимает, как продолжить (только стрелка в тулбаре).
+        // «Готово» просто закрывает экран -- доступы можно выдать сейчас или позже.
+        val onboarding = activity?.intent
+            ?.getBooleanExtra(io.gatekeeper.ui.SettingsActivity.EXTRA_ONBOARDING, false) == true
+        if (onboarding) {
+            preferenceScreen.addPreference(
+                Preference(requireContext()).apply {
+                    setTitle(R.string.settings_perm_done)
+                    layoutResource = R.layout.preference_action_button
+                    setOnPreferenceClickListener {
+                        activity?.finish()
+                        true
+                    }
+                }
+            )
+        }
     }
 
     override fun onResume() {

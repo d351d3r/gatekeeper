@@ -101,6 +101,8 @@
     <string name="settings_root_backup_desc">Settings and app lists into a file</string>
     <string name="settings_root_accesses">Permissions</string>
     <string name="settings_root_accesses_desc">Granted %1$d of %2$d</string>
+    <string name="settings_perm_intro">These accesses are needed for full functionality. Gatekeeper works without them, but some features stay unavailable. Grant them now or later, in Settings under "Permissions".</string>
+    <string name="settings_perm_done">Done</string>
     <string name="settings_perm_list_title">Tap a row to open the system screen that grants it</string>
     <string name="settings_perm_granted">Granted</string>
     <string name="settings_perm_missing">Not granted: %1$s</string>

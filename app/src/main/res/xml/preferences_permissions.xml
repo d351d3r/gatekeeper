@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.preference.Preference
+        android:key="settings_perm_intro"
+        android:selectable="false"
+        app:iconSpaceReserved="false"
+        android:summary="@string/settings_perm_intro" />
 
     <androidx.preference.PreferenceCategory
         android:key="settings_perm_list"
