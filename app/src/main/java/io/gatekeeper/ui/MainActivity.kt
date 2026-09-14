@@ -39,6 +39,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -193,6 +196,22 @@ class MainActivity : AppCompatActivity() {
             TypedValue.COMPLEX_UNIT_DIP, 16f, resources.displayMetrics
         ).toInt()
         toolbar.setContentInsetsRelative(logoInset, 4)
+
+        // Edge-to-edge форсирован на targetSdk 35+. Верхний inset гасит AppBarLayout
+        // (fitsSystemWindows), нижний надо снять руками: без этого кнопка добавления
+        // на жестовой навигации липнет к полоске, а на трехкнопочной уходит под панель.
+        // Список поглощает нижний inset в AppListFragment (последняя строка над панелью).
+        val fabBaseMargin = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 16f, resources.displayMetrics
+        ).toInt()
+        val addAppFab = findViewById<View>(R.id.main_add_app)
+        ViewCompat.setOnApplyWindowInsetsListener(addAppFab) { view, windowInsets ->
+            val bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updateLayoutParams<android.view.ViewGroup.MarginLayoutParams> {
+                bottomMargin = fabBaseMargin + bars.bottom
+            }
+            windowInsets
+        }
 
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(

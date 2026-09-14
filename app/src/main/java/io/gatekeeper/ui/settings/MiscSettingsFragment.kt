@@ -2,7 +2,6 @@ package io.gatekeeper.ui.settings
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import androidx.preference.SwitchPreferenceCompat
 import androidx.preference.Preference
@@ -20,23 +19,17 @@ class MiscSettingsFragment : SettingsSubFragment() {
     }
 
     /**
-     * До Android 13 заглушка разблокировала системный выбор платежки для профиля --
-     * оставляем свитч. С Android 13 платежка по умолчанию -- роль «Кошелек» на все
-     * устройство, приложением рабочего профиля она быть не может (запрет платформы),
-     * а старый механизм убран: свитч бесполезен, вместо него честная инфо-строка.
+     * Заглушка регистрирует пустой платежный HCE-сервис в личном профиле. Android не
+     * дает выбрать платежное приложение рабочего профиля, пока в личном нет ни одного
+     * платежного сервиса -- заглушка снимает это ограничение (прием Shelter). Дальше
+     * приложение профиля назначается в системных настройках NFC/кошелька вручную.
      */
     private fun bindPaymentStub() {
-        val stub = findPreference<SwitchPreferenceCompat>(SETTINGS_PAYMENT_STUB)
-        val wall = findPreference<Preference>(SETTINGS_PAYMENT_WALL)
-        val legacy = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
-        stub?.isVisible = legacy
-        wall?.isVisible = !legacy
-        if (legacy) {
-            stub?.isChecked = manager.getPaymentStubEnabled()
-            stub?.setOnPreferenceChangeListener { _, newState ->
-                manager.setPaymentStubEnabled(newState as Boolean)
-                true
-            }
+        val stub = findPreference<SwitchPreferenceCompat>(SETTINGS_PAYMENT_STUB) ?: return
+        stub.isChecked = manager.getPaymentStubEnabled()
+        stub.setOnPreferenceChangeListener { _, newState ->
+            manager.setPaymentStubEnabled(newState as Boolean)
+            true
         }
     }
 
@@ -58,7 +51,6 @@ class MiscSettingsFragment : SettingsSubFragment() {
 
     companion object {
         private const val SETTINGS_PAYMENT_STUB = "settings_payment_stub"
-        private const val SETTINGS_PAYMENT_WALL = "settings_payment_wall"
         private const val SETTINGS_VERSION = "settings_version"
 
         /** Сводка строки -- человеческий текст, адрес живет отдельно. */

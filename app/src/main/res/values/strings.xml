@@ -142,9 +142,7 @@
     <string name="settings_block_caller_id">Hide caller names from the profile</string>
     <string name="settings_block_caller_id_desc">A call from a number saved only in the work profile shows up as unknown in the personal call log.</string>
     <string name="settings_payment_stub">Payment Service Stub</string>
-    <string name="settings_payment_wall">NFC payment from the work profile</string>
-    <string name="settings_payment_wall_desc">On Android 13 and newer the default payment app is the device-wide Wallet role (Settings, Default apps). A work-profile app cannot be the wallet on a personally-owned phone: the platform does not allow it. So tap-to-pay from the profile is unavailable -- it works only while the profile\'s payment app is open in the foreground. The old stub changes nothing on Android 13+.</string>
-    <string name="settings_payment_stub_desc">Enable a fake NFC payment service in the main profile, so that the "contactless payments" option under Settings - NFC becomes enabled to allow you to choose a payment app inside the work profile. This works around an Android bug that makes it impossible to select a payment app inside the work profile if none is available in the main profile.</string>
+    <string name="settings_payment_stub_desc">Registers an empty NFC payment service in the main profile. Without one, Android will not let you set a work-profile app as the contactless payment app while the main profile has no payment app. After enabling it, pick the work-profile app in system settings: \"Contactless payments\" under NFC, or on Android 15 \"Default apps\" -> \"Wallet\".</string>
     <string name="settings_cross_profile_link_rules">Open links in work profile</string>
     <string name="settings_cross_profile_link_rules_dialog">Comma-separated domains, e.g. .ru, .su, example.com. Warning: the work profile browser sees every matching link, including personal ones.</string>
     <string name="settings_cross_profile_link_rules_none">No rules: links open in the current profile</string>

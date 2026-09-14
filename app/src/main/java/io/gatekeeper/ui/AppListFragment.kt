@@ -21,6 +21,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import android.widget.LinearLayout
 import android.widget.TextView
 import io.gatekeeper.util.GatekeeperToast
@@ -135,6 +138,16 @@ class AppListFragment : BaseFragment() {
         list!!.adapter = adapter
         list!!.layoutManager = LinearLayoutManager(activity)
         list!!.setHasFixedSize(true)
+
+        // Нижний inset навигации: последняя строка списка должна вставать над панелью,
+        // а не уходить под нее (edge-to-edge форсирован на targetSdk 35+). clipToPadding
+        // false -- список скроллится под панель, но докручивается до конца.
+        list!!.clipToPadding = false
+        ViewCompat.setOnApplyWindowInsetsListener(list!!) { view, windowInsets ->
+            val bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(bottom = bars.bottom)
+            windowInsets
+        }
 
         swipeRefresh!!.setOnRefreshListener { refresh() }
 
