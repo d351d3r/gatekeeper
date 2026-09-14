@@ -15,6 +15,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.RemoteException
+import android.text.format.Formatter
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.Menu
@@ -204,6 +205,8 @@ class AppListFragment : BaseFragment() {
             MENU_ITEM_FREEZE -> freezeAppFromMenu(app)
             MENU_ITEM_UNFREEZE -> unfreezeAppFromMenu(app)
             MENU_ITEM_LAUNCH -> launchAppFromMenu(app)
+            MENU_ITEM_PERMISSIONS -> openAppPermissions(app)
+            MENU_ITEM_TRAFFIC -> showAppTraffic(app)
             MENU_ITEM_CREATE_UNFREEZE_SHORTCUT -> loadIconAndAddUnfreezeShortcut(app, null)
             MENU_ITEM_AUTO_FREEZE -> toggleAutoFreezeFromMenu(app, checked)
             MENU_ITEM_ALLOW_CROSS_PROFILE_WIDGET -> toggleCrossProfileWidget(app, checked)
@@ -280,6 +283,52 @@ class AppListFragment : BaseFragment() {
         }
         DummyActivity.registerSameProcessRequest(intent)
         startActivity(intent)
+    }
+
+    private fun openAppPermissions(app: ApplicationInfoWrapper) {
+        val work = service ?: return
+        AppPermissionsActivity.start(
+            requireContext(), work, app.getPackageName(), app.getLabel().orEmpty()
+        )
+    }
+
+    private fun showAppTraffic(app: ApplicationInfoWrapper) {
+        val work = service ?: return
+        Thread {
+            // Трафик считает NetworkStatsManager, которому нужен доступ к статистике
+            // использования. Без него запрос отдает SecurityException -> 0, что читалось
+            // бы как «трафика нет». Поэтому сперва честно проверяем доступ.
+            val hasUsage = try {
+                work.hasUsageStatsPermission()
+            } catch (_: RemoteException) {
+                false
+            }
+            val usage = if (hasUsage) {
+                try {
+                    work.getAppDataUsage(app.getPackageName())
+                } catch (_: RemoteException) {
+                    longArrayOf(0L, 0L)
+                }
+            } else {
+                null
+            }
+            activity?.runOnUiThread { showTrafficDialog(app, usage) }
+        }.start()
+    }
+
+    private fun showTrafficDialog(app: ApplicationInfoWrapper, usage: LongArray?) {
+        if (!isAdded) return
+        val builder = AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.app_traffic_title, app.getLabel().orEmpty()))
+            .setPositiveButton(android.R.string.ok, null)
+        if (usage == null) {
+            builder.setMessage(R.string.app_traffic_no_usage_access)
+        } else {
+            val received = Formatter.formatShortFileSize(requireContext(), usage.getOrElse(0) { 0L })
+            val sent = Formatter.formatShortFileSize(requireContext(), usage.getOrElse(1) { 0L })
+            builder.setMessage(getString(R.string.app_traffic_body, sent, received))
+        }
+        builder.show()
     }
 
     private fun toggleAutoFreezeFromMenu(app: ApplicationInfoWrapper, checked: Boolean) {

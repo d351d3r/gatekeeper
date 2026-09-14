@@ -29,8 +29,7 @@
 
         <androidx.preference.Preference
             android:key="settings_removal_wipe"
-            app:iconSpaceReserved="false"
-            android:selectable="false"
+            android:icon="@drawable/ic_delete"
             android:title="@string/settings_removal_wipe"
             android:summary="@string/settings_removal_wipe_desc" />
 

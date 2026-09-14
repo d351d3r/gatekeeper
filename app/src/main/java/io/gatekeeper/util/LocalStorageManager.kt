@@ -147,6 +147,7 @@ class LocalStorageManager private constructor(context: Context) {
         /** Парная к предыдущей политика: имя звонящего из книги профиля в личном журнале. */
         const val PREF_BLOCK_CALLER_ID = "block_caller_id"
         const val PREF_PAYMENT_STUB = "payment_stub"
+        const val PREF_THEME_MODE = "theme_mode"
         const val PREF_ANTI_SPY_BOOT_FREEZE_PENDING = "anti_spy_boot_freeze_pending"
         const val PREF_ANTI_SPY_LAUNCH_VERSION_CODE = "anti_spy_launch_version_code"
         /** Главный переключатель сторожа VPN; по умолчанию выключен. */

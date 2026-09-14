@@ -4,11 +4,14 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.app.Service
 import android.app.admin.DevicePolicyManager
+import android.app.usage.NetworkStats
+import android.app.usage.NetworkStatsManager
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -28,6 +31,7 @@ import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.UriForwardProxy
 import io.gatekeeper.util.Notifications
 import io.gatekeeper.util.PackageSequence
+import io.gatekeeper.util.PermissionGroups
 import io.gatekeeper.util.StatusNotification
 import io.gatekeeper.util.Utility
 import io.gatekeeper.util.WorkPackageWatcher
@@ -448,6 +452,46 @@ class GatekeeperService : Service() {
             return pending.toList()
         }
 
+        override fun getDeniablePermissions(pkg: String): List<String> {
+            if (!isProfileOwner) return emptyList()
+            val declared = try {
+                packageManager!!.getPackageInfo(pkg, PackageManager.GET_PERMISSIONS)
+                    .requestedPermissions?.toSet() ?: emptySet()
+            } catch (e: PackageManager.NameNotFoundException) {
+                Log.w(TAG, "getDeniablePermissions: $pkg not installed here", e)
+                emptySet()
+            }
+            return PermissionGroups.controllable().filter { it in declared }
+        }
+
+        override fun getPermissionState(pkg: String, permission: String): Int {
+            if (!isProfileOwner) {
+                return DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT
+            }
+            return try {
+                policyManager!!.getPermissionGrantState(adminComponent!!, pkg, permission)
+            } catch (e: SecurityException) {
+                Log.w(TAG, "getPermissionState refused: $pkg/$permission", e)
+                DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT
+            }
+        }
+
+        override fun setPermissionState(pkg: String, permission: String, state: Int): Boolean {
+            if (!isProfileOwner) return false
+            return try {
+                policyManager!!.setPermissionGrantState(adminComponent!!, pkg, permission, state)
+            } catch (e: SecurityException) {
+                Log.w(TAG, "setPermissionState refused: $pkg/$permission -> $state", e)
+                false
+            }
+        }
+
+        override fun getAppDataUsage(pkg: String): LongArray {
+            val uid = if (isProfileOwner) uidOf(pkg) else null
+            val nsm = this@GatekeeperService.getSystemService(NetworkStatsManager::class.java)
+            return if (uid == null || nsm == null) longArrayOf(0L, 0L) else sumUidUsage(nsm, uid)
+        }
+
         override fun setAlwaysOnVpn(packageName: String?, lockdown: Boolean): String? {
             check(isProfileOwner) { "Cannot set always-on VPN without being profile owner" }
             val target = packageName?.takeIf { it.isNotEmpty() }
@@ -507,6 +551,53 @@ class GatekeeperService : Service() {
             policyManager!!.isApplicationHidden(adminComponent!!, packageName)
     }
 
+    private fun uidOf(pkg: String): Int? = try {
+        packageManager!!.getApplicationInfo(pkg, 0).uid
+    } catch (e: PackageManager.NameNotFoundException) {
+        Log.w(TAG, "getAppDataUsage: $pkg not installed here", e)
+        null
+    }
+
+    /** Суммарный трафик uid по Wi-Fi и мобильной сети за окно: [rxBytes, txBytes]. */
+    private fun sumUidUsage(nsm: NetworkStatsManager, uid: Int): LongArray {
+        val end = System.currentTimeMillis()
+        val start = end - USAGE_WINDOW_MS
+        var rx = 0L
+        var tx = 0L
+        for (type in intArrayOf(ConnectivityManager.TYPE_WIFI, ConnectivityManager.TYPE_MOBILE)) {
+            val bytes = queryUidBytes(nsm, type, uid, start, end)
+            rx += bytes[0]
+            tx += bytes[1]
+        }
+        return longArrayOf(rx, tx)
+    }
+
+    private fun queryUidBytes(
+        nsm: NetworkStatsManager,
+        type: Int,
+        uid: Int,
+        start: Long,
+        end: Long,
+    ): LongArray {
+        var rx = 0L
+        var tx = 0L
+        try {
+            nsm.queryDetailsForUid(type, null, start, end, uid).use { stats ->
+                val bucket = NetworkStats.Bucket()
+                while (stats.hasNextBucket()) {
+                    stats.getNextBucket(bucket)
+                    rx += bucket.rxBytes
+                    tx += bucket.txBytes
+                }
+            }
+        } catch (e: RemoteException) {
+            Log.w(TAG, "getAppDataUsage query failed type=$type", e)
+        } catch (e: SecurityException) {
+            Log.w(TAG, "getAppDataUsage denied type=$type", e)
+        }
+        return longArrayOf(rx, tx)
+    }
+
     /** Установлен ли пакет в профиле, где работает этот сервис (скрытые -- тоже установлены). */
     private fun isPackageInstalledHere(packageName: String): Boolean = try {
         packageManager!!.getApplicationInfo(packageName, 0)
@@ -542,5 +633,8 @@ class GatekeeperService : Service() {
         private const val VPN_SUPPORTS_ALWAYS_ON = "android.net.VpnService.SUPPORTS_ALWAYS_ON"
         private const val NOTIFICATION_ID = 0x49a11
         private const val LIST_ICON_MAX_PX = 128
+
+        /** Окно подсчёта трафика приложения: последние 30 дней. */
+        private const val USAGE_WINDOW_MS = 30L * 24 * 60 * 60 * 1000
     }
 }

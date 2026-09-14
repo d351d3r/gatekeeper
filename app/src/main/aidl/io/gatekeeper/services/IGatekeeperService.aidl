@@ -56,4 +56,15 @@ interface IGatekeeperService {
     // недоступен. Нужен личной стороне, чтобы следить за установками в профиле, не
     // перечисляя весь список: перечисление стоит трех IPC на пакет.
     int getPackageChangeSequence(int since);
+    // Пер-аппное управление опасными (runtime) разрешениями приложения профиля.
+    // Только права, которыми управляет DevicePolicyManager.setPermissionGrantState.
+    // Вызывается личным профилем у сервиса рабочего профиля.
+    // getDeniablePermissions -- объявленные приложением dangerous-разрешения.
+    // state: 0 = default (обычно), 1 = granted, 2 = denied (политикой).
+    List<String> getDeniablePermissions(String pkg);
+    int getPermissionState(String pkg, String permission);
+    boolean setPermissionState(String pkg, String permission, int state);
+    // Объём трафика приложения профиля за окно (по умолчанию 30 дней): [rxBytes, txBytes].
+    // NetworkStatsManager, нужен PACKAGE_USAGE_STATS. Вызывается личным профилем у рабочего.
+    long[] getAppDataUsage(String pkg);
 }

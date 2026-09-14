@@ -26,6 +26,8 @@ internal const val MENU_ITEM_CREATE_UNFREEZE_SHORTCUT = 10006
 internal const val MENU_ITEM_AUTO_FREEZE = 10007
 internal const val MENU_ITEM_ALLOW_CROSS_PROFILE_WIDGET = 10008
 internal const val MENU_ITEM_ALLOW_CROSS_PROFILE_INTERACTION = 10009
+internal const val MENU_ITEM_PERMISSIONS = 10010
+internal const val MENU_ITEM_TRAFFIC = 10011
 
 /**
  * Пункт листа действий. Последствие названо у каждого: раньше строка была одним
@@ -119,6 +121,22 @@ internal object AppMenuEntries {
                 )
             )
         }
+        entries.add(
+            AppMenuEntry(
+                MENU_ITEM_PERMISSIONS,
+                R.string.app_sheet_permissions,
+                R.drawable.ic_verified_user,
+                R.string.app_sheet_permissions_desc,
+            )
+        )
+        entries.add(
+            AppMenuEntry(
+                MENU_ITEM_TRAFFIC,
+                R.string.app_sheet_traffic,
+                R.drawable.ic_link,
+                R.string.app_sheet_traffic_desc,
+            )
+        )
         entries.add(
             AppMenuEntry(
                 MENU_ITEM_LAUNCH,

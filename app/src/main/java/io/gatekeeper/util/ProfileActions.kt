@@ -59,4 +59,11 @@ object ProfileActions {
      * перепривязки профиль остается недостижимым навсегда (ProfileRepairFlow).
      */
     const val REQUEST_REPAIR = PREFIX + "REQUEST_REPAIR"
+
+    /**
+     * Паник-удаление рабочего профиля. Личная сторона после подтверждения шлет
+     * подписанное действие рабочей DummyActivity, а та как profile owner зовет
+     * DevicePolicyManager.wipeData -- уносит только управляемый профиль, не устройство.
+     */
+    const val WIPE_PROFILE = PREFIX + "WIPE_PROFILE"
 }

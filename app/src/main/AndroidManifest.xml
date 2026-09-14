@@ -86,6 +86,27 @@
         <activity android:name=".ui.SettingsActivity"
             android:label="@string/settings" />
 
+        <activity android:name=".ui.AppPermissionsActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme" />
+
+        <!-- Паник-подтверждение удаления профиля: прозрачная, поверх текущего экрана. -->
+        <activity android:name=".ui.PanicWipeActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@style/Theme.Gatekeeper.Translucent" />
+
+        <!-- Плитка быстрых настроек: паник-удаление профиля через подтверждение. -->
+        <service android:name=".services.PanicWipeTileService"
+            android:label="@string/tile_panic_wipe"
+            android:icon="@drawable/ic_delete"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <activity android:name=".ui.AntiSpyVpnPromptActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
@@ -135,6 +156,7 @@
                 <action android:name="io.gatekeeper.action.PACKAGEINSTALLER_CALLBACK" />
                 <action android:name="io.gatekeeper.action.OPEN_POWER_SETTINGS" />
                 <action android:name="io.gatekeeper.action.OPEN_MAIN_APP" />
+                <action android:name="io.gatekeeper.action.WIPE_PROFILE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

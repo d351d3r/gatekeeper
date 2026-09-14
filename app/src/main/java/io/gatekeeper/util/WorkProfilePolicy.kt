@@ -86,6 +86,10 @@ private val RELAY_ACTION_FILTERS: List<Pair<String, Int>> = listOf(
     BatchFreezeService.ACTION to TO_WORK,
     DummyActivity.INSTALL_PACKAGE to TO_PARENT,
     DummyActivity.UNINSTALL_PACKAGE to TO_PARENT,
+    // Личный (подтверждение паника) -> рабочий, где profile owner зовет wipeData.
+    // TO_PARENT, как у INSTALL_PACKAGE и SYNC_ISOLATION: у флага имя наоборот, но
+    // именно он поднимает ForwardIntentToManagedProfile (личный -> рабочий, замер).
+    DummyActivity.WIPE_PROFILE to TO_PARENT,
 )
 
 private fun actionSendFilter(): IntentFilter = IntentFilter().apply {

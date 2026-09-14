@@ -176,6 +176,22 @@ class WorkRelayHandlers(private val activity: DummyActivity) {
         activity.finish()
     }
 
+    /**
+     * Паник-удаление профиля: как profile owner зовем wipeData -- уносит только
+     * управляемый профиль, не устройство (полный сброс -- привилегия device owner,
+     * которой у нас нет). После вызова процесс профиля умирает, finish может не долететь.
+     */
+    fun handleWipeProfile() {
+        if (activity.isProfileOwnerInternal) {
+            try {
+                activity.policyManagerInternal.wipeData(0)
+            } catch (e: SecurityException) {
+                android.util.Log.w("WorkRelayHandlers", "wipeData refused", e)
+            }
+        }
+        activity.finish()
+    }
+
     private companion object {
 
         /** Ключи настроек сторожа: их приезд обязан поднять или снять сторож. */

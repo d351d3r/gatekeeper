@@ -11,6 +11,7 @@ import io.gatekeeper.services.GatekeeperService
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.Notifications
 import io.gatekeeper.util.SettingsManager
+import io.gatekeeper.util.ThemeMode
 
 class GatekeeperApplication : Application() {
     private var mainServiceConnection: ServiceConnection? = null
@@ -20,6 +21,8 @@ class GatekeeperApplication : Application() {
         super.onCreate()
         LocalStorageManager.initialize(this)
         SettingsManager.initialize(this)
+        // Выбор темы применяем до первой activity: системная / светлая / тёмная.
+        ThemeMode.apply(ThemeMode.current())
         // Все пять каналов заводятся сразу: иначе настроить их в системе можно
         // только после того, как канал впервые что-то показал.
         Notifications.ensureChannels(this)

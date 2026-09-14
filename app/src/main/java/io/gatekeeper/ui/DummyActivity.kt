@@ -140,6 +140,7 @@ class DummyActivity : Activity() {
             OPEN_MAIN_APP to ::actionOpenMainApp,
             REQUEST_REPAIR to profileRepairFlow::handleRequestRepair,
             PACKAGEINSTALLER_CALLBACK to { installFlow.handleCallback(intent) },
+            WIPE_PROFILE to workRelayHandlers::handleWipeProfile,
         )
     }
 
@@ -288,6 +289,7 @@ class DummyActivity : Activity() {
         const val OPEN_POWER_SETTINGS = ProfileActions.OPEN_POWER_SETTINGS
         const val OPEN_MAIN_APP = ProfileActions.OPEN_MAIN_APP
         const val REQUEST_REPAIR = ProfileActions.REQUEST_REPAIR
+        const val WIPE_PROFILE = ProfileActions.WIPE_PROFILE
         /** Extra FREEZE_ALL_IN_LIST: запуск от фоновой VPN-заморозки (иначе — ручной). */
         const val EXTRA_VPN_ORIGIN = "vpn_origin"
 
