@@ -4,9 +4,12 @@ import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.admin.DeviceAdminReceiver
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import io.gatekeeper.R
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.Notifications
@@ -16,6 +19,25 @@ import io.gatekeeper.util.Utility
 class GatekeeperDeviceAdminReceiver : DeviceAdminReceiver() {
     override fun onProfileProvisioningComplete(context: Context, intent: Intent) {
         super.onProfileProvisioningComplete(context, intent)
+
+        // setProfileEnabled в этом broadcast, а не только в FinalizeActivity: на
+        // Android 8+ единственным путём к включению профиля была activity-цепочка
+        // (FinalizeActivity -> DummyActivity -> enforceWorkProfilePolicies), а её
+        // система убивает ресайклом процесса сразу после установки DPC в профиль
+        // (замер на AVD 16: "Killing io.gatekeeper/u15 (change io.gatekeeper)" через
+        // 10 мс после запуска, до setProfileEnabled). Профиль оставался DISABLED без
+        // восстановления. Этот callback доставляется системой синхронно и надёжно --
+        // включаем профиль здесь, а полную настройку доделает activity/реле, когда
+        // приложение в профиле сможет запуститься.
+        runCatching {
+            val manager = context.getSystemService(DevicePolicyManager::class.java)
+            val admin = ComponentName(
+                context.applicationContext,
+                GatekeeperDeviceAdminReceiver::class.java,
+            )
+            manager?.setProfileEnabled(admin)
+        }.onFailure { Log.w(TAG, "setProfileEnabled on provisioning complete failed", it) }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) return
         val i = Intent(context.applicationContext, DummyActivity::class.java)
         i.action = DummyActivity.FINALIZE_PROVISION
@@ -43,5 +65,6 @@ class GatekeeperDeviceAdminReceiver : DeviceAdminReceiver() {
 
     companion object {
         private const val NOTIFICATION_ID = 114514
+        private const val TAG = "GatekeeperDPC"
     }
 }
