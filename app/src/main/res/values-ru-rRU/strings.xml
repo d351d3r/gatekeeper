@@ -193,7 +193,7 @@
     <string name="format_immediately">Сразу</string>
     <string name="continue_anyway">Все равно продолжить</string>
     <string name="notifications_important">Gatekeeper: важное</string>
-    <string name="finish_provision_desc">Поздравляем! Вы в одном шаге от завершения настройки Gatekeeper.</string>
+    <string name="finish_provision_desc">Остался последний шаг настройки Gatekeeper.</string>
     <string name="install_app_to_profile">Установить APK из файла</string>
     <string name="install_app_to_profile_success">Приложение установлено в рабочий профиль.</string>
     <string name="settings_block_contacts_searching">Скрыть контакты профиля от поиска</string><string name="settings_block_contacts_searching_desc">Личный профиль больше не сможет искать и подтягивать контакты, сохраненные в рабочем профиле.</string>

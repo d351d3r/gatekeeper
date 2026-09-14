@@ -10,7 +10,7 @@
 <!-- Notifications -->
     <string name="notifications_important">Gatekeeper Important</string>
     <string name="finish_provision_title">Click here to finish setting up Gatekeeper</string>
-    <string name="finish_provision_desc">Congratulations! You are one click away from finishing setting up Gatekeeper.</string>
+    <string name="finish_provision_desc">One last step to finish setting up Gatekeeper.</string>
     <string name="service_title">Gatekeeper Service</string>
     <string name="service_desc">The work profile is connected. Tap to open the app list.</string>
     <string name="service_auto_freeze_title">Auto-freeze pending</string>
@@ -376,7 +376,7 @@
     <string name="settings_diag_work_service_bad">No link. Open the work tab of Gatekeeper once.</string>
     <string name="settings_diag_vendor_note">Limits of this check</string>
     <string name="settings_diag_vendor_note_desc">Vendor task killers (ColorOS HANS, MIUI, EMUI and the like) are invisible to Android APIs. If freezing still misfires while every check above is green, look for Gatekeeper in the vendor battery settings as well.</string>
-    <!-- Bridges between copies screen -->
+    <!-- Exchange between copies of an app screen -->
     <string name="settings_root_bridges">Exchange between copies of an app</string>
     <string name="settings_root_bridges_none">Off: no copy exchanges data with its personal twin</string>
     <plurals name="settings_root_bridges_count">
