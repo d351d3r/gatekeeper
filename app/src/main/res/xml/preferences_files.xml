@@ -23,6 +23,12 @@
         android:title="@string/settings_media_mirror"
         android:summary="@string/settings_media_mirror_desc" />
 
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="settings_share_work_to_personal"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_share_work_to_personal"
+        android:summary="@string/settings_share_work_to_personal_desc" />
+
     <androidx.preference.Preference
         android:key="settings_files_how"
         app:iconSpaceReserved="false"

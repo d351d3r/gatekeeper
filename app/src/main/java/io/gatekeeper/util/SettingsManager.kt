@@ -87,6 +87,14 @@ class SettingsManager private constructor(context: Context) {
     fun getBlockCallerIdEnabled(): Boolean =
         storage.getBoolean(LocalStorageManager.PREF_BLOCK_CALLER_ID)
 
+    fun setShareWorkToPersonalEnabled(enabled: Boolean) {
+        storage.setBoolean(LocalStorageManager.PREF_SHARE_WORK_TO_PERSONAL, enabled)
+        syncSettingsToProfileBool(LocalStorageManager.PREF_SHARE_WORK_TO_PERSONAL, enabled)
+    }
+
+    fun getShareWorkToPersonalEnabled(): Boolean =
+        storage.getBoolean(LocalStorageManager.PREF_SHARE_WORK_TO_PERSONAL)
+
     fun setAutoFreezeServiceEnabled(enabled: Boolean) {
         storage.setBoolean(LocalStorageManager.PREF_AUTO_FREEZE_SERVICE, enabled)
         syncSettingsToProfileBool(LocalStorageManager.PREF_AUTO_FREEZE_SERVICE, enabled)

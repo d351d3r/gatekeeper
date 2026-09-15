@@ -146,6 +146,9 @@ class LocalStorageManager private constructor(context: Context) {
         const val PREF_BLOCK_CONTACTS_SEARCHING = "block_contacts_searching"
         /** Парная к предыдущей политика: имя звонящего из книги профиля в личном журнале. */
         const val PREF_BLOCK_CALLER_ID = "block_caller_id"
+        /** Разрешить отправку (ACTION_SEND) из рабочего профиля в личное: в шаре
+         *  появляется вкладка «Личные». Выключено по умолчанию -- дырка в изоляции. */
+        const val PREF_SHARE_WORK_TO_PERSONAL = "share_work_to_personal"
         const val PREF_PAYMENT_STUB = "payment_stub"
         const val PREF_THEME_MODE = "theme_mode"
         const val PREF_ANTI_SPY_BOOT_FREEZE_PENDING = "anti_spy_boot_freeze_pending"

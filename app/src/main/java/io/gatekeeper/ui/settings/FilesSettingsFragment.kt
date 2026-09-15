@@ -16,7 +16,17 @@ class FilesSettingsFragment : SettingsSubFragment() {
         addPreferencesFromResource(R.xml.preferences_files)
         bindFileChooser()
         bindMediaMirror()
+        bindShareWorkToPersonal()
         applyPlatformRestrictions()
+    }
+
+    private fun bindShareWorkToPersonal() {
+        val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_SHARE_WORK_TO_PERSONAL) ?: return
+        pref.isChecked = manager.getShareWorkToPersonalEnabled()
+        pref.setOnPreferenceChangeListener { _, newState ->
+            manager.setShareWorkToPersonalEnabled(newState as Boolean)
+            true
+        }
     }
 
     private fun bindFileChooser() {
@@ -74,5 +84,6 @@ class FilesSettingsFragment : SettingsSubFragment() {
     companion object {
         private const val SETTINGS_CROSS_PROFILE_FILE_CHOOSER = "settings_cross_profile_file_chooser"
         private const val SETTINGS_MEDIA_MIRROR = "settings_media_mirror"
+        private const val SETTINGS_SHARE_WORK_TO_PERSONAL = "settings_share_work_to_personal"
     }
 }

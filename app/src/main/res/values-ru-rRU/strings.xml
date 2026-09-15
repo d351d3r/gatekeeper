@@ -139,6 +139,8 @@
     <string name="install_unknown_sources_open">Открыть настройки</string>
     <string name="settings_media_mirror">Копировать фото профиля в галерею</string>
     <string name="settings_media_mirror_desc">Копирует новые скриншоты и фото/видео камеры из профиля в личную галерею. Оригиналы остаются в профиле.</string>
+    <string name="settings_share_work_to_personal">Отправка в личный профиль</string>
+    <string name="settings_share_work_to_personal_desc">Добавляет в шару рабочих приложений вкладку «Личные» -- отправить рабочий скриншот или файл сразу в личное приложение. Выключено -- профили изолированы.</string>
     <string name="uninstall_fail_system_app">Невозможно удалить системные приложения в профиле, который Gatekeeper не контролирует.</string>
     <string name="unsupported_launcher">Невозможно добавить ярлык в ваш лаунчер. Пожалуйста, свяжитесь с разработчиком.</string>
     <string name="app_context_menu_title">Операции для %s</string>

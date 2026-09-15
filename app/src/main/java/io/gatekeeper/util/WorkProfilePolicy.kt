@@ -152,6 +152,49 @@ object WorkProfilePolicy {
         )
     }
 
+    /**
+     * Весь набор кросс-профильных intent-фильтров разом: стирается и собирается заново,
+     * потому что этот метод -- единственный владелец набора (добавление из сервиса иначе
+     * стерло бы релей). Служебные фильтры + opt-in отправка рабочее->личное (шара) +
+     * доменные правила ссылок (C2).
+     */
+    private fun applyCrossProfileIntentFilters(
+        manager: DevicePolicyManager,
+        adminComponent: ComponentName
+    ) {
+        manager.clearCrossProfileIntentFilters(adminComponent)
+
+        for ((action, direction) in RELAY_ACTION_FILTERS) {
+            manager.addCrossProfileIntentFilter(adminComponent, IntentFilter(action), direction)
+        }
+
+        manager.addCrossProfileIntentFilter(adminComponent, actionSendFilter(), TO_WORK)
+        // Обратное направление -- отправка (ACTION_SEND) из рабочего в личное -- только по
+        // явному тумблеру: в шаре рабочего приложения появляется вкладка «Личные». Дырка в
+        // изоляции по действию пользователя, поэтому выключено по умолчанию. Входящий
+        // доступ к рабочим файлам не открывается -- добавляется лишь форвард шары.
+        if (SettingsManager.getInstance().getShareWorkToPersonalEnabled()) {
+            manager.addCrossProfileIntentFilter(adminComponent, actionSendFilter(), TO_PARENT)
+        }
+        manager.addCrossProfileIntentFilter(
+            adminComponent,
+            browsableFilter(withDefaultCategory = false),
+            TO_WORK
+        )
+        manager.addCrossProfileIntentFilter(
+            adminComponent,
+            browsableFilter(withDefaultCategory = true),
+            TO_WORK
+        )
+
+        // C2: доменные правила перенаправления ссылок (docs/feature_cross_profile_links.md).
+        val linkRules = LocalStorageManager.getInstance()
+            .getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES)
+        for (rule in linkRules) {
+            manager.addCrossProfileIntentFilter(adminComponent, buildLinkViewFilter(rule), TO_WORK)
+        }
+    }
+
     fun enforceWorkProfilePolicies(context: Context) {
         val manager = context.getSystemService(DevicePolicyManager::class.java)
         val adminComponent = ComponentName(
@@ -176,42 +219,7 @@ object WorkProfilePolicy {
             0
         )
 
-        manager.clearCrossProfileIntentFilters(adminComponent)
-
-        for ((action, direction) in RELAY_ACTION_FILTERS) {
-            manager.addCrossProfileIntentFilter(
-                adminComponent,
-                IntentFilter(action),
-                direction
-            )
-        }
-
-        manager.addCrossProfileIntentFilter(adminComponent, actionSendFilter(), TO_WORK)
-        manager.addCrossProfileIntentFilter(
-            adminComponent,
-            browsableFilter(withDefaultCategory = false),
-            TO_WORK
-        )
-        manager.addCrossProfileIntentFilter(
-            adminComponent,
-            browsableFilter(withDefaultCategory = true),
-            TO_WORK
-        )
-
-        // C2: доменные правила перенаправления ссылок (docs/feature_cross_profile_links.md).
-        // Читаем из префов здесь, а не в GatekeeperService: этот метод — единственный
-        // владелец набора кросс-профильных фильтров. Правила применяются идемпотентно
-        // вместе со служебными фильтрами, иначе их добавление из сервиса стирало бы
-        // весь релей между профилями.
-        val linkRules = LocalStorageManager.getInstance()
-            .getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES)
-        for (rule in linkRules) {
-            manager.addCrossProfileIntentFilter(
-                adminComponent,
-                buildLinkViewFilter(rule),
-                TO_WORK
-            )
-        }
+        applyCrossProfileIntentFilters(manager, adminComponent)
 
         manager.setCrossProfileContactsSearchDisabled(
             adminComponent,
