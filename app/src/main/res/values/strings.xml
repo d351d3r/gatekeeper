@@ -146,7 +146,8 @@
     <string name="theme_system">Match device</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
-    <string name="settings_payment_stub_desc">Registers an empty NFC payment service in the main profile. Without one, Android will not let you set a work-profile app as the contactless payment app while the main profile has no payment app. After enabling it, pick the work-profile app in system settings: \"Contactless payments\" under NFC, or on Android 15 \"Default apps\" -> \"Wallet\".</string>
+    <string name="settings_payment_stub_desc">Lets you set a work-profile bank app as the default for payments</string>
+    <string name="settings_payment_setup_hint">Set the work-profile app as the default payment app in system settings: NFC -> \"Contactless payments\". On Android 15, \"Default apps\" -> \"Wallet\".</string>
     <string name="settings_cross_profile_link_rules">Open links in work profile</string>
     <string name="settings_cross_profile_link_rules_dialog">Comma-separated domains, e.g. .ru, .su, example.com. Warning: the work profile browser sees every matching link, including personal ones.</string>
     <string name="settings_cross_profile_link_rules_none">No rules: links open in the current profile</string>
@@ -479,21 +480,11 @@
          what is protected rather than warning about a removal that cannot happen. -->
     <string name="settings_root_removal">Uninstalling Gatekeeper</string>
     <string name="settings_root_removal_desc">The work copy cannot be uninstalled; the profile is removed separately</string>
-    <string name="settings_removal_group_protected">Protection from accidental removal</string>
-    <string name="settings_removal_work_copy">The work copy cannot be uninstalled</string>
-    <string name="settings_removal_work_copy_desc">While Gatekeeper owns the work profile, Android refuses to remove its copy inside the profile: the button in system settings is greyed out and the request is rejected. A stray tap cannot take the profile with it.</string>
-    <string name="settings_removal_personal_copy">Removing the personal copy is safe</string>
-    <string name="settings_removal_personal_copy_desc">The profile, the cloned apps and their data stay where they are. Install Gatekeeper again and it returns to the same profile: it will ask you to confirm the re-pairing with a code.</string>
-    <string name="settings_removal_group_wipe">Removing the profile</string>
     <string name="settings_removal_wipe">Remove work profile</string>
-    <string name="settings_removal_wipe_desc">Deletes the work profile with every cloned app, its accounts, its chats and its files. Asks for confirmation. There is no undo and no recycle bin. The "Wipe profile" quick-settings tile does the same.</string>
-    <string name="settings_removal_group_before">Before removing the profile</string>
-    <string name="settings_removal_backup">Export the backup</string>
-    <string name="settings_removal_backup_desc">Settings, the app lists and the auto-freeze list into a file you keep</string>
-    <string name="settings_removal_survives">The backup holds no data</string>
-    <string name="settings_removal_survives_desc">No app data, no accounts, no files: only settings and package names. Copy anything you want to keep out of the profile first, with File Shuttle or the system file picker.</string>
-    <string name="settings_removal_keep_profile">Keeping the profile across a reinstall</string>
-    <string name="settings_removal_keep_profile_desc">The profile can outlive the app: its ownership may be handed to another app for the duration of the reinstall and handed back afterwards. Verified on a test bench, including a change of signing key. It needs a second, companion app, which this build does not ship yet.</string>
+    <string name="settings_removal_wipe_desc">Every app, account and file -- permanently</string>
+    <string name="settings_removal_backup">Settings backup</string>
+    <string name="settings_removal_backup_desc">Settings and app lists to a file</string>
+    <string name="settings_removal_safe">Uninstalling the app itself keeps the profile.</string>
     <!-- Re-pairing the personal copy to a live profile after its data was wiped -->
     <string name="work_service_bind_repair">Reconnect</string>
     <string name="repair_request_title">Reconnect to the work profile</string>

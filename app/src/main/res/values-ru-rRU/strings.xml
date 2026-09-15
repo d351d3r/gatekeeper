@@ -237,7 +237,8 @@
     <string name="service_auto_freeze_desc">Gatekeeper автоматически заморозит приложения, запущенные с помощью \"Разморозить и запустить\" при следующей блокировке экрана.</string>
 <string name="payment_stub_description">Gatekeeper (заглушка NFC)</string>
     <string name="allow_cross_profile_interaction">Разрешить работу между профилями</string>
-    <string name="settings_payment_stub_desc">Регистрирует пустой платежный сервис NFC в личном профиле. Без него Android не дает назначить платежное приложение рабочего профиля, пока в личном платежных приложений нет. После включения выберите приложение профиля в системных настройках: «Бесконтактная оплата» в разделе NFC, а на Android 15 -- «Приложения по умолчанию» -> «Кошелек».</string>
+    <string name="settings_payment_stub_desc">Разрешает назначить банк из профиля платежным по умолчанию</string>
+    <string name="settings_payment_setup_hint">Выберите банк платежным по умолчанию в системных настройках: NFC -> «Бесконтактная оплата». На Android 15 -- «Приложения по умолчанию» -> «Кошелек».</string>
     <string name="settings_payment_stub">Заглушка платежных сервисов</string>
     <string name="settings_theme">Тема</string>
     <string name="theme_system">Как на устройстве</string>
@@ -454,21 +455,11 @@
          что защищено, а не пугает удалением, которое невозможно. -->
     <string name="settings_root_removal">Удаление Gatekeeper</string>
     <string name="settings_root_removal_desc">Рабочую копию удалить нельзя, профиль удаляется отдельно</string>
-    <string name="settings_removal_group_protected">Защита от случайного удаления</string>
-    <string name="settings_removal_work_copy">Рабочую копию удалить нельзя</string>
-    <string name="settings_removal_work_copy_desc">Пока Gatekeeper владеет рабочим профилем, Android отказывается удалять его копию внутри профиля: кнопка в системных настройках гаснет, а запрос отклоняется. Случайный тап не унесет профиль с собой.</string>
-    <string name="settings_removal_personal_copy">Личную копию удалять безопасно</string>
-    <string name="settings_removal_personal_copy_desc">Профиль, клоны и их данные остаются на месте. Поставьте Gatekeeper заново, и он вернется к тому же профилю: понадобится подтвердить перепривязку кодом.</string>
-    <string name="settings_removal_group_wipe">Удаление профиля</string>
     <string name="settings_removal_wipe">Удалить рабочий профиль</string>
-    <string name="settings_removal_wipe_desc">Удалит рабочий профиль со всеми клонами, аккаунтами, перепиской и файлами. Спросит подтверждение. Отмены нет, корзины нет. То же делает плитка быстрых настроек «Стереть профиль».</string>
-    <string name="settings_removal_group_before">Перед удалением профиля</string>
-    <string name="settings_removal_backup">Выгрузить резервную копию</string>
-    <string name="settings_removal_backup_desc">Настройки, списки приложений и список автозаморозки в файл, который останется у вас</string>
-    <string name="settings_removal_survives">Резервная копия не содержит данных</string>
-    <string name="settings_removal_survives_desc">Ни данных приложений, ни аккаунтов, ни файлов: только настройки и имена пакетов. Все, что хотите сохранить, скопируйте из профиля заранее - через File Shuttle или системный выбор файлов.</string>
-    <string name="settings_removal_keep_profile">Сохранить профиль при переустановке</string>
-    <string name="settings_removal_keep_profile_desc">Профиль может пережить приложение: владение передается другому приложению на время переустановки и возвращается обратно. Проверено на стенде, в том числе со сменой ключа подписи. Нужен второй APK-компаньон, которого в этой сборке пока нет.</string>
+    <string name="settings_removal_wipe_desc">Все приложения, аккаунты и файлы -- навсегда</string>
+    <string name="settings_removal_backup">Резервная копия настроек</string>
+    <string name="settings_removal_backup_desc">Настройки и списки приложений в файл</string>
+    <string name="settings_removal_safe">Удалить само приложение можно как обычно -- профиль останется.</string>
     <!-- Перепривязка личной копии к живому профилю после стирания ее данных -->
     <string name="work_service_bind_repair">Перепривязать</string>
     <string name="repair_request_title">Перепривязка к рабочему профилю</string>

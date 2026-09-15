@@ -3,63 +3,23 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.preference.PreferenceCategory
+    <androidx.preference.Preference
+        android:key="settings_removal_wipe"
+        android:icon="@drawable/ic_delete"
+        android:title="@string/settings_removal_wipe"
+        android:summary="@string/settings_removal_wipe_desc" />
+
+    <androidx.preference.Preference
+        android:key="settings_removal_backup"
+        android:icon="@drawable/ic_upload"
+        android:title="@string/settings_removal_backup"
+        android:summary="@string/settings_removal_backup_desc"
+        app:fragment="io.gatekeeper.ui.settings.BackupSettingsFragment" />
+
+    <androidx.preference.Preference
+        android:key="settings_removal_safe"
         app:iconSpaceReserved="false"
-        android:title="@string/settings_removal_group_protected">
-
-        <androidx.preference.Preference
-            android:key="settings_removal_work_copy"
-            app:iconSpaceReserved="false"
-            android:selectable="false"
-            android:title="@string/settings_removal_work_copy"
-            android:summary="@string/settings_removal_work_copy_desc" />
-
-        <androidx.preference.Preference
-            android:key="settings_removal_personal_copy"
-            app:iconSpaceReserved="false"
-            android:selectable="false"
-            android:title="@string/settings_removal_personal_copy"
-            android:summary="@string/settings_removal_personal_copy_desc" />
-
-    </androidx.preference.PreferenceCategory>
-
-    <androidx.preference.PreferenceCategory
-        app:iconSpaceReserved="false"
-        android:title="@string/settings_removal_group_wipe">
-
-        <androidx.preference.Preference
-            android:key="settings_removal_wipe"
-            android:icon="@drawable/ic_delete"
-            android:title="@string/settings_removal_wipe"
-            android:summary="@string/settings_removal_wipe_desc" />
-
-    </androidx.preference.PreferenceCategory>
-
-    <androidx.preference.PreferenceCategory
-        app:iconSpaceReserved="false"
-        android:title="@string/settings_removal_group_before">
-
-        <androidx.preference.Preference
-            android:key="settings_removal_backup"
-            android:icon="@drawable/ic_upload"
-            android:title="@string/settings_removal_backup"
-            android:summary="@string/settings_removal_backup_desc"
-            app:fragment="io.gatekeeper.ui.settings.BackupSettingsFragment" />
-
-        <androidx.preference.Preference
-            android:key="settings_removal_survives"
-            app:iconSpaceReserved="false"
-            android:selectable="false"
-            android:title="@string/settings_removal_survives"
-            android:summary="@string/settings_removal_survives_desc" />
-
-        <androidx.preference.Preference
-            android:key="settings_removal_keep_profile"
-            app:iconSpaceReserved="false"
-            android:selectable="false"
-            android:title="@string/settings_removal_keep_profile"
-            android:summary="@string/settings_removal_keep_profile_desc" />
-
-    </androidx.preference.PreferenceCategory>
+        android:selectable="false"
+        android:summary="@string/settings_removal_safe" />
 
 </androidx.preference.PreferenceScreen>

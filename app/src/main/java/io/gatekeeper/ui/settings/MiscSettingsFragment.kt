@@ -3,6 +3,7 @@ package io.gatekeeper.ui.settings
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.preference.ListPreference
 import androidx.preference.SwitchPreferenceCompat
 import androidx.preference.Preference
@@ -48,9 +49,21 @@ class MiscSettingsFragment : SettingsSubFragment() {
         val stub = findPreference<SwitchPreferenceCompat>(SETTINGS_PAYMENT_STUB) ?: return
         stub.isChecked = manager.getPaymentStubEnabled()
         stub.setOnPreferenceChangeListener { _, newState ->
-            manager.setPaymentStubEnabled(newState as Boolean)
+            val enabled = newState as Boolean
+            manager.setPaymentStubEnabled(enabled)
+            if (enabled) showPaymentSetupHint()
             true
         }
+    }
+
+    /** Шаг настройки нужен ровно в момент включения -- показываем его тогда, а не
+     *  держим туториал в подписи свитча. */
+    private fun showPaymentSetupHint() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.settings_payment_stub)
+            .setMessage(R.string.settings_payment_setup_hint)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 
     private fun bindVersion() {

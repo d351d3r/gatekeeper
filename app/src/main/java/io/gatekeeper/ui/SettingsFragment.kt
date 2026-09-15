@@ -62,6 +62,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val key = requireActivity().intent.getStringExtra(SettingsActivity.EXTRA_OPEN_SCREEN)
         val pref = key?.let { findPreference<Preference>(it) }
         if (pref == null) return
+        // Съедаем ссылку после первого открытия. Иначе при возврате на корень его
+        // onViewCreated снова читает ту же экстру и заново открывает подэкран -- BACK
+        // и стрелка вверх зацикливаются, из подэкрана не выйти (жалоба на «зависло»).
+        requireActivity().intent.removeExtra(SettingsActivity.EXTRA_OPEN_SCREEN)
         view?.post {
             (activity as? OnPreferenceStartFragmentCallback)?.onPreferenceStartFragment(this, pref)
         }
