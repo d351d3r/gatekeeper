@@ -454,8 +454,14 @@ class GatekeeperService : Service() {
 
         override fun getDeniablePermissions(pkg: String): List<String> {
             if (!isProfileOwner) return emptyList()
+            // Замороженное приложение скрыто (setApplicationHidden) и голому
+            // getPackageInfo невидимо -- те же флаги, что и при перечислении списка,
+            // иначе у замороженных приложений разрешения читались бы как пустые.
+            val flags = PackageManager.GET_PERMISSIONS or
+                PackageManager.MATCH_DISABLED_COMPONENTS or
+                PackageManager.MATCH_UNINSTALLED_PACKAGES
             val declared = try {
-                packageManager!!.getPackageInfo(pkg, PackageManager.GET_PERMISSIONS)
+                packageManager!!.getPackageInfo(pkg, flags)
                     .requestedPermissions?.toSet() ?: emptySet()
             } catch (e: PackageManager.NameNotFoundException) {
                 Log.w(TAG, "getDeniablePermissions: $pkg not installed here", e)

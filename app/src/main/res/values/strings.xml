@@ -326,6 +326,7 @@
     <string name="status_counts">Apps: %1$d, frozen: %2$d, running: %3$d</string>
     <string name="action_freeze_list">Freeze (%d)</string>
     <string name="action_unfreeze_list">Unfreeze (%d)</string>
+    <string name="status_batch_count">(%d)</string>
     <!-- Notification channels (G5) -->
     <string name="notif_channel_status">Background work</string>
     <string name="notif_channel_status_desc">The permanent row Android requires while Gatekeeper keeps the link to the work profile. It can be collapsed, not hidden.</string>

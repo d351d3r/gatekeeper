@@ -134,6 +134,7 @@ class AppListFragment : BaseFragment() {
                 setActionModeCancelHandler {
                     actionMode?.finish()
                 }
+                freezeHandler = { app -> toggleFreezeInline(app) }
             }
         }
         list!!.adapter = adapter
@@ -290,6 +291,11 @@ class AppListFragment : BaseFragment() {
         AppPermissionsActivity.start(
             requireContext(), work, app.getPackageName(), app.getLabel().orEmpty()
         )
+    }
+
+    /** Кнопка заморозки на строке: переключает состояние тем же путем, что и лист действий. */
+    private fun toggleFreezeInline(app: ApplicationInfoWrapper) {
+        if (app.isHidden()) unfreezeAppFromMenu(app) else freezeAppFromMenu(app)
     }
 
     private fun showAppTraffic(app: ApplicationInfoWrapper) {

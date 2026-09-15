@@ -648,9 +648,9 @@ class MainActivity : AppCompatActivity() {
         setup.isVisible = !hasList
         if (hasList) {
             findViewById<MaterialButton>(R.id.main_status_freeze).text =
-                getString(R.string.action_freeze_list, listSize)
+                getString(R.string.status_batch_count, listSize)
             findViewById<MaterialButton>(R.id.main_status_unfreeze).text =
-                getString(R.string.action_unfreeze_list, listSize)
+                getString(R.string.status_batch_count, listSize)
             counts.text = getString(
                 R.string.status_counts,
                 workAppsTotal,

@@ -1,22 +1,32 @@
 package io.gatekeeper.ui
 
+import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.os.RemoteException
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import io.gatekeeper.R
 import io.gatekeeper.services.ILoadIconCallback
 import io.gatekeeper.services.IGatekeeperService
 import io.gatekeeper.util.ApplicationInfoWrapper
+import io.gatekeeper.util.PermissionGroups
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
 
 class AppListAdapter(
     private val service: IGatekeeperService,
@@ -26,8 +36,8 @@ class AppListAdapter(
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val icon: ImageView = view.findViewById(R.id.list_app_icon)
         private val title: TextView = view.findViewById(R.id.list_app_title)
-        private val state: TextView = view.findViewById(R.id.list_app_state)
-        private val autoFreezeBadge: TextView = view.findViewById(R.id.list_app_auto_freeze)
+        private val permsRow: LinearLayout = view.findViewById(R.id.list_app_perms_row)
+        private val freeze: ImageView = view.findViewById(R.id.list_app_freeze)
         private val selectOrder: TextView = view.findViewById(R.id.list_app_select_order)
         private var itemIndex = -1
 
@@ -36,6 +46,65 @@ class AppListAdapter(
             if (allowMultiSelect) {
                 view.setOnLongClickListener { onLongClick() }
             }
+        }
+
+        /**
+         * Состояние строки приложения профиля (вне режима выбора): под именем -- значки
+         * объявленных им опасных разрешений (какие права запрашивает), справа -- кнопка
+         * заморозки (снежинка) / разморозки (оттаивание), тап переключает. Список прав
+         * добывается кросс-профильным IPC, поэтому кешируется и подгружается фоном --
+         * строка сперва без разрешений, потом дорисовывает их, когда пришли.
+         */
+        private fun bindRowState(info: ApplicationInfoWrapper) {
+            val show = workProfile && !multiSelectMode
+            if (!show) {
+                permsRow.visibility = View.GONE
+                permsRow.removeAllViews()
+                freeze.visibility = View.GONE
+                return
+            }
+            val context = itemView.context
+            val frozen = info.isHidden()
+
+            freeze.visibility = View.VISIBLE
+            freeze.setImageResource(if (frozen) R.drawable.ic_unfreeze else R.drawable.ic_freeze)
+            freeze.contentDescription =
+                context.getString(if (frozen) R.string.unfreeze_app else R.string.freeze_app)
+            val tintAttr =
+                if (frozen) com.google.android.material.R.attr.colorOnSurface
+                else com.google.android.material.R.attr.colorOnSurfaceVariant
+            ImageViewCompat.setImageTintList(freeze, attrColor(context, tintAttr))
+            freeze.setOnClickListener { freezeHandler?.invoke(list[itemIndex]) }
+
+            val pkg = info.getPackageName()
+            val cached = cachedPerms(pkg)
+            renderPerms(cached)
+            if (cached == null && !permsExecutor.isShutdown && beginPermsQuery(pkg)) {
+                val boundIndex = itemIndex
+                try {
+                    permsExecutor.execute {
+                        val icons = computePermIcons(pkg)
+                        endPermsQuery(pkg, icons)
+                        handler.post {
+                            if (boundIndex == itemIndex && itemIndex >= 0 &&
+                                list[itemIndex].getPackageName() == pkg
+                            ) {
+                                renderPerms(icons)
+                            }
+                        }
+                    }
+                } catch (_: RejectedExecutionException) {
+                    // Адаптер отсоединяется, executor уже погашен -- права не нужны.
+                    endPermsQuery(pkg, emptyList())
+                }
+            }
+        }
+
+        private fun renderPerms(icons: List<Int>?) {
+            permsRow.removeAllViews()
+            val context = itemView.context
+            icons?.forEach { res -> permsRow.addView(makePermIcon(context, res)) }
+            permsRow.visibility = if (permsRow.childCount > 0) View.VISIBLE else View.GONE
         }
 
         private fun onClick() {
@@ -113,21 +182,7 @@ class AppListAdapter(
 
                 val info = list[itemIndex]
                 title.text = info.getLabel()
-                // Подпись только у замороженных: у работающих она повторяла одно и
-                // то же на каждой строке и была шумом. Состояние есть лишь у
-                // приложения профиля -- у личной копии заморозки не бывает.
-                if (workProfile && info.isHidden()) {
-                    state.visibility = View.VISIBLE
-                    state.setText(R.string.row_state_frozen)
-                } else {
-                    state.visibility = View.GONE
-                }
-
-                autoFreezeBadge.visibility = if (workProfile && autoFreezePackages.contains(info.getPackageName())) {
-                    View.VISIBLE
-                } else {
-                    View.GONE
-                }
+                bindRowState(info)
 
                 if (multiSelectMode && selectedIndices.contains(itemIndex)) {
                     showSelectOrder()
@@ -186,6 +241,37 @@ class AppListAdapter(
     private val handler = Handler(Looper.getMainLooper())
     private var workProfile = false
     private var autoFreezePackages: Set<String> = emptySet()
+
+    /** Тап по кнопке заморозки/разморозки строки. Ставит фрагмент. */
+    var freezeHandler: ((ApplicationInfoWrapper) -> Unit)? = null
+
+    /** Пакет -> глифы объявленных им опасных разрешений. Права статичны (манифест), так что
+     *  кеш живет до пересбора списка. Заполняется фоновым потоком, читается с UI. */
+    private val permsCache = HashMap<String, List<Int>>()
+    private val permsInFlight = HashSet<String>()
+    private val permsExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+
+    private fun cachedPerms(pkg: String): List<Int>? = synchronized(permsCache) { permsCache[pkg] }
+
+    /** true, если запрос по пакету надо ставить: его нет ни в кеше, ни в полете. */
+    private fun beginPermsQuery(pkg: String): Boolean =
+        synchronized(permsCache) { !permsCache.containsKey(pkg) && permsInFlight.add(pkg) }
+
+    private fun endPermsQuery(pkg: String, icons: List<Int>) = synchronized(permsCache) {
+        permsCache[pkg] = icons
+        permsInFlight.remove(pkg)
+    }
+
+    /** Объявленные приложением опасные разрешения -> глифы групп. Кросс-профильный IPC. */
+    private fun computePermIcons(pkg: String): List<Int> {
+        val declared = try {
+            service.getDeniablePermissions(pkg)?.toSet() ?: emptySet()
+        } catch (_: RemoteException) {
+            return emptyList()
+        }
+        return PermissionGroups.groupsFor(declared).map { it.iconRes }
+    }
+
     private var allowMultiSelect = false
     private var multiSelectMode = false
     private val selectedIndices = ArrayList<Int>()
@@ -193,6 +279,31 @@ class AppListAdapter(
     fun setWorkProfile(workProfile: Boolean) {
         this.workProfile = workProfile
     }
+
+    private fun attrColor(context: Context, attr: Int): ColorStateList {
+        val tv = TypedValue()
+        context.theme.resolveAttribute(attr, tv, true)
+        val color = if (tv.resourceId != 0) ContextCompat.getColor(context, tv.resourceId) else tv.data
+        return ColorStateList.valueOf(color)
+    }
+
+    /** Маленький приглушенный глиф разрешения для ряда под именем. */
+    private fun makePermIcon(context: Context, iconRes: Int): ImageView {
+        val size = dpToPx(context, PERM_ICON_DP)
+        val view = ImageView(context)
+        view.layoutParams = LinearLayout.LayoutParams(size, size).apply {
+            marginEnd = dpToPx(context, PERM_ICON_GAP_DP)
+        }
+        view.setImageResource(iconRes)
+        ImageViewCompat.setImageTintList(
+            view,
+            attrColor(context, com.google.android.material.R.attr.colorOnSurfaceVariant)
+        )
+        return view
+    }
+
+    private fun dpToPx(context: Context, dp: Int): Int =
+        (dp * context.resources.displayMetrics.density).toInt()
 
     fun setAutoFreezePackages(packages: Set<String>?) {
         autoFreezePackages = packages ?: emptySet()
@@ -233,6 +344,10 @@ class AppListAdapter(
         origList.clear()
         list.clear()
         iconCache.clear()
+        synchronized(permsCache) {
+            permsCache.clear()
+            permsInFlight.clear()
+        }
         origList.addAll(apps)
         notifyChange()
     }
@@ -281,7 +396,16 @@ class AppListAdapter(
         holder.setIndex(-1)
     }
 
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        // Адаптер пересоздается на каждый onCreateView фрагмента: гасим фоновый поток
+        // запроса разрешений, чтобы он не висел недемоном после ухода с экрана.
+        permsExecutor.shutdown()
+    }
+
     companion object {
         private const val MAX_ICON_CACHE_ENTRIES = 80
+        private const val PERM_ICON_DP = 16
+        private const val PERM_ICON_GAP_DP = 6
     }
 }

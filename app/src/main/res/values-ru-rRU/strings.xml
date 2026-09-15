@@ -299,6 +299,7 @@
     <string name="status_counts">Приложений: %1$d, заморожено: %2$d, работает: %3$d</string>
     <string name="action_freeze_list">Заморозить (%d)</string>
     <string name="action_unfreeze_list">Разморозить (%d)</string>
+    <string name="status_batch_count">(%d)</string>
     <!-- Каналы уведомлений (G5) -->
     <string name="notif_channel_status">Работа в фоне</string>
     <string name="notif_channel_status_desc">Постоянная строка, которой Android обязывает приложение, пока Gatekeeper держит связь с рабочим профилем. Ее можно свернуть, но не убрать.</string>

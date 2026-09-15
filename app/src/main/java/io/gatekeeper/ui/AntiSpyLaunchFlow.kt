@@ -74,9 +74,12 @@ class AntiSpyLaunchFlow(private val activity: Activity) {
     /** Personal -> work: разморозить пакет(ы), запустить, заморозить обратно по настройке. */
     fun forwardUnfreezeAndLaunchToWorkProfile() {
         val forwardIntent = Intent(DummyActivity.UNFREEZE_AND_LAUNCH)
-        if (!Utility.tryTransferIntentToProfile(activity, forwardIntent)) return
         val intent = activity.intent
         val packageName = requireNotNull(intent.getStringExtra("packageName"))
+        // packageName/shouldFreeze/linkedPackages входят в AuthPayload.SIGNED_EXTRA_KEYS:
+        // подпись считается по extras, поэтому кладём их ДО transferIntentToProfile.
+        // Иначе u11 пересчитает payload с ними, verify не сойдётся, isAuthorized вернёт
+        // false и init() сделает finish() -- запуск молча не случится.
         forwardIntent.putExtra("packageName", packageName)
         forwardIntent.putExtra(
             "shouldFreeze",
@@ -102,6 +105,7 @@ class AntiSpyLaunchFlow(private val activity: Activity) {
             forwardIntent.putExtra("linkedPackages", packages)
             forwardIntent.putExtra("linkedPackagesShouldFreeze", packagesShouldFreeze)
         }
+        if (!Utility.tryTransferIntentToProfile(activity, forwardIntent)) return
         activity.startActivity(forwardIntent)
     }
 
