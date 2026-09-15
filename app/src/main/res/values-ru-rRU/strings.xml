@@ -299,7 +299,6 @@
     <string name="status_counts">Приложений: %1$d, заморожено: %2$d, работает: %3$d</string>
     <string name="action_freeze_list">Заморозить (%d)</string>
     <string name="action_unfreeze_list">Разморозить (%d)</string>
-    <string name="status_batch_count">(%d)</string>
     <!-- Каналы уведомлений (G5) -->
     <string name="notif_channel_status">Работа в фоне</string>
     <string name="notif_channel_status_desc">Постоянная строка, которой Android обязывает приложение, пока Gatekeeper держит связь с рабочим профилем. Ее можно свернуть, но не убрать.</string>
@@ -388,6 +387,7 @@
     <string name="app_permissions_title">Разрешения</string>
     <string name="app_permissions_header">Выключенное разрешение запрещено политикой: приложение не сможет им пользоваться и не сможет запросить снова. Если оно активно использует право, часть функций может отвалиться. Показаны только разрешения, которые приложение запрашивает.</string>
     <string name="app_permissions_empty">Это приложение не запрашивает разрешений, которыми можно управлять.</string>
+    <string name="perm_legend_title">Значки разрешений</string>
     <string name="perm_group_location">Геолокация</string>
     <string name="perm_group_camera">Камера</string>
     <string name="perm_group_microphone">Микрофон</string>

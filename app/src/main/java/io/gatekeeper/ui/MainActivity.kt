@@ -3,6 +3,8 @@
 package io.gatekeeper.ui
 
 import android.Manifest
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.view.View
 import android.app.admin.DevicePolicyManager
@@ -59,6 +61,7 @@ import io.gatekeeper.services.KillerService
 import io.gatekeeper.util.AntiSpyLaunchGate
 import io.gatekeeper.util.AuthenticationUtility
 import io.gatekeeper.util.AntiSpyManager
+import io.gatekeeper.util.PermissionGroups
 import io.gatekeeper.util.WorkProfileStatus
 import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.AutoFreezeDefaults
@@ -647,10 +650,11 @@ class MainActivity : AppCompatActivity() {
         buttons.isVisible = hasList
         setup.isVisible = !hasList
         if (hasList) {
-            findViewById<MaterialButton>(R.id.main_status_freeze).text =
-                getString(R.string.status_batch_count, listSize)
-            findViewById<MaterialButton>(R.id.main_status_unfreeze).text =
-                getString(R.string.status_batch_count, listSize)
+            // Значок + короткая подпись действия: полная "Заморозить (N)" не влезает в
+            // половину ширины и переносится на две строки. Число не теряем -- счетчики
+            // заморожено/работает выше в карточке.
+            findViewById<MaterialButton>(R.id.main_status_freeze).setText(R.string.freeze_app)
+            findViewById<MaterialButton>(R.id.main_status_unfreeze).setText(R.string.unfreeze_app)
             counts.text = getString(
                 R.string.status_counts,
                 workAppsTotal,
@@ -997,6 +1001,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 true
             }
+            R.id.main_menu_perm_legend -> {
+                showPermLegend()
+                true
+            }
             R.id.main_menu_show_all -> {
                 toggleShowAll(item)
                 true
@@ -1009,6 +1017,24 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    /** Легенда значков разрешений: глиф + название каждой группы, которую мы показываем
+     *  под именем приложения. Помогает узнать глифы, которые иначе надо угадывать. */
+    private fun showPermLegend() {
+        val content = layoutInflater.inflate(R.layout.dialog_perm_legend, null)
+        val container = content.findViewById<LinearLayout>(R.id.perm_legend_container)
+        for (group in PermissionGroups.ALL) {
+            val row = layoutInflater.inflate(R.layout.perm_legend_row, container, false)
+            row.findViewById<ImageView>(R.id.perm_legend_icon).setImageResource(group.iconRes)
+            row.findViewById<TextView>(R.id.perm_legend_label).setText(group.labelRes)
+            container.addView(row)
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.perm_legend_title)
+            .setView(content)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 
     private fun openSettings() = openSettingsScreen(null)

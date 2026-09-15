@@ -326,7 +326,6 @@
     <string name="status_counts">Apps: %1$d, frozen: %2$d, running: %3$d</string>
     <string name="action_freeze_list">Freeze (%d)</string>
     <string name="action_unfreeze_list">Unfreeze (%d)</string>
-    <string name="status_batch_count">(%d)</string>
     <!-- Notification channels (G5) -->
     <string name="notif_channel_status">Background work</string>
     <string name="notif_channel_status_desc">The permanent row Android requires while Gatekeeper keeps the link to the work profile. It can be collapsed, not hidden.</string>
@@ -413,6 +412,7 @@
     <string name="app_permissions_title">Permissions</string>
     <string name="app_permissions_header">A disabled permission is blocked by policy: the app cannot use it or request it again. If the app actively uses it, some features may break. Only permissions the app requests are shown.</string>
     <string name="app_permissions_empty">This app requests no permissions that can be managed.</string>
+    <string name="perm_legend_title">Permission icons</string>
     <string name="perm_group_location">Location</string>
     <string name="perm_group_camera">Camera</string>
     <string name="perm_group_microphone">Microphone</string>

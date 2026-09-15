@@ -32,7 +32,7 @@
             app:trackStopIndicatorSize="0dp"
             app:trackThickness="4dp"
             app:indicatorColor="@color/setupWizardHeaderProgress"
-            app:trackColor="@color/md_outlineVariant" />
+            app:trackColor="?attr/colorOutlineVariant" />
 
         <TextView
             android:id="@+id/wizard_step_label"
@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:textAppearance="?attr/textAppearanceLabelMedium"
-            android:textColor="@color/md_onSurfaceVariant" />
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
     </LinearLayout>
 
@@ -73,7 +73,7 @@
                 android:layout_marginTop="12dp"
                 android:lineSpacingMultiplier="1.15"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="@color/md_onSurfaceVariant" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
             <TextView
                 android:id="@+id/wizard_link"
@@ -81,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="@color/md_primary"
+                android:textColor="?attr/colorPrimary"
                 android:visibility="gone" />
 
             <LinearLayout

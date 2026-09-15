@@ -23,6 +23,7 @@ import io.gatekeeper.R
 import io.gatekeeper.services.ILoadIconCallback
 import io.gatekeeper.services.IGatekeeperService
 import io.gatekeeper.util.ApplicationInfoWrapper
+import io.gatekeeper.util.PermGroup
 import io.gatekeeper.util.PermissionGroups
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -83,13 +84,13 @@ class AppListAdapter(
                 val boundIndex = itemIndex
                 try {
                     permsExecutor.execute {
-                        val icons = computePermIcons(pkg)
-                        endPermsQuery(pkg, icons)
+                        val groups = computePermGroups(pkg)
+                        endPermsQuery(pkg, groups)
                         handler.post {
                             if (boundIndex == itemIndex && itemIndex >= 0 &&
                                 list[itemIndex].getPackageName() == pkg
                             ) {
-                                renderPerms(icons)
+                                renderPerms(groups)
                             }
                         }
                     }
@@ -100,10 +101,10 @@ class AppListAdapter(
             }
         }
 
-        private fun renderPerms(icons: List<Int>?) {
+        private fun renderPerms(groups: List<PermGroup>?) {
             permsRow.removeAllViews()
             val context = itemView.context
-            icons?.forEach { res -> permsRow.addView(makePermIcon(context, res)) }
+            groups?.forEach { group -> permsRow.addView(makePermIcon(context, group)) }
             permsRow.visibility = if (permsRow.childCount > 0) View.VISIBLE else View.GONE
         }
 
@@ -245,31 +246,32 @@ class AppListAdapter(
     /** Тап по кнопке заморозки/разморозки строки. Ставит фрагмент. */
     var freezeHandler: ((ApplicationInfoWrapper) -> Unit)? = null
 
-    /** Пакет -> глифы объявленных им опасных разрешений. Права статичны (манифест), так что
-     *  кеш живет до пересбора списка. Заполняется фоновым потоком, читается с UI. */
-    private val permsCache = HashMap<String, List<Int>>()
+    /** Пакет -> группы объявленных им опасных разрешений. Права статичны (манифест), так
+     *  что кеш живет до пересбора списка. Заполняется фоновым потоком, читается с UI. */
+    private val permsCache = HashMap<String, List<PermGroup>>()
     private val permsInFlight = HashSet<String>()
     private val permsExecutor: ExecutorService = Executors.newSingleThreadExecutor()
 
-    private fun cachedPerms(pkg: String): List<Int>? = synchronized(permsCache) { permsCache[pkg] }
+    private fun cachedPerms(pkg: String): List<PermGroup>? =
+        synchronized(permsCache) { permsCache[pkg] }
 
     /** true, если запрос по пакету надо ставить: его нет ни в кеше, ни в полете. */
     private fun beginPermsQuery(pkg: String): Boolean =
         synchronized(permsCache) { !permsCache.containsKey(pkg) && permsInFlight.add(pkg) }
 
-    private fun endPermsQuery(pkg: String, icons: List<Int>) = synchronized(permsCache) {
-        permsCache[pkg] = icons
+    private fun endPermsQuery(pkg: String, groups: List<PermGroup>) = synchronized(permsCache) {
+        permsCache[pkg] = groups
         permsInFlight.remove(pkg)
     }
 
-    /** Объявленные приложением опасные разрешения -> глифы групп. Кросс-профильный IPC. */
-    private fun computePermIcons(pkg: String): List<Int> {
+    /** Объявленные приложением опасные разрешения -> группы (глиф + название). Кросс-проф. IPC. */
+    private fun computePermGroups(pkg: String): List<PermGroup> {
         val declared = try {
             service.getDeniablePermissions(pkg)?.toSet() ?: emptySet()
         } catch (_: RemoteException) {
             return emptyList()
         }
-        return PermissionGroups.groupsFor(declared).map { it.iconRes }
+        return PermissionGroups.groupsFor(declared)
     }
 
     private var allowMultiSelect = false
@@ -287,14 +289,16 @@ class AppListAdapter(
         return ColorStateList.valueOf(color)
     }
 
-    /** Маленький приглушенный глиф разрешения для ряда под именем. */
-    private fun makePermIcon(context: Context, iconRes: Int): ImageView {
+    /** Маленький приглушенный глиф разрешения для ряда под именем; название группы --
+     *  в contentDescription, чтобы TalkBack читал, какие права просит приложение. */
+    private fun makePermIcon(context: Context, group: PermGroup): ImageView {
         val size = dpToPx(context, PERM_ICON_DP)
         val view = ImageView(context)
         view.layoutParams = LinearLayout.LayoutParams(size, size).apply {
             marginEnd = dpToPx(context, PERM_ICON_GAP_DP)
         }
-        view.setImageResource(iconRes)
+        view.setImageResource(group.iconRes)
+        view.contentDescription = context.getString(group.labelRes)
         ImageViewCompat.setImageTintList(
             view,
             attrColor(context, com.google.android.material.R.attr.colorOnSurfaceVariant)

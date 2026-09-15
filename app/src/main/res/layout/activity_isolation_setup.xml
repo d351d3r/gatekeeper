@@ -52,7 +52,7 @@
                     android:layout_marginBottom="20dp"
                     android:lineSpacingMultiplier="1.1"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="@color/md_onSurfaceVariant"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:text="@string/isolation_preset_convenient_desc" />
 
                 <RadioButton
@@ -70,7 +70,7 @@
                     android:layout_marginStart="44dp"
                     android:lineSpacingMultiplier="1.1"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="@color/md_onSurfaceVariant"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:text="@string/isolation_preset_isolated_desc" />
 
             </RadioGroup>
@@ -85,7 +85,7 @@
                 android:drawableEnd="@drawable/ic_expand_more"
                 android:gravity="center_vertical"
                 android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textColor="@color/md_primary"
+                android:textColor="?attr/colorPrimary"
                 android:text="@string/isolation_setup_advanced" />
 
             <!--

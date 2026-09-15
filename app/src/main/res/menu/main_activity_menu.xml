@@ -34,6 +34,12 @@
         android:title="@string/file_shuttle_action" />
 
     <item
+        android:id="@+id/main_menu_perm_legend"
+        android:icon="@drawable/ic_verified_user"
+        app:iconTint="?attr/colorOnSurface"
+        android:title="@string/perm_legend_title" />
+
+    <item
         android:id="@+id/main_menu_show_all"
         android:icon="@drawable/ic_apps"
         app:iconTint="?attr/colorOnSurface"
