@@ -68,7 +68,7 @@
     <string name="settings_root_backup_desc">Настройки и списки приложений в файл</string>
     <string name="settings_root_accesses">Разрешения</string>
     <string name="settings_root_accesses_desc">Выдано %1$d из %2$d</string>
-    <string name="settings_perm_intro">Эти доступы нужны для полной работы. Без них Gatekeeper работает, но часть функций недоступна. Выдать можно сейчас или позже - в Настройки, раздел «Разрешения».</string>
+    <string name="settings_perm_intro">Нужны для полной работы. Без них приложение работает, но часть функций недоступна. Выдать можно сейчас или позже.</string>
     <string name="settings_perm_done">Готово</string>
     <string name="settings_perm_list_title">Нажмите строку, чтобы открыть системный экран выдачи</string>
     <string name="settings_perm_granted">Выдано</string>
@@ -138,7 +138,7 @@
     <string name="install_unknown_sources_message">Android требует одноразовое разрешение, прежде чем Gatekeeper сможет ставить приложения в рабочий профиль. Включите «Разрешить из этого источника» в открывшемся экране и повторите клонирование.</string>
     <string name="install_unknown_sources_open">Открыть настройки</string>
     <string name="settings_media_mirror">Копировать фото профиля в галерею</string>
-    <string name="settings_media_mirror_desc">Копирует новые скриншоты (Pictures/Screenshots) и фото/видео камеры (DCIM/Camera) из рабочего профиля в личную галерею. Срабатывает при каждом подключении File Shuttle (например, при открытии «Файлов»). Оригиналы остаются в рабочем профиле. Копируются только эти две папки, остальное профиль не покидает.</string>
+    <string name="settings_media_mirror_desc">Копирует новые скриншоты и фото/видео камеры из профиля в личную галерею. Оригиналы остаются в профиле.</string>
     <string name="uninstall_fail_system_app">Невозможно удалить системные приложения в профиле, который Gatekeeper не контролирует.</string>
     <string name="unsupported_launcher">Невозможно добавить ярлык в ваш лаунчер. Пожалуйста, свяжитесь с разработчиком.</string>
     <string name="app_context_menu_title">Операции для %s</string>
@@ -158,7 +158,7 @@
     <string name="documents_ui">Открыть проводник</string>
     <string name="settings_interaction">Взаимодействие</string>
     <string name="settings_auto_freeze_service">Заморозка при блокировке экрана</string>
-    <string name="settings_auto_freeze_service_desc">Пока приложение заморожено, его уведомления не приходят. Область выбирается ниже.</string>
+    <string name="settings_auto_freeze_service_desc">Пока приложение заморожено, его уведомления не приходят.</string>
     <string name="settings_auto_freeze_scope">Область заморозки</string>
     <string name="settings_auto_freeze_scope_session">Запущенные за сеанс</string>
     <string name="settings_auto_freeze_scope_list">Список автозаморозки</string>
@@ -173,7 +173,7 @@
     <string name="power_diagnostics_open">Проверить</string>
     <string name="settings_anti_spy">Заморозка при включении VPN</string>
     <string name="settings_anti_spy_enabled">Автоматически морозить приложения профиля</string>
-    <string name="settings_anti_spy_enabled_desc">По умолчанию выключено: заморозка убивает уведомления мессенджеров, банков и госуслуг. Она бесполезна, если трафик рабочего профиля не идет через VPN - скрывать нечего, а приложения замолкают зря.</string>
+    <string name="settings_anti_spy_enabled_desc">Замораживает приложения профиля при смене VPN. Их уведомления в это время молчат, поэтому по умолчанию выключено.</string>
     <string name="settings_anti_spy_freeze_on_vpn">Триггер: поднялся VPN</string>
     <string name="settings_anti_spy_freeze_on_vpn_desc">Реагировать на появление туннеля.</string>
     <string name="settings_anti_spy_scope">Область заморозки</string>
@@ -183,7 +183,7 @@
     <string name="settings_anti_spy_notify_only_desc">Для тех, кому уведомления важнее автоматики.</string>
     <string name="settings_anti_spy_delay">Задержка перед заморозкой</string>
     <string name="settings_anti_spy_routing">Маршрут трафика профиля</string>
-    <string name="settings_anti_spy_routing_bypass">Замерено сейчас: трафик рабочего профиля идет мимо туннеля. Заморозка по VPN здесь ничего не защищает, только гасит приложения.</string>
+    <string name="settings_anti_spy_routing_bypass">Трафик профиля идет мимо туннеля -- заморозка по VPN тут ничего не скрывает.</string>
     <string name="settings_anti_spy_routing_in_tunnel">Замерено сейчас: трафик рабочего профиля идет через туннель.</string>
     <string name="settings_anti_spy_routing_vpn_down">Туннель не поднят. Включите VPN и откройте этот экран снова, чтобы получить ответ.</string>
     <string name="settings_anti_spy_routing_unknown">Рабочий профиль не ответил, замерить нечем.</string>
@@ -198,13 +198,13 @@
     <string name="finish_provision_desc">Остался последний шаг настройки Gatekeeper.</string>
     <string name="install_app_to_profile">Установить APK из файла</string>
     <string name="install_app_to_profile_success">Приложение установлено в рабочий профиль.</string>
-    <string name="settings_block_contacts_searching">Скрыть контакты профиля от поиска</string><string name="settings_block_contacts_searching_desc">Личный профиль больше не сможет искать и подтягивать контакты, сохраненные в рабочем профиле.</string>
+    <string name="settings_block_contacts_searching">Скрыть контакты профиля от поиска</string><string name="settings_block_contacts_searching_desc">Личный профиль не сможет искать и подтягивать контакты рабочего профиля.</string>
     <string name="settings_block_caller_id">Скрыть имя звонящего из профиля</string>
-    <string name="settings_block_caller_id_desc">Звонок с номера, сохраненного только в рабочем профиле, в личном журнале останется без имени.</string>
-    <string name="settings_cross_profile_file_chooser_desc">По умолчанию выключено. Когда включено, другой профиль появляется источником в выборе файла, и границу пересекает только тот файл, который вы там выбрали.</string>
+    <string name="settings_block_caller_id_desc">Звонок с номера из рабочего профиля в личном журнале останется без имени.</string>
+    <string name="settings_cross_profile_file_chooser_desc">Другой профиль появляется источником в выборе файла. Границу пересекает только выбранный файл.</string>
     <string name="show_all_warning">Управление скрытыми в списке приложениями может привести к разного рода нестабильностям и сбоям, однако эта функция может оказаться полезной в случаях, когда в некачественно настроенных производителем прошивках не включены все необходимые системные приложения в рабочем профиле по умолчанию. Продолжайте на свой страх и риск.</string>
     <string name="settings_dont_freeze_foreground">Пропускать активные приложения</string>
-    <string name="settings_dont_freeze_foreground_desc">Не замораживать приложение на переднем плане при блокировке экрана. Это может быть полезно для приложений типа аудиопроигрывателя, но вам придется вручную замораживать их через ярлык \"Групповая заморозка\".</string>
+    <string name="settings_dont_freeze_foreground_desc">Не морозить приложение на переднем плане при блокировке экрана. Для плееров и подобного.</string>
     <string name="file_shuttle_unavailable">Нет связи с другим профилем. Откройте там Gatekeeper и повторите.</string>
     <string name="file_shuttle_read_failed">Не удалось прочитать этот каталог из другого профиля.</string>
     <string name="file_shuttle_service_title">Обмен файлами</string>
@@ -254,7 +254,7 @@
     <!-- Корневые CA рабочего профиля (docs/feature_ca_certs.md) -->
     <string name="settings_ca_category">Корневые сертификаты</string>
     <string name="settings_ca_install">Установить корневой сертификат…</string>
-    <string name="settings_ca_install_desc">Устанавливает корневой CA (например, корень Минцифры) только в рабочий профиль: госсайты начнут открываться в браузерах внутри профиля. Большинство приложений пользовательским CA не доверяют (ограничение Android 7+), личный профиль не затрагивается. Система покажет уведомление «сеть может отслеживаться»; это ожидаемо.</string>
+    <string name="settings_ca_install_desc">Ставит корневой сертификат (например, Минцифры) только в рабочий профиль -- госсайты откроются в его браузерах. Приложения такому сертификату не доверяют (Android 7+).</string>
     <string name="settings_ca_installed">Установленные сертификаты</string>
     <string name="settings_ca_installed_desc">Корневые сертификаты рабочего профиля. Тап: просмотр и удаление.</string>
     <string name="ca_install_title">Установить сертификат?</string>
@@ -322,12 +322,12 @@
     <string name="settings_contacts_group_closed">Скрытие контактов профиля</string>
     <string name="settings_contacts_group_share">Передача контактов в профиль</string>
     <string name="settings_contacts_share_vcard">Отправить отдельные контакты файлом</string>
-    <string name="settings_contacts_share_vcard_desc">Поделитесь контактом из личных «Контактов» и выберите рабочий профиль: он попадет в клон. Границу пересекут только те контакты, которые вы выбрали.</string>
+    <string name="settings_contacts_share_vcard_desc">Поделитесь контактом из личных «Контактов» в рабочий профиль. Границу пересечет только выбранный контакт.</string>
     <string name="settings_contacts_share_account">Добавить аккаунт внутри профиля</string>
-    <string name="settings_contacts_share_account_desc">Аккаунт Google или Exchange, добавленный в рабочем профиле, принесет с собой всю свою адресную книгу. Удобно и прямо противоположно выборочности: владелец аккаунта видит и профиль.</string>
+    <string name="settings_contacts_share_account_desc">Аккаунт Google или Exchange в рабочем профиле приносит всю свою адресную книгу -- и ее видит владелец аккаунта.</string>
     <!-- Экран правил ссылок (H2) -->
     <string name="settings_links_warning">Эти ссылки увидит рабочий браузер</string>
-    <string name="settings_links_warning_desc">Любая http(s)-ссылка на домен из списка откроется в рабочем профиле: и та, по которой вы перешли из рабочего приложения, и та, что пришла в личный чат. Правило покрывает домен и все его поддомены.</string>
+    <string name="settings_links_warning_desc">Ссылка на домен из списка откроется в рабочем профиле -- и из рабочего приложения, и из личного чата. Поддомены тоже считаются.</string>
     <string name="settings_links_list_title">Домены</string>
     <string name="settings_links_add">Добавить домены</string>
     <string name="settings_links_add_desc">Несколько через запятую: example.com, *.wikipedia.org, .ru</string>
@@ -366,9 +366,9 @@
         <item quantity="other">Открыто для приложений: %1$d</item>
     </plurals>
     <string name="settings_bridges_widgets_title">Виджеты на личном рабочем столе</string>
-    <string name="settings_bridges_widgets_desc">Приложение из этого списка может вынести свой виджет рабочего профиля на личный рабочий стол. Виджет показывает рабочие данные за пределами профиля, а заморозка приложения его гасит.</string>
+    <string name="settings_bridges_widgets_desc">Приложение может вынести виджет рабочего профиля на личный стол. Заморозка виджет гасит.</string>
     <string name="settings_bridges_interaction_title">Общение с собственной копией</string>
-    <string name="settings_bridges_interaction_desc">Приложение из этого списка может обмениваться данными со своей копией в другом профиле: две копии перестают быть чужими друг другу. Android 11 и новее.</string>
+    <string name="settings_bridges_interaction_desc">Две копии приложения в разных профилях смогут обмениваться данными. Android 11+.</string>
     <string name="settings_bridges_no_apps">Своих приложений в профиле пока нет</string>
     <string name="settings_bridges_unavailable">Рабочий профиль сейчас не отвечает</string>
     <string name="settings_bridges_failed">Рабочий профиль отклонил изменение</string>
@@ -425,17 +425,17 @@
     <string name="settings_backup_group_scope">Содержимое файла</string>
     <string name="settings_backup_group_actions">Действия</string>
     <string name="settings_backup_contains">Внутри</string>
-    <string name="settings_backup_contains_desc">Настройки Gatekeeper, имена пакетов обоих профилей и список автозаморозки. Обычный JSON, его можно открыть и прочитать.</string>
+    <string name="settings_backup_contains_desc">Настройки, имена пакетов обоих профилей и список автозаморозки. Обычный JSON.</string>
     <string name="settings_backup_excludes">Не попадает в файл</string>
-    <string name="settings_backup_excludes_desc">Ни данных приложений, ни APK, ни аккаунтов, ни сертификатов. Восстановление ставит рабочие приложения заново из личного профиля чистыми копиями: логины и переписка не вернутся. Сам рабочий профиль и ключ профиля тоже не восстанавливаются.</string>
+    <string name="settings_backup_excludes_desc">Без данных приложений, APK, аккаунтов и сертификатов. Восстановление ставит приложения заново, чистыми -- логины и переписка не вернутся.</string>
     <!-- Экран файлов (G7): почему системное «Поделиться» тут бессильно -->
     <string name="settings_files_why">Почему системное «Поделиться» не помогает</string>
-    <string name="settings_files_why_desc">Рабочий профиль - это отдельный пользователь Android. Приложения одной стороны вообще не видят хранилище другой, поэтому системному «Поделиться» нечего предложить: профили не соседние папки, а разные пользователи одного телефона.</string>
+    <string name="settings_files_why_desc">Профили -- это разные пользователи Android, их хранилища не видят друг друга. Поэтому системному «Поделиться» между ними нечего предложить.</string>
     <string name="settings_files_how">Перенос файла</string>
-    <string name="settings_files_how_desc">Откройте выбор файла из того приложения, которому файл нужен, и выберите источником Gatekeeper: там появится другой профиль. Или нажмите кнопку переноса на верхней панели списка приложений. Приложение-получатель получит доступ к этому одному файлу и ни к чему больше.</string>
+    <string name="settings_files_how_desc">В приложении-получателе откройте выбор файла и выберите источником Gatekeeper -- появится другой профиль. Доступ будет к одному этому файлу.</string>
     <!-- Экран сертификатов (G7) -->
     <string name="settings_ca_scope">Только рабочий профиль</string>
-    <string name="settings_ca_scope_desc">Установленному здесь корневому CA доверяют браузеры внутри профиля. Большинство приложений пользовательским CA не доверяют начиная с Android 7, личный профиль не затрагивается. В профиле Android будет постоянно показывать уведомление «сеть может отслеживаться».</string>
+    <string name="settings_ca_scope_desc">Сертификату доверяют браузеры профиля, но не приложения (с Android 7). Личный профиль не затронут.</string>
     <string name="settings_ca_list_title">Установленные</string>
     <string name="settings_ca_install_short">Выберите файл .crt или .pem: отпечаток покажем до установки</string>
     <!-- Закрепленный VPN профиля (C6) -->
@@ -444,7 +444,7 @@
     <string name="settings_alwayson_app">VPN-приложение профиля</string>
     <string name="settings_alwayson_none">Не закреплен: трафик профиля идет туда, куда его отправит система</string>
     <string name="settings_alwayson_lockdown">Запретить трафик мимо туннеля</string>
-    <string name="settings_alwayson_lockdown_desc">Пока туннель не поднят, рабочие приложения остаются вообще без сети. В этом и смысл: утечки в открытый интернет не будет, но и связи не будет, пока VPN не вернется.</string>
+    <string name="settings_alwayson_lockdown_desc">Пока туннель не поднят, рабочие приложения без сети -- никаких утечек в обход VPN, но и связи нет.</string>
     <string name="settings_alwayson_no_apps">Ни одно приложение профиля не умеет быть VPN</string>
     <string name="settings_alwayson_unavailable">Рабочий профиль сейчас не отвечает</string>
     <string name="settings_alwayson_failed">Профиль отказался закрепить этот VPN: %1$s</string>
@@ -475,7 +475,7 @@
     <string name="file_shuttle_notice_title">Подключиться к другому профилю?</string>
     <string name="file_shuttle_notice_text">Файловый менеджер запросил файлы другого профиля. Нажмите, чтобы поднять связь, и повторите действие в нем.</string>
     <string name="settings_files_manager">Просмотр из файлового менеджера</string>
-    <string name="settings_files_manager_desc">Файловый менеджер, умеющий добавлять хранилище через системный выбор (MiXplorer, Total Commander), получает доступ к другому профилю насовсем: добавьте хранилище, выберите Gatekeeper - и оно останется в его списке. Когда он откроет папку после простоя, связи не будет и он сообщит об отказе; тогда придет уведомление с предложением поднять связь, и повтор действия в самом менеджере уже пройдет.</string>
+    <string name="settings_files_manager_desc">Дает файловому менеджеру (MiXplorer, Total Commander) постоянный доступ к другому профилю: добавьте хранилище и выберите Gatekeeper.</string>
     <!-- Изоляция профиля: пресеты и отдельные политики -->
     <string name="settings_root_isolation">Изоляция профиля</string>
     <string name="settings_root_isolation_desc">Уровень изоляции и отдельные запреты</string>
@@ -544,7 +544,7 @@
     <string name="isolation_setup_advanced">Дополнительная настройка</string>
     <string name="isolation_setup_done">Готово</string>
     <string name="settings_anti_spy_what">Как это работает</string>
-    <string name="settings_anti_spy_what_desc">Приложение внутри профиля видит, что на телефоне поднят VPN, даже если туннель работает только в личной части. Куда ведет туннель, оно не узнает: таблица маршрутов и список соединений для него закрыты. Сам факт VPN на устройстве Android скрыть нельзя.\n\nФункция следит за состоянием VPN и, когда тот включается или выключается, замораживает выбранные приложения профиля: приложению, которому нельзя видеть смену сети, в этот момент не дают работать.</string>
+    <string name="settings_anti_spy_what_desc">Морозит выбранные приложения профиля, когда VPN включается или выключается -- чтобы они не заметили смену сети. Куда ведет туннель, приложение не видит, но сам факт VPN на устройстве Android скрыть нельзя.</string>
     <string name="main_add_app">Добавить приложение</string>
     <string name="main_pick_app_title">Выберите приложение</string>
     <string name="app_list_empty_work">В рабочем профиле пока нет приложений.\n\nНажмите «Добавить» внизу, чтобы поставить сюда приложение из личного профиля.</string>

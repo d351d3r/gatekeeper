@@ -101,7 +101,7 @@
     <string name="settings_root_backup_desc">Settings and app lists into a file</string>
     <string name="settings_root_accesses">Permissions</string>
     <string name="settings_root_accesses_desc">Granted %1$d of %2$d</string>
-    <string name="settings_perm_intro">These accesses are needed for full functionality. Gatekeeper works without them, but some features stay unavailable. Grant them now or later, in Settings under "Permissions".</string>
+    <string name="settings_perm_intro">Needed for full function. Without them the app works, but some features are unavailable. Grant now or later.</string>
     <string name="settings_perm_done">Done</string>
     <string name="settings_perm_list_title">Tap a row to open the system screen that grants it</string>
     <string name="settings_perm_granted">Granted</string>
@@ -136,11 +136,11 @@
     <string name="settings_root_misc_desc">Profile NFC payment, version, links</string>
     <string name="settings_interaction">Interaction</string>
     <string name="settings_cross_profile_file_chooser">File Shuttle</string>
-    <string name="settings_cross_profile_file_chooser_desc">Off by default. When on, the other profile appears as a source in the file picker, and only the file you pick there crosses the border.</string>
+    <string name="settings_cross_profile_file_chooser_desc">The other profile appears as a source in the file picker. Only the file you pick crosses the boundary.</string>
     <string name="settings_block_contacts_searching">Hide work contacts from search</string>
-    <string name="settings_block_contacts_searching_desc">The personal profile can no longer search or look up contacts stored in the work profile.</string>
+    <string name="settings_block_contacts_searching_desc">The personal profile can no longer search or pull in work-profile contacts.</string>
     <string name="settings_block_caller_id">Hide caller names from the profile</string>
-    <string name="settings_block_caller_id_desc">A call from a number saved only in the work profile shows up as unknown in the personal call log.</string>
+    <string name="settings_block_caller_id_desc">A call from a number saved only in the work profile stays nameless in the personal call log.</string>
     <string name="settings_payment_stub">Payment Service Stub</string>
     <string name="settings_theme">Theme</string>
     <string name="theme_system">Match device</string>
@@ -161,17 +161,17 @@
     <string name="power_diagnostics_problem_detected">Battery restrictions may make Gatekeeper unreliable.</string>
     <string name="power_diagnostics_open">Check</string>
     <string name="settings_auto_freeze_service">Freeze on screen lock</string>
-    <string name="settings_auto_freeze_service_desc">While an app is frozen its notifications do not arrive. The scope is chosen below.</string>
+    <string name="settings_auto_freeze_service_desc">While an app is frozen, its notifications do not arrive.</string>
     <string name="settings_auto_freeze_scope">Freeze scope</string>
     <string name="settings_auto_freeze_scope_session">Apps launched this session</string>
     <string name="settings_auto_freeze_scope_list">Auto Freeze list</string>
     <string name="settings_auto_freeze_scope_all">All third-party work apps</string>
     <string name="settings_auto_freeze_delay">Auto Freeze Delay</string>
     <string name="settings_dont_freeze_foreground">Skip Foreground Apps</string>
-    <string name="settings_dont_freeze_foreground_desc">Do NOT freeze foreground apps (with visible activity) when you lock your screen. This can be useful for apps like music players, but you\'ll need to manually freeze them through \"Batch Freeze Shortcut\" afterwards.</string>
+    <string name="settings_dont_freeze_foreground_desc">Do not freeze a foreground app on screen lock. For players and the like.</string>
     <string name="settings_anti_spy">Freeze when a VPN comes up</string>
     <string name="settings_anti_spy_enabled">Freeze work apps automatically</string>
-    <string name="settings_anti_spy_enabled_desc">Off by default: freezing kills notifications from messengers, banks and government apps. It is useless if work profile traffic does not go through the VPN - there is nothing to hide, and the apps go silent for nothing.</string>
+    <string name="settings_anti_spy_enabled_desc">Freezes profile apps when the VPN changes. Their notifications go silent meanwhile, so it is off by default.</string>
     <string name="settings_anti_spy_freeze_on_vpn">Trigger: VPN comes up</string>
     <string name="settings_anti_spy_freeze_on_vpn_desc">React when a tunnel is established.</string>
     <string name="settings_anti_spy_scope">Freeze scope</string>
@@ -181,7 +181,7 @@
     <string name="settings_anti_spy_notify_only_desc">For those who need notifications more than automation.</string>
     <string name="settings_anti_spy_delay">Delay before freezing</string>
     <string name="settings_anti_spy_routing">Where profile traffic goes</string>
-    <string name="settings_anti_spy_routing_bypass">Measured now: work profile traffic goes around the tunnel. Freezing on VPN protects nothing here and only silences the apps.</string>
+    <string name="settings_anti_spy_routing_bypass">The profile traffic goes outside the tunnel -- VPN freezing hides nothing here.</string>
     <string name="settings_anti_spy_routing_in_tunnel">Measured now: work profile traffic goes through the tunnel.</string>
     <string name="settings_anti_spy_routing_vpn_down">No tunnel is up. Turn the VPN on and open this screen again to get an answer.</string>
     <string name="settings_anti_spy_routing_unknown">The work profile did not answer, nothing to measure.</string>
@@ -230,7 +230,7 @@
     <string name="install_unknown_sources_message">Android requires a one-time permission before Gatekeeper can install apps into the work profile. Enable \"Allow from this source\" in the screen that opens, then start the clone again.</string>
     <string name="install_unknown_sources_open">Open settings</string>
     <string name="settings_media_mirror">Copy work photos to the gallery</string>
-    <string name="settings_media_mirror_desc">Copies new screenshots (Pictures/Screenshots) and camera photos and videos (DCIM/Camera) from the work profile into the personal gallery. Runs on every File Shuttle connection, for example when Files is opened. The originals stay in the work profile. Only these two folders are copied; nothing else leaves the profile.</string>
+    <string name="settings_media_mirror_desc">Copies new screenshots and camera photos and videos from the profile into your personal gallery. Originals stay in the profile.</string>
     <string name="uninstall_fail_system_app">Cannot uninstall system apps in a profile that Gatekeeper has no control of.</string>
     <string name="unsupported_launcher">Cannot add shortcuts to your launcher. Please contact the developer for more information.</string>
     <string name="app_context_menu_title">Operations for %s</string>
@@ -281,7 +281,7 @@
     <!-- Root CA certificates for the work profile (docs/feature_ca_certs.md) -->
     <string name="settings_ca_category">Root certificates</string>
     <string name="settings_ca_install">Install root certificate…</string>
-    <string name="settings_ca_install_desc">Install a root CA (for example, the Russian Ministry of Digital Development root) into the work profile only: government sites will then open in browsers inside the profile. Most apps do not trust user-installed CAs since Android 7, and the personal profile is never touched. Android will show a persistent \"network may be monitored\" notice; that is expected.</string>
+    <string name="settings_ca_install_desc">Installs a root certificate into the work profile only -- its browsers will open sites that need it. Apps do not trust user certificates (Android 7+).</string>
     <string name="settings_ca_installed">Installed certificates</string>
     <string name="settings_ca_installed_desc">Root certificates installed in the work profile. Tap to review or remove.</string>
     <string name="ca_install_title">Install certificate?</string>
@@ -349,12 +349,12 @@
     <string name="settings_contacts_group_closed">Hiding profile contacts</string>
     <string name="settings_contacts_group_share">Passing contacts into the profile</string>
     <string name="settings_contacts_share_vcard">Send single contacts as a file</string>
-    <string name="settings_contacts_share_vcard_desc">Share a contact from the personal Contacts app, pick the work profile, and it lands in the clone. Only the contacts you picked cross the border.</string>
+    <string name="settings_contacts_share_vcard_desc">Share a contact from personal Contacts to the work profile. Only the contact you pick crosses over.</string>
     <string name="settings_contacts_share_account">Add an account inside the profile</string>
-    <string name="settings_contacts_share_account_desc">A Google or Exchange account added in the work profile brings its whole address book with it. Convenient, and the opposite of selective: the account owner sees the profile too.</string>
+    <string name="settings_contacts_share_account_desc">A Google or Exchange account in the work profile brings its whole address book -- and the account owner sees it.</string>
     <!-- Link rules screen (H2) -->
     <string name="settings_links_warning">The work browser will see these links</string>
-    <string name="settings_links_warning_desc">Every http(s) link matching a domain below opens in the work profile, whether you followed it from a work app or from a personal chat. A rule covers the domain and all its subdomains.</string>
+    <string name="settings_links_warning_desc">A link to a listed domain opens in the work profile -- both from a work app and from a personal chat. Subdomains count too.</string>
     <string name="settings_links_list_title">Domains</string>
     <string name="settings_links_add">Add domains</string>
     <string name="settings_links_add_desc">Several, comma separated: example.com, *.wikipedia.org, .ru</string>
@@ -391,9 +391,9 @@
         <item quantity="other">Open for %1$d apps</item>
     </plurals>
     <string name="settings_bridges_widgets_title">Widgets on the personal home screen</string>
-    <string name="settings_bridges_widgets_desc">An app allowed here can put its work-profile widget on your personal home screen. The widget shows work data outside the profile, and freezing the app blanks it.</string>
+    <string name="settings_bridges_widgets_desc">The app may place its work-profile widget on the personal home screen. Freezing the app blanks it.</string>
     <string name="settings_bridges_interaction_title">Talking to its own copy</string>
-    <string name="settings_bridges_interaction_desc">An app allowed here may exchange data with its copy in the other profile: the two copies stop being strangers. Android 11 and newer.</string>
+    <string name="settings_bridges_interaction_desc">The two copies of an app in different profiles may exchange data. Android 11+.</string>
     <string name="settings_bridges_no_apps">No apps of your own in the profile yet</string>
     <string name="settings_bridges_unavailable">The work profile is not responding right now</string>
     <string name="settings_bridges_failed">The work profile refused that change</string>
@@ -450,17 +450,17 @@
     <string name="settings_backup_group_scope">What the file holds</string>
     <string name="settings_backup_group_actions">Actions</string>
     <string name="settings_backup_contains">Inside</string>
-    <string name="settings_backup_contains_desc">Gatekeeper settings, the package names of both profiles and the auto-freeze list, as plain JSON you can read yourself.</string>
+    <string name="settings_backup_contains_desc">Settings, package names of both profiles and the auto-freeze list. Plain JSON.</string>
     <string name="settings_backup_excludes">Not included in the file</string>
-    <string name="settings_backup_excludes_desc">No app data, no APKs, no accounts, no certificates. Restoring reinstalls the work apps from the personal profile as fresh copies: their logins and chats do not come back. The work profile itself is not restored either, and neither is the profile key.</string>
+    <string name="settings_backup_excludes_desc">No app data, APKs, accounts or certificates. A restore reinstalls the apps fresh -- logins and chats do not come back.</string>
     <!-- Files screen (G7): why the system share sheet cannot do this -->
     <string name="settings_files_why">Why the system Share does not help</string>
-    <string name="settings_files_why_desc">A work profile is a separate Android user. Apps on one side cannot see the other side\'s storage at all, so the system share sheet has nothing to offer: the profiles are not neighbouring folders, they are different users of the same phone.</string>
+    <string name="settings_files_why_desc">Profiles are separate Android users and their storage cannot see each other, so the system Share sheet has nothing to offer between them.</string>
     <string name="settings_files_how">Moving a file</string>
-    <string name="settings_files_how_desc">Open the file picker from the app that needs the file and choose Gatekeeper as the source: the other profile shows up there. Or use the transfer button on the top bar of the app list. The receiving app gets access to that one file and nothing else.</string>
+    <string name="settings_files_how_desc">In the receiving app open the file picker and choose Gatekeeper as the source -- the other profile appears. Access is to that one file.</string>
     <!-- Certificates screen (G7) -->
     <string name="settings_ca_scope">Work profile only</string>
-    <string name="settings_ca_scope_desc">A root CA installed here is trusted by browsers inside the profile. Most apps ignore user-installed CAs since Android 7, and the personal profile is never touched. Android will show a permanent \"network may be monitored\" notice in the profile.</string>
+    <string name="settings_ca_scope_desc">Browsers in the profile trust the certificate, apps do not (since Android 7). The personal profile is untouched.</string>
     <string name="settings_ca_list_title">Installed</string>
     <string name="settings_ca_install_short">Pick a .crt or .pem file; the fingerprint is shown before anything is installed</string>
     <!-- Always-on VPN for the profile (C6) -->
@@ -469,7 +469,7 @@
     <string name="settings_alwayson_app">VPN app of the profile</string>
     <string name="settings_alwayson_none">Not pinned: profile traffic goes wherever the system sends it</string>
     <string name="settings_alwayson_lockdown">Block traffic outside the tunnel</string>
-    <string name="settings_alwayson_lockdown_desc">While the tunnel is down, work apps get no network at all. That is the point: no leak into the open internet, but also no connection until the VPN comes back.</string>
+    <string name="settings_alwayson_lockdown_desc">Until the tunnel is up, work apps have no network at all -- no leaks around the VPN, but no connection either.</string>
     <string name="settings_alwayson_no_apps">No app inside the profile can act as a VPN</string>
     <string name="settings_alwayson_unavailable">The work profile is not responding right now</string>
     <string name="settings_alwayson_failed">The profile refused to pin that VPN: %1$s</string>
@@ -500,7 +500,7 @@
     <string name="file_shuttle_notice_title">Connect to the other profile?</string>
     <string name="file_shuttle_notice_text">A file manager asked for files from the other profile. Tap to open the link, then repeat the action there.</string>
     <string name="settings_files_manager">Browsing from a file manager</string>
-    <string name="settings_files_manager_desc">A file manager that can add a storage location through the system picker (MiXplorer, Total Commander) keeps access to the other profile permanently: add the location, pick Gatekeeper, and it stays in its list. The first time it opens the folder after an idle spell, the link is down and it reports no access - a notification then offers to raise the link, and repeating the action inside the file manager works.</string>
+    <string name="settings_files_manager_desc">Gives a file manager (MiXplorer, Total Commander) lasting access to the other profile: add storage and pick Gatekeeper.</string>
     <!-- Profile isolation: presets and the individual policies -->
     <string name="settings_root_isolation">Profile isolation</string>
     <string name="settings_root_isolation_desc">The isolation level and the individual blocks</string>
@@ -569,7 +569,7 @@
     <string name="isolation_setup_advanced">Advanced settings</string>
     <string name="isolation_setup_done">Done</string>
     <string name="settings_anti_spy_what">How this works</string>
-    <string name="settings_anti_spy_what_desc">An app inside the profile can see that a VPN is up on the phone, even when the tunnel runs only in the personal part. Where the tunnel leads stays hidden: the routing table and connection list are closed to it. The VPN being up on an Android device cannot be hidden.\n\nThe watch follows the VPN state and freezes the chosen profile apps when it goes up or down: an app that must not observe a network change is kept from running at that moment.</string>
+    <string name="settings_anti_spy_what_desc">Freezes the chosen profile apps when a VPN turns on or off, so they cannot notice the network change. The app cannot see where the tunnel goes, but Android cannot hide that a VPN exists.</string>
     <string name="main_add_app">Add app</string>
     <string name="main_pick_app_title">Pick an app</string>
     <string name="app_list_empty_work">No apps in the work profile yet.\n\nTap \"Add\" below to install an app here from the personal profile.</string>
