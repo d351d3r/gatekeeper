@@ -15,6 +15,7 @@ import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.Notifications
 import io.gatekeeper.util.StatusNotification
 import io.gatekeeper.util.Utility
+import io.gatekeeper.util.WorkProfilePolicy
 
 class GatekeeperDeviceAdminReceiver : DeviceAdminReceiver() {
     override fun onProfileProvisioningComplete(context: Context, intent: Intent) {
@@ -37,6 +38,15 @@ class GatekeeperDeviceAdminReceiver : DeviceAdminReceiver() {
             )
             manager?.setProfileEnabled(admin)
         }.onFailure { Log.w(TAG, "setProfileEnabled on provisioning complete failed", it) }
+
+        // Кросс-профильные фильтры реле регистрируем здесь же, а не только в
+        // activity-цепочке: её убивает тот же ресайкл процесса ("change io.gatekeeper"),
+        // и без фильтров личная сторона не резолвит TRY_START_SERVICE ("no system
+        // forwarder") -- экран завершения висит вечно, хотя профиль уже включён.
+        // Этот callback доставляется надёжно, поэтому реле поднимается до убийства.
+        runCatching {
+            WorkProfilePolicy.enforceWorkProfilePolicies(context.applicationContext)
+        }.onFailure { Log.w(TAG, "enforceWorkProfilePolicies on provisioning complete failed", it) }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) return
         val i = Intent(context.applicationContext, DummyActivity::class.java)

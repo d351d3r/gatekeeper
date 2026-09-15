@@ -40,6 +40,12 @@ jobs:
           java-version: 17
 
       - uses: android-actions/setup-android@v4
+        continue-on-error: true
+
+      # Раннер иногда приезжает с cmdline-tools, на которых setup-android падает на
+      # приёме лицензий. SDK предустановлен -- принимаем лицензии напрямую.
+      - name: Accept Android SDK licenses
+        run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null 2>&1 || true
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew

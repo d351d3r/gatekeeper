@@ -23,6 +23,13 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
+        continue-on-error: true
+
+      # Раннер GitHub иногда приезжает с cmdline-tools, на которых setup-android
+      # спотыкается о приём лицензий (exit 1, "licenses not accepted"). SDK при этом
+      # предустановлен и рабочий -- принимаем лицензии напрямую, чтобы сборка не падала.
+      - name: Accept Android SDK licenses
+        run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null 2>&1 || true
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -60,6 +67,10 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
+        continue-on-error: true
+
+      - name: Accept Android SDK licenses
+        run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null 2>&1 || true
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
