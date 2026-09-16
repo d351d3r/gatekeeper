@@ -71,6 +71,17 @@ class SettingsManager private constructor(context: Context) {
     fun getCrossProfileFileChooserEnabled(): Boolean =
         storage.getBoolean(LocalStorageManager.PREF_CROSS_PROFILE_FILE_CHOOSER)
 
+    fun setCrossProfileContentAccessEnabled(enabled: Boolean) {
+        storage.setBooleanNow(LocalStorageManager.PREF_CROSS_PROFILE_CONTENT_ACCESS, enabled)
+        syncSettingsToProfileBool(
+            LocalStorageManager.PREF_CROSS_PROFILE_CONTENT_ACCESS,
+            enabled,
+        )
+    }
+
+    fun getCrossProfileContentAccessEnabled(): Boolean =
+        storage.getBoolean(LocalStorageManager.PREF_CROSS_PROFILE_CONTENT_ACCESS)
+
     fun setCrossProfileInteractionAllEnabled(enabled: Boolean) {
         storage.setBooleanNow(LocalStorageManager.PREF_CROSS_PROFILE_INTERACTION_ALL, enabled)
         syncSettingsToProfileBool(

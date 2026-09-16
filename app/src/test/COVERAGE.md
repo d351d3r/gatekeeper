@@ -41,12 +41,12 @@ Service — только wiring, без ветвлений, достойных �
 
 | Модуль | Тест | Что проверяется |
 |---|---|---|
-| `CrossProfileDocumentsProvider` | DocumentsProviderTest | A3: корни/листинг/чтение через шаттл |
+| `CrossProfileDocumentsProvider`, `FileShuttleExternalBrowser` | DocumentsProviderTest | A3: корни/листинг/чтение через шаттл; временная выдача корня внешнему проводнику |
 | `FileShuttleService` | FileShuttleForegroundTest | foreground-сессия, сроки жизни |
 | `AntiSpyVpnWatchService` | AntiSpyVpnWatchTest | сторож VPN в отдельном процессе |
 | `AuthenticationUtility` | AuthenticationBootstrapTest | bootstrap авторизации на устройстве |
 | `Utility.createLauncherShortcut` | BatchShortcutIconTest | A2: иконка ярлыка — растр, без падения на requestPinShortcut |
-| `ProfileForwarder` (разрешение) | ForwarderResolutionTest | разрешение реле на устройстве |
+| `ProfileForwarder` (разрешение) | ForwarderResolutionTest | разрешение реле и системного доступа к контенту на устройстве |
 | `ServiceLiveness` | ServiceLivenessTest | живость binder-ов обоих сервисов |
 | среда | EnvironmentTest, TestProfiles, ImpostorRelayActivity | предусловия и фикстуры профиля |
 

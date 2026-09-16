@@ -1,8 +1,11 @@
 package io.gatekeeper
 
 import android.content.Intent
+import android.net.Uri
 import android.os.SystemClock
+import android.provider.MediaStore
 import io.gatekeeper.ui.DummyActivity
+import io.gatekeeper.util.SettingsManager
 import io.gatekeeper.util.Utility
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -61,6 +64,29 @@ class ForwarderResolutionTest {
         )
     }
 
+    @Test
+    fun contentAccessAddsWorkProfileForwarders() {
+        val settings = SettingsManager.getInstance()
+        val previous = settings.getCrossProfileContentAccessEnabled()
+        try {
+            settings.setCrossProfileContentAccessEnabled(true)
+
+            val photoPicker = Intent(MediaStore.ACTION_PICK_IMAGES).setType("image/*")
+            waitForSystemForwarder(photoPicker)
+
+            val apk = Intent(Intent.ACTION_VIEW).apply {
+                addCategory(Intent.CATEGORY_DEFAULT)
+                setDataAndType(
+                    Uri.parse("content://io.gatekeeper.test/download.apk"),
+                    "application/vnd.android.package-archive",
+                )
+            }
+            waitForSystemForwarder(apk)
+        } finally {
+            settings.setCrossProfileContentAccessEnabled(previous)
+        }
+    }
+
     /** An APK update cannot alter profile-owner policy until its work-profile process runs. */
     private fun refreshWorkProfilePolicies() {
         val refresh = Intent(DummyActivity.TRY_START_SERVICE).apply {
@@ -76,6 +102,17 @@ class ForwarderResolutionTest {
             SystemClock.sleep(100)
         }
         throw AssertionError("обновленные политики рабочего профиля не применились")
+    }
+
+    private fun waitForSystemForwarder(intent: Intent) {
+        repeat(30) {
+            val hasSystemForwarder = context.packageManager
+                .queryIntentActivities(intent, 0)
+                .any { it.activityInfo.packageName == "android" }
+            if (hasSystemForwarder) return
+            SystemClock.sleep(100)
+        }
+        throw AssertionError("системный форвардер не появился для ${intent.action}")
     }
 
     /** Действие, которого нет ни у форвардера, ни у нас, резолва не имеет вовсе. */

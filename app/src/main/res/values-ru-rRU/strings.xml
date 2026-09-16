@@ -157,6 +157,14 @@
     <string name="batch_operation">Выбрать несколько</string>
     <string name="show_all">Все приложения</string>
     <string name="settings_cross_profile_file_chooser">Перенос файлов</string>
+    <string name="settings_external_file_manager">Открыть во внешнем проводнике</string>
+    <string name="settings_external_file_manager_desc">Открывает другой профиль напрямую в совместимом проводнике</string>
+    <string name="external_file_manager_choose">Выберите проводник</string>
+    <string name="external_file_manager_confirm_title">Открыть в %1$s?</string>
+    <string name="external_file_manager_confirm_message">Выбранный проводник временно получит доступ на чтение и запись ко всем файлам, доступным через перенос файлов в другом профиле. Доступ действует, пока открыта его задача.</string>
+    <string name="external_file_manager_open">Открыть</string>
+    <string name="external_file_manager_unavailable">Совместимый внешний проводник не установлен.</string>
+    <string name="settings_cross_profile_content_access">Системный доступ к контенту между профилями</string>
     <string name="documents_ui">Открыть проводник</string>
     <string name="settings_interaction">Взаимодействие</string>
     <string name="settings_auto_freeze_service">Заморозка при блокировке экрана</string>
@@ -204,6 +212,7 @@
     <string name="settings_block_caller_id">Скрыть имя звонящего из профиля</string>
     <string name="settings_block_caller_id_desc">Звонок с номера из рабочего профиля в личном журнале останется без имени.</string>
     <string name="settings_cross_profile_file_chooser_desc">Другой профиль появляется источником в выборе файла. Границу пересекает только выбранный файл.</string>
+    <string name="settings_cross_profile_content_access_desc">Разрешает системному открытию файлов и выбору фото переключаться между личным и рабочим профилями. Выбранные файлы, фото, видео и APK могут пересекать границу профилей.</string>
     <string name="show_all_warning">Управление скрытыми в списке приложениями может привести к разного рода нестабильностям и сбоям, однако эта функция может оказаться полезной в случаях, когда в некачественно настроенных производителем прошивках не включены все необходимые системные приложения в рабочем профиле по умолчанию. Продолжайте на свой страх и риск.</string>
     <string name="settings_dont_freeze_foreground">Пропускать активные приложения</string>
     <string name="settings_dont_freeze_foreground_desc">Не морозить приложение на переднем плане при блокировке экрана. Для плееров и подобного.</string>

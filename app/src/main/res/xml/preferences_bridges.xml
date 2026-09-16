@@ -3,6 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="settings_bridges_interaction_all"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_bridges_interaction_all"
+        android:summary="@string/settings_bridges_interaction_all_desc" />
+
     <androidx.preference.PreferenceCategory
         android:key="settings_bridges_widgets"
         app:iconSpaceReserved="false"
@@ -15,12 +21,6 @@
             android:summary="@string/settings_bridges_widgets_desc" />
 
     </androidx.preference.PreferenceCategory>
-
-    <androidx.preference.SwitchPreferenceCompat
-        android:key="settings_bridges_interaction_all"
-        app:iconSpaceReserved="false"
-        android:title="@string/settings_bridges_interaction_all"
-        android:summary="@string/settings_bridges_interaction_all_desc" />
 
     <androidx.preference.PreferenceCategory
         android:key="settings_bridges_interaction"

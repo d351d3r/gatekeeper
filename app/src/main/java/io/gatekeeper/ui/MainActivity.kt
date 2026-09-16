@@ -67,6 +67,7 @@ import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.AutoFreezeDefaults
 import io.gatekeeper.util.BackupPayload
 import io.gatekeeper.util.FileShuttleConnection
+import io.gatekeeper.util.FileShuttleExternalBrowser
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.PairingCode
 import io.gatekeeper.util.ProfileActions
@@ -149,6 +150,9 @@ class MainActivity : AppCompatActivity() {
     private var pendingBindFailureReason = 0
     private var retryStartupProbeAfterFailure = false
     private var pendingDocumentsUi = false
+    private var documentsUiReady = false
+    private var pendingDocumentsRoot = false
+    private var finishAfterDocumentsUi = false
     private var mainAppListFragment: AppListFragment? = null
     private var workAppListFragment: AppListFragment? = null
 
@@ -228,6 +232,7 @@ class MainActivity : AppCompatActivity() {
             )
 
         init()
+        handleExternalDocumentsLaunch(intent, launchedFromPackageCompat())
     }
 
     private fun finishIfBackgroundShortcutLaunch(intent: Intent?): Boolean {
@@ -281,8 +286,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        val callerPackage = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            runCatching { currentCaller.getPackage() }.getOrNull()
+        } else {
+            null
+        }
         setIntent(intent)
         batchShortcutFlow.handleShortcutIntent(intent)
+        handleExternalDocumentsLaunch(intent, callerPackage ?: launchedFromPackageCompat())
     }
 
     private fun setupWizardCb(result: Boolean) {
@@ -767,10 +778,8 @@ class MainActivity : AppCompatActivity() {
             retryStartupProbeAfterFailure = false
             showWorkServiceBindFailed(reason, retryStartupProbe)
         }
-        if (pendingDocumentsUi) {
-            pendingDocumentsUi = false
-            window.decorView.removeCallbacks(documentsUiWarmUpTimeout)
-            openDocumentsUi()
+        if (pendingDocumentsUi && documentsUiReady) {
+            openPendingDocumentsUi()
         }
         if (serviceMain != null && serviceWork != null && !servicesAlive()) {
             doOnDestroy()
@@ -791,7 +800,9 @@ class MainActivity : AppCompatActivity() {
         // Реле и его activity прозрачные, onStop при прогреве не приходит. Если он пришел,
         // пользователь ушел из приложения -- проводник по возвращении открывать нельзя.
         pendingDocumentsUi = false
-        window.decorView.removeCallbacks(documentsUiWarmUpTimeout)
+        documentsUiReady = false
+        pendingDocumentsRoot = false
+        finishAfterDocumentsUi = false
         super.onStop()
     }
 
@@ -1059,34 +1070,101 @@ class MainActivity : AppCompatActivity() {
     /**
      * Прогрев связи с файловым шаттлом перед проводником. Открывать DocumentsUI сразу после
      * [FileShuttleConnection.requestBind] нельзя: запуск сносит с экрана кросс-профильное реле,
-     * и привязка не доезжает (замер Фазы 3). Поэтому проводник открывается после возврата реле,
-     * из [onResume]; запасной путь по таймауту нужен там, где реле не поднималось вовсе,
-     * иначе пункт меню молча ничего не сделает.
+     * и привязка не доезжает (замер Фазы 3). Поэтому ждем реальный биндер и открываем
+     * проводник только после его получения и возврата activity в RESUMED.
      */
-    private fun openDocumentsUiAfterWarmUp() {
-        val warmingUp = SettingsManager.getInstance().getCrossProfileFileChooserEnabled() &&
-            FileShuttleConnection.peek() == null &&
-            FileShuttleConnection.requestBind(this)
-        if (!warmingUp) {
-            openDocumentsUi()
+    private fun openDocumentsUiAfterWarmUp(
+        openRoot: Boolean = false,
+        finishAfterOpen: Boolean = false,
+    ) {
+        if (!SettingsManager.getInstance().getCrossProfileFileChooserEnabled() ||
+            FileShuttleConnection.peek() != null
+        ) {
+            openDocumentsUi(openRoot)
+            if (finishAfterOpen) finish()
+            return
+        }
+        if (!FileShuttleConnection.requestBind(this)) {
+            GatekeeperToast.show(this, R.string.file_shuttle_unavailable)
+            if (finishAfterOpen) finish()
             return
         }
         pendingDocumentsUi = true
-        window.decorView.postDelayed(documentsUiWarmUpTimeout, DOCUMENTS_UI_WARMUP_MS)
+        documentsUiReady = false
+        pendingDocumentsRoot = openRoot
+        finishAfterDocumentsUi = finishAfterOpen
+        Thread {
+            val connected = FileShuttleConnection.awaitBinder(
+                FileShuttleConnection.BIND_TIMEOUT_MS,
+            ) != null
+            runOnUiThread {
+                if (!pendingDocumentsUi) return@runOnUiThread
+                if (!connected) {
+                    val finishAfterFailure = finishAfterDocumentsUi
+                    pendingDocumentsUi = false
+                    documentsUiReady = false
+                    pendingDocumentsRoot = false
+                    finishAfterDocumentsUi = false
+                    GatekeeperToast.show(this, R.string.file_shuttle_unavailable)
+                    if (finishAfterFailure) finish()
+                    return@runOnUiThread
+                }
+                documentsUiReady = true
+                if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                    openPendingDocumentsUi()
+                }
+            }
+        }.start()
     }
 
-    private val documentsUiWarmUpTimeout = Runnable {
-        if (pendingDocumentsUi && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-            pendingDocumentsUi = false
-            openDocumentsUi()
+    private fun openPendingDocumentsUi() {
+        val openRoot = pendingDocumentsRoot
+        val finishAfterOpen = finishAfterDocumentsUi
+        pendingDocumentsUi = false
+        documentsUiReady = false
+        pendingDocumentsRoot = false
+        finishAfterDocumentsUi = false
+        openDocumentsUi(openRoot)
+        if (finishAfterOpen) finish()
+    }
+
+    private fun openDocumentsUi(openRoot: Boolean = false) {
+        val documentsIntent = if (openRoot) {
+            FileShuttleExternalBrowser.documentsRootIntent(this)
+        } else {
+            Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(null, "vnd.android.document/root")
+            }
         }
+        startActivity(documentsIntent)
     }
 
-    private fun openDocumentsUi() {
-        startActivity(Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(null, "vnd.android.document/root")
-        })
+    private fun handleExternalDocumentsLaunch(intent: Intent?, callerPackage: String?) {
+        if (!isGoogleFilesLauncherIntent(intent, callerPackage)) return
+        if (!SettingsManager.getInstance().getCrossProfileFileChooserEnabled()) {
+            openFileShuttleEntry()
+            return
+        }
+        openDocumentsUiAfterWarmUp(openRoot = true, finishAfterOpen = true)
     }
+
+    private fun isGoogleFilesLauncherIntent(intent: Intent?, callerPackage: String?): Boolean =
+        listOf(
+            intent?.action == Intent.ACTION_MAIN,
+            intent?.hasCategory(Intent.CATEGORY_LAUNCHER) == true,
+            FileShuttleExternalBrowser.isGoogleFiles(callerPackage),
+            storage?.getBoolean(LocalStorageManager.PREF_HAS_SETUP) == true,
+        ).all { it }
+
+    private fun launchedFromPackageCompat(): String? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            launchedFromPackage ?: referrerPackage()
+        } else {
+            referrerPackage()
+        }
+
+    private fun referrerPackage(): String? =
+        referrer?.takeIf { it.scheme == "android-app" }?.host
 
     /**
      * C3: вход в шаттл с верхней панели, а не из глубины меню. Если
@@ -1220,7 +1298,5 @@ class MainActivity : AppCompatActivity() {
         private const val APP_LIST_INSTALL_REFRESH_MS = 2000L
         private const val POWER_DIAGNOSTICS_PROMPT_INTERVAL_MS = 24L * 60L * 60L * 1000L
 
-        /** Сквозной путь привязки шаттла -- ~300 мс (замер Фазы 1); ждем с запасом. */
-        private const val DOCUMENTS_UI_WARMUP_MS = 1500L
     }
 }

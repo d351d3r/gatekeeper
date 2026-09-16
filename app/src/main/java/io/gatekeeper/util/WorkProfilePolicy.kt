@@ -29,6 +29,8 @@ private const val TO_PARENT = DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT
  *  ForwardIntentToParent в рабочем профиле. Имя флага обратно смыслу. */
 private const val TO_WORK = DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED
 
+private const val ACTION_PICK_IMAGES = "android.provider.action.PICK_IMAGES"
+
 /**
  * Служебные фильтры релея: action -> направление. Единая таблица вместо
  * ~30 повторных вызовов addCrossProfileIntentFilter. Направление не всегда
@@ -108,6 +110,50 @@ private fun actionSendFilter(): IntentFilter = IntentFilter().apply {
     addCategory(Intent.CATEGORY_DEFAULT)
 }
 
+private fun contentViewFilter(): IntentFilter = IntentFilter().apply {
+    addAction(Intent.ACTION_VIEW)
+    addAction(Intent.ACTION_EDIT)
+    addAction(Intent.ACTION_PICK)
+    addCategory(Intent.CATEGORY_DEFAULT)
+    addCategory(Intent.CATEGORY_BROWSABLE)
+    addDataScheme("content")
+    try {
+        addDataType("*/*")
+    } catch (_: IntentFilter.MalformedMimeTypeException) {
+    }
+}
+
+private fun contentSelectionFilter(): IntentFilter = IntentFilter().apply {
+    addAction(Intent.ACTION_GET_CONTENT)
+    addAction(Intent.ACTION_OPEN_DOCUMENT)
+    addAction(Intent.ACTION_CREATE_DOCUMENT)
+    addCategory(Intent.CATEGORY_DEFAULT)
+    addCategory(Intent.CATEGORY_OPENABLE)
+    try {
+        addDataType("*/*")
+    } catch (_: IntentFilter.MalformedMimeTypeException) {
+    }
+}
+
+private fun documentTreeFilter(): IntentFilter = IntentFilter(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+    addCategory(Intent.CATEGORY_DEFAULT)
+}
+
+private fun photoPickerFilter(): IntentFilter = IntentFilter(ACTION_PICK_IMAGES).apply {
+    addCategory(Intent.CATEGORY_DEFAULT)
+    try {
+        addDataType("*/*")
+    } catch (_: IntentFilter.MalformedMimeTypeException) {
+    }
+}
+
+private fun crossProfileContentFilters(): List<IntentFilter> = listOf(
+    contentViewFilter(),
+    contentSelectionFilter(),
+    documentTreeFilter(),
+    photoPickerFilter(),
+)
+
 private fun browsableFilter(withDefaultCategory: Boolean): IntentFilter =
     IntentFilter(Intent.ACTION_VIEW).apply {
         addCategory(Intent.CATEGORY_BROWSABLE)
@@ -181,6 +227,12 @@ object WorkProfilePolicy {
         // доступ к рабочим файлам не открывается -- добавляется лишь форвард шары.
         if (SettingsManager.getInstance().getShareWorkToPersonalEnabled()) {
             manager.addCrossProfileIntentFilter(adminComponent, actionSendFilter(), TO_PARENT)
+        }
+        if (SettingsManager.getInstance().getCrossProfileContentAccessEnabled()) {
+            for (filter in crossProfileContentFilters()) {
+                manager.addCrossProfileIntentFilter(adminComponent, filter, TO_WORK)
+                manager.addCrossProfileIntentFilter(adminComponent, filter, TO_PARENT)
+            }
         }
         manager.addCrossProfileIntentFilter(
             adminComponent,

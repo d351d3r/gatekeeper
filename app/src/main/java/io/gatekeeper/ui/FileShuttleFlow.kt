@@ -22,13 +22,23 @@ import io.gatekeeper.util.Utility
  * в запросивший процесс. Вынесено из DummyActivity.
  */
 class FileShuttleFlow(private val activity: DummyActivity) {
+    private var pendingCallback: IFileShuttleServiceCallback? = null
 
     fun handleStartFileShuttle() {
+        val callback = IFileShuttleServiceCallback.Stub.asInterface(
+            activity.intent.getBundleExtra(EXTRA)?.getBinder(CALLBACK),
+        )
+        if (callback == null) {
+            Log.w(TAG, "file shuttle refused: callback is missing")
+            activity.finish()
+            return
+        }
+        pendingCallback = callback
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             if (activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED
             ) {
-                doStartFileShuttle()
+                doStartFileShuttle(callback)
             } else {
                 activity.requestPermissions(
                     arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
@@ -39,7 +49,7 @@ class FileShuttleFlow(private val activity: DummyActivity) {
             // "Поверх других приложений" здесь больше не нужно: шаттл запрашивают только
             // видимые activity, фонового старта в этом пути не осталось.
             if (Utility.checkAllFileAccessPermission()) {
-                doStartFileShuttle()
+                doStartFileShuttle(callback)
             } else {
                 Log.w(TAG, "file shuttle refused: no all-files access in this profile")
                 activity.finish()
@@ -49,24 +59,25 @@ class FileShuttleFlow(private val activity: DummyActivity) {
 
     /** Ветка REQUEST_EXTERNAL_STORAGE из onRequestPermissionsResult. */
     fun onStoragePermissionResult(granted: Boolean) {
-        if (granted) {
-            doStartFileShuttle()
+        val callback = pendingCallback
+        if (granted && callback != null) {
+            doStartFileShuttle(callback)
         } else {
             activity.finish()
         }
     }
 
-    private fun doStartFileShuttle() {
+    private fun doStartFileShuttle(callback: IFileShuttleServiceCallback) {
         (activity.application as GatekeeperApplication).bindFileShuttleService(
             object : ServiceConnection {
                 override fun onServiceConnected(name: ComponentName, service: IBinder) {
                     val shuttle = IFileShuttleService.Stub.asInterface(service)
-                    val callback = IFileShuttleServiceCallback.Stub.asInterface(
-                        activity.intent.getBundleExtra("extra")!!.getBinder("callback")
-                    )
                     try {
                         callback.callback(shuttle)
                     } catch (_: RemoteException) {
+                    }
+                    if (pendingCallback?.asBinder() === callback.asBinder()) {
+                        pendingCallback = null
                     }
                     activity.finish()
                 }
@@ -80,6 +91,8 @@ class FileShuttleFlow(private val activity: DummyActivity) {
 
     companion object {
         private const val TAG = "FileShuttleFlow"
+        private const val EXTRA = "extra"
+        private const val CALLBACK = "callback"
         internal const val REQUEST_EXTERNAL_STORAGE = 2
     }
 }

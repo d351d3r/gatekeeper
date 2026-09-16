@@ -16,6 +16,19 @@
         android:title="@string/settings_cross_profile_file_chooser"
         android:summary="@string/settings_cross_profile_file_chooser_desc" />
 
+    <androidx.preference.Preference
+        android:dependency="settings_cross_profile_file_chooser"
+        android:key="settings_external_file_manager"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_external_file_manager"
+        android:summary="@string/settings_external_file_manager_desc" />
+
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="settings_cross_profile_content_access"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_cross_profile_content_access"
+        android:summary="@string/settings_cross_profile_content_access_desc" />
+
     <androidx.preference.SwitchPreferenceCompat
         android:dependency="settings_cross_profile_file_chooser"
         android:key="settings_media_mirror"

@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.RemoteException
 import android.provider.Settings
+import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import io.gatekeeper.R
 import io.gatekeeper.util.LocalStorageManager
@@ -15,9 +16,21 @@ class FilesSettingsFragment : SettingsSubFragment() {
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_files)
         bindFileChooser()
+        bindExternalFileManager()
+        bindCrossProfileContentAccess()
         bindMediaMirror()
         bindShareWorkToPersonal()
         applyPlatformRestrictions()
+    }
+
+    private fun bindCrossProfileContentAccess() {
+        val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_CROSS_PROFILE_CONTENT_ACCESS)
+            ?: return
+        pref.isChecked = manager.getCrossProfileContentAccessEnabled()
+        pref.setOnPreferenceChangeListener { _, newState ->
+            manager.setCrossProfileContentAccessEnabled(newState as Boolean)
+            true
+        }
     }
 
     private fun bindShareWorkToPersonal() {
@@ -35,6 +48,14 @@ class FilesSettingsFragment : SettingsSubFragment() {
         pref.isChecked = manager.getCrossProfileFileChooserEnabled()
         pref.setOnPreferenceChangeListener { _, newState ->
             onFileChooserChange(newState as Boolean)
+        }
+    }
+
+    private fun bindExternalFileManager() {
+        val pref = findPreference<Preference>(SETTINGS_EXTERNAL_FILE_MANAGER) ?: return
+        pref.setOnPreferenceClickListener {
+            ExternalFileManagerFlow(this).show()
+            true
         }
     }
 
@@ -83,6 +104,9 @@ class FilesSettingsFragment : SettingsSubFragment() {
 
     companion object {
         private const val SETTINGS_CROSS_PROFILE_FILE_CHOOSER = "settings_cross_profile_file_chooser"
+        private const val SETTINGS_CROSS_PROFILE_CONTENT_ACCESS =
+            "settings_cross_profile_content_access"
+        private const val SETTINGS_EXTERNAL_FILE_MANAGER = "settings_external_file_manager"
         private const val SETTINGS_MEDIA_MIRROR = "settings_media_mirror"
         private const val SETTINGS_SHARE_WORK_TO_PERSONAL = "settings_share_work_to_personal"
     }

@@ -38,6 +38,9 @@
 
     <!-- For querying apps on Android R and later -->
     <queries>
+        <package android:name="com.google.android.documentsui" />
+        <package android:name="com.android.documentsui" />
+        <package android:name="com.google.android.go.documentsui" />
         <intent>
             <action android:name="android.intent.action.MAIN"/>
         </intent>

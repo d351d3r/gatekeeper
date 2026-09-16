@@ -15,6 +15,7 @@ import io.gatekeeper.services.FileShuttleService
 import io.gatekeeper.services.IFileShuttleService
 import io.gatekeeper.util.CrossProfileDocumentsProvider
 import io.gatekeeper.util.FileShuttleConnection
+import io.gatekeeper.util.FileShuttleExternalBrowser
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -75,6 +76,49 @@ class DocumentsProviderTest {
         val cursor = failFast { resolver.query(DocumentsContract.buildRootsUri(AUTHORITY), null, null, null) }
         assertNotNull("queryRoots вернул null", cursor)
         cursor!!.use { assertEquals(1, it.count) }
+    }
+
+    @Test
+    fun externalBrowserIntent_grantsRootWithoutPersistentAccess() {
+        val component = ComponentName("com.example.files", "com.example.files.BrowseActivity")
+        val intent = FileShuttleExternalBrowser.browseIntent(component)
+        val expectedFlags = android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or
+            android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+            android.content.Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
+
+        assertEquals(component, intent.component)
+        assertEquals(android.content.Intent.ACTION_VIEW, intent.action)
+        assertEquals("resource/folder", intent.type)
+        val treeUri = DocumentsContract.buildTreeDocumentUri(AUTHORITY, ROOT)
+        assertEquals(
+            DocumentsContract.buildDocumentUriUsingTree(treeUri, ROOT),
+            intent.data,
+        )
+        assertEquals(expectedFlags, intent.flags and expectedFlags)
+        assertEquals(0, intent.flags and android.content.Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        val grantedUris = requireNotNull(intent.clipData)
+        assertEquals(2, grantedUris.itemCount)
+        assertEquals(
+            DocumentsContract.buildDocumentUri(AUTHORITY, ROOT),
+            grantedUris.getItemAt(0).uri,
+        )
+        assertEquals(
+            treeUri,
+            grantedUris.getItemAt(1).uri,
+        )
+    }
+
+    @Test
+    fun documentsRootIntent_opensExactGatekeeperRoot() {
+        val intent = FileShuttleExternalBrowser.documentsRootIntent(context)
+
+        assertEquals(android.content.Intent.ACTION_VIEW, intent.action)
+        assertEquals("vnd.android.document/root", intent.type)
+        assertEquals(
+            DocumentsContract.buildRootUri(AUTHORITY, ROOT),
+            intent.data,
+        )
+        assertEquals(0, intent.flags)
     }
 
     /**

@@ -134,6 +134,7 @@ class LocalStorageManager private constructor(context: Context) {
         const val PREF_ACCESSES_SHOWN = "accesses_shown"
         const val PREF_AUTO_FREEZE_LIST_WORK_PROFILE = "auto_freeze_list_work_profile"
         const val PREF_CROSS_PROFILE_FILE_CHOOSER = "cross_profile_file_chooser"
+        const val PREF_CROSS_PROFILE_CONTENT_ACCESS = "cross_profile_content_access"
         const val PREF_CROSS_PROFILE_INTERACTION_ALL = "cross_profile_interaction_all"
         const val PREF_CROSS_PROFILE_INTERACTION_MANUAL = "cross_profile_interaction_manual"
         const val PREF_AUTH_KEY = "auth_key"
