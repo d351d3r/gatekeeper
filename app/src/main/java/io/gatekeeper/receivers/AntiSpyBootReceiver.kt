@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import io.gatekeeper.util.AntiSpyManager
+import io.gatekeeper.util.CalendarRouting
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.Utility
 
@@ -18,6 +19,7 @@ class AntiSpyBootReceiver : BroadcastReceiver() {
         }
         val app = context.applicationContext
         LocalStorageManager.initialize(app)
+        CalendarRouting.scheduleIfEnabled(app)
         val storage = LocalStorageManager.getInstance()
         AntiSpyManager.onDeviceBoot(storage)
         Utility.trimApplicationCache(app)

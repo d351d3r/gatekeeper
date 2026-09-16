@@ -137,6 +137,8 @@ class LocalStorageManager private constructor(context: Context) {
         const val PREF_CROSS_PROFILE_CONTENT_ACCESS = "cross_profile_content_access"
         /** Разрешить рабочим приложениям открывать создание события в личном календаре. */
         const val PREF_CREATE_PERSONAL_CALENDAR_EVENTS = "create_personal_calendar_events"
+        const val PREF_LOCAL_CALENDAR_ROUTING = "local_calendar_routing"
+        const val PREF_LOCAL_CALENDAR_TARGET = "local_calendar_target"
         const val PREF_CROSS_PROFILE_INTERACTION_ALL = "cross_profile_interaction_all"
         const val PREF_CROSS_PROFILE_INTERACTION_MANUAL = "cross_profile_interaction_manual"
         const val PREF_AUTH_KEY = "auth_key"

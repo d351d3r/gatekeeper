@@ -287,7 +287,7 @@ object WorkProfilePolicy {
         val linkRules = LocalStorageManager.getInstance()
             .getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES)
         for (rule in linkRules) {
-            manager.addCrossProfileIntentFilter(adminComponent, buildLinkViewFilter(rule), TO_WORK)
+            manager.addCrossProfileIntentFilter(adminComponent, buildLinkViewFilter(rule), TO_PARENT)
         }
     }
 

@@ -9,6 +9,18 @@
         android:title="@string/settings_create_personal_calendar_events"
         android:summary="@string/settings_create_personal_calendar_events_desc" />
 
+    <androidx.preference.ListPreference
+        android:key="settings_local_calendar_target"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_local_calendar_target"
+        android:summary="@string/settings_local_calendar_target_desc" />
+
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="settings_local_calendar_routing"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_local_calendar_routing"
+        android:summary="@string/settings_local_calendar_routing_desc" />
+
     <androidx.preference.SwitchPreferenceCompat
         android:key="settings_bridges_interaction_all"
         app:iconSpaceReserved="false"

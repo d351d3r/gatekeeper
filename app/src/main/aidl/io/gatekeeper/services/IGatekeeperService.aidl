@@ -69,4 +69,11 @@ interface IGatekeeperService {
     long[] getAppDataUsage(String pkg);
     // Allow every installed package that declares INTERACT_ACROSS_PROFILES.
     boolean applyAllCrossProfilePackages();
+    // Кодирование цели: id|account|displayName; состояния: enabled|targetId;
+    // null из setter означает успех.
+    List<String> getWritableGoogleCalendars();
+    String getLocalCalendarRoutingState();
+    String setLocalCalendarRouting(long targetId, boolean enabled);
+    boolean setCrossProfileContentAccessEnabled(boolean enabled);
+    boolean getCrossProfileContentAccessEnabled();
 }

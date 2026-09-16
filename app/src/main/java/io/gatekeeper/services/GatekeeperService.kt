@@ -25,6 +25,7 @@ import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.CaCertificates
+import io.gatekeeper.util.CalendarRouting
 import io.gatekeeper.util.CloneOutcome
 import io.gatekeeper.util.FileProviderProxy
 import io.gatekeeper.util.LocalStorageManager
@@ -313,6 +314,67 @@ class GatekeeperService : Service() {
             }
         }
 
+        @Suppress("TooGenericExceptionCaught")
+        override fun getWritableGoogleCalendars(): List<String> {
+            check(isProfileOwner) { "Only the work profile can list its calendars" }
+            val dpm = policyManager!!
+            val admin = adminComponent!!
+            val wasEnabled = CalendarRouting.state().first
+            val oldGrantState = if (wasEnabled) {
+                DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED
+            } else {
+                DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT
+            }
+            var restoreFailed = false
+            val calendars = try {
+                val readGranted = dpm.setPermissionGrantState(
+                    admin,
+                    packageName,
+                    android.Manifest.permission.READ_CALENDAR,
+                    DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED,
+                )
+                if (readGranted) {
+                    CalendarRouting.listWritableGoogleCalendars(this@GatekeeperService)
+                        .map(CalendarRouting::encodeTarget)
+                } else {
+                    emptyList()
+                }
+            } catch (e: RuntimeException) {
+                Log.w(TAG, "getWritableGoogleCalendars: temporary grant failed", e)
+                emptyList()
+            } finally {
+                restoreFailed = try {
+                    !dpm.setPermissionGrantState(
+                        admin,
+                        packageName,
+                        android.Manifest.permission.READ_CALENDAR,
+                        oldGrantState,
+                    )
+                } catch (e: RuntimeException) {
+                    Log.w(TAG, "getWritableGoogleCalendars: grant restore failed", e)
+                    true
+                }
+            }
+            return if (restoreFailed) emptyList() else calendars
+        }
+
+        override fun getLocalCalendarRoutingState(): String {
+            check(isProfileOwner) { "Only the work profile owns calendar routing" }
+            val (enabled, targetId) = CalendarRouting.state()
+            return "${if (enabled) 1 else 0}|${targetId ?: -1L}"
+        }
+
+        override fun setLocalCalendarRouting(targetId: Long, enabled: Boolean): String? {
+            check(isProfileOwner) { "Only the work profile owns calendar routing" }
+            return CalendarRouting.configure(
+                this@GatekeeperService,
+                policyManager!!,
+                adminComponent!!,
+                targetId,
+                enabled,
+            )
+        }
+
         /**
          * Спрашивается личным профилем: покрывает ли туннель трафик этого пользователя.
          * Из личного профиля возможности сети рабочего профиля не видны, а `tun0` виден
@@ -403,6 +465,41 @@ class GatekeeperService : Service() {
                 local.setStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES, old)
                 false
             }
+        }
+
+        @Suppress("TooGenericExceptionCaught")
+        override fun setCrossProfileContentAccessEnabled(enabled: Boolean): Boolean {
+            if (!isProfileOwner) return false
+            val local = LocalStorageManager.getInstance()
+            val old = local.getBoolean(LocalStorageManager.PREF_CROSS_PROFILE_CONTENT_ACCESS)
+            return try {
+                local.setBooleanNow(LocalStorageManager.PREF_CROSS_PROFILE_CONTENT_ACCESS, enabled)
+                WorkProfilePolicy.enforceWorkProfilePolicies(this@GatekeeperService)
+                true
+            } catch (e: RuntimeException) {
+                Log.e(TAG, "setCrossProfileContentAccessEnabled: apply failed", e)
+                val preferenceRestored = try {
+                    local.setBooleanNow(LocalStorageManager.PREF_CROSS_PROFILE_CONTENT_ACCESS, old)
+                    true
+                } catch (restoreError: RuntimeException) {
+                    Log.e(TAG, "setCrossProfileContentAccessEnabled: preference rollback failed", restoreError)
+                    false
+                }
+                if (preferenceRestored) {
+                    try {
+                        WorkProfilePolicy.enforceWorkProfilePolicies(this@GatekeeperService)
+                    } catch (restoreError: RuntimeException) {
+                        Log.e(TAG, "setCrossProfileContentAccessEnabled: policy restore failed", restoreError)
+                    }
+                }
+                false
+            }
+        }
+
+        override fun getCrossProfileContentAccessEnabled(): Boolean {
+            check(isProfileOwner) { "Cannot read content access without being profile owner" }
+            return LocalStorageManager.getInstance()
+                .getBoolean(LocalStorageManager.PREF_CROSS_PROFILE_CONTENT_ACCESS)
         }
 
         /**

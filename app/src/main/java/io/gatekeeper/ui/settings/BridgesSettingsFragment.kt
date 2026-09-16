@@ -3,11 +3,13 @@ package io.gatekeeper.ui.settings
 import android.os.Build
 import android.os.Bundle
 import android.os.RemoteException
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.SwitchPreferenceCompat
 import io.gatekeeper.R
 import io.gatekeeper.util.ApplicationInfoWrapper
+import io.gatekeeper.util.CalendarRouting
 import io.gatekeeper.util.GatekeeperToast
 import io.gatekeeper.util.LocalStorageManager
 
@@ -17,6 +19,7 @@ import io.gatekeeper.util.LocalStorageManager
  * кому они выданы, можно было лишь долгим нажатием на каждое приложение
  * по очереди. Обе настраиваются по приложению и обе выключены по умолчанию.
  */
+@Suppress("TooManyFunctions")
 class BridgesSettingsFragment : SettingsSubFragment() {
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
@@ -28,6 +31,7 @@ class BridgesSettingsFragment : SettingsSubFragment() {
             manager.setCreatePersonalCalendarEventsEnabled(it)
             true
         }
+        bindCalendarRouting()
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             // setCrossProfilePackages появился в Android 11: до него раздела нет.
             findPreference<SwitchPreferenceCompat>(MASTER_INTERACTION)?.isVisible = false
@@ -62,12 +66,18 @@ class BridgesSettingsFragment : SettingsSubFragment() {
                 }
             }
             val interaction = readList { work.crossProfilePackages }
+            val calendarState = try {
+                work.localCalendarRoutingState
+            } catch (_: RemoteException) {
+                null
+            }
             postOnUi {
                 if (apps == null || widgets == null || interaction == null) {
                     showUnavailable()
                     return@postOnUi
                 }
                 interactionPackages = interaction
+                applyCalendarState(calendarState)
                 fillApps(
                     CATEGORY_WIDGETS,
                     apps,
@@ -97,6 +107,105 @@ class BridgesSettingsFragment : SettingsSubFragment() {
             note.summary = getString(R.string.settings_bridges_unavailable)
         }
         findPreference<SwitchPreferenceCompat>(MASTER_INTERACTION)?.isEnabled = false
+        findPreference<SwitchPreferenceCompat>(LOCAL_CALENDAR_ROUTING)?.isEnabled = false
+        findPreference<ListPreference>(LOCAL_CALENDAR_TARGET)?.isEnabled = false
+    }
+
+    private fun bindCalendarRouting() {
+        val target = findPreference<ListPreference>(LOCAL_CALENDAR_TARGET) ?: return
+        val toggle = findPreference<SwitchPreferenceCompat>(LOCAL_CALENDAR_ROUTING) ?: return
+        target.isPersistent = false
+        toggle.isPersistent = false
+        target.setOnPreferenceClickListener { loadCalendarTargets(target) }
+        target.setOnPreferenceChangeListener { _, value -> changeCalendarTarget(target, toggle, value) }
+        toggle.setOnPreferenceChangeListener { _, value -> changeCalendarRouting(value as Boolean) }
+    }
+
+    private fun loadCalendarTargets(target: ListPreference): Boolean {
+        val work = serviceWork ?: return true
+        val encoded = try {
+            work.writableGoogleCalendars
+        } catch (_: RemoteException) {
+            emptyList()
+        }
+        val calendars = encoded.mapNotNull(CalendarRouting::decodeTarget)
+        if (calendars.isEmpty()) {
+            GatekeeperToast.show(requireContext(), R.string.settings_local_calendar_no_targets)
+        } else {
+            target.entries = calendars.map {
+                if (it.displayName.isBlank()) {
+                    it.accountName
+                } else {
+                    "${it.displayName} - ${it.accountName}"
+                }
+            }.toTypedArray()
+            target.entryValues = calendars.map { it.id.toString() }.toTypedArray()
+        }
+        return calendars.isEmpty()
+    }
+
+    @Suppress("ReturnCount")
+    private fun changeCalendarTarget(
+        target: ListPreference,
+        toggle: SwitchPreferenceCompat,
+        value: Any,
+    ): Boolean {
+        val id = value.toString().toLongOrNull() ?: return false
+        val work = serviceWork ?: return false
+        val error = try {
+            work.setLocalCalendarRouting(id, toggle.isChecked)
+        } catch (_: RemoteException) {
+            "transport"
+        }
+        if (error != null) {
+            GatekeeperToast.show(requireContext(), R.string.settings_local_calendar_failed)
+            return false
+        }
+        calendarTargetId = id
+        target.summary = target.entries
+            ?.zip(target.entryValues.orEmpty())
+            ?.firstOrNull { it.second.toString() == id.toString() }
+            ?.first
+            ?: getString(R.string.settings_local_calendar_selected, id)
+        return true
+    }
+
+    @Suppress("ReturnCount")
+    private fun changeCalendarRouting(enabled: Boolean): Boolean {
+        if (enabled && calendarTargetId < 0L) {
+            GatekeeperToast.show(requireContext(), R.string.settings_local_calendar_choose_first)
+            return false
+        }
+        val work = serviceWork ?: return false
+        val error = try {
+            work.setLocalCalendarRouting(calendarTargetId, enabled)
+        } catch (_: RemoteException) {
+            "transport"
+        }
+        if (error != null) {
+            GatekeeperToast.show(requireContext(), R.string.settings_local_calendar_failed)
+        }
+        return error == null
+    }
+
+    private fun applyCalendarState(encoded: String?) {
+        val parts = encoded?.split('|', limit = 2).orEmpty()
+        if (parts.size != 2) return
+        val enabled = parts[0] == "1"
+        calendarTargetId = parts[1].toLongOrNull() ?: -1L
+        findPreference<SwitchPreferenceCompat>(LOCAL_CALENDAR_ROUTING)?.apply {
+            isEnabled = true
+            isChecked = enabled
+        }
+        findPreference<ListPreference>(LOCAL_CALENDAR_TARGET)?.apply {
+            isEnabled = true
+            value = calendarTargetId.takeIf { it >= 0L }?.toString()
+            summary = if (calendarTargetId >= 0L) {
+                getString(R.string.settings_local_calendar_selected, calendarTargetId)
+            } else {
+                getString(R.string.settings_local_calendar_target_desc)
+            }
+        }
     }
 
     /**
@@ -227,7 +336,10 @@ class BridgesSettingsFragment : SettingsSubFragment() {
         private const val MASTER_INTERACTION = "settings_bridges_interaction_all"
         private const val CREATE_PERSONAL_CALENDAR_EVENTS =
             "settings_create_personal_calendar_events"
+        private const val LOCAL_CALENDAR_TARGET = "settings_local_calendar_target"
+        private const val LOCAL_CALENDAR_ROUTING = "settings_local_calendar_routing"
     }
 
     private var interactionPackages: Set<String> = emptySet()
+    private var calendarTargetId: Long = -1L
 }

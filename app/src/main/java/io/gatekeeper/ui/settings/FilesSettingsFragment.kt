@@ -23,13 +23,44 @@ class FilesSettingsFragment : SettingsSubFragment() {
         applyPlatformRestrictions()
     }
 
+    override fun onResume() {
+        super.onResume()
+        val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_CROSS_PROFILE_CONTENT_ACCESS)
+            ?: return
+        pref.isEnabled = false
+        val enabled = try {
+            serviceWork?.getCrossProfileContentAccessEnabled()
+        } catch (_: RemoteException) {
+            null
+        }
+        if (enabled != null) {
+            pref.isChecked = enabled
+            LocalStorageManager.getInstance().setBooleanNow(
+                LocalStorageManager.PREF_CROSS_PROFILE_CONTENT_ACCESS,
+                enabled,
+            )
+            pref.isEnabled = true
+        }
+    }
+
     private fun bindCrossProfileContentAccess() {
         val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_CROSS_PROFILE_CONTENT_ACCESS)
             ?: return
-        pref.isChecked = manager.getCrossProfileContentAccessEnabled()
+        pref.isEnabled = false
         pref.setOnPreferenceChangeListener { _, newState ->
-            manager.setCrossProfileContentAccessEnabled(newState as Boolean)
-            true
+            val enabled = newState as Boolean
+            val applied = try {
+                serviceWork?.setCrossProfileContentAccessEnabled(enabled) == true
+            } catch (_: RemoteException) {
+                false
+            }
+            if (applied) {
+                LocalStorageManager.getInstance().setBooleanNow(
+                    LocalStorageManager.PREF_CROSS_PROFILE_CONTENT_ACCESS,
+                    enabled,
+                )
+            }
+            applied
         }
     }
 

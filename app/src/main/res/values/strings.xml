@@ -365,7 +365,7 @@
     <string name="settings_contacts_share_account_desc">A Google or Exchange account in the work profile brings its whole address book -- and the account owner sees it.</string>
     <!-- Link rules screen (H2) -->
     <string name="settings_open_links_in_work">Open links in work profile apps</string>
-    <string name="settings_open_links_in_work_desc">Let apps in the work profile handle http(s) links you tap in the personal profile. Needs a browser or matching app in the work profile. Off keeps the profiles isolated.</string>
+    <string name="settings_open_links_in_work_desc">Let apps in the work profile handle every http(s) link you tap in the personal profile. When off, only the domain rules below remain active.</string>
     <string name="settings_links_warning">The work browser will see these links</string>
     <string name="settings_links_warning_desc">A link to a listed domain opens in the work profile -- both from a work app and from a personal chat. Subdomains count too.</string>
     <string name="settings_links_list_title">Domains</string>
@@ -414,6 +414,14 @@
     <string name="settings_bridges_failed">The work profile refused that change</string>
     <string name="settings_create_personal_calendar_events">Create events in the personal calendar</string>
     <string name="settings_create_personal_calendar_events_desc">Let work apps send event-creation requests to a calendar in the personal profile. Existing events and calendar accounts are not moved.</string>
+    <string name="settings_local_calendar_target">Google calendar for local events</string>
+    <string name="settings_local_calendar_target_desc">Choose a writable Google calendar from the work profile. Calendar access is granted only while choosing or while routing is enabled.</string>
+    <string name="settings_local_calendar_routing">Move local work events to Google Calendar</string>
+    <string name="settings_local_calendar_routing_desc">Moves current and future events created in any local, non-syncing work calendar to the selected Google calendar. Other synced calendars are not changed.</string>
+    <string name="settings_local_calendar_no_targets">No writable Google calendar was found in the work profile</string>
+    <string name="settings_local_calendar_failed">Could not configure calendar routing</string>
+    <string name="settings_local_calendar_choose_first">Choose a Google calendar first</string>
+    <string name="settings_local_calendar_selected">Selected calendar ID: %1$d. Tap to view or change it.</string>
     <!-- App action sheet (G4): every row names its consequence -->
     <string name="app_sheet_clone_work_desc">Installs a second copy inside the profile, with its own data and accounts</string>
     <string name="app_sheet_clone_main_desc">Installs a copy in the personal profile, with its own data</string>

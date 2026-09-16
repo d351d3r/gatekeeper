@@ -35,6 +35,8 @@
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 
     <!-- For querying apps on Android R and later -->
     <queries>
@@ -324,6 +326,10 @@
                 <action android:name="io.gatekeeper.action.BATCH_FREEZE_WORK" />
             </intent-filter>
         </service>
+
+        <service android:name=".services.CalendarRoutingJobService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <service android:name=".services.AntiSpyDummyVpnService"
             android:exported="false"

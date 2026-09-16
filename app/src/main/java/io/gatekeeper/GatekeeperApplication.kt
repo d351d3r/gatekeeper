@@ -8,6 +8,7 @@ import android.util.Log
 import com.google.android.material.color.DynamicColors
 import io.gatekeeper.services.FileShuttleService
 import io.gatekeeper.services.GatekeeperService
+import io.gatekeeper.util.CalendarRouting
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.Notifications
 import io.gatekeeper.util.SettingsManager
@@ -21,6 +22,7 @@ class GatekeeperApplication : Application() {
         super.onCreate()
         LocalStorageManager.initialize(this)
         SettingsManager.initialize(this)
+        CalendarRouting.scheduleIfEnabled(this)
         // Выбор темы применяем до первой activity: системная / светлая / тёмная.
         ThemeMode.apply(ThemeMode.current())
         // Все пять каналов заводятся сразу: иначе настроить их в системе можно
