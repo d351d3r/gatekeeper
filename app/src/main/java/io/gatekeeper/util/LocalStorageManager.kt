@@ -134,6 +134,8 @@ class LocalStorageManager private constructor(context: Context) {
         const val PREF_ACCESSES_SHOWN = "accesses_shown"
         const val PREF_AUTO_FREEZE_LIST_WORK_PROFILE = "auto_freeze_list_work_profile"
         const val PREF_CROSS_PROFILE_FILE_CHOOSER = "cross_profile_file_chooser"
+        const val PREF_CROSS_PROFILE_INTERACTION_ALL = "cross_profile_interaction_all"
+        const val PREF_CROSS_PROFILE_INTERACTION_MANUAL = "cross_profile_interaction_manual"
         const val PREF_AUTH_KEY = "auth_key"
         const val PREF_AUTH_BOOTSTRAPPED = "auth_bootstrapped"
         const val PREF_AUTO_FREEZE_SERVICE = "auto_freeze_service"
@@ -149,6 +151,10 @@ class LocalStorageManager private constructor(context: Context) {
         /** Разрешить отправку (ACTION_SEND) из рабочего профиля в личное: в шаре
          *  появляется вкладка «Личные». Выключено по умолчанию -- дырка в изоляции. */
         const val PREF_SHARE_WORK_TO_PERSONAL = "share_work_to_personal"
+        /** Разрешить приложениям рабочего профиля открывать http(s)-ссылки, нажатые
+         *  в личном профиле (личный -> рабочий). Выключено по умолчанию -- дырка в
+         *  изоляции по действию пользователя. */
+        const val PREF_OPEN_LINKS_IN_WORK = "open_links_in_work"
         const val PREF_PAYMENT_STUB = "payment_stub"
         const val PREF_THEME_MODE = "theme_mode"
         const val PREF_ANTI_SPY_BOOT_FREEZE_PENDING = "anti_spy_boot_freeze_pending"

@@ -71,6 +71,17 @@ class SettingsManager private constructor(context: Context) {
     fun getCrossProfileFileChooserEnabled(): Boolean =
         storage.getBoolean(LocalStorageManager.PREF_CROSS_PROFILE_FILE_CHOOSER)
 
+    fun setCrossProfileInteractionAllEnabled(enabled: Boolean) {
+        storage.setBooleanNow(LocalStorageManager.PREF_CROSS_PROFILE_INTERACTION_ALL, enabled)
+        syncSettingsToProfileBool(
+            LocalStorageManager.PREF_CROSS_PROFILE_INTERACTION_ALL,
+            enabled,
+        )
+    }
+
+    fun getCrossProfileInteractionAllEnabled(): Boolean =
+        storage.getBoolean(LocalStorageManager.PREF_CROSS_PROFILE_INTERACTION_ALL)
+
     fun setBlockContactsSearchingEnabled(enabled: Boolean) {
         storage.setBoolean(LocalStorageManager.PREF_BLOCK_CONTACTS_SEARCHING, enabled)
         syncSettingsToProfileBool(LocalStorageManager.PREF_BLOCK_CONTACTS_SEARCHING, enabled)
@@ -94,6 +105,14 @@ class SettingsManager private constructor(context: Context) {
 
     fun getShareWorkToPersonalEnabled(): Boolean =
         storage.getBoolean(LocalStorageManager.PREF_SHARE_WORK_TO_PERSONAL)
+
+    fun setOpenLinksInWorkEnabled(enabled: Boolean) {
+        storage.setBoolean(LocalStorageManager.PREF_OPEN_LINKS_IN_WORK, enabled)
+        syncSettingsToProfileBool(LocalStorageManager.PREF_OPEN_LINKS_IN_WORK, enabled)
+    }
+
+    fun getOpenLinksInWorkEnabled(): Boolean =
+        storage.getBoolean(LocalStorageManager.PREF_OPEN_LINKS_IN_WORK)
 
     fun setAutoFreezeServiceEnabled(enabled: Boolean) {
         storage.setBoolean(LocalStorageManager.PREF_AUTO_FREEZE_SERVICE, enabled)

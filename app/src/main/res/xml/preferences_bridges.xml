@@ -16,6 +16,12 @@
 
     </androidx.preference.PreferenceCategory>
 
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="settings_bridges_interaction_all"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_bridges_interaction_all"
+        android:summary="@string/settings_bridges_interaction_all_desc" />
+
     <androidx.preference.PreferenceCategory
         android:key="settings_bridges_interaction"
         app:iconSpaceReserved="false"

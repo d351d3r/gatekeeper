@@ -328,6 +328,8 @@
     <string name="settings_contacts_share_account">Добавить аккаунт внутри профиля</string>
     <string name="settings_contacts_share_account_desc">Аккаунт Google или Exchange в рабочем профиле приносит всю свою адресную книгу -- и ее видит владелец аккаунта.</string>
     <!-- Экран правил ссылок (H2) -->
+    <string name="settings_open_links_in_work">Открывать ссылки в приложениях рабочего профиля</string>
+    <string name="settings_open_links_in_work_desc">Позволяет приложениям рабочего профиля обрабатывать http(s)-ссылки, нажатые в личном профиле. Нужен браузер или подходящее приложение в рабочем профиле. Выключено -- профили изолированы.</string>
     <string name="settings_links_warning">Эти ссылки увидит рабочий браузер</string>
     <string name="settings_links_warning_desc">Ссылка на домен из списка откроется в рабочем профиле -- и из рабочего приложения, и из личного чата. Поддомены тоже считаются.</string>
     <string name="settings_links_list_title">Домены</string>
@@ -371,6 +373,8 @@
     <string name="settings_bridges_widgets_desc">Приложение может вынести виджет рабочего профиля на личный стол. Заморозка виджет гасит.</string>
     <string name="settings_bridges_interaction_title">Общение с собственной копией</string>
     <string name="settings_bridges_interaction_desc">Две копии приложения в разных профилях смогут обмениваться данными. Android 11+.</string>
+    <string name="settings_bridges_interaction_all">Разрешить все подходящие приложения</string>
+    <string name="settings_bridges_interaction_all_desc">Разрешить установленным приложениям с поддержкой Connected apps запрашивать связь. Android все равно попросит ваше подтверждение. Для Календаря и Цифрового благополучия нужны копии в обоих профилях.</string>
     <string name="settings_bridges_no_apps">Своих приложений в профиле пока нет</string>
     <string name="settings_bridges_unavailable">Рабочий профиль сейчас не отвечает</string>
     <string name="settings_bridges_failed">Рабочий профиль отклонил изменение</string>

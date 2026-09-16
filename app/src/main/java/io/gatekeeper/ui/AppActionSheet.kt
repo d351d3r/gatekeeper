@@ -166,7 +166,11 @@ internal object AppMenuEntries {
                 checked = pkg in widgetProviders,
             )
         )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+            !LocalStorageManager.getInstance().getBoolean(
+                LocalStorageManager.PREF_CROSS_PROFILE_INTERACTION_ALL
+            )
+        ) {
             entries.add(
                 AppMenuEntry(
                     MENU_ITEM_ALLOW_CROSS_PROFILE_INTERACTION,

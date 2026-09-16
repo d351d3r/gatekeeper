@@ -9,6 +9,7 @@ import androidx.preference.SwitchPreferenceCompat
 import io.gatekeeper.R
 import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.GatekeeperToast
+import io.gatekeeper.util.LocalStorageManager
 
 /**
  * Экран «Мосты между копиями»: две дырки в изоляции, которые до сих пор жили
@@ -22,7 +23,13 @@ class BridgesSettingsFragment : SettingsSubFragment() {
         addPreferencesFromResource(R.xml.preferences_bridges)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             // setCrossProfilePackages появился в Android 11: до него раздела нет.
+            findPreference<SwitchPreferenceCompat>(MASTER_INTERACTION)?.isVisible = false
             findPreference<PreferenceCategory>(CATEGORY_INTERACTION)?.isVisible = false
+        } else {
+            findPreference<SwitchPreferenceCompat>(MASTER_INTERACTION)
+                ?.setOnPreferenceChangeListener { _, newState ->
+                    setAllInteraction(newState as Boolean)
+                }
         }
     }
 
@@ -33,19 +40,40 @@ class BridgesSettingsFragment : SettingsSubFragment() {
             showUnavailable()
             return
         }
+        findPreference<SwitchPreferenceCompat>(MASTER_INTERACTION)?.apply {
+            isEnabled = true
+            isChecked = manager.getCrossProfileInteractionAllEnabled()
+        }
         Thread {
-            val apps = fetchApps(work)?.filter { !it.isSystem() && it.isInstalled() }
+            // Connected apps includes platform and preinstalled apps such as Calendar.
+            val apps = fetchApps(work)?.filter { it.isInstalled() }
             val widgets = readList { work.crossProfileWidgetProviders }
+            if (manager.getCrossProfileInteractionAllEnabled()) {
+                try {
+                    work.applyAllCrossProfilePackages()
+                } catch (_: RemoteException) {
+                }
+            }
             val interaction = readList { work.crossProfilePackages }
             postOnUi {
                 if (apps == null || widgets == null || interaction == null) {
                     showUnavailable()
                     return@postOnUi
                 }
-                fillApps(CATEGORY_WIDGETS, apps, widgets) { pkg, on -> setWidget(pkg, on) }
-                fillApps(CATEGORY_INTERACTION, apps, interaction) { pkg, on ->
-                    setInteraction(pkg, on, interaction)
-                }
+                interactionPackages = interaction
+                fillApps(
+                    CATEGORY_WIDGETS,
+                    apps,
+                    widgets,
+                    apply = { pkg, on -> setWidget(pkg, on) },
+                )
+                fillApps(
+                    CATEGORY_INTERACTION,
+                    apps,
+                    interaction,
+                    apply = { pkg, on -> setInteraction(pkg, on, interaction) },
+                    editable = !manager.getCrossProfileInteractionAllEnabled(),
+                )
             }
         }.start()
     }
@@ -61,6 +89,7 @@ class BridgesSettingsFragment : SettingsSubFragment() {
             val note = findPreference<Preference>("${key}_note") ?: continue
             note.summary = getString(R.string.settings_bridges_unavailable)
         }
+        findPreference<SwitchPreferenceCompat>(MASTER_INTERACTION)?.isEnabled = false
     }
 
     /**
@@ -72,6 +101,7 @@ class BridgesSettingsFragment : SettingsSubFragment() {
         apps: List<ApplicationInfoWrapper>,
         allowed: Set<String>,
         apply: (String, Boolean) -> Boolean,
+        editable: Boolean = true,
     ) {
         val category = findPreference<PreferenceCategory>(categoryKey) ?: return
         val note = findPreference<Preference>("${categoryKey}_note")
@@ -95,6 +125,7 @@ class BridgesSettingsFragment : SettingsSubFragment() {
                     title = app.getLabel() ?: pkg
                     summary = pkg
                     isChecked = pkg in allowed
+                    isEnabled = editable
                     isIconSpaceReserved = false
                     setOnPreferenceChangeListener { _, newState ->
                         val enabled = newState as Boolean
@@ -128,14 +159,66 @@ class BridgesSettingsFragment : SettingsSubFragment() {
         if (enabled) next.add(pkg) else next.remove(pkg)
         return try {
             work.crossProfilePackages = next.toList()
+            interactionPackages = next
             true
         } catch (_: RemoteException) {
             false
         }
     }
 
+    private fun setAllInteraction(enabled: Boolean): Boolean {
+        val work = serviceWork ?: return false
+        val storage = LocalStorageManager.getInstance()
+        return try {
+            if (enabled) enableAllInteraction(work, storage) else disableAllInteraction(work, storage)
+        } catch (_: RemoteException) {
+            false
+        }
+    }
+
+    private fun enableAllInteraction(
+        work: io.gatekeeper.services.IGatekeeperService,
+        storage: LocalStorageManager,
+    ): Boolean {
+        val current = readList { work.crossProfilePackages }
+        return if (current == null) {
+            false
+        } else {
+            interactionPackages = current
+            storage.setStringList(
+                LocalStorageManager.PREF_CROSS_PROFILE_INTERACTION_MANUAL,
+                interactionPackages.toTypedArray(),
+            )
+            if (!work.applyAllCrossProfilePackages()) {
+                storage.remove(LocalStorageManager.PREF_CROSS_PROFILE_INTERACTION_MANUAL)
+                false
+            } else {
+                manager.setCrossProfileInteractionAllEnabled(true)
+                interactionPackages = readList { work.crossProfilePackages } ?: interactionPackages
+                true
+            }
+        }
+    }
+
+    private fun disableAllInteraction(
+        work: io.gatekeeper.services.IGatekeeperService,
+        storage: LocalStorageManager,
+    ): Boolean {
+        manager.setCrossProfileInteractionAllEnabled(false)
+        val restored = storage.getStringList(
+            LocalStorageManager.PREF_CROSS_PROFILE_INTERACTION_MANUAL
+        ).toSet()
+        work.crossProfilePackages = restored.toList()
+        storage.remove(LocalStorageManager.PREF_CROSS_PROFILE_INTERACTION_MANUAL)
+        interactionPackages = restored
+        return true
+    }
+
     companion object {
         private const val CATEGORY_WIDGETS = "settings_bridges_widgets"
         private const val CATEGORY_INTERACTION = "settings_bridges_interaction"
+        private const val MASTER_INTERACTION = "settings_bridges_interaction_all"
     }
+
+    private var interactionPackages: Set<String> = emptySet()
 }

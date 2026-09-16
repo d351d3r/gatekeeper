@@ -380,6 +380,11 @@ class AppListFragment : BaseFragment() {
     }
 
     private fun toggleCrossProfileInteraction(app: ApplicationInfoWrapper, checked: Boolean) {
+        if (LocalStorageManager.getInstance().getBoolean(
+                LocalStorageManager.PREF_CROSS_PROFILE_INTERACTION_ALL
+            )) {
+            return
+        }
         val newState = !checked
         if (newState) {
             crossProfilePackages.add(app.getPackageName())

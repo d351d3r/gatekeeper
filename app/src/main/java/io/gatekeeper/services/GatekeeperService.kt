@@ -296,6 +296,23 @@ class GatekeeperService : Service() {
             policyManager!!.setCrossProfilePackages(adminComponent!!, HashSet(packages))
         }
 
+        override fun applyAllCrossProfilePackages(): Boolean {
+            check(isProfileOwner) {
+                "Cannot access cross-profile packages without being profile owner"
+            }
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return false
+            return try {
+                WorkProfilePolicy.applyAllCrossProfilePackages(
+                    this@GatekeeperService,
+                    policyManager!!,
+                    adminComponent!!,
+                )
+            } catch (e: SecurityException) {
+                Log.w(TAG, "applyAllCrossProfilePackages denied", e)
+                false
+            }
+        }
+
         /**
          * Спрашивается личным профилем: покрывает ли туннель трафик этого пользователя.
          * Из личного профиля возможности сети рабочего профиля не видны, а `tun0` виден

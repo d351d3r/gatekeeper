@@ -7,6 +7,7 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
+import androidx.preference.SwitchPreferenceCompat
 import io.gatekeeper.R
 import io.gatekeeper.util.CrossProfileLinkRules
 import io.gatekeeper.util.GatekeeperToast
@@ -25,6 +26,13 @@ class LinksSettingsFragment : SettingsSubFragment() {
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_links)
+        findPreference<SwitchPreferenceCompat>(SETTINGS_OPEN_LINKS_IN_WORK)?.apply {
+            isChecked = manager.getOpenLinksInWorkEnabled()
+            setOnPreferenceChangeListener { _, newState ->
+                manager.setOpenLinksInWorkEnabled(newState as Boolean)
+                true
+            }
+        }
         rules.addAll(
             LocalStorageManager.getInstance()
                 .getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES)
@@ -144,5 +152,6 @@ class LinksSettingsFragment : SettingsSubFragment() {
         private const val DIALOG_PADDING_DP = 24
         private const val SETTINGS_LINKS_LIST = "settings_links_list"
         private const val SETTINGS_LINKS_ADD = "settings_links_add"
+        private const val SETTINGS_OPEN_LINKS_IN_WORK = "settings_open_links_in_work"
     }
 }

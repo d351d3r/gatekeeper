@@ -355,6 +355,8 @@
     <string name="settings_contacts_share_account">Add an account inside the profile</string>
     <string name="settings_contacts_share_account_desc">A Google or Exchange account in the work profile brings its whole address book -- and the account owner sees it.</string>
     <!-- Link rules screen (H2) -->
+    <string name="settings_open_links_in_work">Open links in work profile apps</string>
+    <string name="settings_open_links_in_work_desc">Let apps in the work profile handle http(s) links you tap in the personal profile. Needs a browser or matching app in the work profile. Off keeps the profiles isolated.</string>
     <string name="settings_links_warning">The work browser will see these links</string>
     <string name="settings_links_warning_desc">A link to a listed domain opens in the work profile -- both from a work app and from a personal chat. Subdomains count too.</string>
     <string name="settings_links_list_title">Domains</string>
@@ -396,6 +398,8 @@
     <string name="settings_bridges_widgets_desc">The app may place its work-profile widget on the personal home screen. Freezing the app blanks it.</string>
     <string name="settings_bridges_interaction_title">Talking to its own copy</string>
     <string name="settings_bridges_interaction_desc">The two copies of an app in different profiles may exchange data. Android 11+.</string>
+    <string name="settings_bridges_interaction_all">Allow all eligible apps</string>
+    <string name="settings_bridges_interaction_all_desc">Allow installed apps that support Connected apps to request a connection. Android still asks for your confirmation. Calendar and Digital Wellbeing require a copy in both profiles.</string>
     <string name="settings_bridges_no_apps">No apps of your own in the profile yet</string>
     <string name="settings_bridges_unavailable">The work profile is not responding right now</string>
     <string name="settings_bridges_failed">The work profile refused that change</string>

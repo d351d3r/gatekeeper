@@ -67,4 +67,6 @@ interface IGatekeeperService {
     // Объём трафика приложения профиля за окно (по умолчанию 30 дней): [rxBytes, txBytes].
     // NetworkStatsManager, нужен PACKAGE_USAGE_STATS. Вызывается личным профилем у рабочего.
     long[] getAppDataUsage(String pkg);
+    // Allow every installed package that declares INTERACT_ACROSS_PROFILES.
+    boolean applyAllCrossProfilePackages();
 }

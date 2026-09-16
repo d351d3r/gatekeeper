@@ -17,10 +17,16 @@ import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.ui.MainActivity
 import io.gatekeeper.widget.FreezeWidgetProvider
 
-/** Рабочий профиль вызывает действие, резолвящееся в личном. */
+// Направления проверены замером форвардеров (query-activities, API 36): у флагов
+// имя обратно фактическому направлению, поэтому и константы, и записи таблицы ниже
+// ориентируемся на замер, а не на имя флага.
+
+/** Личный вызывает действие, резолвящееся в рабочем (личный -> рабочий): поднимает
+ *  ForwardIntentToManagedProfile в личном профиле. Имя флага обратно смыслу. */
 private const val TO_PARENT = DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT
 
-/** Личный профиль вызывает действие, резолвящееся в рабочем. */
+/** Рабочий вызывает действие, резолвящееся в личном (рабочий -> личный): поднимает
+ *  ForwardIntentToParent в рабочем профиле. Имя флага обратно смыслу. */
 private const val TO_WORK = DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED
 
 /**
@@ -187,12 +193,55 @@ object WorkProfilePolicy {
             TO_WORK
         )
 
+        // Обратное направление для ссылок -- личный -> рабочий: приложения рабочего
+        // профиля обрабатывают http(s)-ссылку, нажатую в личном. Дырка в изоляции по
+        // действию пользователя, поэтому за тумблером и выключено по умолчанию. Флаг
+        // TO_PARENT (FLAG_MANAGED_CAN_ACCESS_PARENT) поднимает ForwardIntentToManagedProfile
+        // в личном профиле -- проверено замером форвардеров (query-activities, API 36);
+        // имя константы обратно смыслу, см. заметку у определения TO_PARENT/TO_WORK.
+        if (SettingsManager.getInstance().getOpenLinksInWorkEnabled()) {
+            manager.addCrossProfileIntentFilter(
+                adminComponent,
+                browsableFilter(withDefaultCategory = false),
+                TO_PARENT
+            )
+            manager.addCrossProfileIntentFilter(
+                adminComponent,
+                browsableFilter(withDefaultCategory = true),
+                TO_PARENT
+            )
+        }
+
         // C2: доменные правила перенаправления ссылок (docs/feature_cross_profile_links.md).
         val linkRules = LocalStorageManager.getInstance()
             .getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES)
         for (rule in linkRules) {
             manager.addCrossProfileIntentFilter(adminComponent, buildLinkViewFilter(rule), TO_WORK)
         }
+    }
+
+    fun applyAllCrossProfilePackages(
+        context: Context,
+        manager: DevicePolicyManager,
+        adminComponent: ComponentName,
+    ): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return false
+        val packageFlags = PackageManager.GET_PERMISSIONS or
+            PackageManager.MATCH_DISABLED_COMPONENTS or
+            PackageManager.MATCH_UNINSTALLED_PACKAGES
+        val packages = context.packageManager.getInstalledPackages(packageFlags).asSequence()
+            .filter { it.packageName != context.packageName }
+            .filter { packageInfo ->
+                (packageInfo.applicationInfo?.flags ?: 0) and
+                    android.content.pm.ApplicationInfo.FLAG_INSTALLED != 0
+            }
+            .filter {
+                it.requestedPermissions?.contains(Manifest.permission.INTERACT_ACROSS_PROFILES) == true
+            }
+            .map { it.packageName }
+            .toSet()
+        manager.setCrossProfilePackages(adminComponent, packages)
+        return true
     }
 
     fun enforceWorkProfilePolicies(context: Context) {
@@ -220,6 +269,10 @@ object WorkProfilePolicy {
         )
 
         applyCrossProfileIntentFilters(manager, adminComponent)
+
+        if (SettingsManager.getInstance().getCrossProfileInteractionAllEnabled()) {
+            applyAllCrossProfilePackages(context, manager, adminComponent)
+        }
 
         manager.setCrossProfileContactsSearchDisabled(
             adminComponent,

@@ -3,6 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="settings_open_links_in_work"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_open_links_in_work"
+        android:summary="@string/settings_open_links_in_work_desc" />
+
     <androidx.preference.Preference
         android:key="settings_links_warning"
         app:iconSpaceReserved="false"
