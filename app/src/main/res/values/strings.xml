@@ -412,6 +412,8 @@
     <string name="settings_bridges_no_apps">No apps of your own in the profile yet</string>
     <string name="settings_bridges_unavailable">The work profile is not responding right now</string>
     <string name="settings_bridges_failed">The work profile refused that change</string>
+    <string name="settings_create_personal_calendar_events">Create events in the personal calendar</string>
+    <string name="settings_create_personal_calendar_events_desc">Let work apps send event-creation requests to a calendar in the personal profile. Existing events and calendar accounts are not moved.</string>
     <!-- App action sheet (G4): every row names its consequence -->
     <string name="app_sheet_clone_work_desc">Installs a second copy inside the profile, with its own data and accounts</string>
     <string name="app_sheet_clone_main_desc">Installs a copy in the personal profile, with its own data</string>

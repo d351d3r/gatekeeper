@@ -46,7 +46,7 @@ Service — только wiring, без ветвлений, достойных �
 | `AntiSpyVpnWatchService` | AntiSpyVpnWatchTest | сторож VPN в отдельном процессе |
 | `AuthenticationUtility` | AuthenticationBootstrapTest | bootstrap авторизации на устройстве |
 | `Utility.createLauncherShortcut` | BatchShortcutIconTest | A2: иконка ярлыка — растр, без падения на requestPinShortcut |
-| `ProfileForwarder` (разрешение) | ForwarderResolutionTest | разрешение реле и системного доступа к контенту на устройстве |
+| `ProfileForwarder` (разрешение) | ForwarderResolutionTest | разрешение реле, доступа к контенту и создания события в личном календаре |
 | `ServiceLiveness` | ServiceLivenessTest | живость binder-ов обоих сервисов |
 | среда | EnvironmentTest, TestProfiles, ImpostorRelayActivity | предусловия и фикстуры профиля |
 

@@ -9,6 +9,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.UserManager
+import android.provider.CalendarContract
 import android.provider.Settings
 import io.gatekeeper.receivers.AppListRefreshReceiver
 import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
@@ -154,6 +155,17 @@ private fun crossProfileContentFilters(): List<IntentFilter> = listOf(
     photoPickerFilter(),
 )
 
+private fun calendarInsertFilter(): IntentFilter = IntentFilter().apply {
+    addAction(Intent.ACTION_INSERT)
+    addCategory(Intent.CATEGORY_DEFAULT)
+    addDataScheme("content")
+    addDataAuthority(CalendarContract.AUTHORITY, null)
+    try {
+        addDataType("vnd.android.cursor.dir/event")
+    } catch (_: IntentFilter.MalformedMimeTypeException) {
+    }
+}
+
 private fun browsableFilter(withDefaultCategory: Boolean): IntentFilter =
     IntentFilter(Intent.ACTION_VIEW).apply {
         addCategory(Intent.CATEGORY_BROWSABLE)
@@ -233,6 +245,13 @@ object WorkProfilePolicy {
                 manager.addCrossProfileIntentFilter(adminComponent, filter, TO_WORK)
                 manager.addCrossProfileIntentFilter(adminComponent, filter, TO_PARENT)
             }
+        }
+        if (SettingsManager.getInstance().getCreatePersonalCalendarEventsEnabled()) {
+            manager.addCrossProfileIntentFilter(
+                adminComponent,
+                calendarInsertFilter(),
+                TO_WORK,
+            )
         }
         manager.addCrossProfileIntentFilter(
             adminComponent,

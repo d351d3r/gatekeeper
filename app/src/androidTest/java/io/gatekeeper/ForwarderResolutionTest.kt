@@ -3,10 +3,13 @@ package io.gatekeeper
 import android.content.Intent
 import android.net.Uri
 import android.os.SystemClock
+import android.provider.CalendarContract
 import android.provider.MediaStore
+import androidx.test.platform.app.InstrumentationRegistry
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.SettingsManager
 import io.gatekeeper.util.Utility
+import java.io.FileInputStream
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -87,6 +90,35 @@ class ForwarderResolutionTest {
         }
     }
 
+    @Test
+    fun calendarInsertCanReachPersonalCalendar() {
+        val settings = SettingsManager.getInstance()
+        val previous = settings.getCreatePersonalCalendarEventsEnabled()
+        try {
+            settings.setCreatePersonalCalendarEventsEnabled(true)
+            val workUser = requireNotNull(
+                Regex("id=(\\d+).*type=profile\\.MANAGED")
+                    .find(shell("cmd user list -v"))
+                    ?.groupValues
+                    ?.get(1)
+            )
+            repeat(30) {
+                val output = shell(
+                    "cmd package query-activities --brief --user $workUser " +
+                        "-a ${Intent.ACTION_INSERT} " +
+                        "-c ${Intent.CATEGORY_DEFAULT} " +
+                        "-d ${CalendarContract.Events.CONTENT_URI} " +
+                        "-t vnd.android.cursor.dir/event"
+                )
+                if ("ForwardIntentToParent" in output) return
+                SystemClock.sleep(100)
+            }
+            throw AssertionError("рабочий профиль не получил переход в личный календарь")
+        } finally {
+            settings.setCreatePersonalCalendarEventsEnabled(previous)
+        }
+    }
+
     /** An APK update cannot alter profile-owner policy until its work-profile process runs. */
     private fun refreshWorkProfilePolicies() {
         val refresh = Intent(DummyActivity.TRY_START_SERVICE).apply {
@@ -113,6 +145,15 @@ class ForwarderResolutionTest {
             SystemClock.sleep(100)
         }
         throw AssertionError("системный форвардер не появился для ${intent.action}")
+    }
+
+    private fun shell(command: String): String {
+        val descriptor = InstrumentationRegistry.getInstrumentation()
+            .uiAutomation
+            .executeShellCommand(command)
+        return descriptor.use {
+            FileInputStream(it.fileDescriptor).bufferedReader().use { reader -> reader.readText() }
+        }
     }
 
     /** Действие, которого нет ни у форвардера, ни у нас, резолва не имеет вовсе. */

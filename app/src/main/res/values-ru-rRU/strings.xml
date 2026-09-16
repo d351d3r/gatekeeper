@@ -387,6 +387,8 @@
     <string name="settings_bridges_no_apps">Своих приложений в профиле пока нет</string>
     <string name="settings_bridges_unavailable">Рабочий профиль сейчас не отвечает</string>
     <string name="settings_bridges_failed">Рабочий профиль отклонил изменение</string>
+    <string name="settings_create_personal_calendar_events">Создавать события в личном календаре</string>
+    <string name="settings_create_personal_calendar_events_desc">Рабочие приложения смогут передавать запрос на создание события календарю личного профиля. Существующие события и аккаунты не переносятся.</string>
     <!-- Лист действий над приложением (G4): у каждой строки названо последствие -->
     <string name="app_sheet_clone_work_desc">Поставит вторую копию внутрь профиля, со своими данными и аккаунтами</string>
     <string name="app_sheet_clone_main_desc">Поставит копию в личный профиль, со своими данными</string>

@@ -43,6 +43,7 @@ object BackupPayload {
      */
     val EXPORTABLE_SETTINGS: Set<String> = setOf(
         LocalStorageManager.PREF_CROSS_PROFILE_FILE_CHOOSER,
+        LocalStorageManager.PREF_CREATE_PERSONAL_CALENDAR_EVENTS,
         LocalStorageManager.PREF_AUTO_FREEZE_SERVICE,
         LocalStorageManager.PREF_DONT_FREEZE_FOREGROUND,
         LocalStorageManager.PREF_AUTO_FREEZE_DELAY,

@@ -82,6 +82,17 @@ class SettingsManager private constructor(context: Context) {
     fun getCrossProfileContentAccessEnabled(): Boolean =
         storage.getBoolean(LocalStorageManager.PREF_CROSS_PROFILE_CONTENT_ACCESS)
 
+    fun setCreatePersonalCalendarEventsEnabled(enabled: Boolean) {
+        storage.setBooleanNow(LocalStorageManager.PREF_CREATE_PERSONAL_CALENDAR_EVENTS, enabled)
+        syncSettingsToProfileBool(
+            LocalStorageManager.PREF_CREATE_PERSONAL_CALENDAR_EVENTS,
+            enabled,
+        )
+    }
+
+    fun getCreatePersonalCalendarEventsEnabled(): Boolean =
+        storage.getBoolean(LocalStorageManager.PREF_CREATE_PERSONAL_CALENDAR_EVENTS)
+
     fun setCrossProfileInteractionAllEnabled(enabled: Boolean) {
         storage.setBooleanNow(LocalStorageManager.PREF_CROSS_PROFILE_INTERACTION_ALL, enabled)
         syncSettingsToProfileBool(

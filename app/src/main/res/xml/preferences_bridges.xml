@@ -4,6 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.preference.SwitchPreferenceCompat
+        android:key="settings_create_personal_calendar_events"
+        app:iconSpaceReserved="false"
+        android:title="@string/settings_create_personal_calendar_events"
+        android:summary="@string/settings_create_personal_calendar_events_desc" />
+
+    <androidx.preference.SwitchPreferenceCompat
         android:key="settings_bridges_interaction_all"
         app:iconSpaceReserved="false"
         android:title="@string/settings_bridges_interaction_all"

@@ -21,6 +21,13 @@ class BridgesSettingsFragment : SettingsSubFragment() {
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_bridges)
+        bindCheckBox(
+            CREATE_PERSONAL_CALENDAR_EVENTS,
+            manager.getCreatePersonalCalendarEventsEnabled(),
+        ) {
+            manager.setCreatePersonalCalendarEventsEnabled(it)
+            true
+        }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             // setCrossProfilePackages появился в Android 11: до него раздела нет.
             findPreference<SwitchPreferenceCompat>(MASTER_INTERACTION)?.isVisible = false
@@ -218,6 +225,8 @@ class BridgesSettingsFragment : SettingsSubFragment() {
         private const val CATEGORY_WIDGETS = "settings_bridges_widgets"
         private const val CATEGORY_INTERACTION = "settings_bridges_interaction"
         private const val MASTER_INTERACTION = "settings_bridges_interaction_all"
+        private const val CREATE_PERSONAL_CALENDAR_EVENTS =
+            "settings_create_personal_calendar_events"
     }
 
     private var interactionPackages: Set<String> = emptySet()

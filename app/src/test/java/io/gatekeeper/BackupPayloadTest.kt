@@ -94,6 +94,10 @@ class BackupPayloadTest {
         // Белый список не должен ссылаться на удалённые константы.
         assertTrue(LocalStorageManager.PREF_AUTO_FREEZE_SERVICE in BackupPayload.EXPORTABLE_SETTINGS)
         assertTrue(LocalStorageManager.PREF_ANTI_SPY_VPN_WATCH_ENABLED in BackupPayload.EXPORTABLE_SETTINGS)
+        assertTrue(
+            LocalStorageManager.PREF_CREATE_PERSONAL_CALENDAR_EVENTS in
+                BackupPayload.EXPORTABLE_SETTINGS,
+        )
     }
 
     @Test
