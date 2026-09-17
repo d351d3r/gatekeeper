@@ -4,6 +4,8 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.RemoteException
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -24,6 +26,8 @@ import io.gatekeeper.util.LocalStorageManager
  */
 @Suppress("TooManyFunctions")
 class BridgesSettingsFragment : SettingsSubFragment() {
+    private val searchHandler = Handler(Looper.getMainLooper())
+    private val pendingSearchRenders = mutableMapOf<String, Runnable>()
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_bridges)
@@ -123,9 +127,19 @@ class BridgesSettingsFragment : SettingsSubFragment() {
             queryHintRes = R.string.settings_bridges_search_hint
             onQueryChanged = { query ->
                 bridgeQueries[categoryKey] = query.trim()
-                renderBridgeCategory(categoryKey)
+                pendingSearchRenders.remove(categoryKey)?.let(searchHandler::removeCallbacks)
+                pendingSearchRenders[categoryKey] = Runnable {
+                    renderBridgeCategory(categoryKey)
+                    pendingSearchRenders.remove(categoryKey)
+                }.also { searchHandler.postDelayed(it, SEARCH_DEBOUNCE_MS) }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        pendingSearchRenders.values.forEach(searchHandler::removeCallbacks)
+        pendingSearchRenders.clear()
+        super.onDestroyView()
     }
 
     private fun renderBridgeCategory(categoryKey: String) {
@@ -292,6 +306,7 @@ class BridgesSettingsFragment : SettingsSubFragment() {
             val pkg = app.getPackageName()
             val pref = SwitchPreferenceCompat(requireContext()).apply {
                 key = "$categoryKey.$pkg"
+                layoutResource = R.layout.preference_compact
                 title = app.getLabel() ?: pkg
                 summary = pkg
                 isChecked = pkg in allowed
@@ -403,6 +418,7 @@ class BridgesSettingsFragment : SettingsSubFragment() {
     companion object {
         private const val CATEGORY_WIDGETS = "settings_bridges_widgets"
         private const val CATEGORY_INTERACTION = "settings_bridges_interaction"
+        private const val SEARCH_DEBOUNCE_MS = 140L
         private const val MASTER_INTERACTION = "settings_bridges_interaction_all"
         private const val CREATE_PERSONAL_CALENDAR_EVENTS =
             "settings_create_personal_calendar_events"

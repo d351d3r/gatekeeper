@@ -4,6 +4,7 @@
 
     <androidx.preference.SwitchPreferenceCompat
         android:key="settings_auto_freeze_service"
+        android:layout="@layout/preference_compact"
         android:icon="@drawable/ic_freeze"
         android:title="@string/settings_auto_freeze_service"
         android:summary="@string/settings_auto_freeze_service_desc" />
@@ -11,18 +12,21 @@
     <androidx.preference.DropDownPreference
         android:dependency="settings_auto_freeze_service"
         android:key="settings_auto_freeze_scope"
+        android:layout="@layout/preference_dropdown_compact"
         android:icon="@drawable/ic_apps"
         android:title="@string/settings_auto_freeze_scope" />
 
     <androidx.preference.DropDownPreference
         android:dependency="settings_auto_freeze_service"
         android:key="settings_auto_freeze_delay"
+        android:layout="@layout/preference_dropdown_compact"
         android:icon="@drawable/ic_timer"
         android:title="@string/settings_auto_freeze_delay" />
 
     <androidx.preference.SwitchPreferenceCompat
         android:dependency="settings_auto_freeze_service"
         android:key="settings_dont_freeze_foreground"
+        android:layout="@layout/preference_compact"
         android:icon="@drawable/ic_launch"
         android:title="@string/settings_dont_freeze_foreground"
         android:summary="@string/settings_dont_freeze_foreground_desc" />
@@ -51,11 +55,13 @@
 
         <androidx.preference.Preference
             android:key="settings_create_unfreeze_all_shortcut"
+            android:layout="@layout/preference_compact"
             android:icon="@drawable/ic_unfreeze"
             android:title="@string/create_unfreeze_all_shortcut" />
 
         <androidx.preference.Preference
             android:key="settings_create_freeze_all_shortcut"
+            android:layout="@layout/preference_compact"
             android:icon="@drawable/ic_freeze"
             android:title="@string/create_freeze_all_shortcut" />
     </androidx.preference.PreferenceCategory>

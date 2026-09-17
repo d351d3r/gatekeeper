@@ -6,6 +6,8 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.RemoteException
 import android.provider.Settings
 import android.util.AttributeSet
@@ -36,18 +38,23 @@ class FreezeSettingsFragment : SettingsSubFragment() {
     private var autoFreezeQuery = ""
     private var autoFreezeApps: List<io.gatekeeper.util.ApplicationInfoWrapper>? = null
     private var autoFreezePackages: Set<String> = emptySet()
+    private val searchHandler = Handler(Looper.getMainLooper())
+    private var pendingSearchRender: Runnable? = null
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_freeze)
         findPreference<SettingsSearchPreference>(SETTINGS_AUTO_FREEZE_SEARCH)
             ?.onQueryChanged = { query ->
                 autoFreezeQuery = query.trim()
-                val category = findPreference<PreferenceCategory>(SETTINGS_AUTO_FREEZE_LIST)
-                val work = serviceWork
-                val apps = autoFreezeApps
-                if (category != null && work != null && apps != null) {
-                    showAutoFreezeEntries(category, autoFreezePackages, apps, work)
-                }
+                pendingSearchRender?.let(searchHandler::removeCallbacks)
+                pendingSearchRender = Runnable {
+                    val category = findPreference<PreferenceCategory>(SETTINGS_AUTO_FREEZE_LIST)
+                    val work = serviceWork
+                    val apps = autoFreezeApps
+                    if (category != null && work != null && apps != null) {
+                        showAutoFreezeEntries(category, autoFreezePackages, apps, work)
+                    }
+                }.also { searchHandler.postDelayed(it, SEARCH_DEBOUNCE_MS) }
             }
         bindCheckBox(
             SETTINGS_AUTO_FREEZE_SERVICE,
@@ -69,6 +76,12 @@ class FreezeSettingsFragment : SettingsSubFragment() {
     override fun onResume() {
         super.onResume()
         fillAutoFreezeList()
+    }
+
+    override fun onDestroyView() {
+        pendingSearchRender?.let(searchHandler::removeCallbacks)
+        pendingSearchRender = null
+        super.onDestroyView()
     }
 
     private fun bindScope() {
@@ -196,19 +209,17 @@ class FreezeSettingsFragment : SettingsSubFragment() {
             .toSet()
         autoFreezePackages = packages
         autoFreezeApps = null
+        findPreference<SettingsSearchPreference>(SETTINGS_AUTO_FREEZE_SEARCH)?.isVisible =
+            packages.isNotEmpty()
+        category.isVisible = packages.isNotEmpty()
         findPreference<Preference>(SETTINGS_AUTO_FREEZE_CLEAR_ALL)?.apply {
             isEnabled = packages.isNotEmpty()
+            isVisible = packages.isNotEmpty()
             summary = getString(R.string.settings_auto_freeze_clear_all_summary)
         }
         val work = serviceWork
         if (packages.isEmpty() || work == null) {
             removeAutoFreezeEntries(category)
-            val empty = Preference(requireContext()).apply {
-                title = getString(R.string.settings_auto_freeze_list_empty)
-                isEnabled = false
-                isIconSpaceReserved = false
-            }
-            category.addPreference(empty)
             showBatchCounts(this, packages.size, null)
             return
         }
@@ -239,6 +250,7 @@ class FreezeSettingsFragment : SettingsSubFragment() {
         showBatchCounts(this, packages.size, apps)
         if (visiblePackages.isEmpty()) {
             val empty = Preference(requireContext()).apply {
+                layoutResource = R.layout.preference_compact
                 title = getString(R.string.settings_auto_freeze_search_empty)
                 isEnabled = false
                 isIconSpaceReserved = false
@@ -249,6 +261,7 @@ class FreezeSettingsFragment : SettingsSubFragment() {
         visiblePackages.sortedBy { labels?.get(it) ?: it }.forEach { pkg ->
             val pref = Preference(requireContext()).apply {
                 key = pkg
+                layoutResource = R.layout.preference_compact
                 title = labels?.get(pkg) ?: pkg
                 summary = pkg
                 isIconSpaceReserved = true
@@ -295,6 +308,7 @@ class FreezeSettingsFragment : SettingsSubFragment() {
         private const val SETTINGS_AUTO_FREEZE_SEARCH = "settings_auto_freeze_search"
 
         private val AUTO_FREEZE_DELAY_SECONDS = intArrayOf(0, 60, 2 * 60, 5 * 60)
+        private const val SEARCH_DEBOUNCE_MS = 140L
     }
 }
 
@@ -319,6 +333,25 @@ class SettingsSearchPreference @JvmOverloads constructor(
         search.isIconified = false
         search.queryHint = context.getString(queryHintRes)
         search.setQuery(queryText, false)
+        val searchText = search.findViewById<android.widget.EditText>(
+            androidx.appcompat.R.id.search_src_text,
+        )
+        if (initialBind) {
+            searchText?.isFocusable = false
+            searchText?.isFocusableInTouchMode = false
+            search.post {
+                search.clearFocus()
+                holder.itemView.requestFocus()
+            }
+            initialBind = false
+        }
+        val enableSearch = {
+            searchText?.isFocusable = true
+            searchText?.isFocusableInTouchMode = true
+            searchText?.requestFocus()
+        }
+        search.setOnClickListener { enableSearch() }
+        searchText?.setOnClickListener { enableSearch() }
         search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
 
@@ -331,6 +364,7 @@ class SettingsSearchPreference @JvmOverloads constructor(
     }
 
     private var queryText = ""
+    private var initialBind = true
 }
 
 /** Счётчики кнопок «Заморозить все» / «Разморозить все» по факту списка. */

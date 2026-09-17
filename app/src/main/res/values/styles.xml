@@ -61,6 +61,25 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
+    <style name="PreferenceThemeOverlay" parent="BasePreferenceThemeOverlay">
+        <item name="preferenceStyle">@style/Preference.Gatekeeper</item>
+        <item name="preferenceCategoryStyle">@style/Preference.Category.Gatekeeper</item>
+        <item name="switchPreferenceCompatStyle">@style/Preference.Switch.Gatekeeper</item>
+        <item name="checkBoxPreferenceStyle">@style/Preference.Switch.Gatekeeper</item>
+    </style>
+
+    <style name="Preference.Gatekeeper" parent="Preference.Material">
+        <item name="android:layout">@layout/preference_compact</item>
+    </style>
+
+    <style name="Preference.Category.Gatekeeper" parent="Preference.Category.Material">
+        <item name="android:layout">@layout/preference_category_compact</item>
+    </style>
+
+    <style name="Preference.Switch.Gatekeeper" parent="Preference.SwitchPreferenceCompat.Material">
+        <item name="android:layout">@layout/preference_compact</item>
+    </style>
+
     <!-- Виджет живет вне активности: RemoteViews берет ?attr отсюда. -->
     <style name="Theme.Gatekeeper.Widget" parent="AppTheme.Base" />
 

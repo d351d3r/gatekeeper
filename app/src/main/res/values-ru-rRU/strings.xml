@@ -54,10 +54,10 @@
     <string name="freeze_all_shortcut">Заморозить</string>
     <string name="settings">Настройки</string>
     <string name="settings_root_freeze">Заморозка</string>
-    <string name="settings_root_freeze_off">Выключена: приложения не замораживаются при блокировке</string>
+    <string name="settings_root_freeze_off">Выключена</string>
     <string name="settings_root_freeze_on">При блокировке экрана: %1$s</string>
     <string name="settings_root_antispy">VPN профиля</string>
-    <string name="settings_root_antispy_desc">Закрепленный VPN и заморозка при его включении</string>
+    <string name="settings_root_antispy_desc">VPN и заморозка приложений</string>
     <string name="settings_root_files">Файлы и медиа</string>
     <string name="settings_root_files_off">Обмен между профилями выключен</string>
     <string name="settings_root_files_on">Обмен между профилями включен</string>
@@ -94,7 +94,7 @@
     <string name="settings_bridges_search_empty">Подходящих приложений нет</string>
     <string name="settings_auto_freeze_list_empty">Список пуст. Откройте приложение в списке и включите «Автозаморозка»</string>
     <string name="settings_auto_freeze_clear_all">Очистить список автозаморозки</string>
-    <string name="settings_auto_freeze_clear_all_summary">Убрать все приложения из автоматической заморозки</string>
+    <string name="settings_auto_freeze_clear_all_summary">Убрать приложения из автозаморозки</string>
     <string name="settings_auto_freeze_clear_all_title">Очистить список автозаморозки?</string>
     <string name="settings_auto_freeze_clear_all_message">Все %1$d приложений в списке будут исключены из автоматической заморозки. Уже замороженные приложения останутся замороженными, пока вы не разморозите их.</string>
     <string name="settings_auto_freeze_clear_all_done">Список автозаморозки очищен</string>
@@ -109,9 +109,9 @@
         <item quantity="other">Установлено: %1$d</item>
     </plurals>
     <string name="settings_root_diagnostics">Диагностика</string>
-    <string name="settings_root_diagnostics_desc">Батарея, фон, связь с профилем</string>
+    <string name="settings_root_diagnostics_desc">Батарея, фон и связь с профилем</string>
     <string name="settings_root_misc">Прочее</string>
-    <string name="settings_root_misc_desc">NFC-оплата профиля, версия, ссылки</string>
+    <string name="settings_root_misc_desc">NFC, версия и ссылки</string>
     <string name="settings_about">О программе</string>
     <string name="settings_version">Версия</string>
     <string name="settings_user_guide">Руководство</string>
@@ -266,7 +266,7 @@
     <string name="theme_dark">Темная</string>
     <string name="settings_cross_profile_link_rules">Ссылки в рабочем профиле</string>
     <string name="settings_cross_profile_link_rules_dialog">Домены через запятую, напр. .ru, .su, example.com. Внимание: браузер рабочего профиля увидит каждую подходящую ссылку, включая личные.</string>
-    <string name="settings_cross_profile_link_rules_none">Правил нет: ссылки открываются в текущем профиле</string>
+    <string name="settings_cross_profile_link_rules_none">Ссылки открываются по умолчанию</string>
     <string name="settings_cross_profile_link_rules_current">Активно: %1$s</string>
     <string name="settings_cross_profile_link_rules_skipped">Пропущено неверных записей: %1$d</string>
     <string name="settings_cross_profile_link_rules_failed">Не удалось применить правила (рабочий профиль недоступен)</string>
@@ -336,9 +336,9 @@
     <string name="notif_freeze_incomplete_text">Осталось работать приложений: %d. Откройте Gatekeeper и заморозьте их вручную.</string>
     <!-- Экран «Контакты и звонки» (H3) -->
     <string name="settings_root_contacts">Контакты и звонки</string>
-    <string name="settings_root_contacts_open">Личный профиль видит контакты рабочего</string>
-    <string name="settings_root_contacts_closed">Контакты рабочего профиля скрыты от личного</string>
-    <string name="settings_root_contacts_partial">Закрыто наполовину: один из двух переключателей выключен</string>
+    <string name="settings_root_contacts_open">Контакты рабочего профиля доступны</string>
+    <string name="settings_root_contacts_closed">Контакты рабочего профиля скрыты</string>
+    <string name="settings_root_contacts_partial">Настроено частично</string>
     <string name="settings_contacts_group_closed">Скрытие контактов профиля</string>
     <string name="settings_contacts_group_share">Передача контактов в профиль</string>
     <string name="settings_contacts_share_vcard">Отправить отдельные контакты файлом</string>
@@ -379,8 +379,8 @@
     <string name="settings_diag_vendor_note">Пределы проверки</string>
     <string name="settings_diag_vendor_note_desc">Вендорские убийцы задач (ColorOS HANS, MIUI, EMUI и подобные) для Android-API невидимы. Если заморозка все равно срабатывает через раз, а проверки выше зеленые, поищите Gatekeeper еще и в фирменных настройках батареи.</string>
     <!-- Экран «Обмен между копиями приложения» -->
-    <string name="settings_root_bridges">Обмен между копиями приложения</string>
-    <string name="settings_root_bridges_none">Выключено: ни одна копия не обменивается данными с личной</string>
+    <string name="settings_root_bridges">Связь приложений</string>
+    <string name="settings_root_bridges_none">Выключено</string>
     <plurals name="settings_root_bridges_count">
         <item quantity="one">Открыто для приложения: %1$d</item>
         <item quantity="few">Открыто для приложений: %1$d</item>
@@ -392,16 +392,16 @@
     <string name="settings_bridges_interaction_title">Общение с собственной копией</string>
     <string name="settings_bridges_interaction_desc">Две копии приложения в разных профилях смогут обмениваться данными. Android 11+.</string>
     <string name="settings_bridges_interaction_all">Разрешить все подходящие приложения</string>
-    <string name="settings_bridges_interaction_all_desc">Разрешить установленным приложениям с поддержкой Connected apps запрашивать связь. Android все равно попросит ваше подтверждение. Для Календаря и Цифрового благополучия нужны копии в обоих профилях.</string>
+    <string name="settings_bridges_interaction_all_desc">Связь для подходящих приложений. Android запросит подтверждение. Для Календаря и Цифрового благополучия нужны копии в обоих профилях.</string>
     <string name="settings_bridges_no_apps">Своих приложений в профиле пока нет</string>
     <string name="settings_bridges_unavailable">Рабочий профиль сейчас не отвечает</string>
     <string name="settings_bridges_failed">Рабочий профиль отклонил изменение</string>
     <string name="settings_create_personal_calendar_events">Создавать события в личном календаре</string>
-    <string name="settings_create_personal_calendar_events_desc">Рабочие приложения смогут передавать запрос на создание события календарю личного профиля. Существующие события и аккаунты не переносятся.</string>
+    <string name="settings_create_personal_calendar_events_desc">Рабочие приложения смогут создавать события в личном календаре. Существующие события не переносятся.</string>
     <string name="settings_local_calendar_target">Google-календарь для локальных событий</string>
-    <string name="settings_local_calendar_target_desc">Выберите доступный для записи Google-календарь рабочего профиля. Доступ к календарям выдается только при выборе или пока перенос включен.</string>
-    <string name="settings_local_calendar_routing">Переносить локальные рабочие события в Google Calendar</string>
-    <string name="settings_local_calendar_routing_desc">Переносит текущие и новые события из любого локального несинхронизируемого календаря рабочего профиля в выбранный Google-календарь. Другие синхронизируемые календари не меняются.</string>
+    <string name="settings_local_calendar_target_desc">Выберите Google-календарь рабочего профиля. Доступ выдается только при выборе или пока перенос включен.</string>
+    <string name="settings_local_calendar_routing">Переносить локальные события</string>
+    <string name="settings_local_calendar_routing_desc">Переносит локальные события рабочего профиля в выбранный Google-календарь. Синхронизируемые календари не меняются.</string>
     <string name="settings_local_calendar_no_targets">В рабочем профиле не найден доступный для записи Google-календарь</string>
     <string name="settings_local_calendar_failed">Не удалось настроить перенос календаря</string>
     <string name="settings_local_calendar_choose_first">Сначала выберите Google-календарь</string>
@@ -489,7 +489,7 @@
          система сама отказывается удалять его рабочую копию, поэтому экран говорит,
          что защищено, а не пугает удалением, которое невозможно. -->
     <string name="settings_root_removal">Удаление Gatekeeper</string>
-    <string name="settings_root_removal_desc">Рабочую копию удалить нельзя, профиль удаляется отдельно</string>
+    <string name="settings_root_removal_desc">Профиль удаляется в настройках Android</string>
     <string name="settings_removal_wipe">Удалить рабочий профиль</string>
     <string name="settings_removal_wipe_desc">Все приложения, аккаунты и файлы -- навсегда</string>
     <string name="settings_removal_backup">Резервная копия настроек</string>
@@ -513,7 +513,7 @@
     <string name="settings_files_manager_desc">Дает файловому менеджеру (MiXplorer, Total Commander) постоянный доступ к другому профилю: добавьте хранилище и выберите Gatekeeper.</string>
     <!-- Изоляция профиля: пресеты и отдельные политики -->
     <string name="settings_root_isolation">Изоляция профиля</string>
-    <string name="settings_root_isolation_desc">Уровень изоляции и отдельные запреты</string>
+    <string name="settings_root_isolation_desc">Уровень защиты профиля</string>
     <string name="isolation_preset_group">Уровень изоляции</string>
     <string name="isolation_preset_convenient">Удобный</string>
     <string name="isolation_preset_convenient_desc">Работают: контакты, буфер обмена, перенос файлов, уведомления. Запретов нет.</string>

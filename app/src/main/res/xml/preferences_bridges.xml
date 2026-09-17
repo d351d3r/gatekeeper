@@ -5,24 +5,32 @@
 
     <androidx.preference.SwitchPreferenceCompat
         android:key="settings_create_personal_calendar_events"
+        android:layout="@layout/preference_compact"
+        android:icon="@drawable/ic_perm_calendar"
         app:iconSpaceReserved="false"
         android:title="@string/settings_create_personal_calendar_events"
         android:summary="@string/settings_create_personal_calendar_events_desc" />
 
     <androidx.preference.ListPreference
         android:key="settings_local_calendar_target"
+        android:layout="@layout/preference_compact"
+        android:icon="@drawable/ic_perm_calendar"
         app:iconSpaceReserved="false"
         android:title="@string/settings_local_calendar_target"
         android:summary="@string/settings_local_calendar_target_desc" />
 
     <androidx.preference.SwitchPreferenceCompat
         android:key="settings_local_calendar_routing"
+        android:layout="@layout/preference_compact"
+        android:icon="@drawable/ic_link"
         app:iconSpaceReserved="false"
         android:title="@string/settings_local_calendar_routing"
         android:summary="@string/settings_local_calendar_routing_desc" />
 
     <androidx.preference.SwitchPreferenceCompat
         android:key="settings_bridges_interaction_all"
+        android:layout="@layout/preference_compact"
+        android:icon="@drawable/ic_link"
         app:iconSpaceReserved="false"
         android:title="@string/settings_bridges_interaction_all"
         android:summary="@string/settings_bridges_interaction_all_desc" />
@@ -37,6 +45,7 @@
 
         <androidx.preference.Preference
             android:key="settings_bridges_widgets_note"
+            android:layout="@layout/preference_compact"
             app:iconSpaceReserved="false"
             android:selectable="false"
             android:summary="@string/settings_bridges_widgets_desc" />
@@ -53,6 +62,7 @@
 
         <androidx.preference.Preference
             android:key="settings_bridges_interaction_note"
+            android:layout="@layout/preference_compact"
             app:iconSpaceReserved="false"
             android:selectable="false"
             android:summary="@string/settings_bridges_interaction_desc" />

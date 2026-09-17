@@ -87,10 +87,10 @@
     <!-- Settings Options -->
     <string name="settings">Settings</string>
     <string name="settings_root_freeze">Freeze</string>
-    <string name="settings_root_freeze_off">Off: apps are not frozen on screen lock</string>
+    <string name="settings_root_freeze_off">Off</string>
     <string name="settings_root_freeze_on">On screen lock: %1$s</string>
     <string name="settings_root_antispy">Profile VPN</string>
-        <string name="settings_root_antispy_desc">Pinned VPN and freeze when it comes up</string>
+        <string name="settings_root_antispy_desc">VPN and app freezing</string>
     <string name="settings_root_files">Files and media</string>
     <string name="settings_root_files_off">Cross-profile exchange off</string>
     <string name="settings_root_files_on">Cross-profile exchange on</string>
@@ -127,7 +127,7 @@
     <string name="settings_bridges_search_empty">No matching applications</string>
     <string name="settings_auto_freeze_list_empty">List is empty. Open an app in the list and turn on "Auto-freeze"</string>
     <string name="settings_auto_freeze_clear_all">Clear auto-freeze list</string>
-    <string name="settings_auto_freeze_clear_all_summary">Remove every app from automatic freezing</string>
+    <string name="settings_auto_freeze_clear_all_summary">Remove apps from auto-freeze</string>
     <string name="settings_auto_freeze_clear_all_title">Clear auto-freeze list?</string>
     <string name="settings_auto_freeze_clear_all_message">All %1$d apps will be removed from automatic freezing. Apps already frozen will stay frozen until you unfreeze them.</string>
     <string name="settings_auto_freeze_clear_all_done">Auto-freeze list cleared</string>
@@ -140,9 +140,9 @@
         <item quantity="other">%1$d installed</item>
     </plurals>
     <string name="settings_root_diagnostics">Diagnostics</string>
-    <string name="settings_root_diagnostics_desc">Battery, background, link with the profile</string>
+    <string name="settings_root_diagnostics_desc">Battery, background work and profile link</string>
     <string name="settings_root_misc">Misc</string>
-    <string name="settings_root_misc_desc">Profile NFC payment, version, links</string>
+    <string name="settings_root_misc_desc">NFC, version and links</string>
     <string name="settings_interaction">Interaction</string>
     <string name="settings_cross_profile_file_chooser">File Shuttle</string>
     <string name="settings_cross_profile_file_chooser_desc">The other profile appears as a source in the file picker. Only the file you pick crosses the boundary.</string>
@@ -168,7 +168,7 @@
     <string name="settings_payment_setup_hint">Set the work-profile app as the default payment app in system settings: NFC -> \"Contactless payments\". On Android 15, \"Default apps\" -> \"Wallet\".</string>
     <string name="settings_cross_profile_link_rules">Open links in work profile</string>
     <string name="settings_cross_profile_link_rules_dialog">Comma-separated domains, e.g. .ru, .su, example.com. Warning: the work profile browser sees every matching link, including personal ones.</string>
-    <string name="settings_cross_profile_link_rules_none">No rules: links open in the current profile</string>
+    <string name="settings_cross_profile_link_rules_none">Links open by default</string>
     <string name="settings_cross_profile_link_rules_current">Active: %1$s</string>
     <string name="settings_cross_profile_link_rules_skipped">Ignored %1$d invalid entries</string>
     <string name="settings_cross_profile_link_rules_failed">Couldn\'t apply rules (work profile unavailable)</string>
@@ -363,9 +363,9 @@
     <string name="notif_freeze_incomplete_text">%d apps are still running. Open Gatekeeper and freeze them by hand.</string>
     <!-- Contacts and calls screen (H3) -->
     <string name="settings_root_contacts">Contacts and calls</string>
-    <string name="settings_root_contacts_open">The personal profile can see work contacts</string>
-    <string name="settings_root_contacts_closed">Work contacts are hidden from the personal profile</string>
-    <string name="settings_root_contacts_partial">Partly closed: one of the two switches is off</string>
+    <string name="settings_root_contacts_open">Work-profile contacts are available</string>
+    <string name="settings_root_contacts_closed">Work-profile contacts are hidden</string>
+    <string name="settings_root_contacts_partial">Partly configured</string>
     <string name="settings_contacts_group_closed">Hiding profile contacts</string>
     <string name="settings_contacts_group_share">Passing contacts into the profile</string>
     <string name="settings_contacts_share_vcard">Send single contacts as a file</string>
@@ -406,8 +406,8 @@
     <string name="settings_diag_vendor_note">Limits of this check</string>
     <string name="settings_diag_vendor_note_desc">Vendor task killers (ColorOS HANS, MIUI, EMUI and the like) are invisible to Android APIs. If freezing still misfires while every check above is green, look for Gatekeeper in the vendor battery settings as well.</string>
     <!-- Exchange between copies of an app screen -->
-    <string name="settings_root_bridges">Exchange between copies of an app</string>
-    <string name="settings_root_bridges_none">Off: no copy exchanges data with its personal twin</string>
+    <string name="settings_root_bridges">App connections</string>
+    <string name="settings_root_bridges_none">Off</string>
     <plurals name="settings_root_bridges_count">
         <item quantity="one">Open for %1$d app</item>
         <item quantity="other">Open for %1$d apps</item>
@@ -417,16 +417,16 @@
     <string name="settings_bridges_interaction_title">Talking to its own copy</string>
     <string name="settings_bridges_interaction_desc">The two copies of an app in different profiles may exchange data. Android 11+.</string>
     <string name="settings_bridges_interaction_all">Allow all eligible apps</string>
-    <string name="settings_bridges_interaction_all_desc">Allow installed apps that support Connected apps to request a connection. Android still asks for your confirmation. Calendar and Digital Wellbeing require a copy in both profiles.</string>
+    <string name="settings_bridges_interaction_all_desc">Allow eligible apps to connect. Android still asks for confirmation. Calendar and Digital Wellbeing need a copy in both profiles.</string>
     <string name="settings_bridges_no_apps">No apps of your own in the profile yet</string>
     <string name="settings_bridges_unavailable">The work profile is not responding right now</string>
     <string name="settings_bridges_failed">The work profile refused that change</string>
     <string name="settings_create_personal_calendar_events">Create events in the personal calendar</string>
-    <string name="settings_create_personal_calendar_events_desc">Let work apps send event-creation requests to a calendar in the personal profile. Existing events and calendar accounts are not moved.</string>
+    <string name="settings_create_personal_calendar_events_desc">Let work apps create events in the personal calendar. Existing events are not moved.</string>
     <string name="settings_local_calendar_target">Google calendar for local events</string>
-    <string name="settings_local_calendar_target_desc">Choose a writable Google calendar from the work profile. Calendar access is granted only while choosing or while routing is enabled.</string>
-    <string name="settings_local_calendar_routing">Move local work events to Google Calendar</string>
-    <string name="settings_local_calendar_routing_desc">Moves current and future events created in any local, non-syncing work calendar to the selected Google calendar. Other synced calendars are not changed.</string>
+    <string name="settings_local_calendar_target_desc">Choose a Google calendar in the work profile. Access is granted only while choosing or routing is enabled.</string>
+    <string name="settings_local_calendar_routing">Move local events</string>
+    <string name="settings_local_calendar_routing_desc">Moves local work-profile events to the selected Google calendar. Synced calendars are unchanged.</string>
     <string name="settings_local_calendar_no_targets">No writable Google calendar was found in the work profile</string>
     <string name="settings_local_calendar_failed">Could not configure calendar routing</string>
     <string name="settings_local_calendar_choose_first">Choose a Google calendar first</string>
@@ -514,7 +514,7 @@
          the system itself refuses to uninstall its work copy, so the screen states
          what is protected rather than warning about a removal that cannot happen. -->
     <string name="settings_root_removal">Uninstalling Gatekeeper</string>
-    <string name="settings_root_removal_desc">The work copy cannot be uninstalled; the profile is removed separately</string>
+    <string name="settings_root_removal_desc">Remove the profile in Android settings</string>
     <string name="settings_removal_wipe">Remove work profile</string>
     <string name="settings_removal_wipe_desc">Every app, account and file -- permanently</string>
     <string name="settings_removal_backup">Settings backup</string>
@@ -538,7 +538,7 @@
     <string name="settings_files_manager_desc">Gives a file manager (MiXplorer, Total Commander) lasting access to the other profile: add storage and pick Gatekeeper.</string>
     <!-- Profile isolation: presets and the individual policies -->
     <string name="settings_root_isolation">Profile isolation</string>
-    <string name="settings_root_isolation_desc">The isolation level and the individual blocks</string>
+    <string name="settings_root_isolation_desc">Profile protection level</string>
     <string name="isolation_preset_group">Isolation level</string>
     <string name="isolation_preset_convenient">Convenient</string>
     <string name="isolation_preset_convenient_desc">Working: contacts, clipboard, file transfer, notifications. Nothing is blocked.</string>
