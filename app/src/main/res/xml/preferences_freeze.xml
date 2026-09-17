@@ -4,34 +4,46 @@
 
     <androidx.preference.SwitchPreferenceCompat
         android:key="settings_auto_freeze_service"
+        android:icon="@drawable/ic_freeze"
         android:title="@string/settings_auto_freeze_service"
         android:summary="@string/settings_auto_freeze_service_desc" />
 
     <androidx.preference.DropDownPreference
         android:dependency="settings_auto_freeze_service"
         android:key="settings_auto_freeze_scope"
+        android:icon="@drawable/ic_apps"
         android:title="@string/settings_auto_freeze_scope" />
 
     <androidx.preference.DropDownPreference
         android:dependency="settings_auto_freeze_service"
         android:key="settings_auto_freeze_delay"
+        android:icon="@drawable/ic_timer"
         android:title="@string/settings_auto_freeze_delay" />
 
     <androidx.preference.SwitchPreferenceCompat
         android:dependency="settings_auto_freeze_service"
         android:key="settings_dont_freeze_foreground"
+        android:icon="@drawable/ic_launch"
         android:title="@string/settings_dont_freeze_foreground"
         android:summary="@string/settings_dont_freeze_foreground_desc" />
 
     <androidx.preference.Preference
         android:key="settings_unfreeze_all"
         android:layout="@layout/preference_action_button"
+        android:icon="@drawable/ic_unfreeze"
         android:title="@string/unfreeze_all" />
 
     <androidx.preference.Preference
         android:key="settings_freeze_all"
         android:layout="@layout/preference_action_button"
+        android:icon="@drawable/ic_freeze"
         android:title="@string/freeze_all" />
+
+    <androidx.preference.Preference
+        android:key="settings_auto_freeze_clear_all"
+        android:layout="@layout/preference_action_button"
+        android:icon="@drawable/ic_delete"
+        android:title="@string/settings_auto_freeze_clear_all" />
 
     <androidx.preference.PreferenceCategory
         android:key="settings_shortcuts"
@@ -39,15 +51,21 @@
 
         <androidx.preference.Preference
             android:key="settings_create_unfreeze_all_shortcut"
+            android:icon="@drawable/ic_unfreeze"
             android:title="@string/create_unfreeze_all_shortcut" />
 
         <androidx.preference.Preference
             android:key="settings_create_freeze_all_shortcut"
+            android:icon="@drawable/ic_freeze"
             android:title="@string/create_freeze_all_shortcut" />
     </androidx.preference.PreferenceCategory>
 
     <androidx.preference.PreferenceCategory
         android:key="settings_auto_freeze_list"
-        android:title="@string/settings_auto_freeze_list" />
+        android:title="@string/settings_auto_freeze_list">
+
+        <io.gatekeeper.ui.settings.SettingsSearchPreference
+            android:key="settings_auto_freeze_search" />
+    </androidx.preference.PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

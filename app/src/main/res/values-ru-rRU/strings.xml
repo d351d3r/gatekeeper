@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources><string name="first_run_alert_cancel">Выйти</string>
     <string name="first_run_alert_continue">Продолжить</string>
-    <string name="device_admin_desc">Служба изоляции приложений</string><string name="service_title">Служба Gatekeeper</string>
-    <string name="service_desc">Рабочий профиль на связи. Нажмите, чтобы открыть список приложений.</string>
+    <string name="device_admin_desc">Служба изоляции приложений</string><string name="service_title">Рабочий профиль подключен</string>
+    <string name="service_desc">Gatekeeper работает. Откройте список приложений.</string>
     <string name="fragment_profile_main">Основной</string>
     <string name="fragment_profile_work">Рабочий</string>
     <string name="row_state_frozen">Заморожено, фон и уведомления выключены</string>
@@ -88,7 +88,16 @@
     <string name="settings_perm_vpn">Доступ к VPN</string>
     <string name="settings_perm_reason_vpn">заморозка при включении VPN не сработает</string>
     <string name="settings_auto_freeze_list">Список автозаморозки</string>
+    <string name="settings_auto_freeze_search_hint">Поиск по списку автозаморозки</string>
+    <string name="settings_auto_freeze_search_empty">Подходящих приложений нет</string>
+    <string name="settings_bridges_search_hint">Поиск приложений</string>
+    <string name="settings_bridges_search_empty">Подходящих приложений нет</string>
     <string name="settings_auto_freeze_list_empty">Список пуст. Откройте приложение в списке и включите «Автозаморозка»</string>
+    <string name="settings_auto_freeze_clear_all">Очистить список автозаморозки</string>
+    <string name="settings_auto_freeze_clear_all_summary">Убрать все приложения из автоматической заморозки</string>
+    <string name="settings_auto_freeze_clear_all_title">Очистить список автозаморозки?</string>
+    <string name="settings_auto_freeze_clear_all_message">Все %1$d приложений в списке будут исключены из автоматической заморозки. Уже замороженные приложения останутся замороженными, пока вы не разморозите их.</string>
+    <string name="settings_auto_freeze_clear_all_done">Список автозаморозки очищен</string>
     <string name="settings_auto_freeze_remove_title">Убрать из автозаморозки?</string>
     <string name="settings_auto_freeze_remove_message">«%1$s» больше не будет замораживаться автоматически. Вернуть можно там же: откройте приложение и включите «Автозаморозка».</string>
     <string name="settings_backup_export_desc">Настройки, списки приложений обоих профилей и список автозаморозки в JSON-файл</string>

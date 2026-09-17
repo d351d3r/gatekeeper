@@ -32,6 +32,9 @@
         app:iconSpaceReserved="false"
         android:title="@string/settings_bridges_widgets_title">
 
+        <io.gatekeeper.ui.settings.SettingsSearchPreference
+            android:key="settings_bridges_widgets_search" />
+
         <androidx.preference.Preference
             android:key="settings_bridges_widgets_note"
             app:iconSpaceReserved="false"
@@ -44,6 +47,9 @@
         android:key="settings_bridges_interaction"
         app:iconSpaceReserved="false"
         android:title="@string/settings_bridges_interaction_title">
+
+        <io.gatekeeper.ui.settings.SettingsSearchPreference
+            android:key="settings_bridges_interaction_search" />
 
         <androidx.preference.Preference
             android:key="settings_bridges_interaction_note"

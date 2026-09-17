@@ -1,5 +1,7 @@
 package io.gatekeeper.ui.settings
 
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.RemoteException
@@ -8,6 +10,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.SwitchPreferenceCompat
 import io.gatekeeper.R
+import io.gatekeeper.services.ILoadIconCallback
 import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.CalendarRouting
 import io.gatekeeper.util.GatekeeperToast
@@ -24,6 +27,8 @@ class BridgesSettingsFragment : SettingsSubFragment() {
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_bridges)
+        bindBridgeSearch(CATEGORY_WIDGETS)
+        bindBridgeSearch(CATEGORY_INTERACTION)
         bindCheckBox(
             CREATE_PERSONAL_CALENDAR_EVENTS,
             manager.getCreatePersonalCalendarEventsEnabled(),
@@ -77,6 +82,8 @@ class BridgesSettingsFragment : SettingsSubFragment() {
                     return@postOnUi
                 }
                 interactionPackages = interaction
+                bridgeApps = apps
+                widgetPackages = widgets
                 applyCalendarState(calendarState)
                 fillApps(
                     CATEGORY_WIDGETS,
@@ -109,6 +116,35 @@ class BridgesSettingsFragment : SettingsSubFragment() {
         findPreference<SwitchPreferenceCompat>(MASTER_INTERACTION)?.isEnabled = false
         findPreference<SwitchPreferenceCompat>(LOCAL_CALENDAR_ROUTING)?.isEnabled = false
         findPreference<ListPreference>(LOCAL_CALENDAR_TARGET)?.isEnabled = false
+    }
+
+    private fun bindBridgeSearch(categoryKey: String) {
+        findPreference<SettingsSearchPreference>("${categoryKey}_search")?.apply {
+            queryHintRes = R.string.settings_bridges_search_hint
+            onQueryChanged = { query ->
+                bridgeQueries[categoryKey] = query.trim()
+                renderBridgeCategory(categoryKey)
+            }
+        }
+    }
+
+    private fun renderBridgeCategory(categoryKey: String) {
+        val apps = bridgeApps ?: return
+        when (categoryKey) {
+            CATEGORY_WIDGETS -> fillApps(
+                CATEGORY_WIDGETS,
+                apps,
+                widgetPackages,
+                apply = { pkg, on -> setWidget(pkg, on) },
+            )
+            CATEGORY_INTERACTION -> fillApps(
+                CATEGORY_INTERACTION,
+                apps,
+                interactionPackages,
+                apply = { pkg, on -> setInteraction(pkg, on, interactionPackages) },
+                editable = !manager.getCrossProfileInteractionAllEnabled(),
+            )
+        }
     }
 
     private fun bindCalendarRouting() {
@@ -212,6 +248,7 @@ class BridgesSettingsFragment : SettingsSubFragment() {
      * Строки приложений добавляются после пояснения и пересобираются на каждый
      * onResume: состояние политики живет в рабочем профиле, а не у нас.
      */
+    @Suppress("LongMethod", "CyclomaticComplexMethod", "ReturnCount")
     private fun fillApps(
         categoryKey: String,
         apps: List<ApplicationInfoWrapper>,
@@ -220,8 +257,10 @@ class BridgesSettingsFragment : SettingsSubFragment() {
         editable: Boolean = true,
     ) {
         val category = findPreference<PreferenceCategory>(categoryKey) ?: return
+        val search = findPreference<SettingsSearchPreference>("${categoryKey}_search")
         val note = findPreference<Preference>("${categoryKey}_note")
         category.removeAll()
+        search?.let { category.addPreference(it) }
         note?.let { category.addPreference(it) }
         if (apps.isEmpty()) {
             category.addPreference(
@@ -233,29 +272,60 @@ class BridgesSettingsFragment : SettingsSubFragment() {
             )
             return
         }
-        for (app in apps) {
-            val pkg = app.getPackageName()
+        val query = bridgeQueries[categoryKey].orEmpty()
+        val visibleApps = apps.filter { app ->
+            query.isBlank() ||
+                app.getPackageName().contains(query, ignoreCase = true) ||
+                app.getLabel().orEmpty().contains(query, ignoreCase = true)
+        }
+        if (visibleApps.isEmpty()) {
             category.addPreference(
-                SwitchPreferenceCompat(requireContext()).apply {
-                    key = "$categoryKey.$pkg"
-                    title = app.getLabel() ?: pkg
-                    summary = pkg
-                    isChecked = pkg in allowed
-                    isEnabled = editable
+                Preference(requireContext()).apply {
+                    title = getString(R.string.settings_bridges_search_empty)
+                    isSelectable = false
                     isIconSpaceReserved = false
-                    setOnPreferenceChangeListener { _, newState ->
-                        val enabled = newState as Boolean
-                        val done = apply(pkg, enabled)
-                        if (!done) {
-                            GatekeeperToast.show(
-                                requireContext(),
-                                R.string.settings_bridges_failed,
-                            )
-                        }
-                        done
-                    }
                 }
             )
+            return
+        }
+        for (app in visibleApps) {
+            val pkg = app.getPackageName()
+            val pref = SwitchPreferenceCompat(requireContext()).apply {
+                key = "$categoryKey.$pkg"
+                title = app.getLabel() ?: pkg
+                summary = pkg
+                isChecked = pkg in allowed
+                isEnabled = editable
+                isIconSpaceReserved = true
+                setIcon(R.drawable.ic_apps)
+                setOnPreferenceChangeListener { _, newState ->
+                    val enabled = newState as Boolean
+                    val done = apply(pkg, enabled)
+                    if (!done) {
+                        GatekeeperToast.show(
+                            requireContext(),
+                            R.string.settings_bridges_failed,
+                        )
+                    }
+                    done
+                }
+            }
+            category.addPreference(pref)
+            val work = serviceWork
+            if (work != null) {
+                try {
+                    work.loadIcon(app, object : ILoadIconCallback.Stub() {
+                        override fun callback(icon: Bitmap) {
+                            postOnUi {
+                                if (category.findPreference<Preference>(pref.key) === pref) {
+                                    pref.icon = BitmapDrawable(resources, icon)
+                                }
+                            }
+                        }
+                    })
+                } catch (_: RemoteException) {
+                }
+            }
         }
     }
 
@@ -341,5 +411,8 @@ class BridgesSettingsFragment : SettingsSubFragment() {
     }
 
     private var interactionPackages: Set<String> = emptySet()
+    private var bridgeApps: List<ApplicationInfoWrapper>? = null
+    private var widgetPackages: Set<String> = emptySet()
+    private val bridgeQueries = mutableMapOf<String, String>()
     private var calendarTargetId: Long = -1L
 }

@@ -397,31 +397,6 @@ class AppListFragment : BaseFragment() {
         }
     }
 
-    /**
-     * Приложения, установленные в профиль мимо нас, попадают в список автозаморозки
-     * (F3). Забираем их у сервиса профиля здесь, а не письмом из профиля: на
-     * Android 14+ запуск activity из фонового сервиса рубит Background Activity
-     * Launch, а биндер в этот момент и так живой -- список только что пришёл им же.
-     */
-    private fun adoptNewWorkPackages() {
-        val fresh = try {
-            service?.takeNewWorkPackages().orEmpty()
-        } catch (_: RemoteException) {
-            return
-        }
-        if (fresh.isEmpty()) {
-            return
-        }
-        for (packageName in fresh) {
-            AutoFreezeDefaults.enableForWorkProfile(requireContext(), packageName)
-        }
-        adapter?.setAutoFreezePackages(
-            LocalStorageManager.getInstance()
-                .getStringList(LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE)
-                .toSet()
-        )
-    }
-
     private fun requestAppListRefresh(followUpAfterInstall: Boolean = false) {
         (activity as? MainActivity)?.scheduleAppListRefresh(followUpAfterInstall)
             ?: ProfileNotifier.scheduleAppListRefresh(requireContext())
@@ -504,7 +479,6 @@ class AppListFragment : BaseFragment() {
                                 apps.size,
                                 apps.count { it.isHidden() },
                             )
-                            adoptNewWorkPackages()
                         }
                         if (freezePackages != null) {
                             adapter!!.setAutoFreezePackages(freezePackages)
@@ -584,13 +558,6 @@ class AppListFragment : BaseFragment() {
             var message = getString(if (isInstall) R.string.clone_success else R.string.uninstall_success)
             message = String.format(message, app.getLabel())
             GatekeeperToast.show(requireContext(), message)
-            if (isInstall && !isRemote) {
-                AutoFreezeDefaults.enableForWorkProfile(
-                    requireContext(),
-                    app.getPackageName(),
-                    clearOptOut = true
-                )
-            }
             if (!isInstall && isRemote) {
                 UnfreezeShortcuts.removeLauncherShortcutsEverywhere(
                     requireContext(),

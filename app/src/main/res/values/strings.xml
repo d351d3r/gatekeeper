@@ -11,8 +11,8 @@
     <string name="notifications_important">Gatekeeper Important</string>
     <string name="finish_provision_title">Click here to finish setting up Gatekeeper</string>
     <string name="finish_provision_desc">One last step to finish setting up Gatekeeper.</string>
-    <string name="service_title">Gatekeeper Service</string>
-    <string name="service_desc">The work profile is connected. Tap to open the app list.</string>
+    <string name="service_title">Work profile connected</string>
+    <string name="service_desc">Gatekeeper is running. Open the app list.</string>
     <string name="service_auto_freeze_title">Auto-freeze pending</string>
     <string name="service_auto_freeze_desc">Gatekeeper will auto-freeze apps launched from \"Unfreeze &amp; Launch\" on the next screen lock event.</string>
     <string name="service_auto_freeze_now">Freeze Now</string>
@@ -121,7 +121,16 @@
     <string name="settings_perm_vpn">VPN access</string>
     <string name="settings_perm_reason_vpn">freeze on VPN will not work</string>
     <string name="settings_auto_freeze_list">Auto-freeze list</string>
+    <string name="settings_auto_freeze_search_hint">Search auto-freeze list</string>
+    <string name="settings_auto_freeze_search_empty">No matching applications</string>
+    <string name="settings_bridges_search_hint">Search applications</string>
+    <string name="settings_bridges_search_empty">No matching applications</string>
     <string name="settings_auto_freeze_list_empty">List is empty. Open an app in the list and turn on "Auto-freeze"</string>
+    <string name="settings_auto_freeze_clear_all">Clear auto-freeze list</string>
+    <string name="settings_auto_freeze_clear_all_summary">Remove every app from automatic freezing</string>
+    <string name="settings_auto_freeze_clear_all_title">Clear auto-freeze list?</string>
+    <string name="settings_auto_freeze_clear_all_message">All %1$d apps will be removed from automatic freezing. Apps already frozen will stay frozen until you unfreeze them.</string>
+    <string name="settings_auto_freeze_clear_all_done">Auto-freeze list cleared</string>
     <string name="settings_auto_freeze_remove_title">Remove from auto-freeze?</string>
     <string name="settings_auto_freeze_remove_message">"%1$s" will no longer be frozen automatically. Add it back the same way: open the app and turn on "Auto-freeze".</string>
     <string name="settings_backup_export_desc">Settings, app lists of both profiles and the auto-freeze list into a JSON file</string>
