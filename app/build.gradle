@@ -86,9 +86,11 @@ android {
             universalApk = false
         }
     }
+    // Java 8 как source/target устарел в javac 21 (JDK Android Studio). Язык 17 на
+    // minSdk 24 безопасен: D8/R8 опускают байткод до нужного уровня Android.
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     lint {
         disable 'MissingTranslation', 'ExtraTranslation', 'GoogleAppIndexingWarning', 'InvalidFragmentVersionForActivityResult'
@@ -158,7 +160,7 @@ afterEvaluate {
 
 dependencies {
     implementation 'androidx.activity:activity:1.13.0'
-    implementation 'androidx.fragment:fragment:1.9.0'
+    implementation 'androidx.fragment:fragment:1.9.1'
     implementation 'androidx.appcompat:appcompat:1.8.0'
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.2'
@@ -166,7 +168,7 @@ dependencies {
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0'
     testImplementation 'junit:junit:4.13.2'
     // JVM-вариант org.json для unit-тестов сериализации бэкапа (на устройстве -- фреймворковый).
-    testImplementation 'org.json:json:20240303'
+    testImplementation 'org.json:json:20260814'
     androidTestImplementation 'androidx.test:core:1.7.0'
     androidTestImplementation 'androidx.test:runner:1.7.0'
     androidTestImplementation 'androidx.test:rules:1.7.0'

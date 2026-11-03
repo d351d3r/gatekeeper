@@ -163,9 +163,11 @@ class AntiSpyVpnWatchTest {
         return !isWatcherRunning(null)
     }
 
+    // getRunningServices устарел с API 26 для чужих сервисов; свои он отдает по-прежнему,
+    // а другого публичного способа узнать, на переднем ли плане свой сервис, нет.
+    @Suppress("DEPRECATION")
     private fun isWatcherRunning(foreground: Boolean?): Boolean {
         val name = AntiSpyVpnWatchService::class.java.name
-        // С API 26 сюда попадают только собственные сервисы, чужие не видны.
         return context.getSystemService(ActivityManager::class.java)
             .getRunningServices(Int.MAX_VALUE)
             .any { it.service.className == name && (foreground == null || it.foreground == foreground) }

@@ -88,7 +88,7 @@ object FileShuttleConnection {
             Thread(runnable, "file-shuttle-ping").apply { isDaemon = true }
         }
 
-    private val pingLock = Object()
+    private val pingLock = Any()
     private var scheduledPing: ScheduledFuture<*>? = null
 
     /**

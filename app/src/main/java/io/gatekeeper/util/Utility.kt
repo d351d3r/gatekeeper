@@ -216,6 +216,10 @@ object Utility {
         LocalStorageManager.getInstance().setStringList(pref, list.toTypedArray())
     }
 
+    /** Итог закрепления ярлыка; сообщает о нем пользователю [showShortcutPinOutcome]. */
+    enum class ShortcutPinOutcome { REQUESTED, LEGACY_SENT, UNSUPPORTED }
+
+    /** Закрепить ярлык и сообщить итог тостом: только с главного потока. */
     fun createLauncherShortcut(
         context: Context,
         launchIntent: Intent,
@@ -223,47 +227,73 @@ object Utility {
         id: String,
         label: String
     ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val shortcutManager = context.getSystemService(ShortcutManager::class.java)
+        showShortcutPinOutcome(context, pinLauncherShortcut(context, launchIntent, icon, id, label))
+    }
 
-            if (shortcutManager.isRequestPinShortcutSupported) {
-                // Пины ярлыка система/лаунчер вправе отклонить исключением (на A16 это
-                // наблюдаемый у апстрима краш при создании ярлыка общей заморозки,
-                // 4PDA #1706): отказ превращаем в тост, а не в падение приложения.
-                try {
-                    val info = ShortcutInfo.Builder(context, id)
-                        .setIntent(launchIntent)
-                        .setIcon(icon)
-                        .setShortLabel(label)
-                        .setLongLabel(label)
-                        .build()
-                    val addIntent = shortcutManager.createShortcutResultIntent(info)
-                    shortcutManager.requestPinShortcut(
-                        info,
-                        PendingIntent.getBroadcast(
-                            context,
-                            0,
-                            addIntent,
-                            PendingIntent.FLAG_IMMUTABLE
-                        ).intentSender
-                    )
-                } catch (e: Exception) {
-                    Log.w(TAG, "requestPinShortcut failed", e)
-                    GatekeeperToast.show(
-                        context,
-                        context.getString(R.string.unsupported_launcher),
-                        android.widget.Toast.LENGTH_LONG,
-                    )
-                }
-            } else {
-                GatekeeperToast.show(
+    /**
+     * Закрепление без UI. Методы ShortcutManager -- IPC в system_server и помечены
+     * @WorkerThread, поэтому колбэки binder закрепляют ярлык прямо на своем потоке,
+     * а итог показывают на главном.
+     */
+    fun pinLauncherShortcut(
+        context: Context,
+        launchIntent: Intent,
+        icon: Icon,
+        id: String,
+        label: String
+    ): ShortcutPinOutcome = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        requestPinShortcut(context, launchIntent, icon, id, label)
+    } else {
+        installLegacyShortcut(context, launchIntent, icon, label)
+        ShortcutPinOutcome.LEGACY_SENT
+    }
+
+    fun showShortcutPinOutcome(context: Context, outcome: ShortcutPinOutcome) {
+        when (outcome) {
+            ShortcutPinOutcome.REQUESTED -> Unit
+            ShortcutPinOutcome.LEGACY_SENT -> GatekeeperToast.show(context, R.string.shortcut_create_success)
+            ShortcutPinOutcome.UNSUPPORTED -> GatekeeperToast.show(
+                context,
+                context.getString(R.string.unsupported_launcher),
+                android.widget.Toast.LENGTH_LONG,
+            )
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private fun requestPinShortcut(
+        context: Context,
+        launchIntent: Intent,
+        icon: Icon,
+        id: String,
+        label: String
+    ): ShortcutPinOutcome {
+        val shortcutManager = context.getSystemService(ShortcutManager::class.java)
+        if (!shortcutManager.isRequestPinShortcutSupported) return ShortcutPinOutcome.UNSUPPORTED
+        // Пины ярлыка система/лаунчер вправе отклонить исключением (на A16 это
+        // наблюдаемый у апстрима краш при создании ярлыка общей заморозки,
+        // 4PDA #1706): отказ превращаем в тост, а не в падение приложения.
+        return try {
+            val info = ShortcutInfo.Builder(context, id)
+                .setIntent(launchIntent)
+                .setIcon(icon)
+                .setShortLabel(label)
+                .setLongLabel(label)
+                .build()
+            val addIntent = shortcutManager.createShortcutResultIntent(info)
+            shortcutManager.requestPinShortcut(
+                info,
+                PendingIntent.getBroadcast(
                     context,
-                    context.getString(R.string.unsupported_launcher),
-                    android.widget.Toast.LENGTH_LONG,
-                )
-            }
-        } else {
-            installLegacyShortcut(context, launchIntent, icon, label)
+                    0,
+                    addIntent,
+                    PendingIntent.FLAG_IMMUTABLE
+                ).intentSender
+            )
+            ShortcutPinOutcome.REQUESTED
+        } catch (e: Exception) {
+            Log.w(TAG, "requestPinShortcut failed", e)
+            ShortcutPinOutcome.UNSUPPORTED
         }
     }
 
@@ -278,7 +308,6 @@ object Utility {
             drawableToBitmap(icon.loadDrawable(context)!!)
         )
         context.sendBroadcast(shortcutIntent)
-        GatekeeperToast.show(context, R.string.shortcut_create_success)
     }
 
     /**

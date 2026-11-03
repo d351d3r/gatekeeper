@@ -251,7 +251,11 @@ class PackageInstallFlow(
                 if (isProfileOwner) {
                     UnfreezeShortcuts.requestRemoveOnOtherProfile(activity, packageName)
                 } else {
-                    UnfreezeShortcuts.removeLauncherShortcutsEverywhere(activity, packageName)
+                    // Снятие ярлыков -- IPC в system_server (ShortcutManager, @WorkerThread),
+                    // а здесь главный поток и activity сразу закрывается: уводим в фон.
+                    val appContext = activity.applicationContext
+                    Thread({ UnfreezeShortcuts.removeLauncherShortcutsEverywhere(appContext, packageName) }, TAG)
+                        .start()
                     LocalStorageManager.getInstance().removeFromStringList(
                         LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE,
                         packageName

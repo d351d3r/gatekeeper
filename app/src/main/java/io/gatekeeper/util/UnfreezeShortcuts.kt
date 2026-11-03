@@ -168,23 +168,23 @@ object UnfreezeShortcuts {
             collectShortcutInfo(info, packageName, idsToDisable, launchIntents, labels)
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            try {
-                val launcherApps = context.getSystemService(LauncherApps::class.java)
-                val query = LauncherApps.ShortcutQuery().apply {
-                    setPackage(context.packageName)
-                    setQueryFlags(
-                        LauncherApps.ShortcutQuery.FLAG_MATCH_PINNED or
-                                LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC
-                    )
-                }
-                val shortcuts = launcherApps.getShortcuts(query, Process.myUserHandle()) ?: emptyList()
-                for (info in shortcuts) {
-                    collectShortcutInfo(info, packageName, idsToDisable, launchIntents, labels)
-                }
-            } catch (e: SecurityException) {
-                Log.w(TAG, "LauncherApps shortcut query failed for $packageName", e)
+        // Функция вызывается только на API 26+ (@RequiresApi): LauncherApps.getShortcuts
+        // (API 25) доступен всегда, отдельная проверка версии была лишней.
+        try {
+            val launcherApps = context.getSystemService(LauncherApps::class.java)
+            val query = LauncherApps.ShortcutQuery().apply {
+                setPackage(context.packageName)
+                setQueryFlags(
+                    LauncherApps.ShortcutQuery.FLAG_MATCH_PINNED or
+                            LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC
+                )
             }
+            val shortcuts = launcherApps.getShortcuts(query, Process.myUserHandle()) ?: emptyList()
+            for (info in shortcuts) {
+                collectShortcutInfo(info, packageName, idsToDisable, launchIntents, labels)
+            }
+        } catch (e: SecurityException) {
+            Log.w(TAG, "LauncherApps shortcut query failed for $packageName", e)
         }
     }
 
