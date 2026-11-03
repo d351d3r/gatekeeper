@@ -26,12 +26,12 @@ import io.gatekeeper.util.BinderCallers
 import io.gatekeeper.util.CrossProfileDocumentsProvider
 import io.gatekeeper.util.FileShuttlePathResolver
 import io.gatekeeper.util.Notifications
+import io.gatekeeper.util.ShuttleEntry
 import io.gatekeeper.util.StatusNotification
 import io.gatekeeper.util.Utility
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.io.Serializable
 
 class FileShuttleService : Service() {
     private val suicideTask = Runnable { suicide() }
@@ -52,58 +52,45 @@ class FileShuttleService : Service() {
             resetSuicideTask()
         }
 
-        override fun loadFiles(path: String): List<Map<String, Serializable>> {
+        override fun loadFiles(path: String): List<ShuttleEntry> {
             resetSuicideTask()
-            val ret = ArrayList<Map<String, Serializable>>()
-            val resolved = resolvePath(path) ?: return ret
-            val f = File(resolved)
-            f.listFiles()?.forEach { child ->
-                ret.add(loadFileMeta(child.path))
-            }
-            return ret
+            val resolved = resolvePath(path) ?: return emptyList()
+            return File(resolved).listFiles()?.map { child -> loadFileMeta(child.path) }.orEmpty()
         }
 
-        override fun loadFileMeta(path: String): Map<String, Serializable> {
+        override fun loadFileMeta(path: String): ShuttleEntry {
             resetSuicideTask()
-            val map = HashMap<String, Serializable>()
-            val resolved = resolvePath(path)
-            if (resolved == null) {
-                // Нейтральный отказ: документ без флагов и с исходным id, чтобы
-                // клиент видел запись, но не мог ни открыть, ни удалить её.
-                map[DocumentsContract.Document.COLUMN_DOCUMENT_ID] = path
-                map[DocumentsContract.Document.COLUMN_FLAGS] = 0
-                return map
-            }
+            // Нейтральный отказ: документ без флагов и с исходным id, чтобы
+            // клиент видел запись, но не мог ни открыть, ни удалить её.
+            val resolved = resolvePath(path) ?: return ShuttleEntry(documentId = path)
             val f = File(resolved)
-            map[DocumentsContract.Document.COLUMN_DOCUMENT_ID] = f.absolutePath
-            if (f == Environment.getExternalStorageDirectory()) {
-                map[DocumentsContract.Document.COLUMN_DISPLAY_NAME] = getString(R.string.app_name)
+            val displayName = if (f == Environment.getExternalStorageDirectory()) {
+                getString(R.string.app_name)
             } else {
-                map[DocumentsContract.Document.COLUMN_DISPLAY_NAME] = f.name
+                f.name
             }
-            map[DocumentsContract.Document.COLUMN_SIZE] = f.length()
-            map[DocumentsContract.Document.COLUMN_LAST_MODIFIED] = f.lastModified()
-
+            val mime: String
+            val flags: Int
             if (f.isDirectory) {
-                map[DocumentsContract.Document.COLUMN_MIME_TYPE] =
-                    DocumentsContract.Document.MIME_TYPE_DIR
-                map[DocumentsContract.Document.COLUMN_FLAGS] =
-                    DocumentsContract.Document.FLAG_DIR_SUPPORTS_CREATE or
-                        DocumentsContract.Document.FLAG_SUPPORTS_DELETE
+                mime = DocumentsContract.Document.MIME_TYPE_DIR
+                flags = DocumentsContract.Document.FLAG_DIR_SUPPORTS_CREATE or
+                    DocumentsContract.Document.FLAG_SUPPORTS_DELETE
             } else {
-                var mime = MimeTypeMap.getSingleton()
+                val guessed = MimeTypeMap.getSingleton()
                     .getMimeTypeFromExtension(Utility.getFileExtension(f.absolutePath))
-                var flags = DocumentsContract.Document.FLAG_SUPPORTS_DELETE
-                if (mime != null && (mime.startsWith("image/") || mime.startsWith("video/"))) {
-                    flags = flags or DocumentsContract.Document.FLAG_SUPPORTS_THUMBNAIL
-                }
-                if (mime == null) {
-                    mime = "application/unknown"
-                }
-                map[DocumentsContract.Document.COLUMN_MIME_TYPE] = mime
-                map[DocumentsContract.Document.COLUMN_FLAGS] = flags
+                val hasThumbnail = guessed != null && (guessed.startsWith("image/") || guessed.startsWith("video/"))
+                mime = guessed ?: "application/unknown"
+                flags = DocumentsContract.Document.FLAG_SUPPORTS_DELETE or
+                    (if (hasThumbnail) DocumentsContract.Document.FLAG_SUPPORTS_THUMBNAIL else 0)
             }
-            return map
+            return ShuttleEntry(
+                documentId = f.absolutePath,
+                displayName = displayName,
+                mimeType = mime,
+                size = f.length(),
+                lastModified = f.lastModified(),
+                flags = flags,
+            )
         }
 
         override fun openFile(path: String, mode: String): ParcelFileDescriptor? {

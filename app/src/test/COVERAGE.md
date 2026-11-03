@@ -79,7 +79,8 @@ JVM-тест подменяет записью вызовов: `SettingsManager.
 | Модуль | Тест | Что проверяется |
 |---|---|---|
 | `FileShuttlePathResolver` | FileShuttlePathResolverTest | пути шаттла, отказ относительным (E-7) |
-| `MediaMirror` (разбор строки), `MediaMirrorSelection` | MediaMirrorRowTest, MediaMirrorSelectionTest | строки листинга: каталоги и строки без типа отброшены; отбор медиа для автопереноса |
+| `MediaMirror` (разбор записи), `MediaMirrorSelection` | MediaMirrorRowTest, MediaMirrorSelectionTest | записи листинга: каталоги, записи без типа и без пути отброшены; отбор медиа для автопереноса |
+| `ShuttleEntry` (колонки) | ShuttleEntryColumnsTest | запись шаттла -> колонки курсора провайдера, нейтральный отказ оставляет колонки пустыми |
 | `ShuttleSession` | ShuttleSessionTest | жизненный цикл сессии File Shuttle |
 | `ForwardedUriRegistry` | ForwardedUriRegistryTest | реестр пересылаемых URI |
 | `CrossProfileLinkRules` | CrossProfileLinkRulesTest | разбор доменных правил ссылок (C2) |
@@ -107,6 +108,7 @@ JVM-тест подменяет записью вызовов: `SettingsManager.
 | `CalendarRouting` (провайдер) | CalendarRoutingDeviceTest | событие локального календаря уезжает в Google-календарь, удаленное — нет (только в рабочем профиле) |
 | `CrossProfileDocumentsProvider`, `FileShuttleExternalBrowser` | DocumentsProviderTest | A3: корни/листинг/чтение через шаттл; временная выдача корня внешнему проводнику |
 | `FileShuttleService` | FileShuttleForegroundTest | foreground-сессия, сроки жизни |
+| `ShuttleEntry` (Parcel) | ShuttleEntryParcelTest | запись и типизированный список проходят через Parcel без потерь, пустые поля остаются пустыми |
 | `AntiSpyVpnWatchService` | AntiSpyVpnWatchTest | сторож VPN в отдельном процессе |
 | `AuthenticationUtility` | AuthenticationBootstrapTest | bootstrap авторизации, ключ не уходит подтвердившей стороне, доказательство ключа |
 | `Utility.createLauncherShortcut` | BatchShortcutIconTest | A2: иконка ярлыка — растр, без падения на requestPinShortcut |
@@ -115,9 +117,10 @@ JVM-тест подменяет записью вызовов: `SettingsManager.
 | передача владения | TransferOwnershipTest | F1: передача владения профилем другому приложению |
 | среда | EnvironmentTest, TestProfiles, ImpostorRelayActivity | предусловия и фикстуры профиля |
 
-RelayGateTest, ProfileGuardsTest, LocalEventsTest и CalendarRoutingDeviceTest
-добавлены 03.11.2026 и на момент записи только компилируются: в среде, где они
-написаны, нет аппаратной виртуализации для эмулятора. Первый прогон — на стенде.
+RelayGateTest, ProfileGuardsTest, LocalEventsTest, CalendarRoutingDeviceTest и
+ShuttleEntryParcelTest добавлены 03.11.2026 и на момент записи только
+компилируются: в среде, где они написаны, нет аппаратной виртуализации для
+эмулятора. Первый прогон — на стенде.
 
 ## Сознательно не покрыто (тонкий слой / граница фреймворка)
 

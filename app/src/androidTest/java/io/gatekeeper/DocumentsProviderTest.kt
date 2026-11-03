@@ -16,6 +16,7 @@ import io.gatekeeper.services.IFileShuttleService
 import io.gatekeeper.util.CrossProfileDocumentsProvider
 import io.gatekeeper.util.FileShuttleConnection
 import io.gatekeeper.util.FileShuttleExternalBrowser
+import io.gatekeeper.util.ShuttleEntry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -197,9 +198,9 @@ class DocumentsProviderTest {
     fun queryChildDocuments_returnsWhenShuttleIsAliveButSilent() {
         val blocked = CountDownLatch(1)
         FileShuttleConnection.injectForTest(object : StubShuttle() {
-            override fun loadFiles(path: String): List<*> {
+            override fun loadFiles(path: String): List<ShuttleEntry> {
                 blocked.await()
-                return emptyList<Any>()
+                return emptyList()
             }
         })
         try {
@@ -224,7 +225,7 @@ class DocumentsProviderTest {
     @Test
     fun queryChildDocuments_keepsConnection_whenCallItselfFails() {
         FileShuttleConnection.injectForTest(object : StubShuttle() {
-            override fun loadFiles(path: String): List<*> = throw TransactionTooLargeException()
+            override fun loadFiles(path: String): List<ShuttleEntry> = throw TransactionTooLargeException()
         })
         val cursor = failFast {
             resolver.query(DocumentsContract.buildChildDocumentsUri(AUTHORITY, ROOT), null, null, null)
@@ -251,7 +252,7 @@ class DocumentsProviderTest {
     @Test
     fun keepsConnection_whenTransactionFailsButBinderIsAlive() {
         FileShuttleConnection.injectForTest(object : StubShuttle() {
-            override fun loadFiles(path: String): List<*> = throw DeadObjectException()
+            override fun loadFiles(path: String): List<ShuttleEntry> = throw DeadObjectException()
         })
         val cursor = failFast {
             resolver.query(DocumentsContract.buildChildDocumentsUri(AUTHORITY, ROOT), null, null, null)
@@ -344,9 +345,9 @@ class DocumentsProviderTest {
     fun longCallDoesNotExpireLiveConnection() {
         val first = AtomicBoolean(true)
         FileShuttleConnection.injectForTest(object : StubShuttle() {
-            override fun loadFiles(path: String): List<*> {
+            override fun loadFiles(path: String): List<ShuttleEntry> {
                 if (first.getAndSet(false)) Thread.sleep(LONG_CALL_MS)
-                return emptyList<Any>()
+                return emptyList()
             }
         })
         val slow = thrownBy(LONG_CALL_MS + DEADLINE_MS) {
@@ -464,8 +465,8 @@ class DocumentsProviderTest {
     /** Заглушка шаттла: тесты переопределяют только тот метод, который проверяют. */
     private open class StubShuttle : IFileShuttleService.Stub() {
         override fun ping() = Unit
-        override fun loadFiles(path: String): List<*> = emptyList<Any>()
-        override fun loadFileMeta(path: String): Map<*, *> = emptyMap<Any, Any>()
+        override fun loadFiles(path: String): List<ShuttleEntry> = emptyList()
+        override fun loadFileMeta(path: String): ShuttleEntry = ShuttleEntry(documentId = path)
         override fun openFile(path: String, mode: String): ParcelFileDescriptor? = null
         override fun openThumbnail(path: String, sizeHint: Point): ParcelFileDescriptor? = null
         override fun createFile(path: String, mimeType: String, displayName: String): String? = null

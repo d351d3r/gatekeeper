@@ -9,7 +9,6 @@ import android.util.Log
 import io.gatekeeper.services.IFileShuttleService
 import java.io.File
 import java.io.FileInputStream
-import java.io.Serializable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -74,10 +73,8 @@ object MediaMirror {
                 Log.w(TAG, "cannot list $dir in the work profile", e)
                 continue
             }
-            @Suppress("UNCHECKED_CAST")
-            val remoteFiles = files.mapNotNull {
-                (it as? Map<String, Serializable>)?.let(::toRemoteFile)
-            }
+            // Типизированный список из Parcel может содержать null-элементы: пропускаем их.
+            val remoteFiles = files.mapNotNull { entry -> entry?.let(::toRemoteFile) }
             val selected = MediaMirrorSelection.select(remoteFiles, watermark)
             Log.i(
                 TAG, "$dir: listed=${files.size} parsed=${remoteFiles.size} " +
@@ -101,20 +98,18 @@ object MediaMirror {
         return copied
     }
 
-    /** Строка листинга шаттла (FileShuttleService.loadFileMeta) -> файл; каталоги и строки без типа -- null. */
-    internal fun toRemoteFile(map: Map<String, Serializable>): MediaMirrorSelection.RemoteFile? {
-        val path = map[DocumentsContract.Document.COLUMN_DOCUMENT_ID] as? String
-        val mime = map[DocumentsContract.Document.COLUMN_MIME_TYPE] as? String
-        if (path == null || mime == null || mime == DocumentsContract.Document.MIME_TYPE_DIR) {
+    /** Запись листинга шаттла -> файл; каталоги, записи без типа и без пути -- null. */
+    internal fun toRemoteFile(entry: ShuttleEntry): MediaMirrorSelection.RemoteFile? {
+        val mime = entry.mimeType
+        if (entry.documentId.isEmpty() || mime == null || mime == DocumentsContract.Document.MIME_TYPE_DIR) {
             return null
         }
         return MediaMirrorSelection.RemoteFile(
-            path = path,
-            name = map[DocumentsContract.Document.COLUMN_DISPLAY_NAME] as? String
-                ?: File(path).name,
+            path = entry.documentId,
+            name = entry.displayName ?: File(entry.documentId).name,
             mime = mime,
-            size = (map[DocumentsContract.Document.COLUMN_SIZE] as? Long) ?: 0L,
-            lastModified = (map[DocumentsContract.Document.COLUMN_LAST_MODIFIED] as? Long) ?: 0L,
+            size = entry.size ?: 0L,
+            lastModified = entry.lastModified ?: 0L,
         )
     }
 
