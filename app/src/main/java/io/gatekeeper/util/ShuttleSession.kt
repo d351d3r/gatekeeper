@@ -1,5 +1,9 @@
 package io.gatekeeper.util
 
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
+
 /**
  * Состояние связи с файловым шаттлом без зависимости от Android SDK: поколение попытки
  * привязки, single-flight, ожидание с обязательным таймаутом и три срока годности --
@@ -23,7 +27,8 @@ class ShuttleSession<T : Any>(
         require(bindTimeoutMs > 0) { "bindTimeoutMs must be positive" }
     }
 
-    private val lock = Object()
+    private val lock = ReentrantLock()
+    private val changed = lock.newCondition()
     private var value: T? = null
     private var generation = 0
     private var bindStartedAt = NO_BIND
@@ -36,7 +41,7 @@ class ShuttleSession<T : Any>(
      * на пути каждого запроса провайдера. Опрос сессию не продлевает: иначе удерживающие
      * пинги, которые ходят через этот же метод, не дали бы ей истечь никогда.
      */
-    fun peek(alive: (T) -> Boolean = { true }): T? = synchronized(lock) {
+    fun peek(alive: (T) -> Boolean = { true }): T? = lock.withLock {
         val current = value ?: return null
         if (expired(clock()) || !alive(current)) {
             value = null
@@ -50,7 +55,7 @@ class ShuttleSession<T : Any>(
      * с последнего вызова. Истекшую сессию не воскрешает -- биндер, переживший срок
      * годности, выдавать нельзя.
      */
-    fun touch() = synchronized(lock) {
+    fun touch() = lock.withLock {
         val now = clock()
         if (expired(now)) {
             value = null
@@ -65,7 +70,7 @@ class ShuttleSession<T : Any>(
      * вызова. Ответ вызова, отправленного раньше, срок назад не отматывает, а опоздавшая
      * отметка сессию не воскрешает -- к этому моменту другая сторона уже могла умереть.
      */
-    fun markContact(at: Long) = synchronized(lock) {
+    fun markContact(at: Long) = lock.withLock {
         if (expired(clock())) {
             value = null
         } else if (at > lastContactAt) {
@@ -88,7 +93,7 @@ class ShuttleSession<T : Any>(
      * Номер поколения новой попытки привязки или [NO_GENERATION], если попытка уже идет
      * и еще не истекла.
      */
-    fun beginBind(): Int = synchronized(lock) {
+    fun beginBind(): Int = lock.withLock {
         val now = clock()
         if (bindStartedAt != NO_BIND && now - bindStartedAt < bindTimeoutMs) {
             return NO_GENERATION
@@ -98,15 +103,15 @@ class ShuttleSession<T : Any>(
     }
 
     /** Попытка не состоялась: снять single-flight, чтобы следующий запрос смог повторить. */
-    fun failBind(generation: Int) = synchronized(lock) {
+    fun failBind(generation: Int) = lock.withLock {
         if (generation == this.generation) {
             bindStartedAt = NO_BIND
-            lock.notifyAll()
+            changed.signalAll()
         }
     }
 
     /** Принимает биндер только от актуального поколения. */
-    fun accept(generation: Int, value: T): Boolean = synchronized(lock) {
+    fun accept(generation: Int, value: T): Boolean = lock.withLock {
         if (generation != this.generation) return false
         val now = clock()
         this.value = value
@@ -114,19 +119,19 @@ class ShuttleSession<T : Any>(
         this.lastContactAt = now
         this.startedAt = now
         bindStartedAt = NO_BIND
-        lock.notifyAll()
+        changed.signalAll()
         true
     }
 
     /** Ожидание биндера. Таймаут обязателен, ложные пробуждения и прерывание учтены. */
     fun await(timeoutMs: Long): T? {
         val deadline = clock() + timeoutMs
-        synchronized(lock) {
+        lock.withLock {
             while (value == null) {
                 val remaining = deadline - clock()
                 if (remaining <= 0) return null
                 try {
-                    lock.wait(remaining)
+                    changed.await(remaining, TimeUnit.MILLISECONDS)
                 } catch (e: InterruptedException) {
                     Thread.currentThread().interrupt()
                     return null
@@ -141,26 +146,26 @@ class ShuttleSession<T : Any>(
      * таймауте, сессия могла успеть привязаться заново. Поколение не трогается -- попытка
      * привязки, начатая пока старый биндер умирал, обязана довезти свой колбэк.
      */
-    fun drop(expected: T) = synchronized(lock) {
+    fun drop(expected: T) = lock.withLock {
         if (value === expected) {
             value = null
         }
     }
 
     /** Сбрасывает биндер указанного поколения; более свежий не трогает. */
-    fun discard(generation: Int) = synchronized(lock) {
+    fun discard(generation: Int) = lock.withLock {
         if (generation == this.generation) {
             value = null
-            lock.notifyAll()
+            changed.signalAll()
         }
     }
 
     /** Сбрасывает биндер и обесценивает колбэки всех начатых попыток. */
-    fun release() = synchronized(lock) {
+    fun release() = lock.withLock {
         value = null
         bindStartedAt = NO_BIND
         ++generation
-        lock.notifyAll()
+        changed.signalAll()
     }
 
     companion object {

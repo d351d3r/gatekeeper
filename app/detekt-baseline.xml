@@ -22,7 +22,6 @@
     <ID>LongMethod:Utility.kt$Utility$fun enforceWorkProfilePolicies(context: Context)</ID>
     <ID>LongParameterList:AntiSpyLaunchGate.kt$AntiSpyLaunchGate$( context: Context, storage: LocalStorageManager, packageName: String?, forceGate: Boolean, onProceed: Runnable, onBlocked: BlockedCallback? )</ID>
     <ID>LongParameterList:Utility.kt$Utility$( context: Context, important: Boolean, ticker: String, title: String, desc: String, icon: Int )</ID>
-    <ID>MagicNumber:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$1000</ID>
     <ID>MagicNumber:AntiSpyDummyVpnService.kt$AntiSpyDummyVpnService$32</ID>
     <ID>MagicNumber:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService$1000L</ID>
     <ID>MagicNumber:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService$1500L</ID>
@@ -71,7 +70,6 @@
     <ID>NestedBlockDepth:MediaMirror.kt$MediaMirror$private fun copyOne( context: Context, service: IFileShuttleService, remote: MediaMirrorSelection.RemoteFile, relativeDir: String, ): Boolean</ID>
     <ID>ReturnCount:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$private fun runOneDummyCycle(context: Context): Int</ID>
     <ID>ReturnCount:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$private fun tryClearVpnBlocking(context: Context): Int</ID>
-    <ID>ReturnCount:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$private fun waitForSignal(signal: AtomicBoolean, lock: Object, timeoutMs: Long): Boolean</ID>
     <ID>ReturnCount:AntiSpyDummyVpnService.kt$AntiSpyDummyVpnService$override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int</ID>
     <ID>ReturnCount:AntiSpyDummyVpnService.kt$AntiSpyDummyVpnService$private fun startTunnel()</ID>
     <ID>ReturnCount:AntiSpyManager.kt$AntiSpyManager$fun freezeAutoFreezeList(context: Context, delivery: AutoFreezeDelivery): Int</ID>

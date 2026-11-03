@@ -523,8 +523,14 @@ class AppListFragment : BaseFragment() {
 
     fun installOrUninstall(app: ApplicationInfoWrapper, isInstall: Boolean) {
         selectedApp = null
+        val appContext = requireContext().applicationContext
         val callback = object : IAppInstallCallback.Stub() {
             override fun callback(result: Int) {
+                // Снятие ярлыков -- IPC в system_server (ShortcutManager, @WorkerThread):
+                // колбэк уже на потоке binder, поэтому до перехода на главный поток.
+                if (result == Activity.RESULT_OK && !isInstall && isRemote) {
+                    UnfreezeShortcuts.removeLauncherShortcutsEverywhere(appContext, app.getPackageName())
+                }
                 runOnUiThread { installAppCallback(result, app, isInstall) }
             }
         }
@@ -548,11 +554,8 @@ class AppListFragment : BaseFragment() {
             var message = getString(if (isInstall) R.string.clone_success else R.string.uninstall_success)
             message = String.format(message, app.getLabel())
             GatekeeperToast.show(requireContext(), message)
+            // Ярлыки удаленного клона сняты еще на потоке binder (installOrUninstall).
             if (!isInstall && isRemote) {
-                UnfreezeShortcuts.removeLauncherShortcutsEverywhere(
-                    requireContext(),
-                    app.getPackageName()
-                )
                 LocalStorageManager.getInstance().removeFromStringList(
                     LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE,
                     app.getPackageName()
@@ -604,36 +607,50 @@ class AppListFragment : BaseFragment() {
         app: ApplicationInfoWrapper,
         linkedApps: List<ApplicationInfoWrapper>?
     ) {
+        val appContext = requireContext().applicationContext
         try {
             service!!.loadIcon(app, object : ILoadIconCallback.Stub() {
                 override fun callback(icon: Bitmap) {
-                    runOnUiThread { addUnfreezeShortcut(app, linkedApps, icon) }
+                    // Закрепление -- IPC в system_server (ShortcutManager, @WorkerThread):
+                    // на потоке binder; тост об итоге и запись в реестр -- на главном.
+                    val pinned = pinUnfreezeShortcut(appContext, app, linkedApps, icon)
+                    runOnUiThread { onUnfreezeShortcutPinned(app, pinned) }
                 }
             })
         } catch (_: RemoteException) {
         }
     }
 
-    fun addUnfreezeShortcut(
+    private class PinnedShortcut(
+        val id: String,
+        val linkedPackages: String?,
+        val outcome: Utility.ShortcutPinOutcome,
+    )
+
+    private fun pinUnfreezeShortcut(
+        context: Context,
         app: ApplicationInfoWrapper,
         linkedApps: List<ApplicationInfoWrapper>?,
         icon: Bitmap
-    ) {
+    ): PinnedShortcut {
         val linkedPackages = linkedApps?.joinToString(",") { it.getPackageName() }
-        val launchIntent = UnfreezeShortcuts.buildLaunchIntent(
-            requireContext(), app.getPackageName(), linkedPackages
-        )
+        val launchIntent = UnfreezeShortcuts.buildLaunchIntent(context, app.getPackageName(), linkedPackages)
         val id = UnfreezeShortcuts.shortcutId(app.getPackageName(), linkedPackages)
-        Utility.createLauncherShortcut(
-            requireContext(), launchIntent,
+        val outcome = Utility.pinLauncherShortcut(
+            context, launchIntent,
             Icon.createWithBitmap(icon), id,
             app.getLabel() ?: app.getPackageName()
         )
+        return PinnedShortcut(id, linkedPackages, outcome)
+    }
+
+    private fun onUnfreezeShortcutPinned(app: ApplicationInfoWrapper, pinned: PinnedShortcut) {
+        Utility.showShortcutPinOutcome(requireContext(), pinned.outcome)
         UnfreezeShortcuts.register(
             app.getPackageName(),
-            id,
+            pinned.id,
             app.getLabel() ?: app.getPackageName(),
-            linkedPackages
+            pinned.linkedPackages
         )
     }
 

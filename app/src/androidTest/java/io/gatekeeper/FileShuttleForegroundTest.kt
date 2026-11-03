@@ -74,19 +74,25 @@ class FileShuttleForegroundTest {
         val application = context.applicationContext as GatekeeperApplication
         application.bindFileShuttleService(connection)
         try {
-            val name = FileShuttleService::class.java.name
-            val manager = context.getSystemService(ActivityManager::class.java)
             val deadline = SystemClock.elapsedRealtime() + 5_000L
             var foreground = false
             while (!foreground && SystemClock.elapsedRealtime() < deadline) {
-                // С API 26 сюда попадают только собственные сервисы, чужие не видны.
-                foreground = manager.getRunningServices(Int.MAX_VALUE)
-                    .any { it.service.className == name && it.foreground }
+                foreground = isShuttleInForeground()
                 if (!foreground) SystemClock.sleep(200)
             }
             assertTrue("поднятый шаттл обязан быть на переднем плане", foreground)
         } finally {
             application.unbindFileShuttleService()
         }
+    }
+
+    // getRunningServices устарел с API 26 для чужих сервисов; свои он отдает по-прежнему,
+    // а другого публичного способа узнать, на переднем ли плане свой сервис, нет.
+    @Suppress("DEPRECATION")
+    private fun isShuttleInForeground(): Boolean {
+        val name = FileShuttleService::class.java.name
+        return context.getSystemService(ActivityManager::class.java)
+            .getRunningServices(Int.MAX_VALUE)
+            .any { it.service.className == name && it.foreground }
     }
 }

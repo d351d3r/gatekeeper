@@ -11,7 +11,12 @@ import android.os.Process
 import android.util.Log
 import androidx.core.content.ContextCompat
 import io.gatekeeper.services.AntiSpyDummyVpnService
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.locks.Condition
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 /**
  * Displaces an active VPN using a short pseudo [android.net.VpnService] tunnel.
@@ -33,6 +38,7 @@ object AntiSpyDummyVpnDisconnector {
     private const val VPN_CLEAR_POLL_MS = 100L
     private const val VPN_CLEAR_MAX_WAIT_MS = 2000L
     private const val WHOLE_OP_TIMEOUT_MS = 30000L
+    private const val MAIN_THREAD_WAIT_MS = 1000L
 
     private val suppressReactions = AtomicBoolean(false)
 
@@ -106,7 +112,8 @@ object AntiSpyDummyVpnDisconnector {
         val disconnected = AtomicBoolean(false)
         val failed = AtomicBoolean(false)
         val permissionRequired = AtomicBoolean(false)
-        val lock = Object()
+        val lock = ReentrantLock()
+        val changed = lock.newCondition()
 
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(ctx: Context, intent: Intent) {
@@ -117,9 +124,7 @@ object AntiSpyDummyVpnDisconnector {
                         permissionRequired.set(true)
                     AntiSpyDummyVpnService.BROADCAST_FAILED -> failed.set(true)
                 }
-                synchronized(lock) {
-                    lock.notifyAll()
-                }
+                lock.withLock { changed.signalAll() }
             }
         }
 
@@ -135,7 +140,7 @@ object AntiSpyDummyVpnDisconnector {
         try {
             startDummyService(app, AntiSpyDummyVpnService.ACTION_ESTABLISH)
 
-            synchronized(lock) {
+            lock.withLock {
                 val deadline = System.currentTimeMillis() + ESTABLISH_TIMEOUT_MS
                 while (!established.get() && !failed.get() && !permissionRequired.get()) {
                     val wait = deadline - System.currentTimeMillis()
@@ -143,7 +148,7 @@ object AntiSpyDummyVpnDisconnector {
                         break
                     }
                     try {
-                        lock.wait(wait)
+                        changed.await(wait, TimeUnit.MILLISECONDS)
                     } catch (e: InterruptedException) {
                         Thread.currentThread().interrupt()
                         return RESULT_FAILED
@@ -165,7 +170,7 @@ object AntiSpyDummyVpnDisconnector {
             disconnected.set(false)
             startDummyService(app, AntiSpyDummyVpnService.ACTION_DISCONNECT)
 
-            if (!waitForSignal(disconnected, lock, DISCONNECT_TIMEOUT_MS)) {
+            if (!waitForSignal(disconnected, lock, changed, DISCONNECT_TIMEOUT_MS)) {
                 Log.w(TAG, "dummy vpn disconnect timed out pid=${Process.myPid()}")
                 return RESULT_FAILED
             }
@@ -187,20 +192,12 @@ object AntiSpyDummyVpnDisconnector {
         filter: IntentFilter
     ) {
         val handler = Handler(context.mainLooper)
-        val gate = Object()
+        val registered = CountDownLatch(1)
         handler.post {
             registerAppBroadcastReceiver(context.applicationContext, receiver, filter)
-            synchronized(gate) {
-                gate.notifyAll()
-            }
+            registered.countDown()
         }
-        synchronized(gate) {
-            try {
-                gate.wait(1000)
-            } catch (e: InterruptedException) {
-                Thread.currentThread().interrupt()
-            }
-        }
+        awaitMainThread(registered)
     }
 
     private fun unregisterReceiver(
@@ -208,22 +205,27 @@ object AntiSpyDummyVpnDisconnector {
         receiver: BroadcastReceiver
     ) {
         val handler = Handler(context.mainLooper)
-        val gate = Object()
+        val unregistered = CountDownLatch(1)
         handler.post {
             try {
                 context.applicationContext.unregisterReceiver(receiver)
             } catch (_: Exception) {
             }
-            synchronized(gate) {
-                gate.notifyAll()
-            }
+            unregistered.countDown()
         }
-        synchronized(gate) {
-            try {
-                gate.wait(1000)
-            } catch (e: InterruptedException) {
-                Thread.currentThread().interrupt()
-            }
+        awaitMainThread(unregistered)
+    }
+
+    /**
+     * Дождаться, пока главный поток выполнит отправленное, но не дольше
+     * [MAIN_THREAD_WAIT_MS]. Защелка не теряет отметку, сделанную раньше начала
+     * ожидания: прежний wait/notifyAll в этом случае ждал полную секунду.
+     */
+    private fun awaitMainThread(done: CountDownLatch) {
+        try {
+            done.await(MAIN_THREAD_WAIT_MS, TimeUnit.MILLISECONDS)
+        } catch (e: InterruptedException) {
+            Thread.currentThread().interrupt()
         }
     }
 
@@ -244,23 +246,26 @@ object AntiSpyDummyVpnDisconnector {
         }
     }
 
-    private fun waitForSignal(signal: AtomicBoolean, lock: Object, timeoutMs: Long): Boolean {
-        synchronized(lock) {
-            val deadline = System.currentTimeMillis() + timeoutMs
-            while (!signal.get()) {
-                val wait = deadline - System.currentTimeMillis()
-                if (wait <= 0) {
-                    return false
-                }
-                try {
-                    lock.wait(wait)
-                } catch (e: InterruptedException) {
-                    Thread.currentThread().interrupt()
-                    return false
-                }
+    /** Ждать [signal] не дольше [timeoutMs]; false -- таймаут или прерывание. */
+    private fun waitForSignal(
+        signal: AtomicBoolean,
+        lock: ReentrantLock,
+        changed: Condition,
+        timeoutMs: Long,
+    ): Boolean = lock.withLock {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        var interrupted = false
+        while (!signal.get() && !interrupted) {
+            val wait = deadline - System.currentTimeMillis()
+            if (wait <= 0) break
+            try {
+                changed.await(wait, TimeUnit.MILLISECONDS)
+            } catch (e: InterruptedException) {
+                Thread.currentThread().interrupt()
+                interrupted = true
             }
         }
-        return true
+        signal.get() && !interrupted
     }
 
     private fun isVpnClearedAfterDisconnect(context: Context): Boolean {
