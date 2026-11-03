@@ -30,8 +30,6 @@
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <!-- Best-effort останов фоновых процессов замораживаемого приложения (N/A для foreground) -->
-    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -45,6 +43,87 @@
         <package android:name="com.google.android.go.documentsui" />
         <intent>
             <action android:name="android.intent.action.MAIN"/>
+        </intent>
+        <!-- Свои служебные действия: приложение, которое объявило их, чтобы перехватывать
+             связь между профилями, должно быть видно поиску подделок (ImpostorScan, S1).
+             Без этого на Android 11+ видимость пакетов скрыла бы его от queryIntentActivities. -->
+        <intent>
+            <action android:name="io.gatekeeper.action.FINALIZE_PROVISION" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.START_SERVICE" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.TRY_START_SERVICE" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.INSTALL_PACKAGE" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.UNINSTALL_PACKAGE" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.UNFREEZE_AND_LAUNCH" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.PUBLIC_UNFREEZE_AND_LAUNCH" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.PUBLIC_FREEZE_ALL" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.PUBLIC_UNFREEZE_ALL" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.SHOW_TOAST" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.REFRESH_MAIN_APP_LIST" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.FREEZE_ALL_IN_LIST" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.UNFREEZE_ALL_IN_LIST" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.REMOVE_UNFREEZE_SHORTCUT" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.REMOVE_UNFREEZE_SHORTCUT_2" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.START_FILE_SHUTTLE" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.START_FILE_SHUTTLE_2" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.SYNCHRONIZE_PREFERENCE" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.SYNC_ISOLATION" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.SYNC_ANTI_SPY_VPN_WATCH" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.SYNC_FREEZE_SERVICE" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.VPN_SESSION_COMPLETE" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.OPEN_POWER_SETTINGS" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.OPEN_MAIN_APP" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.REQUEST_REPAIR" />
+        </intent>
+        <intent>
+            <action android:name="io.gatekeeper.action.WIPE_PROFILE" />
         </intent>
     </queries>
 
@@ -142,7 +221,6 @@
                 <action android:name="io.gatekeeper.action.SHOW_TOAST" />
                 <action android:name="io.gatekeeper.action.FREEZE_ALL_IN_LIST" />
                 <action android:name="io.gatekeeper.action.UNFREEZE_ALL_IN_LIST" />
-                <action android:name="io.gatekeeper.action.ENABLE_AUTO_FREEZE_WORK_PROFILE" />
                 <action android:name="io.gatekeeper.action.REFRESH_MAIN_APP_LIST" />
                 <action android:name="io.gatekeeper.action.VPN_SESSION_COMPLETE" />
                 <action android:name="io.gatekeeper.action.REMOVE_UNFREEZE_SHORTCUT" />
@@ -158,13 +236,21 @@
                      SYNC_FREEZE_SERVICE в рабочий профиль. Без фильтра в манифесте
                      форвардер не поднимается и вызов падает на резолве. -->
                 <action android:name="io.gatekeeper.action.SYNC_FREEZE_SERVICE" />
-                <action android:name="io.gatekeeper.action.PACKAGEINSTALLER_CALLBACK" />
                 <action android:name="io.gatekeeper.action.OPEN_POWER_SETTINGS" />
                 <action android:name="io.gatekeeper.action.OPEN_MAIN_APP" />
                 <action android:name="io.gatekeeper.action.WIPE_PROFILE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <!-- Статус сессий PackageInstaller (S4): неэкспортированный псевдоним DummyActivity.
+             Попасть в него можно только нашим PendingIntent, поэтому подделать «установлено»
+             чужому приложению нельзя, а сама DummyActivity остается экспортированной для
+             кросс-профильного реле. -->
+        <activity-alias
+            android:name=".ui.PackageInstallerCallbackAlias"
+            android:targetActivity=".ui.DummyActivity"
+            android:exported="false" />
 
         <!-- Entry point for the SAF client action when the file shuttle is not connected. -->
         <!-- Not exported: the only way in is our own immutable PendingIntent. -->

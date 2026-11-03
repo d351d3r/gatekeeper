@@ -5,6 +5,7 @@ import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import io.gatekeeper.R
@@ -15,6 +16,10 @@ import io.gatekeeper.util.AntiSpyVpnPromptManager
  */
 class AntiSpyVpnPromptActivity : AppCompatActivity() {
     private var dialog: AlertDialog? = null
+
+    /** Системный экран согласия VPN; результат не важен -- сторож перепроверит сам. */
+    private val vpnPermission =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { finish() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,15 +34,6 @@ class AntiSpyVpnPromptActivity : AppCompatActivity() {
             dialog?.dismiss()
         }
         showDialogForMode(readMode(intent))
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_VPN_PERMISSION) {
-            finish()
-            return
-        }
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun applyShowOnTopFlags() {
@@ -111,12 +107,10 @@ class AntiSpyVpnPromptActivity : AppCompatActivity() {
             finish()
             return
         }
-        @Suppress("DEPRECATION")
-        startActivityForResult(prepare, REQUEST_VPN_PERMISSION)
+        vpnPermission.launch(prepare)
     }
 
     companion object {
-        private const val REQUEST_VPN_PERMISSION = 91
 
         private fun readMode(intent: Intent?): Int {
             if (intent == null) {

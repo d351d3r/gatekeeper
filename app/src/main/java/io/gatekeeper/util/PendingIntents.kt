@@ -1,5 +1,6 @@
 package io.gatekeeper.util
 
+import android.annotation.SuppressLint
 import android.app.ActivityOptions
 import android.app.PendingIntent
 import android.content.Context
@@ -24,14 +25,25 @@ object PendingIntents {
             return PendingIntent.getActivity(context, requestCode, intent, flags)
         }
         val options = ActivityOptions.makeBasic().apply {
-            // Constant deprecated in API 35, but it is still the mode this API 34+ setter takes.
-            @Suppress("DEPRECATION")
-            setPendingIntentCreatorBackgroundActivityStartMode(
-                ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
-            )
+            setPendingIntentCreatorBackgroundActivityStartMode(creatorMode(Build.VERSION.SDK_INT))
         }
         return PendingIntent.getActivity(
             context, requestCode, intent, flags, options.toBundle()
         )
     }
+
+    /**
+     * Создатель отдает свои права на запуск из фона: отправитель -- система (будильник,
+     * PackageInstaller), а она за нас их не добавит. С API 36 для этого есть
+     * MODE_BACKGROUND_ACTIVITY_START_ALLOW_ALWAYS; старый MODE_..._ALLOWED Android 17
+     * просит не использовать. До API 36 другого значения нет.
+     */
+    @SuppressLint("InlinedApi") // версия проверяется по параметру (ради теста); константы -- int
+    fun creatorMode(sdkInt: Int): Int =
+        if (sdkInt >= Build.VERSION_CODES.BAKLAVA) {
+            ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOW_ALWAYS
+        } else {
+            @Suppress("DEPRECATION") // единственное значение до API 36
+            ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
+        }
 }

@@ -45,7 +45,8 @@ class GatekeeperDeviceAdminReceiver : DeviceAdminReceiver() {
         // forwarder") -- экран завершения висит вечно, хотя профиль уже включён.
         // Этот callback доставляется надёжно, поэтому реле поднимается до убийства.
         runCatching {
-            WorkProfilePolicy.enforceWorkProfilePolicies(context.applicationContext)
+            // Свежий профиль: применяем безусловно, мимо отпечатка набора (F4).
+            WorkProfilePolicy.enforceWorkProfilePolicies(context.applicationContext, force = true)
         }.onFailure { Log.w(TAG, "enforceWorkProfilePolicies on provisioning complete failed", it) }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) return

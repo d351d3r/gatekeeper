@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION") // legacy version-gated paths (LocalBroadcastManager)
-
 package io.gatekeeper.util
 
 import android.content.BroadcastReceiver
@@ -12,7 +10,6 @@ import android.os.Looper
 import android.os.Process
 import android.util.Log
 import androidx.core.content.ContextCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.gatekeeper.services.AntiSpyDummyVpnService
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -133,8 +130,7 @@ object AntiSpyDummyVpnDisconnector {
             addAction(AntiSpyDummyVpnService.BROADCAST_PERMISSION_REQUIRED)
         }
         val app = context.applicationContext
-        val lbm = LocalBroadcastManager.getInstance(app)
-        registerReceiver(context, lbm, receiver, filter)
+        registerReceiver(context, receiver, filter)
 
         try {
             startDummyService(app, AntiSpyDummyVpnService.ACTION_ESTABLISH)
@@ -181,20 +177,18 @@ object AntiSpyDummyVpnDisconnector {
                 RESULT_VPN_STILL_ACTIVE
             }
         } finally {
-            unregisterReceiver(context, lbm, receiver)
+            unregisterReceiver(context, receiver)
         }
     }
 
     private fun registerReceiver(
         context: Context,
-        lbm: LocalBroadcastManager,
         receiver: BroadcastReceiver,
         filter: IntentFilter
     ) {
         val handler = Handler(context.mainLooper)
         val gate = Object()
         handler.post {
-            lbm.registerReceiver(receiver, filter)
             registerAppBroadcastReceiver(context.applicationContext, receiver, filter)
             synchronized(gate) {
                 gate.notifyAll()
@@ -211,16 +205,11 @@ object AntiSpyDummyVpnDisconnector {
 
     private fun unregisterReceiver(
         context: Context,
-        lbm: LocalBroadcastManager,
         receiver: BroadcastReceiver
     ) {
         val handler = Handler(context.mainLooper)
         val gate = Object()
         handler.post {
-            try {
-                lbm.unregisterReceiver(receiver)
-            } catch (_: Exception) {
-            }
             try {
                 context.applicationContext.unregisterReceiver(receiver)
             } catch (_: Exception) {

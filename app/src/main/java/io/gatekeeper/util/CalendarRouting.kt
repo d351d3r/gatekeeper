@@ -86,40 +86,82 @@ object CalendarRouting {
         return storage.getBoolean(LocalStorageManager.PREF_LOCAL_CALENDAR_ROUTING) to id
     }
 
-    @Suppress("ReturnCount")
+    /**
+     * Системная сторона маршрутизации: права календаря, провайдер календаря, задачи
+     * JobScheduler. Порядок вызовов и откат при сбое -- в [configure] и
+     * [moveLocalEvents], они покрыты JVM-тестами с заглушкой этого интерфейса.
+     */
+    internal interface Platform {
+        fun setCalendarPermissions(grant: Boolean): Boolean
+        fun writableGoogleCalendars(): List<CalendarRoutingTarget>
+        fun localCalendarIds(): List<Long>
+        fun moveEvents(selection: String, selectionArgs: Array<String>, targetId: Long): Int
+        fun scheduleObserver(): Boolean
+        fun scheduleInitialRun(): Boolean
+        fun cancelJobs()
+    }
+
+    private class AndroidPlatform(
+        private val context: Context,
+        private val manager: DevicePolicyManager? = null,
+        private val admin: ComponentName? = null,
+    ) : Platform {
+        override fun setCalendarPermissions(grant: Boolean): Boolean =
+            manager != null && admin != null && setCalendarPermissions(context, manager, admin, grant)
+
+        override fun writableGoogleCalendars() = listWritableGoogleCalendars(context)
+
+        override fun localCalendarIds() = localCalendarIds(context)
+
+        override fun moveEvents(selection: String, selectionArgs: Array<String>, targetId: Long) =
+            updateEventCalendar(context, selection, selectionArgs, targetId)
+
+        override fun scheduleObserver() = scheduleObserver(context)
+
+        override fun scheduleInitialRun() = scheduleInitialRun(context)
+
+        override fun cancelJobs() = cancel(context)
+    }
+
     fun configure(
         context: Context,
         manager: DevicePolicyManager,
         admin: ComponentName,
         targetId: Long,
         enabled: Boolean,
-    ): String? {
+    ): String? = configure(AndroidPlatform(context, manager, admin), targetId, enabled)
+
+    /**
+     * Включение не оставляет полусостояния: при любом сбое права календаря отзываются,
+     * флаг маршрутизации снят, задачи отменены. Выключение помнит выбранный календарь.
+     */
+    @Suppress("ReturnCount")
+    internal fun configure(platform: Platform, targetId: Long, enabled: Boolean): String? {
+        val storage = LocalStorageManager.getInstance()
         if (!enabled) {
-            val storage = LocalStorageManager.getInstance()
             if (targetId >= 0L) {
                 storage.setLong(LocalStorageManager.PREF_LOCAL_CALENDAR_TARGET, targetId)
             }
             storage.setBooleanNow(LocalStorageManager.PREF_LOCAL_CALENDAR_ROUTING, false)
-            cancel(context)
-            setCalendarPermissions(context, manager, admin, false)
+            platform.cancelJobs()
+            platform.setCalendarPermissions(false)
             return null
         }
 
-        if (!setCalendarPermissions(context, manager, admin, true)) {
+        if (!platform.setCalendarPermissions(true)) {
             return ERROR_PERMISSION
         }
-        if (listWritableGoogleCalendars(context).none { it.id == targetId }) {
-            setCalendarPermissions(context, manager, admin, false)
+        if (platform.writableGoogleCalendars().none { it.id == targetId }) {
+            platform.setCalendarPermissions(false)
             return ERROR_TARGET_NOT_FOUND
         }
 
-        val storage = LocalStorageManager.getInstance()
         storage.setLong(LocalStorageManager.PREF_LOCAL_CALENDAR_TARGET, targetId)
         storage.setBooleanNow(LocalStorageManager.PREF_LOCAL_CALENDAR_ROUTING, true)
-        if (!scheduleObserver(context) || !scheduleInitialRun(context)) {
+        if (!platform.scheduleObserver() || !platform.scheduleInitialRun()) {
             storage.setBooleanNow(LocalStorageManager.PREF_LOCAL_CALENDAR_ROUTING, false)
-            cancel(context)
-            setCalendarPermissions(context, manager, admin, false)
+            platform.cancelJobs()
+            platform.setCalendarPermissions(false)
             return ERROR_SCHEDULER
         }
         return null
@@ -170,20 +212,39 @@ object CalendarRouting {
         return scheduler.schedule(job) == JobScheduler.RESULT_SUCCESS
     }
 
+    fun moveLocalEvents(context: Context): Int = moveLocalEvents(AndroidPlatform(context))
+
+    /** События локальных календарей уезжают в выбранный Google-календарь, пока он доступен для записи. */
     @Suppress("ReturnCount")
-    fun moveLocalEvents(context: Context): Int {
+    internal fun moveLocalEvents(platform: Platform): Int {
         val (enabled, targetId) = state()
         if (!enabled || targetId == null) return 0
-        if (listWritableGoogleCalendars(context).none { it.id == targetId }) {
+        if (platform.writableGoogleCalendars().none { it.id == targetId }) {
             Log.w(TAG, "selected Google calendar is no longer writable: $targetId")
             return 0
         }
+        val (selection, args) = moveSelection(platform.localCalendarIds()) ?: return 0
+        return platform.moveEvents(selection, args, targetId)
+    }
 
-        val localIds = localCalendarIds(context)
-        if (localIds.isEmpty()) return 0
-        val placeholders = localIds.joinToString(",") { "?" }
+    /**
+     * Выборка событий локальных календарей; удаленные (DELETED = 1) не трогаем, иначе
+     * перенос воскресил бы их в Google-календаре. null -- локальных календарей нет.
+     */
+    internal fun moveSelection(localCalendarIds: List<Long>): Pair<String, Array<String>>? {
+        if (localCalendarIds.isEmpty()) return null
+        val placeholders = localCalendarIds.joinToString(",") { "?" }
         val selection = "${CalendarContract.Events.CALENDAR_ID} IN ($placeholders) AND " +
             "${CalendarContract.Events.DELETED} != 1"
+        return selection to localCalendarIds.map(Long::toString).toTypedArray()
+    }
+
+    private fun updateEventCalendar(
+        context: Context,
+        selection: String,
+        selectionArgs: Array<String>,
+        targetId: Long,
+    ): Int {
         val values = ContentValues(1).apply {
             put(CalendarContract.Events.CALENDAR_ID, targetId)
         }
@@ -192,7 +253,7 @@ object CalendarRouting {
                 CalendarContract.Events.CONTENT_URI,
                 values,
                 selection,
-                localIds.map(Long::toString).toTypedArray(),
+                selectionArgs,
             )
         } catch (e: SecurityException) {
             Log.e(TAG, "cannot move local calendar events to $targetId", e)

@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION") // LocalBroadcastManager, pre-O shortcuts/notifications, pre-30 cross-profile APIs
-
 package io.gatekeeper.util
 
 import android.annotation.TargetApi
@@ -37,6 +35,7 @@ import java.io.FileDescriptor
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.util.Locale
 
 object Utility {
     private const val TAG = "Utility"
@@ -52,20 +51,10 @@ object Utility {
         return list
     }
 
-    /**
-     * Foreground delivery: [DummyActivity.FREEZE_ALL_IN_LIST] in the work profile.
-     */
-
-    @Throws(ReflectiveOperationException::class)
-
-
     fun resolveApplicationLabel(context: Context, packageName: String): CharSequence {
         return try {
             val pm = context.packageManager
-            var flags = PackageManager.MATCH_DISABLED_COMPONENTS
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                flags = flags or PackageManager.MATCH_UNINSTALLED_PACKAGES
-            }
+            val flags = PackageManager.MATCH_DISABLED_COMPONENTS or PackageManager.MATCH_UNINSTALLED_PACKAGES
             val info = pm.getApplicationInfo(packageName, flags)
             pm.getApplicationLabel(info)
         } catch (e: PackageManager.NameNotFoundException) {
@@ -274,23 +263,34 @@ object Utility {
                 )
             }
         } else {
-            val shortcutIntent = Intent("com.android.launcher.action.INSTALL_SHORTCUT")
-            shortcutIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, launchIntent)
-            shortcutIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, label)
-            shortcutIntent.putExtra(
-                Intent.EXTRA_SHORTCUT_ICON,
-                drawableToBitmap(icon.loadDrawable(context)!!)
-            )
-            context.sendBroadcast(shortcutIntent)
-            GatekeeperToast.show(context, R.string.shortcut_create_success)
+            installLegacyShortcut(context, launchIntent, icon, label)
         }
     }
 
+    /** Ярлык через broadcast лаунчера: единственный способ до Android 8 (API 26). */
+    @Suppress("DEPRECATION") // EXTRA_SHORTCUT_*: замена -- ShortcutManager, которого до API 26 нет
+    private fun installLegacyShortcut(context: Context, launchIntent: Intent, icon: Icon, label: String) {
+        val shortcutIntent = Intent("com.android.launcher.action.INSTALL_SHORTCUT")
+        shortcutIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, launchIntent)
+        shortcutIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, label)
+        shortcutIntent.putExtra(
+            Intent.EXTRA_SHORTCUT_ICON,
+            drawableToBitmap(icon.loadDrawable(context)!!)
+        )
+        context.sendBroadcast(shortcutIntent)
+        GatekeeperToast.show(context, R.string.shortcut_create_success)
+    }
+
+    /**
+     * Точное совпадение пути, а не LIKE: в LIKE символы `%` и `_` из имени файла работают
+     * как подстановки и находят чужую запись. Колонка DATA нужна только пути API < 29.
+     */
+    @Suppress("DEPRECATION") // MediaColumns.DATA: используется только для API < 29
     fun getMediaStoreId(context: Context, path: String): Int =
         context.contentResolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             arrayOf(MediaStore.MediaColumns._ID),
-            MediaStore.MediaColumns.DATA + " LIKE ? ",
+            MediaStore.MediaColumns.DATA + " = ? ",
             arrayOf(path),
             null
         )?.use { cursor ->
@@ -301,7 +301,13 @@ object Utility {
             }
         } ?: -1
 
+    /**
+     * Степень двойки, с которой картинка декодируется не меньше запрошенного размера.
+     * Неположительный размер -- без уменьшения: иначе условие цикла верно всегда, и
+     * удвоение переполняется до нуля и деления на ноль.
+     */
     fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+        if (reqWidth <= 0 || reqHeight <= 0) return 1
         val height = options.outHeight
         val width = options.outWidth
         var inSampleSize = 1
@@ -320,7 +326,8 @@ object Utility {
         return inSampleSize
     }
 
-    fun decodeSampledBitmap(filePath: String, reqWidth: Int, reqHeight: Int): Bitmap {
+    /** null -- файл не картинка или не читается; раньше это был NPE внутри биндера шаттла. */
+    fun decodeSampledBitmap(filePath: String, reqWidth: Int, reqHeight: Int): Bitmap? {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
         BitmapFactory.decodeFile(filePath, options)
@@ -328,10 +335,10 @@ object Utility {
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
 
         options.inJustDecodeBounds = false
-        return BitmapFactory.decodeFile(filePath, options)!!
+        return BitmapFactory.decodeFile(filePath, options)
     }
 
-    fun decodeSampledBitmap(fd: FileDescriptor, reqWidth: Int, reqHeight: Int): Bitmap {
+    fun decodeSampledBitmap(fd: FileDescriptor, reqWidth: Int, reqHeight: Int): Bitmap? {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
         BitmapFactory.decodeFileDescriptor(fd, null, options)
@@ -339,13 +346,19 @@ object Utility {
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
 
         options.inJustDecodeBounds = false
-        return BitmapFactory.decodeFileDescriptor(fd, null, options)!!
+        return BitmapFactory.decodeFileDescriptor(fd, null, options)
     }
 
+    /**
+     * Расширение имени файла в нижнем регистре: точка в имени каталога расширением не
+     * считается, а MimeTypeMap до Android 10 различает регистр (IMG_0001.JPG иначе
+     * оставался без типа, без миниатюры и мимо зеркала медиа).
+     */
     fun getFileExtension(filePath: String): String? {
-        val index = filePath.lastIndexOf(".")
-        return if (index > 0) {
-            filePath.substring(index + 1)
+        val name = filePath.substringAfterLast('/')
+        val index = name.lastIndexOf('.')
+        return if (index > 0 && index < name.length - 1) {
+            name.substring(index + 1).lowercase(Locale.ROOT)
         } else {
             null
         }

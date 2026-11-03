@@ -56,12 +56,11 @@ class AntiSpyVpnFreezeReceiver : BroadcastReceiver() {
         Log.i(TAG, "VPN batch freeze requested, list=${list.size}")
         // Work :vpnwatch performs DPM freeze; receiver is a one-shot fallback when work list is stale.
         val launched = CrossProfileScheduler.launchFreezeInWorkProfile(app, list, vpnOrigin = true)
-        val started = CrossProfileScheduler.startBatchFreezeInWorkProfile(app, list)
-        if (!launched && !started) {
+        if (!launched) {
             CrossProfileScheduler.scheduleFreezeInWorkProfile(app, list, vpnOrigin = true)
             Log.w(TAG, "VPN batch freeze: cross-profile delivery failed, AlarmManager fallback")
         }
-        Log.i(TAG, "VPN batch freeze dispatched, serviceInWork=$started")
+        Log.i(TAG, "VPN batch freeze dispatched, launched=$launched")
     }
 
     companion object {

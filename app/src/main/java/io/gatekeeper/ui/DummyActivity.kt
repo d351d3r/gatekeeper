@@ -1,8 +1,7 @@
-@file:Suppress("DEPRECATION") // legacy version-gated paths (pre-Q package installer/uninstaller)
-
 package io.gatekeeper.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
@@ -17,6 +16,7 @@ import androidx.core.content.ContextCompat
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.ProfileActions
 import io.gatekeeper.util.ProfileNotifier
+import io.gatekeeper.util.RelayAuthorization
 import io.gatekeeper.util.SameProcessTokens
 import io.gatekeeper.util.SettingsManager
 import io.gatekeeper.util.Utility
@@ -35,43 +35,35 @@ class DummyActivity : Activity() {
         antiSpyFlow = AntiSpyLaunchFlow(this)
         policyManager = getSystemService(DevicePolicyManager::class.java)
         isProfileOwner = policyManager!!.isProfileOwnerApp(packageName)
-        if (isProfileOwner) {
-            WorkProfilePolicy.enforceWorkProfilePolicies(this)
-            WorkProfilePolicy.enforceUserRestrictions(this)
-            SettingsManager.getInstance().applyAll()
-
-            synchronized(DummyActivity::class.java) {
-                // E-4: запрос POST_NOTIFICATIONS не должен блокировать установку/удаление --
-                // раньше диалог разрешения вставал перед install-потоком и первый тап по
-                // «Установить» уходил мимо. Для install-действий разрешение не спрашиваем
-                // (hasRequestedPermission не выставляется -- спросим при обычном входе).
-                val action = intent.action
-                val isInstallAction = action == INSTALL_PACKAGE || action == UNINSTALL_PACKAGE
-                val shouldAsk = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                    !hasRequestedPermission && FINALIZE_PROVISION != action && !isInstallAction
-                if (shouldAsk) {
-                    hasRequestedPermission = true
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                        != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        requestPermissions(
-                            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                            REQUEST_PERMISSION_POST_NOTIFICATIONS
-                        )
-                        return
-                    }
-                }
-            }
-        }
-
         init()
     }
 
-    /** Единственный гейт activity: свой процесс, своя подпись или публичное действие. */
-    private fun isAuthorized(intent: Intent): Boolean =
-        checkSameProcessRequest(intent) ||
-            AuthenticationUtility.checkIntent(intent) ||
-            intent.action in ACTIONS_ALLOWED_WITHOUT_SIGNATURE
+    /**
+     * Единственный гейт activity: свой процесс, своя подпись или публичное действие.
+     * Решение -- [RelayAuthorization] (покрыт JVM-тестами); здесь только данные интента.
+     *
+     * Статус установщика принимается только через неэкспортированный псевдоним
+     * [INSTALLER_CALLBACK_ALIAS]: сама DummyActivity экспортирована, и раньше любое
+     * приложение могло прислать ей «установлено» без подписи (S4).
+     */
+    private fun isAuthorized(intent: Intent): Boolean {
+        val request = RelayAuthorization.Request(
+            action = intent.action,
+            componentClassName = intent.component?.className,
+            isProfileOwner = isProfileOwner,
+            isSettingUp = isSettingUp(),
+        )
+        val authorized = RelayAuthorization.isAuthorized(
+            request,
+            sameProcessToken = { SameProcessTokens.consume(intent.getStringExtra(EXTRA_SAME_PROCESS_NONCE)) },
+            signature = { AuthenticationUtility.checkIntent(intent) },
+        )
+        if (!authorized) Log.w(TAG, "relay action rejected: ${intent.action}")
+        return authorized
+    }
+
+    private fun isSettingUp(): Boolean =
+        LocalStorageManager.getInstance().getBoolean(LocalStorageManager.PREF_IS_SETTING_UP)
 
     private fun init() {
         val intent = intent
@@ -81,11 +73,54 @@ class DummyActivity : Activity() {
             return
         }
 
+        // Политика профиля -- только после проверки: раньше любой интент, в том числе
+        // чужой и неавторизованный, сначала запускал полную пересборку политик (S4).
+        // Пересборка идет, только если набор изменился (F4).
+        if (isProfileOwner) {
+            WorkProfilePolicy.enforceWorkProfilePolicies(this)
+            SettingsManager.getInstance().applyAll()
+            if (requestNotificationPermissionIfNeeded(intent.action)) return
+        }
+        dispatch(intent)
+    }
+
+    private fun dispatch(intent: Intent) {
         val handler = actionHandlers[intent.action]
         if (handler != null) {
             handler()
         } else {
             finish()
+        }
+    }
+
+    /**
+     * E-4: запрос POST_NOTIFICATIONS не должен блокировать установку/удаление -- раньше
+     * диалог разрешения вставал перед install-потоком и первый тап по «Установить» уходил
+     * мимо. Для install-действий разрешение не спрашиваем (hasRequestedPermission не
+     * выставляется -- спросим при обычном входе). Обычно до диалога не доходит: политика
+     * профиля выдает разрешение рабочей копии сама.
+     *
+     * @return true, если показан системный запрос; действие продолжится в
+     * [onRequestPermissionsResult] без повторной проверки (подпись к тому времени может
+     * устареть, а одноразовый токен -- быть израсходован).
+     */
+    @SuppressLint("InlinedApi") // POST_NOTIFICATIONS запрашивается только при shouldAsk (API 33+)
+    private fun requestNotificationPermissionIfNeeded(action: String?): Boolean {
+        synchronized(DummyActivity::class.java) {
+            val isInstallAction = action == INSTALL_PACKAGE || action == UNINSTALL_PACKAGE
+            val shouldAsk = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                !hasRequestedPermission && FINALIZE_PROVISION != action && !isInstallAction
+            if (!shouldAsk) return false
+            hasRequestedPermission = true
+            val granted = ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+            if (!granted) {
+                requestPermissions(
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    REQUEST_PERMISSION_POST_NOTIFICATIONS
+                )
+            }
+            return !granted
         }
     }
 
@@ -168,11 +203,6 @@ class DummyActivity : Activity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        if (isProfileOwner) {
-            WorkProfilePolicy.enforceWorkProfilePolicies(this)
-            WorkProfilePolicy.enforceUserRestrictions(this)
-            SettingsManager.getInstance().applyAll()
-        }
         init()
     }
 
@@ -206,19 +236,24 @@ class DummyActivity : Activity() {
         grantResults: IntArray
     ) {
         when (requestCode) {
+            // Прерванный запрос приходит с пустыми массивами: это отказ, а не падение.
             FileShuttleFlow.REQUEST_EXTERNAL_STORAGE ->
                 fileShuttleFlow.onStoragePermissionResult(
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
                 )
-            REQUEST_PERMISSION_POST_NOTIFICATIONS -> init()
+            REQUEST_PERMISSION_POST_NOTIFICATIONS -> dispatch(intent)
             else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
     }
 
     internal fun finishBatchShortcutFlow() {
         finish()
-        @Suppress("DEPRECATION")
-        overridePendingTransition(0, 0)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
+        } else {
+            @Suppress("DEPRECATION") // замена overrideActivityTransition есть только с API 34
+            overridePendingTransition(0, 0)
+        }
     }
 
     internal fun forwardBatchToMainActivityIfVisible(batchAction: String): Boolean {
@@ -290,37 +325,17 @@ class DummyActivity : Activity() {
         const val OPEN_MAIN_APP = ProfileActions.OPEN_MAIN_APP
         const val REQUEST_REPAIR = ProfileActions.REQUEST_REPAIR
         const val WIPE_PROFILE = ProfileActions.WIPE_PROFILE
+
+        /** Неэкспортированный псевдоним DummyActivity для статуса PackageInstaller (манифест). */
+        const val INSTALLER_CALLBACK_ALIAS = RelayAuthorization.INSTALLER_CALLBACK_ALIAS
+
+        private const val TAG = "DummyActivity"
+
         /** Extra FREEZE_ALL_IN_LIST: запуск от фоновой VPN-заморозки (иначе — ручной). */
         const val EXTRA_VPN_ORIGIN = "vpn_origin"
 
-        private val ACTIONS_ALLOWED_WITHOUT_SIGNATURE = listOf(
-            FINALIZE_PROVISION,
-            // Подписать нечем: запрос на перепривязку и посылается потому, что
-            // ключи разошлись. Гейт тут -- подтверждение человеком со сверкой кода.
-            REQUEST_REPAIR,
-            TRY_START_SERVICE,
-            PUBLIC_FREEZE_ALL,
-            PUBLIC_UNFREEZE_ALL,
-            PUBLIC_UNFREEZE_AND_LAUNCH,
-            REFRESH_MAIN_APP_LIST,
-            SHOW_TOAST,
-            // Подпись живет 30 секунд, PendingIntent уведомления -- пока висит
-            // уведомление. Действие умеет ровно одно: открыть наш же главный экран.
-            OPEN_MAIN_APP,
-            // Свой PendingIntent статуса PackageInstaller: доставляет система, подпись и
-            // nonce неприменимы (PI живёт дольше 30-секундного окна и стреляет повторно,
-            // nonce одноразовый -- оба гейта рвали бы доставку статуса, замер Фазы 19 на
-            // AOSP 16). Результат уходит только в наш биндер из pending-реестра; единственная
-            // опасная ветка -- запуск EXTRA_INTENT при PENDING_USER_ACTION -- гейтится
-            // списком системных пакетов в PackageInstallFlow.isSystemInstallerIntent.
-            PACKAGEINSTALLER_CALLBACK,
-        )
-
-        private val ACTIONS_ALLOWED_WITHOUT_SIGNATURE_SAME_PROCESS = listOf(
-            INSTALL_PACKAGE,
-            UNINSTALL_PACKAGE,
-            UNFREEZE_AND_LAUNCH
-        )
+        /** Одноразовый токен действий своего процесса (RelayAuthorization.SAME_PROCESS_ACTIONS). */
+        private const val EXTRA_SAME_PROCESS_NONCE = "same_process_nonce"
 
         private const val REQUEST_PERMISSION_POST_NOTIFICATIONS = 3
         internal const val REQUEST_ANTI_SPY_VPN = 4
@@ -328,12 +343,7 @@ class DummyActivity : Activity() {
         private var hasRequestedPermission = false
 
         fun registerSameProcessRequest(intent: Intent) {
-            intent.putExtra("same_process_nonce", SameProcessTokens.issue())
-        }
-
-        private fun checkSameProcessRequest(intent: Intent): Boolean {
-            if (intent.action !in ACTIONS_ALLOWED_WITHOUT_SIGNATURE_SAME_PROCESS) return false
-            return SameProcessTokens.consume(intent.getStringExtra("same_process_nonce"))
+            intent.putExtra(EXTRA_SAME_PROCESS_NONCE, SameProcessTokens.issue())
         }
     }
 }

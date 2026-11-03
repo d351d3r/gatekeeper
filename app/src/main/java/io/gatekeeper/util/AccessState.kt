@@ -38,14 +38,13 @@ object AccessState {
         return Counts(checks.count { it }, checks.size)
     }
 
-    @Suppress("DEPRECATION") // checkOpNoThrow -- единственный вариант до Android 10
+    /**
+     * unsafeCheckOpNoThrow устарел в API 36, и справочник отправляет обратно к
+     * checkOpNoThrow(String, int, String) -- он снова единственный и не устаревший.
+     */
     private fun appOpAllowed(context: Context, op: String): Boolean {
         val ops = context.getSystemService(AppOpsManager::class.java) ?: return false
-        val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ops.unsafeCheckOpNoThrow(op, Process.myUid(), context.packageName)
-        } else {
-            ops.checkOpNoThrow(op, Process.myUid(), context.packageName)
-        }
+        val mode = ops.checkOpNoThrow(op, Process.myUid(), context.packageName)
         return mode == AppOpsManager.MODE_ALLOWED
     }
 }

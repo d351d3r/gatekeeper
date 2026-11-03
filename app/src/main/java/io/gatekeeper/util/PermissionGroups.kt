@@ -14,8 +14,8 @@ import io.gatekeeper.R
  */
 data class PermGroup(
     val key: String,
-    @StringRes val labelRes: Int,
-    @DrawableRes val iconRes: Int,
+    @param:StringRes val labelRes: Int,
+    @param:DrawableRes val iconRes: Int,
     val permissions: List<String>,
 )
 
@@ -76,6 +76,12 @@ object PermissionGroups {
                 P + "BLUETOOTH_CONNECT",
                 P + "BLUETOOTH_ADVERTISE",
                 P + "NEARBY_WIFI_DEVICES",
+                P + "UWB_RANGING",
+                // Android 17: доступ к локальной сети стал runtime-разрешением этой же
+                // группы. Документация прямо называет LAN-доступ каналом слежки и снятия
+                // отпечатка устройства -- для приложения из профиля это идентификатор
+                // домашней сети владельца (docs/audit_android17.md, A3).
+                P + "ACCESS_LOCAL_NETWORK",
             ),
         ),
         PermGroup(
@@ -86,6 +92,8 @@ object PermissionGroups {
                 P + "READ_MEDIA_IMAGES",
                 P + "READ_MEDIA_VIDEO",
                 P + "READ_MEDIA_AUDIO",
+                // Android 14: выборочный доступ к фото и видео.
+                P + "READ_MEDIA_VISUAL_USER_SELECTED",
                 P + "ACCESS_MEDIA_LOCATION",
             ),
         ),

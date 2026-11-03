@@ -80,4 +80,18 @@ class AuthPayloadTest {
             )
         )
     }
+
+    /** S1: доказательство владения ключом не выдать за подпись служебного интента. */
+    @Test
+    fun keyProofIsDomainSeparatedFromIntentSignatures() {
+        val challenge = "00ff"
+        val proofPayload = AuthPayload.proofPayload(challenge)
+        val intentPayload = AuthPayload.canonicalize("proof", 0, emptyList())
+        assertNotEquals(intentPayload, proofPayload)
+        assertTrue(proofPayload.startsWith("proof|"))
+        val proof = AuthPayload.sign(key, proofPayload)
+        assertTrue(AuthPayload.verify(key, proofPayload, proof))
+        assertFalse(AuthPayload.verify(key, AuthPayload.proofPayload("00fe"), proof))
+        assertFalse(AuthPayload.verify("ffeeddccbbaa99887766554433221100", proofPayload, proof))
+    }
 }

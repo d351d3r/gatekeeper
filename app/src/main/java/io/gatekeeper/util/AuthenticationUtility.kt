@@ -18,18 +18,26 @@ import javax.crypto.KeyGenerator
 // would be able to access Gatekeeper's internal storage to gain access to the private key.
 // The private key is generated the first time this class is used, and then shared
 // across the profile boundary. Gatekeeper will always trust the first key it receives.
+//
+// The key itself travels only until the other side has proven it holds the key
+// (PREF_AUTH_PEER_CONFIRMED). The system forwarder re-resolves a forwarded intent in the
+// target profile without its component, so any app there that declares the same action
+// can be picked in the "Open with" chooser and read the extras (docs/audit_android17.md, S1).
 object AuthenticationUtility {
     fun signIntent(intent: Intent) {
-        val stored = LocalStorageManager.getInstance()
+        val storage = LocalStorageManager.getInstance()
+        val stored = storage
             .getString(LocalStorageManager.PREF_AUTH_KEY)
-            ?.takeIf { hexStringToByteArray(it) != null }
+            ?.takeIf { Hex.decode(it) != null }
         if (stored == null && intent.action !in BOOTSTRAP_ACTIONS) {
             Log.w(TAG, "cross-profile action deferred until bootstrap: ${intent.action}")
             return
         }
         val key = stored ?: currentKey()
 
-        if (intent.action in BOOTSTRAP_ACTIONS) {
+        if (intent.action in BOOTSTRAP_ACTIONS &&
+            !storage.getBoolean(LocalStorageManager.PREF_AUTH_PEER_CONFIRMED)
+        ) {
             intent.putExtra("auth_key", key)
         }
 
@@ -43,7 +51,7 @@ object AuthenticationUtility {
         if (key == null) {
             return if (canBootstrap(intent)) {
                 val authKey = intent.getStringExtra("auth_key") ?: return false
-                if (hexStringToByteArray(authKey) == null) return false
+                if (Hex.decode(authKey) == null) return false
                 LocalStorageManager.getInstance().setString(
                     LocalStorageManager.PREF_AUTH_KEY,
                     authKey
@@ -52,6 +60,8 @@ object AuthenticationUtility {
                     LocalStorageManager.PREF_AUTH_BOOTSTRAPPED,
                     true
                 )
+                // Ключ пришел от другой стороны -- значит, он у нее есть.
+                markPeerConfirmed()
                 true
             } else {
                 false
@@ -59,16 +69,26 @@ object AuthenticationUtility {
         } else {
             val timestamp = System.currentTimeMillis()
             val intentTimestamp = intent.getLongExtra("timestamp", 0)
-            val delta = timestamp - intentTimestamp
-            if (delta !in -CLOCK_SKEW_MS..<MAX_AGE_MS) {
-                Log.w(TAG, "intent signature timestamp rejected, deltaMs=$delta")
+            if (!AuthPayload.isFresh(timestamp, intentTimestamp)) {
+                Log.w(TAG, "intent signature timestamp rejected, deltaMs=${timestamp - intentTimestamp}")
                 return false
             }
-            return AuthPayload.verify(
+            val verified = AuthPayload.verify(
                 key,
                 signedPayload(intent, intentTimestamp),
                 intent.getStringExtra("signature")
             )
+            // Подпись нашим ключом сошлась -- у отправителя он есть, слать его больше незачем.
+            if (verified) markPeerConfirmed()
+            return verified
+        }
+    }
+
+    /** Другая сторона доказала, что держит общий ключ. */
+    fun markPeerConfirmed() {
+        val storage = LocalStorageManager.getInstance()
+        if (!storage.getBoolean(LocalStorageManager.PREF_AUTH_PEER_CONFIRMED)) {
+            storage.setBoolean(LocalStorageManager.PREF_AUTH_PEER_CONFIRMED, true)
         }
     }
 
@@ -79,10 +99,12 @@ object AuthenticationUtility {
      * приложению, умеющему послать форварднутый интент.
      */
     fun adoptKey(key: String): Boolean {
-        if (hexStringToByteArray(key) == null) return false
+        if (Hex.decode(key) == null) return false
         val storage = LocalStorageManager.getInstance()
         storage.setString(LocalStorageManager.PREF_AUTH_KEY, key)
         storage.setBoolean(LocalStorageManager.PREF_AUTH_BOOTSTRAPPED, true)
+        // Ключ предложила другая сторона -- он у нее есть.
+        storage.setBoolean(LocalStorageManager.PREF_AUTH_PEER_CONFIRMED, true)
         return true
     }
 
@@ -90,11 +112,11 @@ object AuthenticationUtility {
     fun currentKey(): String {
         val storage = LocalStorageManager.getInstance()
         val existing = storage.getString(LocalStorageManager.PREF_AUTH_KEY)
-        if (existing != null && hexStringToByteArray(existing) != null) return existing
+        if (existing != null && Hex.decode(existing) != null) return existing
         val fresh = try {
             val keyGen = KeyGenerator.getInstance("HmacSHA256")
             keyGen.init(KEY_BITS)
-            bytesToHex(keyGen.generateKey().encoded)
+            Hex.encode(keyGen.generateKey().encoded)
         } catch (e: NoSuchAlgorithmException) {
             throw IllegalStateException("HmacSHA256 is unavailable", e)
         }
@@ -105,33 +127,12 @@ object AuthenticationUtility {
     fun reset() {
         LocalStorageManager.getInstance().remove(LocalStorageManager.PREF_AUTH_KEY)
         LocalStorageManager.getInstance().remove(LocalStorageManager.PREF_AUTH_BOOTSTRAPPED)
+        LocalStorageManager.getInstance().remove(LocalStorageManager.PREF_AUTH_PEER_CONFIRMED)
     }
 
     private fun canBootstrap(intent: Intent): Boolean =
         !LocalStorageManager.getInstance().getBoolean(LocalStorageManager.PREF_AUTH_BOOTSTRAPPED) &&
             intent.action in BOOTSTRAP_ACTIONS && intent.hasExtra("auth_key")
-
-    private val hexArray = "0123456789ABCDEF".toCharArray()
-
-    private fun bytesToHex(bytes: ByteArray): String {
-        val hexChars = CharArray(bytes.size * 2)
-        for (j in bytes.indices) {
-            val v = bytes[j].toInt() and 0xFF
-            hexChars[j * 2] = hexArray[v ushr 4]
-            hexChars[j * 2 + 1] = hexArray[v and 0x0F]
-        }
-        return String(hexChars)
-    }
-
-    private fun hexStringToByteArray(s: String): ByteArray? {
-        if (s.isEmpty() || s.length % 2 != 0) return null
-        return ByteArray(s.length / 2) { i ->
-            val high = Character.digit(s[i * 2], 16)
-            val low = Character.digit(s[i * 2 + 1], 16)
-            if (high < 0 || low < 0) return null
-            ((high shl 4) + low).toByte()
-        }
-    }
 
     private fun signedPayload(intent: Intent, timestamp: Long): String =
         AuthPayload.canonicalize(intent.action, timestamp, extractSignedExtras(intent))
@@ -141,29 +142,32 @@ object AuthenticationUtility {
         val extras = intent.extras ?: return emptyList()
         return AuthPayload.SIGNED_EXTRA_KEYS.mapNotNull { key ->
             if (!extras.containsKey(key)) return@mapNotNull null
-            val value = when (val raw = extras.get(key)) {
-                is String -> "s:$raw"
-                is Int -> "i:$raw"
-                is Long -> "l:$raw"
-                is Boolean -> "b:$raw"
-                is Uri -> "u:$raw"
-                is Array<*> -> {
-                    if (raw.all { it is String }) {
-                        @Suppress("UNCHECKED_CAST")
-                        AuthPayload.encodeStringArray(raw as Array<String>)
-                    } else null
-                }
-                is BooleanArray -> "ba:${raw.joinToString(",") { it.toString() }}"
-                else -> null
-            } ?: return@mapNotNull null
-            key to value
+            encodeSignedValue(extras.get(key))?.let { key to it }
         }
+    }
+
+    /**
+     * Каноническая запись значения extra для подписи; null -- тип не подписывается.
+     * Тип входит в запись: Int 5 и Long 5 -- разные значения для обработчика.
+     */
+    internal fun encodeSignedValue(raw: Any?): String? = when (raw) {
+        is String -> "s:$raw"
+        is Int -> "i:$raw"
+        is Long -> "l:$raw"
+        is Boolean -> "b:$raw"
+        is Uri -> "u:$raw"
+        is Array<*> -> if (raw.all { it is String }) {
+            @Suppress("UNCHECKED_CAST")
+            AuthPayload.encodeStringArray(raw as Array<String>)
+        } else {
+            null
+        }
+        is BooleanArray -> "ba:${raw.joinToString(",") { it.toString() }}"
+        else -> null
     }
 
     private const val TAG = "AuthUtility"
     private const val KEY_BITS = 256
-    private const val CLOCK_SKEW_MS = 2_000L
-    private const val MAX_AGE_MS = 30_000L
     private val BOOTSTRAP_ACTIONS = setOf(
         DummyActivity.TRY_START_SERVICE,
         DummyActivity.START_SERVICE,

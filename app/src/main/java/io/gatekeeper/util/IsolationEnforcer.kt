@@ -4,6 +4,7 @@ import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
 import android.os.Build
+import android.os.UserManager
 import android.util.Log
 import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 
@@ -80,6 +81,15 @@ object IsolationEnforcer {
             IsolationPolicies.METHOD_NEARBY_APPS ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     dpm.nearbyAppStreamingPolicy = streaming(on)
+                }
+            // Ограничение разрешает личным приложениям принимать ссылки из профиля;
+            // политика «ссылки остаются в профиле» его снимает. Форвард-фильтры ссылок
+            // рабочий -> личный при этом не регистрируются (WorkProfilePolicy).
+            IsolationPolicies.METHOD_WORK_LINKS_STAY ->
+                if (on) {
+                    dpm.clearUserRestriction(admin, UserManager.ALLOW_PARENT_PROFILE_APP_LINKING)
+                } else {
+                    dpm.addUserRestriction(admin, UserManager.ALLOW_PARENT_PROFILE_APP_LINKING)
                 }
         }
     }

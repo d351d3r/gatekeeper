@@ -4,7 +4,6 @@ import android.content.Intent
 import io.gatekeeper.R
 import io.gatekeeper.services.FreezeService
 import io.gatekeeper.util.AntiSpyLaunchGate
-import io.gatekeeper.util.AntiSpyVpnGuard
 import io.gatekeeper.util.GatekeeperToast
 import io.gatekeeper.util.ProfileNotifier
 
@@ -24,25 +23,21 @@ class UnfreezeLaunchFlow(private val activity: DummyActivity) {
         get() = activity.intent
 
     fun handleUnfreezeAndLaunch() {
-        if (tryForwardPublicToParent()) {
-            return
-        }
         if (!isProfileOwner) {
             unfreezeAndLaunchFromPersonal()
             return
         }
-        unfreezeAndLaunchAsProfileOwner()
-    }
-
-    /** Рабочая сторона, публичный шорткат: перебросить обратно в личный профиль. */
-    private fun tryForwardPublicToParent(): Boolean {
-        val forwarded = isProfileOwner &&
-            DummyActivity.PUBLIC_UNFREEZE_AND_LAUNCH == intent.action &&
-            AntiSpyVpnGuard.forwardPublicUnfreezeToParent(activity, intent)
-        if (forwarded) {
+        // Ярлыки «Разморозить и запустить» создает личная копия, и их интент адресован
+        // личной DummyActivity. В профиле публичное действие без подписи может прислать
+        // только приложение профиля -- раньше оно так размораживало любые пакеты, включая
+        // linkedPackages, мимо шлюза Anti Spy (пересылка в личный профиль падала: фильтра
+        // для этого действия нет, и выполнение доходило до разморозки здесь). S2.
+        if (DummyActivity.PUBLIC_UNFREEZE_AND_LAUNCH == intent.action) {
+            android.util.Log.w("UnfreezeLaunchFlow", "public unfreeze refused in the work profile")
             activity.finish()
+            return
         }
-        return forwarded
+        unfreezeAndLaunchAsProfileOwner()
     }
 
     /** Личная сторона: гейт anti-spy, затем форвард в рабочий профиль. */

@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION") // legacy version-gated paths (pre-Q package installer/uninstaller)
-
 package io.gatekeeper.ui
 
 import android.app.Activity
@@ -8,7 +6,9 @@ import android.app.admin.DevicePolicyManager
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInstaller
+import android.content.pm.PackageManager
 import android.Manifest
 import android.net.Uri
 import android.os.Build
@@ -17,11 +17,13 @@ import android.os.StrictMode
 import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.IntentCompat
 import io.gatekeeper.R
 import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.services.IAppInstallCallback
 import io.gatekeeper.util.FileProviderProxy
 import io.gatekeeper.util.GatekeeperToast
+import io.gatekeeper.util.InstallRestrictionLease
 import io.gatekeeper.util.InstallWarnPolicy
 import io.gatekeeper.util.InstallationProgressListener
 import io.gatekeeper.util.LocalStorageManager
@@ -51,17 +53,20 @@ class PackageInstallFlow(
         // установщика. Предупреждаем до запуска сессии; отмена отвечает вызвавшему
         // RESULT_CANCELED, а не молчаливым висяком (4PDA #2105, #2113).
         if (InstallWarnPolicy.shouldWarn(Utility.isMIUI(), isProfileOwner)) {
+            var proceeding = false
             AlertDialog.Builder(activity)
                 .setMessage(R.string.miui_install_apk_warning)
                 .setPositiveButton(R.string.continue_anyway) { _, _ ->
+                    proceeding = true
                     proceedInstallPackage(operationId)
                 }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    val pending = operationId?.let(PendingPackageOperations::consume)
-                    FileProviderProxy.clearForwardProxy(pending?.forwardedUri)
-                    try {
-                        pending?.callback?.callback(Activity.RESULT_CANCELED)
-                    } catch (_: RemoteException) {
+                .setNegativeButton(android.R.string.cancel, null)
+                // Отмена, «назад» и касание мимо одинаково: вызвавший получает отказ, а
+                // прозрачная activity не остается висеть поверх экрана, как было раньше.
+                .setOnDismissListener {
+                    // Закрытие самой activity тоже снимает диалог: тогда итог уже отправлен.
+                    if (!proceeding && !activity.isFinishing) {
+                        appInstallFinished(Activity.RESULT_CANCELED, operationId)
                     }
                 }
                 .show()
@@ -72,19 +77,16 @@ class PackageInstallFlow(
 
     fun uninstallPackage() {
         val operationId = capturePendingPackageOperation(PendingPackageOperations.OperationType.UNINSTALL)
+        // «Запрет удаления» из изоляции действует и на владельца профиля (F1).
+        InstallRestrictionLease.lift(activity, InstallRestrictionLease.UNINSTALL)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             uninstallPackageQ(operationId)
             return
         }
-
-        val uri = Uri.fromParts("package", intent.getStringExtra("package"), null)
-        val uninstallIntent = Intent(Intent.ACTION_UNINSTALL_PACKAGE, uri).apply {
-            putExtra(Intent.EXTRA_RETURN_RESULT, true)
-        }
-        @Suppress("DEPRECATION")
-        activity.startActivityForResult(
-            uninstallIntent,
-            PendingPackageOperations.registerLegacy(operationId)
+        SystemInstaller.startLegacyUninstall(
+            activity,
+            intent.getStringExtra("package"),
+            PendingPackageOperations.registerLegacy(operationId),
         )
     }
 
@@ -102,17 +104,20 @@ class PackageInstallFlow(
         val status = callbackIntent.extras!!.getInt(PackageInstaller.EXTRA_STATUS)
         when (status) {
             PackageInstaller.STATUS_PENDING_USER_ACTION -> {
-                // Единственная опасная ветка при бесподписном действии: запуск чужого
-                // интента. Пускаем только системный экран подтверждения установки.
-                @Suppress("DEPRECATION")
-                val confirmIntent = callbackIntent.extras!!.get(Intent.EXTRA_INTENT) as? Intent
+                // Статус приходит только через неэкспортированный псевдоним, то есть от
+                // нашего PendingIntent; проверка цели -- вторая линия. Раньше пускался
+                // только список AOSP/Google-установщиков, и на прошивках со своим
+                // установщиком подтверждение молча не показывалось. Теперь -- любой
+                // системный пакет.
+                val confirmIntent = IntentCompat.getParcelableExtra(
+                    callbackIntent, Intent.EXTRA_INTENT, Intent::class.java
+                )
                 val resolvedPkg = confirmIntent?.resolveActivity(activity.packageManager)?.packageName
-                val systemInstaller = resolvedPkg == "android" ||
-                    resolvedPkg == activity.packageName ||
-                    resolvedPkg == "com.android.packageinstaller" ||
-                    resolvedPkg == "com.google.android.packageinstaller"
-                if (confirmIntent == null || !systemInstaller) {
-                    Log.w(TAG, "PACKAGEINSTALLER_CALLBACK: чужой EXTRA_INTENT отклонён")
+                if (confirmIntent == null || resolvedPkg == null ||
+                    !SystemInstaller.isSystemPackage(activity, resolvedPkg)
+                ) {
+                    Log.w(TAG, "PACKAGEINSTALLER_CALLBACK: EXTRA_INTENT вне системы отклонён: $resolvedPkg")
+                    appInstallFinished(Activity.RESULT_CANCELED, operationId)
                     return
                 }
                 activity.startActivity(confirmIntent)
@@ -123,6 +128,10 @@ class PackageInstallFlow(
     }
 
     private fun proceedInstallPackage(operationId: String?) {
+        // «Запрет установки» и «неизвестные источники» из изоляции действуют и на
+        // владельца профиля: снимаем их до проверки canRequestPackageInstalls, которая
+        // иначе всегда отвечает «нельзя» (F1). Возвращает их appInstallFinished.
+        InstallRestrictionLease.lift(activity, InstallRestrictionLease.INSTALL)
         var uri: Uri? = null
         if (intent.hasExtra("package")) {
             uri = Uri.fromParts("package", intent.getStringExtra("package"), null)
@@ -159,27 +168,26 @@ class PackageInstallFlow(
                         }
                     }
                     .setNegativeButton(android.R.string.cancel, null)
+                    // Раньше ни один из ответов не завершал операцию: вызвавший ждал вечно,
+                    // а прозрачная activity оставалась поверх экрана. После выдачи
+                    // разрешения пользователь повторяет клонирование.
+                    .setOnDismissListener {
+                        if (!activity.isFinishing) appInstallFinished(Activity.RESULT_CANCELED, operationId)
+                    }
                     .show()
+                StrictMode.setVmPolicy(policy)
                 return
             }
             try {
-                PackageInstallerSession(activity, isProfileOwner)
+                PackageInstallerSession(activity)
                     .create(uri, intent.getStringArrayExtra("split_apks"), operationId)
             } catch (e: IOException) {
-                throw RuntimeException(e)
+                // Раньше -- RuntimeException и падение процесса профиля посреди установки.
+                Log.w(TAG, "cannot open install session", e)
+                appInstallFinished(Activity.RESULT_FIRST_USER + PackageInstaller.STATUS_FAILURE, operationId)
             }
         } else {
-            val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE, uri).apply {
-                putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, activity.packageName)
-                putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
-                putExtra(Intent.EXTRA_RETURN_RESULT, true)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-            @Suppress("DEPRECATION")
-            activity.startActivityForResult(
-                installIntent,
-                PendingPackageOperations.registerLegacy(operationId)
-            )
+            SystemInstaller.startLegacyInstall(activity, uri, PendingPackageOperations.registerLegacy(operationId))
         }
 
         StrictMode.setVmPolicy(policy)
@@ -187,8 +195,7 @@ class PackageInstallFlow(
 
     private fun uninstallPackageQ(operationId: String?) {
         val pi = activity.packageManager.packageInstaller
-        val callbackIntent = Intent(activity, DummyActivity::class.java).apply {
-            action = DummyActivity.PACKAGEINSTALLER_CALLBACK
+        val callbackIntent = PackageInstallerSession.callbackIntent(activity).apply {
             operationId?.let { putExtra(PendingPackageOperations.PENDING_PACKAGE_OPERATION_ID, it) }
             data = Uri.parse("gatekeeper://package-uninstall/${operationId ?: UUID.randomUUID()}")
         }
@@ -200,6 +207,8 @@ class PackageInstallFlow(
 
     /** Финал любой операции установки/удаления: колбэк вызвавшему и summary-обработка. */
     fun appInstallFinished(resultCode: Int, operationId: String?) {
+        // Вернуть ограничения изоляции, снятые на время операции (F1).
+        InstallRestrictionLease.restore(activity)
         val pending = operationId?.let(PendingPackageOperations::consume)
         FileProviderProxy.clearForwardProxy(pending?.forwardedUri)
         var callback: IAppInstallCallback? = null
@@ -283,8 +292,7 @@ class PackageInstallFlow(
         }
         val callbackExtra = intent.getBundleExtra("callback")!!
         val callback = IAppInstallCallback.Stub.asInterface(callbackExtra.getBinder("callback"))
-        @Suppress("DEPRECATION")
-        val forwardedUri = intent.getParcelableExtra<Uri>("direct_install_apk")
+        val forwardedUri = IntentCompat.getParcelableExtra(intent, "direct_install_apk", Uri::class.java)
         val operationId = PendingPackageOperations.register(
             PendingPackageOperations.PendingPackageOperation(
                 type = type,
@@ -302,14 +310,54 @@ class PackageInstallFlow(
     }
 }
 
+/** Экраны системного установщика: путь до Android 10 и проверка цели подтверждения. */
+internal object SystemInstaller {
+    /** До Android 10 установка -- только через экран системы. */
+    @Suppress("DEPRECATION") // ACTION_INSTALL_PACKAGE и его extras: замена -- PackageInstaller (API 29+)
+    fun startLegacyInstall(activity: Activity, uri: Uri?, requestCode: Int) {
+        val installIntent = Intent(Intent.ACTION_INSTALL_PACKAGE, uri).apply {
+            putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, activity.packageName)
+            putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
+            putExtra(Intent.EXTRA_RETURN_RESULT, true)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        activity.startActivityForResult(installIntent, requestCode)
+    }
+
+    /** До Android 10 удаление -- только через экран системы. */
+    @Suppress("DEPRECATION") // ACTION_UNINSTALL_PACKAGE: замена -- PackageInstaller.uninstall (API 29+)
+    fun startLegacyUninstall(activity: Activity, packageName: String?, requestCode: Int) {
+        val uri = Uri.fromParts("package", packageName, null)
+        val uninstallIntent = Intent(Intent.ACTION_UNINSTALL_PACKAGE, uri).apply {
+            putExtra(Intent.EXTRA_RETURN_RESULT, true)
+        }
+        activity.startActivityForResult(uninstallIntent, requestCode)
+    }
+
+    /** Подтверждение установки показывает системный пакет: свой у каждой прошивки. */
+    fun isSystemPackage(activity: Activity, packageName: String): Boolean {
+        if (packageName == "android" || packageName == activity.packageName) return true
+        return try {
+            val info = activity.packageManager.getApplicationInfo(packageName, 0)
+            info.flags and ApplicationInfo.FLAG_SYSTEM != 0
+        } catch (_: PackageManager.NameNotFoundException) {
+            false
+        }
+    }
+}
+
 /**
  * Сессия PackageInstaller (API 21+): создание, стейджинг APK, коммит, откат.
- * Профиль-владелец ставит без пользовательского действия -- иначе массовое
- * восстановление из бэкапа (C4) превращается в N системных диалогов подряд.
+ *
+ * Тихой установки здесь нет и быть не может (F3): по PackageInstallerSession в AOSP
+ * без подтверждения пользователя ставят только root, system, владелец устройства,
+ * аффилированный владелец профиля и держатель INSTALL_PACKAGES. Владелец рабочего
+ * профиля на личном телефоне не аффилирован, а USER_ACTION_NOT_REQUIRED действует
+ * лишь для обновлений своих же пакетов с UPDATE_PACKAGES_WITHOUT_USER_ACTION. Поэтому
+ * каждое клонирование -- один системный диалог, восстановление из бэкапа -- N диалогов.
  */
 class PackageInstallerSession(
     private val activity: Activity,
-    private val isProfileOwner: Boolean,
 ) {
     @Throws(IOException::class)
     fun create(uri: Uri?, splitApks: Array<String>?, operationId: String?) {
@@ -317,11 +365,6 @@ class PackageInstallerSession(
         val params = PackageInstaller.SessionParams(
             PackageInstaller.SessionParams.MODE_FULL_INSTALL
         )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && isProfileOwner) {
-            params.setRequireUserAction(
-                PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED
-            )
-        }
         val sessionId = pi.createSession(params)
 
         pi.registerSessionCallback(InstallationProgressListener(activity, pi, sessionId))
@@ -329,8 +372,7 @@ class PackageInstallerSession(
         val session = pi.openSession(sessionId)
         stageAll(uri, splitApks, session, operationId) {
             session.setStagingProgress(STAGING_PROGRESS_INITIAL)
-            val callbackIntent = Intent(activity, DummyActivity::class.java).apply {
-                action = DummyActivity.PACKAGEINSTALLER_CALLBACK
+            val callbackIntent = callbackIntent(activity).apply {
                 operationId?.let {
                     putExtra(PendingPackageOperations.PENDING_PACKAGE_OPERATION_ID, it)
                 }
@@ -400,11 +442,26 @@ class PackageInstallerSession(
             )
         } catch (_: RemoteException) {
         }
+        // Откат идет из потока стейджинга: раньше activity после него оставалась открытой,
+        // а снятые на время установки ограничения -- снятыми.
+        activity.runOnUiThread {
+            InstallRestrictionLease.restore(activity)
+            activity.finish()
+        }
     }
 
     internal companion object {
         private const val TAG = "PackageInstallerSession"
         private const val STAGING_PROGRESS_INITIAL = 0.1f
+
+        /**
+         * Статус адресован неэкспортированному псевдониму DummyActivity: экспортированную
+         * DummyActivity может позвать любое приложение, псевдоним -- только наш
+         * PendingIntent (S4, docs/audit_android17.md).
+         */
+        fun callbackIntent(activity: Activity): Intent =
+            Intent(DummyActivity.PACKAGEINSTALLER_CALLBACK)
+                .setClassName(activity, DummyActivity.INSTALLER_CALLBACK_ALIAS)
 
         /**
          * PendingIntent статуса PackageInstaller отправляет из фона сама система; без

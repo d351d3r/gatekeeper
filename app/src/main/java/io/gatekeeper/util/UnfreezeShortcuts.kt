@@ -84,6 +84,11 @@ object UnfreezeShortcuts {
             }
     }
 
+    /**
+     * Снятие ярлыка через broadcast лаунчера: для ярлыков, поставленных до Android 8
+     * (INSTALL_SHORTCUT), и лаунчеров, которые до сих пор слушают этот broadcast.
+     */
+    @Suppress("DEPRECATION") // EXTRA_SHORTCUT_*: протокол старых лаунчеров, замены у него нет
     private fun sendUninstallBroadcast(
         context: Context,
         launchIntent: Intent,

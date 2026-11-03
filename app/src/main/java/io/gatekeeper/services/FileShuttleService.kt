@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION") // MediaStore.Thumbnails — effective only pre-API 29; 29+ falls back to loadBitmapThumbnail
-
 package io.gatekeeper.services
 
 import android.app.Service
@@ -7,6 +5,7 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
 import android.graphics.Point
+import android.media.MediaScannerConnection
 import android.media.ThumbnailUtils
 import android.net.Uri
 import android.os.Build
@@ -14,13 +13,16 @@ import android.os.Environment
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.Parcel
 import android.os.ParcelFileDescriptor
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.util.Size
 import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import io.gatekeeper.R
 import io.gatekeeper.GatekeeperApplication
+import io.gatekeeper.util.BinderCallers
 import io.gatekeeper.util.CrossProfileDocumentsProvider
 import io.gatekeeper.util.FileShuttlePathResolver
 import io.gatekeeper.util.Notifications
@@ -28,7 +30,6 @@ import io.gatekeeper.util.StatusNotification
 import io.gatekeeper.util.Utility
 import java.io.File
 import java.io.FileNotFoundException
-import java.io.FileOutputStream
 import java.io.IOException
 import java.io.Serializable
 
@@ -37,6 +38,16 @@ class FileShuttleService : Service() {
     private val handler = Handler(Looper.getMainLooper())
 
     private val stub = object : IFileShuttleService.Stub() {
+        /**
+         * Биндер шаттла отдается другому профилю через колбэк из extras интента. Чужое
+         * приложение, получившее его, раньше читало и писало все общее хранилище этого
+         * профиля. Методы исполняются только для Gatekeeper (S1, docs/audit_android17.md).
+         */
+        override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
+            BinderCallers.enforceGatekeeperCaller(code)
+            return super.onTransact(code, data, reply, flags)
+        }
+
         override fun ping() {
             resetSuicideTask()
         }
@@ -189,7 +200,7 @@ class FileShuttleService : Service() {
     private fun thumbnailFor(mime: String, fullPath: String, sizeHint: Point): ParcelFileDescriptor? =
         when {
             mime.startsWith("image/") -> loadImageThumbnail(fullPath, sizeHint)
-            mime.startsWith("video/") -> loadVideoThumbnail(fullPath)
+            mime.startsWith("video/") -> loadVideoThumbnail(fullPath, sizeHint)
             else -> null
         }
 
@@ -286,52 +297,78 @@ class FileShuttleService : Service() {
         stopSelf()
     }
 
-    private fun loadImageThumbnail(fullPath: String, sizeHint: Point): ParcelFileDescriptor? {
+    /**
+     * С API 29 миниатюру строит [ThumbnailUtils] прямо по файлу (с учетом EXIF-поворота);
+     * таблица MediaStore.Images.Thumbnails там устарела и пуста, поэтому старый путь
+     * через нее оставлен только для API < 29.
+     */
+    private fun loadImageThumbnail(fullPath: String, sizeHint: Point): ParcelFileDescriptor? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            bitmapToFd(createThumbnail(File(fullPath), sizeHint, video = false))
+        } else {
+            loadImageThumbnailLegacy(fullPath, sizeHint)
+        }
+
+    private fun loadVideoThumbnail(fullPath: String, sizeHint: Point): ParcelFileDescriptor? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            bitmapToFd(createThumbnail(File(fullPath), sizeHint, video = true))
+        } else {
+            @Suppress("DEPRECATION") // единственный API миниатюр видео до Android 10
+            bitmapToFd(
+                ThumbnailUtils.createVideoThumbnail(fullPath, MediaStore.Video.Thumbnails.MINI_KIND)
+            )
+        }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun createThumbnail(file: File, sizeHint: Point, video: Boolean): Bitmap? {
+        val size = Size(sizeHint.x.coerceAtLeast(1), sizeHint.y.coerceAtLeast(1))
+        return try {
+            if (video) {
+                ThumbnailUtils.createVideoThumbnail(file, size, null)
+            } else {
+                ThumbnailUtils.createImageThumbnail(file, size, null)
+            }
+        } catch (_: IOException) {
+            null
+        }
+    }
+
+    @Suppress("DEPRECATION") // MediaStore.Images.Thumbnails: путь только для API < 29
+    private fun loadImageThumbnailLegacy(fullPath: String, sizeHint: Point): ParcelFileDescriptor? {
         val id = Utility.getMediaStoreId(this, fullPath)
         if (id == -1) {
             return loadBitmapThumbnail(fullPath, sizeHint)
         }
-        var result = MediaStore.Images.Thumbnails.queryMiniThumbnail(
-            contentResolver,
-            id.toLong(),
-            MediaStore.Images.Thumbnails.MINI_KIND,
-            null,
-        )
-        if (result.count == 0) {
+        val query = {
+            MediaStore.Images.Thumbnails.queryMiniThumbnail(
+                contentResolver,
+                id.toLong(),
+                MediaStore.Images.Thumbnails.MINI_KIND,
+                null,
+            )
+        }
+        var result = query()
+        if (result == null || result.count == 0) {
+            result?.close()
             MediaStore.Images.Thumbnails.getThumbnail(
                 contentResolver,
                 id.toLong(),
                 MediaStore.Images.Thumbnails.MINI_KIND,
                 null,
             )
-            result = MediaStore.Images.Thumbnails.queryMiniThumbnail(
-                contentResolver,
-                id.toLong(),
-                MediaStore.Images.Thumbnails.MINI_KIND,
-                null,
-            )
+            result = query()
         }
-        if (result.count == 0) {
-            return loadBitmapThumbnail(fullPath, sizeHint)
+        return result.use { cursor ->
+            if (cursor == null || !cursor.moveToFirst()) {
+                return@use loadBitmapThumbnail(fullPath, sizeHint)
+            }
+            try {
+                val index = cursor.getColumnIndex(MediaStore.Images.Thumbnails.DATA)
+                contentResolver.openFileDescriptor(Uri.fromFile(File(cursor.getString(index))), "r")
+            } catch (_: FileNotFoundException) {
+                null
+            }
         }
-        result.moveToFirst()
-        return try {
-            val index = result.getColumnIndex(MediaStore.Images.Thumbnails.DATA)
-            contentResolver.openFileDescriptor(
-                Uri.fromFile(File(result.getString(index))),
-                "r",
-            )
-        } catch (_: FileNotFoundException) {
-            null
-        }
-    }
-
-    private fun loadVideoThumbnail(fullPath: String): ParcelFileDescriptor? {
-        val bmp = ThumbnailUtils.createVideoThumbnail(
-            fullPath,
-            MediaStore.Video.Thumbnails.MINI_KIND,
-        )
-        return bitmapToFd(bmp)
     }
 
     private fun loadBitmapThumbnail(path: String, sizeHint: Point): ParcelFileDescriptor? {
@@ -348,8 +385,10 @@ class FileShuttleService : Service() {
         }
 
         Thread {
+            // AutoCloseOutputStream закрывает сам ParcelFileDescriptor, а не только поток
+            // поверх его дескриптора: иначе пишущий конец трубы оставался незакрытым объектом.
             try {
-                FileOutputStream(pair[1].fileDescriptor).use { os ->
+                ParcelFileDescriptor.AutoCloseOutputStream(pair[1]).use { os ->
                     bmp.compress(Bitmap.CompressFormat.PNG, 100, os)
                     os.flush()
                 }
@@ -361,11 +400,13 @@ class FileShuttleService : Service() {
         return pair[0]
     }
 
+    /**
+     * Новый файл должен сразу появиться в галерее. Broadcast ACTION_MEDIA_SCANNER_SCAN_FILE
+     * устарел с API 29; MediaScannerConnection.scanFile -- поддерживаемая замена.
+     */
     private fun notifyMediaScannerIfNecessary(f: File, mimeType: String?) {
         if (mimeType != null && (mimeType.startsWith("image/") || mimeType.startsWith("video/"))) {
-            val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-            intent.data = Uri.fromFile(f)
-            sendBroadcast(intent)
+            MediaScannerConnection.scanFile(this, arrayOf(f.absolutePath), arrayOf(mimeType), null)
         }
     }
 

@@ -1,9 +1,12 @@
 package io.gatekeeper
 
+import io.gatekeeper.util.AntiSpyFreezeScope
+import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.ScreenLockFreezeMigration
 import io.gatekeeper.util.ScreenLockFreezeScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
@@ -103,5 +106,38 @@ class ScreenLockFreezeMigrationTest {
         for (scope in ScreenLockFreezeScope.entries) {
             assertEquals(scope, ScreenLockFreezeScope.fromStored(scope.stored))
         }
+    }
+
+    /** run() читает старые настройки сторожа и отмечает перенос пройденным -- ровно один раз. */
+    @Test
+    fun runMigratesLegacySettingsOnce() {
+        TestStorage.install()
+        val storage = LocalStorageManager.getInstance()
+        storage.setBoolean(LocalStorageManager.PREF_ANTI_SPY_FREEZE_ON_SCREEN_LOCK, true)
+        storage.setInt(LocalStorageManager.PREF_ANTI_SPY_FREEZE_SCOPE, AntiSpyFreezeScope.WHOLE_WORK_PROFILE.stored)
+        storage.setInt(LocalStorageManager.PREF_ANTI_SPY_FREEZE_DELAY, 120)
+
+        assertEquals(
+            ScreenLockFreezeMigration.Decision(
+                enableService = true,
+                scope = ScreenLockFreezeScope.WHOLE_WORK_PROFILE,
+                delaySeconds = 120,
+            ),
+            ScreenLockFreezeMigration.run(storage),
+        )
+        assertTrue(storage.getBoolean(LocalStorageManager.PREF_SCREEN_LOCK_FREEZE_MIGRATED))
+        assertNull(ScreenLockFreezeMigration.run(storage))
+    }
+
+    /** Без старого триггера переносить нечего, но повторно настройки не перечитываются. */
+    @Test
+    fun runWithoutLegacyTriggerOnlyMarksTheMigration() {
+        TestStorage.install()
+        val storage = LocalStorageManager.getInstance()
+        assertNull(ScreenLockFreezeMigration.run(storage))
+        assertTrue(storage.getBoolean(LocalStorageManager.PREF_SCREEN_LOCK_FREEZE_MIGRATED))
+
+        storage.setBoolean(LocalStorageManager.PREF_ANTI_SPY_FREEZE_ON_SCREEN_LOCK, true)
+        assertNull(ScreenLockFreezeMigration.run(storage))
     }
 }

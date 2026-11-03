@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION") // legacy version-gated paths (LocalBroadcastManager)
-
 package io.gatekeeper.ui
 
 import android.Manifest
@@ -24,6 +22,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.Parcel
 import android.os.PowerManager
 import android.os.Process
 import android.os.RemoteException
@@ -46,7 +45,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -65,9 +63,14 @@ import io.gatekeeper.util.PermissionGroups
 import io.gatekeeper.util.WorkProfileStatus
 import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.AutoFreezeDefaults
+import io.gatekeeper.util.BinderCallers
+import io.gatekeeper.util.ImpostorScan
+import io.gatekeeper.util.KeyProof
+import io.gatekeeper.util.StartActivityProxyPolicy
 import io.gatekeeper.util.BackupPayload
 import io.gatekeeper.util.FileShuttleConnection
 import io.gatekeeper.util.FileShuttleExternalBrowser
+import io.gatekeeper.util.LocalEvents
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.PairingCode
 import io.gatekeeper.util.ProfileActions
@@ -220,16 +223,11 @@ class MainActivity : AppCompatActivity() {
             windowInsets
         }
 
-        LocalBroadcastManager.getInstance(this)
-            .registerReceiver(
-                antiSpyVpnBlockReceiver,
-                IntentFilter(AntiSpyLaunchGate.BROADCAST_LAUNCH_BLOCKED_VPN)
-            )
-        LocalBroadcastManager.getInstance(this)
-            .registerReceiver(
-                appListRefreshReceiver,
-                IntentFilter(AppListFragment.BROADCAST_REFRESH)
-            )
+        LocalEvents.register(
+            antiSpyVpnBlockReceiver,
+            IntentFilter(AntiSpyLaunchGate.BROADCAST_LAUNCH_BLOCKED_VPN)
+        )
+        LocalEvents.register(appListRefreshReceiver, IntentFilter(AppListFragment.BROADCAST_REFRESH))
 
         init()
         handleExternalDocumentsLaunch(intent, launchedFromPackageCompat())
@@ -385,8 +383,18 @@ class MainActivity : AppCompatActivity() {
             onWorkServiceBindFailed(reason, null)
             return
         }
+        // Биндер из результата реле мог вернуть не Gatekeeper, а приложение, выбранное в
+        // системном выборе «Открыть с помощью» (S1). Прокси и данные отдаем только тому,
+        // кто доказал владение общим ключом. Молчаливый повтор тут не нужен: это не сбой.
+        val candidate = IGatekeeperService.Stub.asInterface(binder)
+        if (!proveWorkService(candidate)) {
+            android.util.Log.w(TAG, "work service failed the shared-key proof")
+            showWorkServiceBindFailed(WorkServiceBindFailure.UNVERIFIED)
+            return
+        }
+        AuthenticationUtility.markPeerConfirmed()
         workBindAttempts = 0
-        serviceWork = IGatekeeperService.Stub.asInterface(binder)
+        serviceWork = candidate
         registerStartActivityProxies()
         startKiller()
         window.decorView.post {
@@ -395,6 +403,7 @@ class MainActivity : AppCompatActivity() {
             checkPowerDiagnosticsOnceDaily()
             batchShortcutFlow.runPending()
             workListPoller.start()
+            checkImpostorsInBackground()
         }
         buildView()
         // Первый запуск ведет за руку: сначала пресет изоляции, потом разрешения,
@@ -403,6 +412,71 @@ class MainActivity : AppCompatActivity() {
         if (!handled && !storeCloneFlow.maybePrompt(serviceMain, serviceWork)) {
             maybeShowFileShuttleHint()
         }
+    }
+
+    /** Биндер принадлежит Gatekeeper, только если ответ на вызов посчитан общим ключом. */
+    @Suppress("TooGenericExceptionCaught") // чужой биндер вправе бросить что угодно
+    private fun proveWorkService(service: IGatekeeperService): Boolean {
+        val challenge = KeyProof.newChallenge()
+        val proof = try {
+            service.proveAuthKey(challenge)
+        } catch (e: RemoteException) {
+            android.util.Log.w(TAG, "key proof call failed", e)
+            null
+        } catch (e: RuntimeException) {
+            android.util.Log.w(TAG, "key proof call failed", e)
+            null
+        }
+        return KeyProof.verify(challenge, proof)
+    }
+
+    /**
+     * Приложения, объявившие служебные действия Gatekeeper, попадают в системный выбор
+     * рядом с ним и могут перехватить связь между профилями (S1). В рабочем профиле
+     * Gatekeeper -- владелец и может их заморозить; в личном -- только назвать.
+     */
+    private fun checkImpostorsInBackground() {
+        val work = serviceWork ?: return
+        Thread {
+            val inWork = try {
+                work.impostorPackages.orEmpty()
+            } catch (e: RemoteException) {
+                android.util.Log.w(TAG, "impostor scan in profile failed", e)
+                emptyList()
+            }
+            val inPersonal = ImpostorScan.findInThisProfile(this)
+            if (inWork.isEmpty() && inPersonal.isEmpty()) return@Thread
+            window.decorView.post {
+                if (!isFinishing) showImpostorWarning(work, inWork, inPersonal)
+            }
+        }.start()
+    }
+
+    private fun showImpostorWarning(work: IGatekeeperService, inWork: List<String>, inPersonal: List<String>) {
+        val lines = inWork.map { entry ->
+            "• ${ImpostorScan.decodeLabel(entry)} (${getString(R.string.fragment_profile_work)})"
+        } + inPersonal.map { entry ->
+            "• ${ImpostorScan.decodeLabel(entry)} (${getString(R.string.fragment_profile_main)})"
+        }
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.impostor_title)
+            .setMessage(getString(R.string.impostor_message, lines.joinToString("\n")))
+            .setNegativeButton(R.string.impostor_ignore, null)
+        if (inWork.isNotEmpty()) {
+            dialog.setPositiveButton(R.string.impostor_freeze) { _, _ ->
+                val frozen = inWork.count { entry ->
+                    try {
+                        work.freezePackage(ImpostorScan.decodePackage(entry))
+                    } catch (e: RemoteException) {
+                        android.util.Log.w(TAG, "freeze impostor failed", e)
+                        false
+                    }
+                }
+                GatekeeperToast.show(this, getString(R.string.impostor_frozen, frozen))
+                refreshAppLists()
+            }
+        }
+        dialog.show()
     }
 
     /**
@@ -742,17 +816,37 @@ class MainActivity : AppCompatActivity() {
     private fun registerStartActivityProxies() {
         try {
             serviceMain!!.setStartActivityProxy(object : IStartActivityProxy.Stub() {
+                override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
+                    BinderCallers.enforceGatekeeperCaller(code)
+                    return super.onTransact(code, data, reply, flags)
+                }
+
                 override fun startActivity(intent: Intent) {
                     this@MainActivity.startActivity(intent)
                 }
             })
+            // Прокси запускает интент от имени видимой личной копии. Раньше он запускал
+            // что угодно и с любыми флагами (вплоть до выдачи URI-прав) для любого, кто
+            // держит биндер. Теперь -- только Gatekeeper и только установку/удаление (S1).
             serviceWork!!.setStartActivityProxy(object : IStartActivityProxy.Stub() {
+                override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
+                    BinderCallers.enforceGatekeeperCaller(code)
+                    return super.onTransact(code, data, reply, flags)
+                }
+
                 override fun startActivity(intent: Intent) {
+                    if (!StartActivityProxyPolicy.isAllowed(intent.action)) {
+                        android.util.Log.w(TAG, "start-activity proxy refused ${intent.action}")
+                        return
+                    }
                     val dummyIntent = Intent(intent.action)
                     if (!Utility.tryTransferIntentToProfileUnsigned(this@MainActivity, dummyIntent)) {
                         return
                     }
                     intent.component = dummyIntent.component
+                    intent.flags = StartActivityProxyPolicy.sanitizeFlags(intent.action, intent.flags)
+                    intent.clipData = null
+                    intent.selector = null
                     this@MainActivity.startActivity(intent)
                 }
             })
@@ -817,10 +911,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         workListPoller.stop()
-        LocalBroadcastManager.getInstance(this)
-            .unregisterReceiver(antiSpyVpnBlockReceiver)
-        LocalBroadcastManager.getInstance(this)
-            .unregisterReceiver(appListRefreshReceiver)
+        LocalEvents.unregister(antiSpyVpnBlockReceiver)
+        LocalEvents.unregister(appListRefreshReceiver)
         super.onDestroy()
         if (!restarting) {
             doOnDestroy()
@@ -859,7 +951,7 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(BROADCAST_SEARCH_FILTER_CHANGED).apply {
                     putExtra("text", newText.lowercase().trim())
                 }
-                LocalBroadcastManager.getInstance(this@MainActivity).sendBroadcast(intent)
+                LocalEvents.send(this@MainActivity, intent)
                 return true
             }
         })
@@ -978,16 +1070,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onContextMenuClosed(menu: Menu) {
         super.onContextMenuClosed(menu)
-        LocalBroadcastManager.getInstance(this)
-            .sendBroadcast(Intent(BROADCAST_CONTEXT_MENU_CLOSED))
+        LocalEvents.send(this, Intent(BROADCAST_CONTEXT_MENU_CLOSED))
     }
 
     private fun toggleShowAll(item: MenuItem) {
         val update = Runnable {
             showAll = !item.isChecked
             item.isChecked = showAll
-            LocalBroadcastManager.getInstance(this)
-                .sendBroadcast(Intent(AppListFragment.BROADCAST_REFRESH))
+            LocalEvents.send(this, Intent(AppListFragment.BROADCAST_REFRESH))
         }
         if (!item.isChecked) {
             AlertDialog.Builder(this)

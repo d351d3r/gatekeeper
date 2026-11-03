@@ -16,6 +16,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.os.Parcel
 import android.os.PowerManager
 import android.os.RemoteException
 import android.util.Log
@@ -24,10 +25,15 @@ import io.gatekeeper.GatekeeperApplication
 import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.ui.DummyActivity
 import io.gatekeeper.util.ApplicationInfoWrapper
+import io.gatekeeper.util.AuthenticationUtility
+import io.gatekeeper.util.BinderCallers
 import io.gatekeeper.util.CaCertificates
 import io.gatekeeper.util.CalendarRouting
 import io.gatekeeper.util.CloneOutcome
 import io.gatekeeper.util.FileProviderProxy
+import io.gatekeeper.util.ImpostorScan
+import io.gatekeeper.util.KeyProof
+import io.gatekeeper.util.InstallRestrictionLease
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.UriForwardProxy
 import io.gatekeeper.util.Notifications
@@ -46,6 +52,16 @@ class GatekeeperService : Service() {
     private var startActivityProxy: IStartActivityProxy? = null
 
     private val binder = object : IGatekeeperService.Stub() {
+        /**
+         * Биндер уходит в другой профиль через extras интента, и перехватившее его
+         * приложение раньше получало все методы владельца профиля. Теперь методы
+         * исполняются только для Gatekeeper -- в этом или соседнем профиле (S1).
+         */
+        override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
+            BinderCallers.enforceGatekeeperCaller(code)
+            return super.onTransact(code, data, reply, flags)
+        }
+
         override fun ping() {
         }
 
@@ -171,19 +187,22 @@ class GatekeeperService : Service() {
                 callback.callback(CloneOutcome.RESULT_CANNOT_INSTALL_SYSTEM_APP)
                 return
             }
-            // enableSystemApp молчит о результате: если прошивка не отдаёт пакет
-            // в профиль (класс Galaxy Store), его просто не будет после вызова.
-            // Проверяем фактическое наличие -- это отказ, а не молчаливый "успех".
-            policyManager!!.enableSystemApp(adminComponent!!, app.getPackageName())
+            // «Запрет установки» из изоляции действует и на enableSystemApp: снимаем
+            // его только на время вызова (F1).
+            InstallRestrictionLease.lift(this@GatekeeperService, InstallRestrictionLease.INSTALL)
+            try {
+                // enableSystemApp молчит о результате: если прошивка не отдаёт пакет
+                // в профиль (класс Galaxy Store), его просто не будет после вызова.
+                // Проверяем фактическое наличие -- это отказ, а не молчаливый "успех".
+                // Запасного пути нет: installExistingPackage для профиля на личном
+                // телефоне закрыт -- справочник DPM требует аффилированный профиль (F2).
+                policyManager!!.enableSystemApp(adminComponent!!, app.getPackageName())
+            } finally {
+                InstallRestrictionLease.restore(this@GatekeeperService)
+            }
             if (!isPackageInstalledHere(app.getPackageName())) {
-                // E-1: часть прошивок (Samsung) не отдаёт system-пакет через
-                // enableSystemApp. installExistingPackage (API 28+) ставит уже
-                // установленный в другом профиле пакет в этот -- кандидат-фикс;
-                // факт всё равно проверяем по наличию.
-                if (!installExistingSystemApp(app.getPackageName())) {
-                    callback.callback(CloneOutcome.RESULT_CANNOT_INSTALL_SYSTEM_APP)
-                    return
-                }
+                callback.callback(CloneOutcome.RESULT_CANNOT_INSTALL_SYSTEM_APP)
+                return
             }
             policyManager!!.setApplicationHidden(adminComponent!!, app.getPackageName(), false)
             callback.callback(Activity.RESULT_OK)
@@ -256,10 +275,23 @@ class GatekeeperService : Service() {
             check(isProfileOwner) {
                 "Cannot access cross-profile widget providers without being profile owner"
             }
+            val dpm = policyManager!!
+            val admin = adminComponent!!
+            // С API 37 поштучные add/remove устарели: список задается целиком.
+            // Возврат тот же, что у старых методов: true, если список изменился.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+                val providers = dpm.getCrossProfileWidgetProviders(admin).toMutableSet()
+                val changed = if (enabled) providers.add(pkgName) else providers.remove(pkgName)
+                if (changed) {
+                    dpm.setCrossProfileWidgetProviders(providers)
+                }
+                return changed
+            }
             return if (enabled) {
-                policyManager!!.addCrossProfileWidgetProvider(adminComponent!!, pkgName)
+                dpm.addCrossProfileWidgetProvider(admin, pkgName)
             } else {
-                policyManager!!.removeCrossProfileWidgetProvider(adminComponent!!, pkgName)
+                @Suppress("DEPRECATION") // замена setCrossProfileWidgetProviders есть только с API 37
+                dpm.removeCrossProfileWidgetProvider(admin, pkgName)
             }
         }
 
@@ -496,6 +528,20 @@ class GatekeeperService : Service() {
                 .getBoolean(LocalStorageManager.PREF_CROSS_PROFILE_CONTENT_ACCESS)
         }
 
+        override fun proveAuthKey(challenge: String): String? = KeyProof.prove(challenge)
+
+        override fun getImpostorPackages(): List<String> = ImpostorScan.findInThisProfile(this@GatekeeperService)
+
+        override fun freezePackage(packageName: String): Boolean {
+            if (!isProfileOwner || packageName == this@GatekeeperService.packageName) return false
+            return try {
+                policyManager!!.setApplicationHidden(adminComponent!!, packageName, true)
+            } catch (e: SecurityException) {
+                Log.w(TAG, "freezePackage refused: $packageName", e)
+                false
+            }
+        }
+
         /**
          * Приложения профиля, умеющие быть VPN: у них есть сервис с
          * android.net.VpnService. Список нужен личной стороне, чтобы предложить
@@ -605,17 +651,6 @@ class GatekeeperService : Service() {
         }
     }
 
-    private fun installExistingSystemApp(packageName: String): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return false
-        return try {
-            policyManager!!.installExistingPackage(adminComponent!!, packageName) &&
-                isPackageInstalledHere(packageName)
-        } catch (e: SecurityException) {
-            Log.w(TAG, "installExistingPackage refused for $packageName", e)
-            false
-        }
-    }
-
     override fun onCreate() {
         policyManager = getSystemService(DevicePolicyManager::class.java)
         packageManager = getPackageManager()
@@ -658,7 +693,7 @@ class GatekeeperService : Service() {
         val start = end - USAGE_WINDOW_MS
         var rx = 0L
         var tx = 0L
-        for (type in intArrayOf(ConnectivityManager.TYPE_WIFI, ConnectivityManager.TYPE_MOBILE)) {
+        for (type in USAGE_NETWORK_TYPES) {
             val bytes = queryUidBytes(nsm, type, uid, start, end)
             rx += bytes[0]
             tx += bytes[1]
@@ -727,5 +762,16 @@ class GatekeeperService : Service() {
 
         /** Окно подсчёта трафика приложения: последние 30 дней. */
         private const val USAGE_WINDOW_MS = 30L * 24 * 60 * 60 * 1000
+
+        /**
+         * Константы TYPE_* устарели вместе с NetworkInfo, но публичный
+         * NetworkStatsManager.queryDetailsForUid по-прежнему принимает именно их:
+         * другого публичного способа назвать тип сети этому методу нет.
+         */
+        @Suppress("DEPRECATION")
+        private val USAGE_NETWORK_TYPES = intArrayOf(
+            ConnectivityManager.TYPE_WIFI,
+            ConnectivityManager.TYPE_MOBILE,
+        )
     }
 }

@@ -14,10 +14,19 @@ import io.gatekeeper.util.Utility
  */
 class DummyBatchFlow(private val activity: DummyActivity) {
 
+    /** Действие только для личной стороны: в профиле -- тихий отказ, не падение. */
+    private fun rejectedInProfile(action: String): Boolean {
+        if (!activity.isProfileOwnerInternal) return false
+        android.util.Log.w("DummyBatchFlow", "personal-side-only $action reached the profile owner")
+        activity.finish()
+        return true
+    }
+
     fun handlePublicFreezeAll() {
-        if (activity.isProfileOwnerInternal) {
-            error("personal-side-only relay reached the profile owner")
-        }
+        // Публичное действие без подписи: в рабочем профиле его может прислать любое
+        // приложение. Раньше здесь стоял error(...) -- и любое приложение профиля роняло
+        // процесс Gatekeeper вместе со сторожами (S3, docs/audit_android17.md).
+        if (rejectedInProfile(DummyActivity.PUBLIC_FREEZE_ALL)) return
         if (activity.forwardBatchToMainActivityIfVisible(DummyActivity.PUBLIC_FREEZE_ALL)) return
         AntiSpyManager.syncAutoFreezeListToWorkProfile(activity)
         CrossProfileScheduler.launchFreezeInWorkProfile(activity, AntiSpyManager.getAutoFreezeList(activity))
@@ -25,10 +34,11 @@ class DummyBatchFlow(private val activity: DummyActivity) {
     }
 
     fun handlePublicUnfreezeAll() {
-        if (activity.isProfileOwnerInternal) {
-            error("personal-side-only relay reached the profile owner")
+        if (rejectedInProfile(DummyActivity.PUBLIC_UNFREEZE_ALL) ||
+            activity.forwardBatchToMainActivityIfVisible(DummyActivity.PUBLIC_UNFREEZE_ALL)
+        ) {
+            return
         }
-        if (activity.forwardBatchToMainActivityIfVisible(DummyActivity.PUBLIC_UNFREEZE_ALL)) return
         if (!activity.antiSpyFlowInternal.ensureVpnPermissionThenLaunch()) {
             return
         }

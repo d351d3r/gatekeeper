@@ -31,6 +31,11 @@ jobs:
       - name: Accept Android SDK licenses
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null 2>&1 || true
 
+      # compileSdk 37 / build-tools 37.0.0 (Android 17): ставим явно, а не надеемся на
+      # автозагрузку AGP -- образ раннера может отставать от свежей платформы.
+      - name: Install Android 17 SDK platform
+        run: '"${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.0" "build-tools;37.0.0" >/dev/null'
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
@@ -71,6 +76,11 @@ jobs:
 
       - name: Accept Android SDK licenses
         run: yes | "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null 2>&1 || true
+
+      # compileSdk 37 / build-tools 37.0.0 (Android 17): ставим явно, а не надеемся на
+      # автозагрузку AGP -- образ раннера может отставать от свежей платформы.
+      - name: Install Android 17 SDK platform
+        run: '"${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.0" "build-tools;37.0.0" >/dev/null'
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
