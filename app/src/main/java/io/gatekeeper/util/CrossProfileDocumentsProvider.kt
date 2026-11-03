@@ -14,7 +14,6 @@ import android.provider.DocumentsProvider
 import io.gatekeeper.BuildConfig
 import io.gatekeeper.R
 import java.io.FileNotFoundException
-import java.io.Serializable
 
 // A document provider to show files across the profile boundary
 // in the system's Documents UI.
@@ -65,10 +64,8 @@ class CrossProfileDocumentsProvider : DocumentsProvider() {
         }
 
         FileShuttleConnection.touch()
-        @Suppress("UNCHECKED_CAST")
-        val fileInfo = FileShuttleConnection.call {
-            it.loadFileMeta(documentId) as Map<String, Serializable>
-        } ?: return unavailable(projection)
+        val fileInfo = FileShuttleConnection.call { it.loadFileMeta(documentId) }
+            ?: return unavailable(projection)
         includeFile(result, fileInfo)
         return result
     }
@@ -80,17 +77,16 @@ class CrossProfileDocumentsProvider : DocumentsProvider() {
     ): Cursor {
         FileShuttleConnection.touch()
         FileShuttleConnection.rememberQueriedDocument(parentDocumentId)
-        @Suppress("UNCHECKED_CAST")
-        val files = FileShuttleConnection.call {
-            it.loadFiles(parentDocumentId) as List<Map<String, Serializable>>
-        } ?: return unavailable(projection, parentDocumentId)
+        val files = FileShuttleConnection.call { it.loadFiles(parentDocumentId) }
+            ?: return unavailable(projection, parentDocumentId)
         val result = MatrixCursor(projection ?: DEFAULT_DOCUMENT_PROJECTION)
         result.setNotificationUri(
             providerContext().contentResolver,
             DocumentsContract.buildDocumentUri(AUTHORITY, parentDocumentId)
         )
 
-        for (file in files) {
+        // Типизированный список из Parcel может содержать null-элементы: пропускаем их.
+        for (file in files.filterNotNull()) {
             includeFile(result, file)
         }
         return result
@@ -217,10 +213,10 @@ class CrossProfileDocumentsProvider : DocumentsProvider() {
 
     private fun providerContext() = requireNotNull(context) { "provider used before onCreate" }
 
-    private fun includeFile(cursor: MatrixCursor, fileInfo: Map<String, Serializable>) {
+    private fun includeFile(cursor: MatrixCursor, fileInfo: ShuttleEntry) {
         val row = cursor.newRow()
         for (col in DEFAULT_DOCUMENT_PROJECTION) {
-            row.add(col, fileInfo[col])
+            row.add(col, fileInfo.column(col))
         }
     }
 

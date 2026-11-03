@@ -3,28 +3,27 @@ package io.gatekeeper
 import android.provider.DocumentsContract.Document
 import io.gatekeeper.util.MediaMirror
 import io.gatekeeper.util.MediaMirrorSelection
+import io.gatekeeper.util.ShuttleEntry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.io.Serializable
 
 /**
- * Разбор строки листинга шаттла в зеркале медиа. Строки строит
- * FileShuttleService.loadFileMeta: размер и время -- Long, у каталога тип MIME_TYPE_DIR.
+ * Разбор записи листинга шаттла в зеркале медиа. Записи строит
+ * FileShuttleService.loadFileMeta: у каталога тип MIME_TYPE_DIR, у нейтрального
+ * отказа -- только путь и нулевые флаги.
  */
 class MediaMirrorRowTest {
-    private fun row(vararg pairs: Pair<String, Serializable>): Map<String, Serializable> = mapOf(*pairs)
-
     @Test
-    fun fileRowIsParsed() {
+    fun fileEntryIsParsed() {
         val file = MediaMirror.toRemoteFile(
-            row(
-                Document.COLUMN_DOCUMENT_ID to "/storage/emulated/10/DCIM/Camera/a.jpg",
-                Document.COLUMN_DISPLAY_NAME to "a.jpg",
-                Document.COLUMN_MIME_TYPE to "image/jpeg",
-                Document.COLUMN_SIZE to 2048L,
-                Document.COLUMN_LAST_MODIFIED to 1_700_000_000_000L,
+            ShuttleEntry(
+                documentId = "/storage/emulated/10/DCIM/Camera/a.jpg",
+                displayName = "a.jpg",
+                mimeType = "image/jpeg",
+                size = 2048L,
+                lastModified = 1_700_000_000_000L,
             )
         )
         assertEquals(
@@ -41,42 +40,78 @@ class MediaMirrorRowTest {
 
     /** Листинг корня вместо каталога (E-7) состоит из каталогов: ни один не должен уехать как файл. */
     @Test
-    fun directoriesAndUntypedRowsAreSkipped() {
+    fun directoriesUntypedAndPathlessEntriesAreSkipped() {
         assertNull(
             MediaMirror.toRemoteFile(
-                row(
-                    Document.COLUMN_DOCUMENT_ID to "/storage/emulated/10/DCIM",
-                    Document.COLUMN_MIME_TYPE to Document.MIME_TYPE_DIR,
-                )
+                ShuttleEntry(documentId = "/storage/emulated/10/DCIM", mimeType = Document.MIME_TYPE_DIR)
             )
         )
-        assertNull(MediaMirror.toRemoteFile(row(Document.COLUMN_DOCUMENT_ID to "/storage/emulated/10/x.bin")))
-        assertNull(MediaMirror.toRemoteFile(row(Document.COLUMN_MIME_TYPE to "image/png")))
+        assertNull(MediaMirror.toRemoteFile(ShuttleEntry(documentId = "/storage/emulated/10/x.bin")))
+        assertNull(MediaMirror.toRemoteFile(ShuttleEntry(documentId = "", mimeType = "image/png", size = 1L)))
     }
 
     @Test
     fun missingNameFallsBackToTheFileName() {
         val file = MediaMirror.toRemoteFile(
-            row(
-                Document.COLUMN_DOCUMENT_ID to "/storage/emulated/10/Pictures/Screenshots/s.png",
-                Document.COLUMN_MIME_TYPE to "image/png",
-            )
+            ShuttleEntry(documentId = "/storage/emulated/10/Pictures/Screenshots/s.png", mimeType = "image/png")
         )
         assertEquals("s.png", file?.name)
     }
 
-    /** Размер не того типа читается как 0, и отбор такой файл не переносит -- не копия неизвестного объема. */
+    /** Нейтральный отказ без размера читается как 0, и отбор такой файл не переносит. */
     @Test
-    fun sizeOfAnotherTypeIsNotTrusted() {
+    fun entryWithoutSizeIsNotMirrored() {
         val file = MediaMirror.toRemoteFile(
-            row(
-                Document.COLUMN_DOCUMENT_ID to "/storage/emulated/10/DCIM/Camera/v.mp4",
-                Document.COLUMN_MIME_TYPE to "video/mp4",
-                Document.COLUMN_SIZE to 2048,
-                Document.COLUMN_LAST_MODIFIED to 5L,
+            ShuttleEntry(
+                documentId = "/storage/emulated/10/DCIM/Camera/v.mp4",
+                mimeType = "video/mp4",
+                lastModified = 5L,
             )
         )!!
         assertEquals(0L, file.size)
         assertTrue(MediaMirrorSelection.select(listOf(file), watermarkMs = 0L).isEmpty())
+    }
+}
+
+/** Запись шаттла -> колонки курсора провайдера документов. */
+class ShuttleEntryColumnsTest {
+    private val documentColumns = listOf(
+        Document.COLUMN_DOCUMENT_ID,
+        Document.COLUMN_DISPLAY_NAME,
+        Document.COLUMN_FLAGS,
+        Document.COLUMN_MIME_TYPE,
+        Document.COLUMN_SIZE,
+        Document.COLUMN_LAST_MODIFIED,
+    )
+
+    @Test
+    fun everyProviderColumnIsMapped() {
+        val entry = ShuttleEntry(
+            documentId = "/storage/emulated/10/DCIM/Camera/a.jpg",
+            displayName = "a.jpg",
+            mimeType = "image/jpeg",
+            size = 2048L,
+            lastModified = 7L,
+            flags = Document.FLAG_SUPPORTS_DELETE,
+        )
+        assertEquals(
+            listOf<Any?>(entry.documentId, "a.jpg", Document.FLAG_SUPPORTS_DELETE, "image/jpeg", 2048L, 7L),
+            documentColumns.map(entry::column),
+        )
+    }
+
+    /** Нейтральный отказ: в курсоре только путь и нулевые флаги, как и было с картой. */
+    @Test
+    fun refusalEntryLeavesOtherColumnsEmpty() {
+        val refusal = ShuttleEntry(documentId = "relative/path")
+        assertEquals(
+            listOf<Any?>("relative/path", null, 0, null, null, null),
+            documentColumns.map(refusal::column),
+        )
+    }
+
+    @Test
+    fun unknownColumnIsNull() {
+        assertNull(ShuttleEntry(documentId = "/x").column(Document.COLUMN_ICON))
     }
 }
