@@ -26,9 +26,14 @@ Service — только wiring, без ветвлений, достойных �
 ```
 
 Отчет: `app/build/reports/coverage/test/debug/index.html`. Замер 03.11.2026:
-899 из 11 153 строк (8,1 %; было 5,2 %). Знаменатель — все приложение вместе
-с UI, сервисами и сгенерированным AIDL; по правилу выше это wiring, поэтому
-смотреть надо на классы с решениями, а не на общий процент.
+1072 из 11 163 строк (9,6 %; до работы над покрытием было 5,2 %). Знаменатель —
+все приложение вместе с UI, сервисами и сгенерированным AIDL; по правилу выше
+это wiring, поэтому смотреть надо на классы с решениями, а не на общий процент.
+
+Системные вызовы классов с логикой спрятаны за узкими интерфейсами, которые
+JVM-тест подменяет записью вызовов: `SettingsManager.Effects` (письма в соседний
+профиль, сторож VPN, компоненты), `CalendarRouting.Platform` (права календаря,
+провайдер, JobScheduler). Боевые реализации — тонкие адаптеры без ветвлений.
 
 ## Покрыто unit-тестами
 
@@ -40,7 +45,9 @@ Service — только wiring, без ветвлений, достойных �
 | таблица `RELAY_ACTION_FILTERS` | RelayFilterTableTest | одно направление на действие DummyActivity (E-9), действие объявлено в манифесте, публичная разморозка не форвардится (S2), поверхность без подписи на каждом направлении закреплена |
 | `WorkProfilePolicy.settingsInputs` | WorkPolicyInputsTest | каждая настройка политики и изоляции меняет отпечаток (F4), порядок правил ссылок — нет |
 | `KeyProof`, `AuthenticationUtility` (ключ) | KeyProofTest, AuthKeyLifecycleTest | доказательство ключа (S1): чужой ключ, чужой вызов и подпись реле не проходят; создание, принятие, сброс ключа |
-| `AuthPayload` | AuthPayloadTest | формат подписи реле, разделение доменов с доказательством ключа |
+| `AuthPayload` | AuthPayloadTest, SignatureWindowTest | формат подписи реле, разделение доменов с доказательством ключа; окно свежести −2 с … 30 с на границах |
+| `AuthenticationUtility.encodeSignedValue` | SignedValueEncodingTest | каноническая запись extras: тип входит в запись, неподписываемые типы не подписываются |
+| обработчики реле (`ui/*Flow`, `WorkRelayHandlers`, `DummyActivity`) | RelayExtrasSignedTest | каждый читаемый extra подписан или явно неподписываем с причиной (сканирует исходники; так найден неподписанный `isolation_keys`) |
 | `BinderCallers`, `Hex` | BinderCallersTest, HexTest | проверка вызывающего биндера по appId; формат ключей |
 | `ImpostorScan`, `StartActivityProxyPolicy`, `InstallRestrictionLease` | ImpostorScanTest | поиск подделок и queries в манифесте, белый список прокси запуска, аренда ограничений установки (F1) |
 | `PolicyFingerprint` | PolicyFingerprintTest | отпечаток и срок свежести набора политик |
@@ -57,6 +64,9 @@ Service — только wiring, без ветвлений, достойных �
 | `ScreenLockFreezeMigration` | ScreenLockFreezeMigrationTest | перенос старого триггера блокировки, один раз |
 | `LocalStorageManager` | LocalStorageManagerTest | списки в строке (вхождение целиком, пустые элементы), синхронные записи, снимок бэкапа по белому списку |
 | `SettingsManager` (умолчания) | SettingsDefaultsTest | свежая установка: кросс-профильные дырки и сторож VPN выключены |
+| `SettingsManager` (сеттеры) | SettingsSyncTest | каждый сеттер пишет локально и отправляет в соседний профиль то же значение; FreezeService и сторож VPN будятся; изоляция уезжает всем набором; итог миграции доезжает до профиля |
+| `CalendarRouting` (включение, перенос) | CalendarRoutingConfigureTest, CalendarRoutingTest | откат при отказе прав, без календаря и при сбое JobScheduler; выключение помнит выбор; перенос только в доступный для записи календарь, удаленные события не трогает |
+| `VpnVerdict` | VpnVerdictTest | сложение сигналов VPN: любой «да» решает, упавший сигнал не гасит остальные, отказ всех — «VPN нет» (решение закреплено) |
 | `AntiSpyLaunchGate` (решение) | AntiSpyLaunchGateTest | итог гашения VPN → запуск/причина блока, неизвестный итог — блок, тост не поверх запроса разрешения |
 | `AntiSpyWatchPolicy` | AntiSpyWatchPolicyTest | условия автозаморозки сторожем VPN |
 | `NewPackagePolicy`, `PackageSequence` | NewPackagePolicyTest, PackageSequenceTest | новые пакеты профиля (F3) |
@@ -83,6 +93,7 @@ Service — только wiring, без ветвлений, достойных �
 | `PowerDiagnostics` | PowerDiagnosticsTest | диагностика фоновых ограничений |
 | `VpnRoutingAdvice` | VpnRoutingAdviceTest | советы по маршрутизации VPN |
 | `VpnTunnelDetector` (имена) | VpnTunnelDetectorTest | имена туннельных интерфейсов |
+| `Utility` (чистые помощники) | UtilityTest | расширение файла (точка в каталоге, регистр для MimeTypeMap до Android 10), коэффициент уменьшения картинки (в том числе нулевой размер), копирование потока, нормализация и чистка списков |
 | `WorkServiceBindFailure` | WorkServiceBindFailureTest | классификация сбоев бинда work-сервиса |
 | (сборный) | SmokeTest | дымовая проверка окружения тестов |
 
@@ -93,6 +104,7 @@ Service — только wiring, без ветвлений, достойных �
 | `DummyActivity` (гейт) | RelayGateTest | activity спрашивает `RelayAuthorization`: неподписанная команда не исполняется, подписанная — исполняется |
 | `ImpostorScan`, `InstallRestrictionLease` | ProfileGuardsTest | тестовый APK с действием реле найден как подделка (S1); ограничение установки снимается на операцию и возвращается (F1, только в рабочем профиле) |
 | `LocalEvents` | LocalEventsTest | доставка на главном потоке, снятый до доставки получатель молчит |
+| `CalendarRouting` (провайдер) | CalendarRoutingDeviceTest | событие локального календаря уезжает в Google-календарь, удаленное — нет (только в рабочем профиле) |
 | `CrossProfileDocumentsProvider`, `FileShuttleExternalBrowser` | DocumentsProviderTest | A3: корни/листинг/чтение через шаттл; временная выдача корня внешнему проводнику |
 | `FileShuttleService` | FileShuttleForegroundTest | foreground-сессия, сроки жизни |
 | `AntiSpyVpnWatchService` | AntiSpyVpnWatchTest | сторож VPN в отдельном процессе |
@@ -103,9 +115,9 @@ Service — только wiring, без ветвлений, достойных �
 | передача владения | TransferOwnershipTest | F1: передача владения профилем другому приложению |
 | среда | EnvironmentTest, TestProfiles, ImpostorRelayActivity | предусловия и фикстуры профиля |
 
-RelayGateTest, ProfileGuardsTest и LocalEventsTest добавлены 03.11.2026 и
-на момент записи только компилируются: в среде, где они написаны, нет
-аппаратной виртуализации для эмулятора. Первый прогон — на стенде.
+RelayGateTest, ProfileGuardsTest, LocalEventsTest и CalendarRoutingDeviceTest
+добавлены 03.11.2026 и на момент записи только компилируются: в среде, где они
+написаны, нет аппаратной виртуализации для эмулятора. Первый прогон — на стенде.
 
 ## Сознательно не покрыто (тонкий слой / граница фреймворка)
 
@@ -116,22 +128,17 @@ RelayGateTest, ProfileGuardsTest и LocalEventsTest добавлены 03.11.202
 | `AntiSpyManager`, `AntiSpyDummyVpnDisconnector` | системные VPN/activity-сервисы; ядро политик — `AntiSpyWatchPolicy`, решение гейта — `AntiSpyLaunchGate` (покрыты) | средний |
 | `WorkProfileBatchFreeze` | DPM-вызовы; решение «морозить ли» — `AutoFreezePolicy`/defaults (покрыты) | низкий |
 | `GatekeeperToast`, `Notifications` | UI/системные helper-ы | низкий |
+| `Utility` (остальное) | ярлыки, растры, AppOps, пересылка интентов в профиль — обертки над системными сервисами; пересылку проверяет ForwarderResolutionTest, ярлык — BatchShortcutIconTest | низкий |
+| `VpnTunnelDetector` (сигналы) | сами сигналы спрашивают NetworkInterface и ConnectivityManager; решение по ним — `VpnVerdict` (покрыт) | низкий |
 
 ## Пробелы-цели (по приоритету)
 
-1. `VpnTunnelDetector` (6 % строк) — решение «VPN активен» складывается из
-   трех сигналов (tun-интерфейс, VPN-транспорт у любой сети, нет NOT_VPN у
-   активной сети); сбой определения дает `false`, то есть гейт пропускает
-   запуск (fail-open). Вынести сложение сигналов в чистую функцию, покрыть
-   комбинации и явно решить, остается ли сбой открытым. Сейчас покрыт только
-   разбор имен интерфейсов.
-2. `AuthenticationUtility.checkIntent` — окно времени подписи (−2 с … 30 с)
-   и разбор extras покрыты только на устройстве; границы окна достойны
-   JVM-теста после выноса проверки времени в чистую функцию.
-3. `CalendarRouting.configure` / `moveLocalEvents` (6 %) — DPM и
-   ContentResolver: инструментальный тест на календаре, который заводит
-   `tools/testbench.sh`.
-4. `SettingsManager` (сеттеры) — синхронизация в соседний профиль идет
-   через реле, проверяется только сценарием на стенде.
-5. `Utility` (3 %) — сборник разнородных помощников; чистые части
-   выносить по мере правок, а не отдельным рефакторингом.
+Пять целей прошлого замера закрыты (VPN-сигналы, окно подписи, маршрутизация
+календаря, синхронизация настроек, чистые части `Utility`). Остается:
+
+1. Первый прогон новых инструментальных тестов на стенде (см. выше): решения
+   под ними покрыты JVM-тестами, но связка с системой ни разу не исполнялась.
+2. Повтор подписанного интента в окне 30 с: подпись не одноразовая, и
+   подделка, перехватившая интент в «Открыть с помощью», может отправить его
+   повторно без изменений. Подмену extras закрывает RelayExtrasSignedTest,
+   сам повтор — нет; кандидат — одноразовый номер в подписи.

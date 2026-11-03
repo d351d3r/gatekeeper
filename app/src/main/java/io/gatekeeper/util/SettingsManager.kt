@@ -17,31 +17,75 @@ class SettingsManager private constructor(context: Context) {
     // ставят FLAG_ACTIVITY_NEW_TASK, так что контекста приложения им достаточно.
     private val context: Context = context.applicationContext
 
-    // Настройка уже сохранена локально, поэтому недоехавшая синхронизация разводит профили
-    // молча: тумблер включен, а в другом профиле ничего не изменилось. Имя настройки в логе --
-    // единственный способ это разобрать, общего предупреждения о реле для этого мало.
-    private fun syncSettingsToProfileBool(name: String, value: Boolean) {
-        val intent = Intent(DummyActivity.SYNCHRONIZE_PREFERENCE)
-        intent.putExtra("name", name)
-        intent.putExtra("boolean", value)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        if (!Utility.tryTransferIntentToProfile(context, intent)) {
-            Log.w(TAG, "preference $name is not synced to the other profile")
-            return
-        }
-        context.startActivity(intent)
+    /**
+     * Все, что сеттеры делают за пределами своих настроек: письма в соседний профиль,
+     * подъем сторожа VPN, включение компонентов. Настройка к этому моменту уже сохранена
+     * локально, поэтому недоехавшая синхронизация разводит профили молча: тумблер
+     * включен, а в другом профиле ничего не изменилось. JVM-тест подменяет эффекты
+     * записью вызовов и проверяет, что каждый сеттер отправляет то же значение.
+     */
+    internal interface Effects {
+        fun syncBoolean(name: String, value: Boolean)
+        fun syncInt(name: String, value: Int)
+        fun syncIsolation(enabledKeys: Array<String>)
+        fun syncFreezeService()
+        fun syncVpnWatch()
+        fun setComponentEnabled(component: Class<*>, enabled: Boolean)
     }
 
-    private fun syncSettingsToProfileInt(name: String, value: Int) {
-        val intent = Intent(DummyActivity.SYNCHRONIZE_PREFERENCE)
-        intent.putExtra("name", name)
-        intent.putExtra("int", value)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        if (!Utility.tryTransferIntentToProfile(context, intent)) {
-            Log.w(TAG, "preference $name is not synced to the other profile")
-            return
+    internal var effects: Effects = AndroidEffects()
+
+    private inner class AndroidEffects : Effects {
+        override fun syncBoolean(name: String, value: Boolean) = relay(
+            Intent(DummyActivity.SYNCHRONIZE_PREFERENCE).putExtra("name", name).putExtra("boolean", value),
+            "preference $name",
+        )
+
+        override fun syncInt(name: String, value: Int) = relay(
+            Intent(DummyActivity.SYNCHRONIZE_PREFERENCE).putExtra("name", name).putExtra("int", value),
+            "preference $name",
+        )
+
+        /**
+         * Набор уезжает в профиль целиком и одним письмом: реле поднимает activity,
+         * и двадцать три запуска подряд сталкиваются друг с другом.
+         */
+        override fun syncIsolation(enabledKeys: Array<String>) = relay(
+            Intent(DummyActivity.SYNC_ISOLATION).putExtra(ProfileActions.EXTRA_ISOLATION_KEYS, enabledKeys),
+            "isolation policies",
+        )
+
+        /**
+         * Рабочий профиль поднимает/останавливает FreezeService по факту настроек.
+         * Из рабочего процесса письмо уйдёт в личный, где оно безвредно no-op.
+         */
+        override fun syncFreezeService() = relay(Intent(DummyActivity.SYNC_FREEZE_SERVICE), "freeze service sync")
+
+        override fun syncVpnWatch() {
+            AntiSpyVpnWatchService.syncState(context)
         }
-        context.startActivity(intent)
+
+        override fun setComponentEnabled(component: Class<*>, enabled: Boolean) {
+            context.packageManager.setComponentEnabledSetting(
+                ComponentName(context, component),
+                if (enabled) {
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                } else {
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                },
+                PackageManager.DONT_KILL_APP
+            )
+        }
+
+        // Что именно не доехало -- в логе: общего предупреждения о реле для разбора мало.
+        private fun relay(intent: Intent, what: String) {
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            if (!Utility.tryTransferIntentToProfile(context, intent)) {
+                Log.w(TAG, "$what is not synced to the other profile")
+                return
+            }
+            context.startActivity(intent)
+        }
     }
 
     fun applyAll() {
@@ -50,22 +94,16 @@ class SettingsManager private constructor(context: Context) {
     }
 
     fun applyCrossProfileFileChooser() {
-        val enabled = storage.getBoolean(LocalStorageManager.PREF_CROSS_PROFILE_FILE_CHOOSER)
-        context.packageManager.setComponentEnabledSetting(
-            ComponentName(context, CrossProfileDocumentsProvider::class.java),
-            if (enabled) {
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-            } else {
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-            },
-            PackageManager.DONT_KILL_APP
+        effects.setComponentEnabled(
+            CrossProfileDocumentsProvider::class.java,
+            storage.getBoolean(LocalStorageManager.PREF_CROSS_PROFILE_FILE_CHOOSER),
         )
     }
 
     fun setCrossProfileFileChooserEnabled(enabled: Boolean) {
         storage.setBoolean(LocalStorageManager.PREF_CROSS_PROFILE_FILE_CHOOSER, enabled)
         applyCrossProfileFileChooser()
-        syncSettingsToProfileBool(LocalStorageManager.PREF_CROSS_PROFILE_FILE_CHOOSER, enabled)
+        effects.syncBoolean(LocalStorageManager.PREF_CROSS_PROFILE_FILE_CHOOSER, enabled)
     }
 
     fun getCrossProfileFileChooserEnabled(): Boolean =
@@ -73,10 +111,7 @@ class SettingsManager private constructor(context: Context) {
 
     fun setCrossProfileContentAccessEnabled(enabled: Boolean) {
         storage.setBooleanNow(LocalStorageManager.PREF_CROSS_PROFILE_CONTENT_ACCESS, enabled)
-        syncSettingsToProfileBool(
-            LocalStorageManager.PREF_CROSS_PROFILE_CONTENT_ACCESS,
-            enabled,
-        )
+        effects.syncBoolean(LocalStorageManager.PREF_CROSS_PROFILE_CONTENT_ACCESS, enabled)
     }
 
     fun getCrossProfileContentAccessEnabled(): Boolean =
@@ -84,10 +119,7 @@ class SettingsManager private constructor(context: Context) {
 
     fun setCreatePersonalCalendarEventsEnabled(enabled: Boolean) {
         storage.setBooleanNow(LocalStorageManager.PREF_CREATE_PERSONAL_CALENDAR_EVENTS, enabled)
-        syncSettingsToProfileBool(
-            LocalStorageManager.PREF_CREATE_PERSONAL_CALENDAR_EVENTS,
-            enabled,
-        )
+        effects.syncBoolean(LocalStorageManager.PREF_CREATE_PERSONAL_CALENDAR_EVENTS, enabled)
     }
 
     fun getCreatePersonalCalendarEventsEnabled(): Boolean =
@@ -95,10 +127,7 @@ class SettingsManager private constructor(context: Context) {
 
     fun setCrossProfileInteractionAllEnabled(enabled: Boolean) {
         storage.setBooleanNow(LocalStorageManager.PREF_CROSS_PROFILE_INTERACTION_ALL, enabled)
-        syncSettingsToProfileBool(
-            LocalStorageManager.PREF_CROSS_PROFILE_INTERACTION_ALL,
-            enabled,
-        )
+        effects.syncBoolean(LocalStorageManager.PREF_CROSS_PROFILE_INTERACTION_ALL, enabled)
     }
 
     fun getCrossProfileInteractionAllEnabled(): Boolean =
@@ -106,7 +135,7 @@ class SettingsManager private constructor(context: Context) {
 
     fun setBlockContactsSearchingEnabled(enabled: Boolean) {
         storage.setBoolean(LocalStorageManager.PREF_BLOCK_CONTACTS_SEARCHING, enabled)
-        syncSettingsToProfileBool(LocalStorageManager.PREF_BLOCK_CONTACTS_SEARCHING, enabled)
+        effects.syncBoolean(LocalStorageManager.PREF_BLOCK_CONTACTS_SEARCHING, enabled)
     }
 
     fun getBlockContactsSearchingEnabled(): Boolean =
@@ -114,7 +143,7 @@ class SettingsManager private constructor(context: Context) {
 
     fun setBlockCallerIdEnabled(enabled: Boolean) {
         storage.setBoolean(LocalStorageManager.PREF_BLOCK_CALLER_ID, enabled)
-        syncSettingsToProfileBool(LocalStorageManager.PREF_BLOCK_CALLER_ID, enabled)
+        effects.syncBoolean(LocalStorageManager.PREF_BLOCK_CALLER_ID, enabled)
     }
 
     fun getBlockCallerIdEnabled(): Boolean =
@@ -122,7 +151,7 @@ class SettingsManager private constructor(context: Context) {
 
     fun setShareWorkToPersonalEnabled(enabled: Boolean) {
         storage.setBoolean(LocalStorageManager.PREF_SHARE_WORK_TO_PERSONAL, enabled)
-        syncSettingsToProfileBool(LocalStorageManager.PREF_SHARE_WORK_TO_PERSONAL, enabled)
+        effects.syncBoolean(LocalStorageManager.PREF_SHARE_WORK_TO_PERSONAL, enabled)
     }
 
     fun getShareWorkToPersonalEnabled(): Boolean =
@@ -130,7 +159,7 @@ class SettingsManager private constructor(context: Context) {
 
     fun setOpenLinksInWorkEnabled(enabled: Boolean) {
         storage.setBoolean(LocalStorageManager.PREF_OPEN_LINKS_IN_WORK, enabled)
-        syncSettingsToProfileBool(LocalStorageManager.PREF_OPEN_LINKS_IN_WORK, enabled)
+        effects.syncBoolean(LocalStorageManager.PREF_OPEN_LINKS_IN_WORK, enabled)
     }
 
     fun getOpenLinksInWorkEnabled(): Boolean =
@@ -138,8 +167,8 @@ class SettingsManager private constructor(context: Context) {
 
     fun setAutoFreezeServiceEnabled(enabled: Boolean) {
         storage.setBoolean(LocalStorageManager.PREF_AUTO_FREEZE_SERVICE, enabled)
-        syncSettingsToProfileBool(LocalStorageManager.PREF_AUTO_FREEZE_SERVICE, enabled)
-        requestFreezeServiceSync()
+        effects.syncBoolean(LocalStorageManager.PREF_AUTO_FREEZE_SERVICE, enabled)
+        effects.syncFreezeService()
     }
 
     fun getAutoFreezeServiceEnabled(): Boolean =
@@ -147,7 +176,7 @@ class SettingsManager private constructor(context: Context) {
 
     fun setAutoFreezeDelay(seconds: Int) {
         storage.setInt(LocalStorageManager.PREF_AUTO_FREEZE_DELAY, seconds)
-        syncSettingsToProfileInt(LocalStorageManager.PREF_AUTO_FREEZE_DELAY, seconds)
+        effects.syncInt(LocalStorageManager.PREF_AUTO_FREEZE_DELAY, seconds)
     }
 
     fun getAutoFreezeDelay(): Int {
@@ -164,8 +193,8 @@ class SettingsManager private constructor(context: Context) {
      */
     fun setAutoFreezeScope(scope: ScreenLockFreezeScope) {
         storage.setIntNow(LocalStorageManager.PREF_AUTO_FREEZE_SCOPE, scope.stored)
-        syncSettingsToProfileInt(LocalStorageManager.PREF_AUTO_FREEZE_SCOPE, scope.stored)
-        requestFreezeServiceSync()
+        effects.syncInt(LocalStorageManager.PREF_AUTO_FREEZE_SCOPE, scope.stored)
+        effects.syncFreezeService()
     }
 
     fun getAutoFreezeScope(): ScreenLockFreezeScope {
@@ -179,23 +208,9 @@ class SettingsManager private constructor(context: Context) {
         )
     }
 
-    /**
-     * Рабочий профиль поднимает/останавливает FreezeService по факту настроек.
-     * Из рабочего процесса письмо уйдёт в личный, где оно безвредно no-op.
-     */
-    private fun requestFreezeServiceSync() {
-        val intent = Intent(DummyActivity.SYNC_FREEZE_SERVICE)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        if (!Utility.tryTransferIntentToProfile(context, intent)) {
-            Log.w(TAG, "freeze service sync is not delivered to the other profile")
-            return
-        }
-        context.startActivity(intent)
-    }
-
     fun setSkipForegroundEnabled(enabled: Boolean) {
         storage.setBoolean(LocalStorageManager.PREF_DONT_FREEZE_FOREGROUND, enabled)
-        syncSettingsToProfileBool(LocalStorageManager.PREF_DONT_FREEZE_FOREGROUND, enabled)
+        effects.syncBoolean(LocalStorageManager.PREF_DONT_FREEZE_FOREGROUND, enabled)
     }
 
     fun getSkipForegroundEnabled(): Boolean =
@@ -247,37 +262,26 @@ class SettingsManager private constructor(context: Context) {
         syncIsolationToProfile()
     }
 
-    /**
-     * Набор уезжает в профиль целиком и одним письмом: реле поднимает activity,
-     * и двадцать три запуска подряд сталкиваются друг с другом.
-     */
     private fun syncIsolationToProfile() {
         val enabled = IsolationPolicies.ALL
             .filter { getIsolationPolicy(it.key) }
             .map { it.key }
             .toTypedArray()
-        val intent = Intent(DummyActivity.SYNC_ISOLATION)
-        intent.putExtra(ProfileActions.EXTRA_ISOLATION_KEYS, enabled)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        if (!Utility.tryTransferIntentToProfile(context, intent)) {
-            Log.w(TAG, "isolation policies are not synced to the profile")
-            return
-        }
-        context.startActivity(intent)
+        effects.syncIsolation(enabled)
     }
 
     // Запись синхронная: сторож живет в отдельном процессе и читает настройку сразу же,
     // на следующей строке.
     private fun applyWatchBool(name: String, value: Boolean) {
         storage.setBooleanNow(name, value)
-        syncSettingsToProfileBool(name, value)
-        AntiSpyVpnWatchService.syncState(context)
+        effects.syncBoolean(name, value)
+        effects.syncVpnWatch()
     }
 
     private fun applyWatchInt(name: String, value: Int) {
         storage.setIntNow(name, value)
-        syncSettingsToProfileInt(name, value)
-        AntiSpyVpnWatchService.syncState(context)
+        effects.syncInt(name, value)
+        effects.syncVpnWatch()
     }
 
     fun getPaymentStubEnabled(): Boolean =
@@ -289,15 +293,9 @@ class SettingsManager private constructor(context: Context) {
     }
 
     fun applyPaymentStub() {
-        val enabled = storage.getBoolean(LocalStorageManager.PREF_PAYMENT_STUB)
-        context.packageManager.setComponentEnabledSetting(
-            ComponentName(context, PaymentStubService::class.java),
-            if (enabled) {
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-            } else {
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-            },
-            PackageManager.DONT_KILL_APP
+        effects.setComponentEnabled(
+            PaymentStubService::class.java,
+            storage.getBoolean(LocalStorageManager.PREF_PAYMENT_STUB),
         )
     }
 

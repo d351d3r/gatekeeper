@@ -69,9 +69,8 @@ object AuthenticationUtility {
         } else {
             val timestamp = System.currentTimeMillis()
             val intentTimestamp = intent.getLongExtra("timestamp", 0)
-            val delta = timestamp - intentTimestamp
-            if (delta !in -CLOCK_SKEW_MS..<MAX_AGE_MS) {
-                Log.w(TAG, "intent signature timestamp rejected, deltaMs=$delta")
+            if (!AuthPayload.isFresh(timestamp, intentTimestamp)) {
+                Log.w(TAG, "intent signature timestamp rejected, deltaMs=${timestamp - intentTimestamp}")
                 return false
             }
             val verified = AuthPayload.verify(
@@ -143,29 +142,32 @@ object AuthenticationUtility {
         val extras = intent.extras ?: return emptyList()
         return AuthPayload.SIGNED_EXTRA_KEYS.mapNotNull { key ->
             if (!extras.containsKey(key)) return@mapNotNull null
-            val value = when (val raw = extras.get(key)) {
-                is String -> "s:$raw"
-                is Int -> "i:$raw"
-                is Long -> "l:$raw"
-                is Boolean -> "b:$raw"
-                is Uri -> "u:$raw"
-                is Array<*> -> {
-                    if (raw.all { it is String }) {
-                        @Suppress("UNCHECKED_CAST")
-                        AuthPayload.encodeStringArray(raw as Array<String>)
-                    } else null
-                }
-                is BooleanArray -> "ba:${raw.joinToString(",") { it.toString() }}"
-                else -> null
-            } ?: return@mapNotNull null
-            key to value
+            encodeSignedValue(extras.get(key))?.let { key to it }
         }
+    }
+
+    /**
+     * Каноническая запись значения extra для подписи; null -- тип не подписывается.
+     * Тип входит в запись: Int 5 и Long 5 -- разные значения для обработчика.
+     */
+    internal fun encodeSignedValue(raw: Any?): String? = when (raw) {
+        is String -> "s:$raw"
+        is Int -> "i:$raw"
+        is Long -> "l:$raw"
+        is Boolean -> "b:$raw"
+        is Uri -> "u:$raw"
+        is Array<*> -> if (raw.all { it is String }) {
+            @Suppress("UNCHECKED_CAST")
+            AuthPayload.encodeStringArray(raw as Array<String>)
+        } else {
+            null
+        }
+        is BooleanArray -> "ba:${raw.joinToString(",") { it.toString() }}"
+        else -> null
     }
 
     private const val TAG = "AuthUtility"
     private const val KEY_BITS = 256
-    private const val CLOCK_SKEW_MS = 2_000L
-    private const val MAX_AGE_MS = 30_000L
     private val BOOTSTRAP_ACTIONS = setOf(
         DummyActivity.TRY_START_SERVICE,
         DummyActivity.START_SERVICE,

@@ -22,7 +22,6 @@
     <ID>LongMethod:Utility.kt$Utility$fun enforceWorkProfilePolicies(context: Context)</ID>
     <ID>LongParameterList:AntiSpyLaunchGate.kt$AntiSpyLaunchGate$( context: Context, storage: LocalStorageManager, packageName: String?, forceGate: Boolean, onProceed: Runnable, onBlocked: BlockedCallback? )</ID>
     <ID>LongParameterList:Utility.kt$Utility$( context: Context, important: Boolean, ticker: String, title: String, desc: String, icon: Int )</ID>
-    <ID>LoopWithTooManyJumpStatements:VpnTunnelDetector.kt$VpnTunnelDetector$for</ID>
     <ID>MagicNumber:AntiSpyDummyVpnDisconnector.kt$AntiSpyDummyVpnDisconnector$1000</ID>
     <ID>MagicNumber:AntiSpyDummyVpnService.kt$AntiSpyDummyVpnService$32</ID>
     <ID>MagicNumber:AntiSpyVpnWatchService.kt$AntiSpyVpnWatchService$1000L</ID>

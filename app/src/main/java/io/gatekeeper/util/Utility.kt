@@ -35,6 +35,7 @@ import java.io.FileDescriptor
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.util.Locale
 
 object Utility {
     private const val TAG = "Utility"
@@ -300,7 +301,13 @@ object Utility {
             }
         } ?: -1
 
+    /**
+     * Степень двойки, с которой картинка декодируется не меньше запрошенного размера.
+     * Неположительный размер -- без уменьшения: иначе условие цикла верно всегда, и
+     * удвоение переполняется до нуля и деления на ноль.
+     */
     fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+        if (reqWidth <= 0 || reqHeight <= 0) return 1
         val height = options.outHeight
         val width = options.outWidth
         var inSampleSize = 1
@@ -342,10 +349,16 @@ object Utility {
         return BitmapFactory.decodeFileDescriptor(fd, null, options)
     }
 
+    /**
+     * Расширение имени файла в нижнем регистре: точка в имени каталога расширением не
+     * считается, а MimeTypeMap до Android 10 различает регистр (IMG_0001.JPG иначе
+     * оставался без типа, без миниатюры и мимо зеркала медиа).
+     */
     fun getFileExtension(filePath: String): String? {
-        val index = filePath.lastIndexOf(".")
-        return if (index > 0) {
-            filePath.substring(index + 1)
+        val name = filePath.substringAfterLast('/')
+        val index = name.lastIndexOf('.')
+        return if (index > 0 && index < name.length - 1) {
+            name.substring(index + 1).lowercase(Locale.ROOT)
         } else {
             null
         }
