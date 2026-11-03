@@ -73,4 +73,12 @@ interface IGatekeeperService {
     String setLocalCalendarRouting(long targetId, boolean enabled);
     boolean setCrossProfileContentAccessEnabled(boolean enabled);
     boolean getCrossProfileContentAccessEnabled();
+    // Защита связи между профилями (S1, docs/audit_android17.md).
+    // Ответ на вызов: HMAC общего ключа над challenge, null -- ключа нет. Личная сторона
+    // так проверяет, что полученный биндер принадлежит Gatekeeper, а не подделке.
+    String proveAuthKey(String challenge);
+    // Приложения этого профиля, объявившие служебные действия Gatekeeper: "пакет|имя".
+    List<String> getImpostorPackages();
+    // Заморозить приложение этого профиля по имени пакета (найденную подделку).
+    boolean freezePackage(String packageName);
 }

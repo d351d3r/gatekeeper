@@ -24,12 +24,14 @@ def releaseKeyPassword = System.getenv('GATEKEEPER_KEY_PASSWORD') ?:
 def versionCodeValue = (project.findProperty('versionCode') ?: versionProps.getProperty('VERSION_CODE', '1')).toInteger()
 
 android {
-    compileSdk 36
-    buildToolsVersion = '36.0.0'
+    // Android 17. Поведенческие изменения API 37, которые касаются проекта, разобраны
+    // в docs/audit_android17.md (раздел P2).
+    compileSdk 37
+    buildToolsVersion = '37.0.0'
     defaultConfig {
         applicationId "io.gatekeeper"
         minSdkVersion 24
-        targetSdkVersion 36
+        targetSdkVersion 37
         versionCode versionCodeValue
         versionName versionProps.getProperty('VERSION_NAME', '0.0.1')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

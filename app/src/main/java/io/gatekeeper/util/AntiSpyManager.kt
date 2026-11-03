@@ -149,12 +149,9 @@ object AntiSpyManager {
             return -1
         }
 
-        if (CrossProfileScheduler.startBatchFreezeInWorkProfile(app, list)) {
-            Log.i(TAG, "auto-freeze via BatchFreezeService (background), list=${list.size}")
-        } else {
-            Log.w(TAG, "BatchFreezeService failed, AlarmManager fallback")
-            CrossProfileScheduler.scheduleFreezeInWorkProfile(app, list, vpnOrigin = true)
-        }
+        // Из фона в соседний профиль можно попасть только релеем через будильник.
+        Log.i(TAG, "auto-freeze (background) via AlarmManager relay, list=${list.size}")
+        CrossProfileScheduler.scheduleFreezeInWorkProfile(app, list, vpnOrigin = true)
         return -1
     }
 

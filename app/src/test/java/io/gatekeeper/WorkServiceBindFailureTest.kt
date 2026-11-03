@@ -50,6 +50,7 @@ class WorkServiceBindFailureTest {
             WorkServiceBindFailure.CANCELLED,
             WorkServiceBindFailure.NO_BINDER,
             WorkServiceBindFailure.NO_RESOLUTION,
+            WorkServiceBindFailure.UNVERIFIED,
         )
         val messages = reasons.map { WorkServiceBindFailure.messageOf(it) }
         assertEquals(reasons.size, messages.toSet().size)

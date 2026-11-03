@@ -58,4 +58,23 @@ class IsolationPoliciesTest {
     fun `policy keys are unique`() {
         assertEquals(IsolationPolicies.ALL.size, IsolationPolicies.ALL.map { it.key }.toSet().size)
     }
+
+    /** S5: в «изолированно» ссылки из профиля не уходят в личный браузер, в «удобно» -- уходят. */
+    @Test
+    fun `isolated preset keeps profile links in the profile`() {
+        assertTrue(IsolationPolicies.preset(isolated = true).getValue(IsolationPolicies.METHOD_WORK_LINKS_STAY))
+        assertFalse(IsolationPolicies.preset(isolated = false).getValue(IsolationPolicies.METHOD_WORK_LINKS_STAY))
+    }
+
+    /** Каждая политика видна на экране: у строки есть заголовок на обоих языках. */
+    @Test
+    fun `every policy has a title in both locales`() {
+        val en = java.io.File("src/main/res/values/strings.xml").readText()
+        val ru = java.io.File("src/main/res/values-ru-rRU/strings.xml").readText()
+        for (policy in IsolationPolicies.ALL) {
+            val name = "name=\"isolation_${policy.key}\""
+            assertTrue("нет заголовка ${policy.key}", en.contains(name))
+            assertTrue("нет перевода ${policy.key}", ru.contains(name))
+        }
+    }
 }

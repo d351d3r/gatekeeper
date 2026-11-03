@@ -1,5 +1,6 @@
 package io.gatekeeper.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 
@@ -11,6 +12,12 @@ class LocalStorageManager private constructor(context: Context) {
 
     fun remove(pref: String) {
         prefs.edit().remove(pref).apply()
+    }
+
+    /** Удалить до возврата: смерть процесса после вызова не вернет старое значение с диска. */
+    @SuppressLint("ApplySharedPref") // синхронная запись -- и есть смысл метода
+    fun removeNow(pref: String) {
+        prefs.edit().remove(pref).commit()
     }
 
     fun contains(pref: String): Boolean = prefs.contains(pref)
@@ -53,6 +60,11 @@ class LocalStorageManager private constructor(context: Context) {
 
     fun setString(pref: String, value: String) {
         prefs.edit().putString(pref, value).apply()
+    }
+
+    @SuppressLint("ApplySharedPref") // синхронная запись -- и есть смысл метода
+    fun setStringNow(pref: String, value: String) {
+        prefs.edit().putString(pref, value).commit()
     }
 
     fun getStringList(pref: String): Array<String> =
@@ -143,6 +155,12 @@ class LocalStorageManager private constructor(context: Context) {
         const val PREF_CROSS_PROFILE_INTERACTION_MANUAL = "cross_profile_interaction_manual"
         const val PREF_AUTH_KEY = "auth_key"
         const val PREF_AUTH_BOOTSTRAPPED = "auth_bootstrapped"
+
+        /**
+         * Другая сторона доказала, что держит наш ключ: после этого ключ больше не
+         * вкладывается в служебные интенты (S1, docs/audit_android17.md).
+         */
+        const val PREF_AUTH_PEER_CONFIRMED = "auth_peer_confirmed"
         const val PREF_AUTO_FREEZE_SERVICE = "auto_freeze_service"
         const val PREF_DONT_FREEZE_FOREGROUND = "dont_freeze_foreground"
         const val PREF_AUTO_FREEZE_DELAY = "auto_freeze_delay"

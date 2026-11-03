@@ -287,6 +287,12 @@
     <string name="work_service_bind_failed_no_resolution">The work profile cannot be reached: it is switched off, or Gatekeeper is not installed there. Turn Work Mode on and retry.</string>
     <string name="work_service_bind_retry">Retry</string>
     <string name="work_service_bind_close">Close</string>
+    <string name="work_service_bind_failed_unverified">The answer did not come from Gatekeeper in the work profile: it could not prove the shared key. If the system asked you to choose an app while Gatekeeper was opening, you may have picked an app that pretends to be Gatekeeper; remove it from the work profile. If you reinstalled Gatekeeper, tap Reconnect.</string>
+    <string name="impostor_title">Apps intercepting Gatekeeper</string>
+    <string name="impostor_message">These apps declare Gatekeeper\'s service actions and can intercept the link between the profiles:\n\n%1$s\n\nIf the system ever asked you to pick an app while Gatekeeper was opening, it was one of them. Freeze or uninstall them.</string>
+    <string name="impostor_freeze">Freeze in profile</string>
+    <string name="impostor_ignore">Not now</string>
+    <string name="impostor_frozen">Frozen: %1$d</string>
 
     <!-- MIUI -->
     <string name="miui_cannot_clone">Cloning non-system apps to another profile is currently not possible on MIUI. Please clone your system\'s app store (e.g. <b>Play Store</b>) into the other profile and then install apps from there.</string>
@@ -331,7 +337,7 @@
     <string name="wizard_check_slot_free">The profile slot is free: no other profile manager</string>
     <string name="wizard_check_slot_busy">The profile slot is taken: remove the existing work profile in system settings</string>
     <string name="wizard_limits_link">What apps in the profile can still see</string>
-    <string name="wizard_limits_text">The phone model, the Android version and other device properties. That a VPN is up, even when it runs only in the personal part of the phone: the tunnel itself is visible. Where that tunnel leads stays hidden, because the routing table and the connection list are closed to apps.\n\nA screenshot taken inside the profile stays in the profile storage. NFC payment from an app installed only in the profile does not work on most firmwares.</string>
+    <string name="wizard_limits_text">The phone model, the Android version and other device properties. That a VPN is up, even when it runs only in the personal part of the phone: the tunnel itself is visible. Where that tunnel leads stays hidden, because the routing table and the connection list are closed to apps. A link from a profile app that opens in a personal browser goes through your VPN, and the site sees its address; the Isolated level keeps such links inside the profile.\n\nA screenshot taken inside the profile stays in the profile storage. NFC payment from an app installed only in the profile does not work on most firmwares.</string>
     <string name="wizard_check_miui">%1$s: installing APKs inside the profile often hangs. Install apps from a store inside the profile instead.</string>
     <string name="wizard_wait_title">Creating the work profile</string>
     <string name="wizard_wait_text">Usually 10 to 30 seconds. Android is about to show its own profile-creation screen: two or three taps, and you come back here.</string>
@@ -579,6 +585,8 @@
     <string name="isolation_method_nearby_notifications_off_desc">Profile notifications are not streamed to linked computers and tablets</string>
     <string name="isolation_method_nearby_apps_off">Block app streaming to other devices</string>
     <string name="isolation_method_nearby_apps_off_desc">Profile apps cannot be opened on a linked computer</string>
+    <string name="isolation_method_work_links_stay_in_profile">Keep profile links inside the profile</string>
+    <string name="isolation_method_work_links_stay_in_profile_desc">A link tapped in a profile app does not open in a personal browser, where it would go through your VPN and personal cookies. Clone a browser into the profile</string>
     <string name="isolation_method_camera_disabled">Turn off the camera in the profile</string>
     <string name="isolation_method_camera_disabled_desc">No profile app gets the camera</string>
     <string name="isolation_method_screen_capture_disabled">Block screenshots in the profile</string>

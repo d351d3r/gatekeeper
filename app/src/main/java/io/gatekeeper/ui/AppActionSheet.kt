@@ -35,9 +35,9 @@ internal const val MENU_ITEM_TRAFFIC = 10011
  */
 internal class AppMenuEntry(
     val itemId: Int,
-    @StringRes val labelRes: Int,
-    @DrawableRes val iconRes: Int,
-    @StringRes val descRes: Int,
+    @param:StringRes val labelRes: Int,
+    @param:DrawableRes val iconRes: Int,
+    @param:StringRes val descRes: Int,
     val checkable: Boolean = false,
     val checked: Boolean = false,
 )

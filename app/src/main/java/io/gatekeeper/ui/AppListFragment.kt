@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION") // legacy version-gated paths (LocalBroadcastManager)
-
 package io.gatekeeper.ui
 
 import android.app.Activity
@@ -31,7 +29,6 @@ import io.gatekeeper.util.GatekeeperToast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -46,6 +43,7 @@ import io.gatekeeper.util.ApplicationInfoWrapper
 import io.gatekeeper.util.AutoFreezeDefaults
 import io.gatekeeper.util.AutoFreezePolicy
 import io.gatekeeper.util.CloneOutcome
+import io.gatekeeper.util.LocalEvents
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.UnfreezeShortcuts
 import io.gatekeeper.util.ProfileNotifier
@@ -95,23 +93,16 @@ class AppListFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        LocalBroadcastManager.getInstance(requireContext())
-            .registerReceiver(refreshReceiver, IntentFilter(BROADCAST_REFRESH))
-        LocalBroadcastManager.getInstance(requireContext())
-            .registerReceiver(
-                searchReceiver,
-                IntentFilter(MainActivity.BROADCAST_SEARCH_FILTER_CHANGED)
-            )
+        LocalEvents.register(refreshReceiver, IntentFilter(BROADCAST_REFRESH))
+        LocalEvents.register(searchReceiver, IntentFilter(MainActivity.BROADCAST_SEARCH_FILTER_CHANGED))
         refresh()
     }
 
     override fun onPause() {
         super.onPause()
         selectedApp = null
-        LocalBroadcastManager.getInstance(requireContext())
-            .unregisterReceiver(refreshReceiver)
-        LocalBroadcastManager.getInstance(requireContext())
-            .unregisterReceiver(searchReceiver)
+        LocalEvents.unregister(refreshReceiver)
+        LocalEvents.unregister(searchReceiver)
     }
 
     override fun onCreateView(
@@ -361,8 +352,7 @@ class AppListFragment : BaseFragment() {
                 )
             }
         }
-        LocalBroadcastManager.getInstance(requireContext())
-            .sendBroadcast(Intent(BROADCAST_REFRESH))
+        LocalEvents.send(requireContext(), Intent(BROADCAST_REFRESH))
     }
 
     private fun toggleCrossProfileWidget(app: ApplicationInfoWrapper, checked: Boolean) {

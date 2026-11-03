@@ -10,7 +10,6 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.gatekeeper.R
 import io.gatekeeper.receivers.AppListRefreshReceiver
 import io.gatekeeper.ui.AppListFragment
@@ -76,8 +75,7 @@ object ProfileNotifier {
         val handler = Handler(Looper.getMainLooper())
         for (delay in delaysMs) {
             handler.postDelayed({
-                LocalBroadcastManager.getInstance(appContext)
-                    .sendBroadcast(Intent("io.gatekeeper.broadcast.REFRESH"))
+                LocalEvents.send(appContext, Intent(AppListFragment.BROADCAST_REFRESH))
             }, delay)
         }
     }
@@ -138,8 +136,7 @@ object ProfileNotifier {
         }
         MainActivity.refreshIfVisible()
         try {
-            LocalBroadcastManager.getInstance(app)
-                .sendBroadcast(Intent(AppListFragment.BROADCAST_REFRESH))
+            LocalEvents.send(app, Intent(AppListFragment.BROADCAST_REFRESH))
         } catch (e: SecurityException) {
             Log.w(NOTIFIER_TAG, "local app-list refresh broadcast denied", e)
         }

@@ -21,6 +21,13 @@ object WorkServiceBindFailure {
     /** Реле не резолвится: профиль выключен, снесен или в нем нет приложения. */
     const val NO_RESOLUTION = 3
 
+    /**
+     * Биндер получен, но не доказал владение общим ключом: ответил не Gatekeeper
+     * рабочего профиля (подделка в системном выборе) или ключи разошлись (S1).
+     * Повторять молча нельзя -- это не сбой связи.
+     */
+    const val UNVERIFIED = 4
+
     /** Сколько раз повторяем молча, прежде чем спросить пользователя. */
     const val SILENT_RETRIES = 1
 
@@ -34,6 +41,7 @@ object WorkServiceBindFailure {
         CANCELLED -> R.string.work_service_bind_failed_cancelled
         NO_BINDER -> R.string.work_service_bind_failed_no_binder
         NO_RESOLUTION -> R.string.work_service_bind_failed_no_resolution
+        UNVERIFIED -> R.string.work_service_bind_failed_unverified
         else -> 0
     }
 

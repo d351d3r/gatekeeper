@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION") // legacy version-gated paths (LocalBroadcastManager, CONNECTIVITY_ACTION)
-
 package io.gatekeeper.services
 
 import android.app.AlarmManager
@@ -53,7 +51,6 @@ class AntiSpyVpnWatchService : Service() {
     private var vpnPresent = false
     private var foregroundStarted = false
     private var foregroundSinceMs = 0L
-    private var connectivityReceiver: BroadcastReceiver? = null
     private var freezeCompleteReceiver: BroadcastReceiver? = null
     private var vpnFreezeInFlight = false
     private var vpnFreezeDoneForSession = false
@@ -112,8 +109,9 @@ class AntiSpyVpnWatchService : Service() {
     /** Приводит подписки в соответствие настройкам; вызывается на каждом старте. */
     private fun applyTriggers() {
         if (config.freezeOnVpn) {
+            // CONNECTIVITY_ACTION (устарел с API 28) больше не слушаем: те же переходы дают
+            // колбэки сети ниже, а пропуски закрывает опрос.
             registerVpnCallbacks()
-            registerConnectivityReceiver()
             vpnPresent = VpnTunnelDetector.isVpnActive(this)
             Log.d(TAG, "initial vpn=$vpnPresent")
             handler.removeCallbacks(pollRunnable)
@@ -121,7 +119,6 @@ class AntiSpyVpnWatchService : Service() {
         } else {
             handler.removeCallbacks(pollRunnable)
             unregisterVpnCallbacks()
-            connectivityReceiver = unregisterSafely(connectivityReceiver)
         }
         // Уже идущий отсчет обязан подчиниться новой настройке: увидев отсчет, пользователь
         // идет именно в настройки, и заморозить его приложения после этого нельзя.
@@ -178,23 +175,6 @@ class AntiSpyVpnWatchService : Service() {
             Log.e(TAG, "startForeground failed", e)
             false
         }
-    }
-
-    private fun registerConnectivityReceiver() {
-        if (connectivityReceiver != null) return
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                if (VpnTunnelDetector.isVpnActive(context)) {
-                    Log.d(TAG, "CONNECTIVITY_ACTION vpn active")
-                    onVpnStateChanged(true)
-                }
-            }
-        }
-        connectivityReceiver = registerLocalReceiver(
-            receiver,
-            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION),
-            "CONNECTIVITY_ACTION",
-        )
     }
 
     private fun registerFreezeCompleteReceiver() {
@@ -540,7 +520,6 @@ class AntiSpyVpnWatchService : Service() {
         handler.removeCallbacks(pollRunnable)
         freezePending = false
         cancelNotification(FREEZE_PENDING_NOTIFICATION_ID)
-        connectivityReceiver = unregisterSafely(connectivityReceiver)
         freezeCompleteReceiver = unregisterSafely(freezeCompleteReceiver)
         unregisterVpnCallbacks()
         super.onDestroy()

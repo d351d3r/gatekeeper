@@ -18,6 +18,13 @@ object AuthPayload {
         return "action=${escape(action ?: "")}|timestamp=$timestamp|extras=$canonicalExtras"
     }
 
+    /**
+     * Что подписывает сторона, доказывая владение ключом в ответ на вызов. Префикс не
+     * совпадает ни с одним каноническим представлением интента ("action=..."), поэтому
+     * доказательство нельзя выдать за подпись служебного действия и наоборот.
+     */
+    fun proofPayload(challenge: String): String = "proof|" + escape(challenge)
+
     fun encodeStringArray(values: Array<out String>): String = buildString {
         append("sa:")
         values.forEach { value ->

@@ -1,12 +1,9 @@
-@file:Suppress("DEPRECATION") // legacy version-gated paths (LocalBroadcastManager)
-
 package io.gatekeeper.util
 
 import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
 import io.gatekeeper.util.GatekeeperToast
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.gatekeeper.R
 
 /**
@@ -88,7 +85,7 @@ object AntiSpyLaunchGate {
         if (!TextUtils.isEmpty(packageName)) {
             broadcast.putExtra(EXTRA_PACKAGE_NAME, packageName)
         }
-        LocalBroadcastManager.getInstance(app).sendBroadcast(broadcast)
+        LocalEvents.send(app, broadcast)
     }
 
     private fun messageForReason(context: Context, reason: Int): String {

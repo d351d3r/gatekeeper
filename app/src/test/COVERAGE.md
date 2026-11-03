@@ -56,7 +56,7 @@ Service — только wiring, без ветвлений, достойных �
 |---|---|---|
 | `MainActivity`, `AppListFragment`, `DummyActivity`, `SettingsFragment`, `SetupWizardActivity` | чистый wiring: binder-вызовы + UI; ветвления выносим в `util/` (см. C1/C3/C4) | регрессии wiring ловятся ручным прогоном сценариев USER_GUIDE |
 | `GatekeeperService`, `KillerService`, `BatchFreezeService`, `FreezeService` | шеллы над AIDL/DPM; решения принимают вызывающие (покрыты) | низкий |
-| `AntiSpyManager`, `AntiSpyVpnGuard`, `VpnTunnelDetector`, `AntiSpyLaunchGate` | завязаны на системные VPN/activity-сервисы; ядро политик вынесено в `AntiSpyWatchPolicy` (покрыто) | средний — цель будущего эшелона |
+| `AntiSpyManager`, `VpnTunnelDetector`, `AntiSpyLaunchGate` | завязаны на системные VPN/activity-сервисы; ядро политик вынесено в `AntiSpyWatchPolicy` (покрыто) | средний — цель будущего эшелона |
 | `WorkProfileBatchFreeze` | DPM-вызовы; решение «морозить ли» — `AutoFreezePolicy`/defaults | низкий |
 | `LocalStorageManager` | типизированная обёртка SharedPreferences; опасные места (типы) покрыты через round-trip `BackupPayloadTest` | низкий |
 | `GatekeeperToast`, `PendingIntents` | UI/системные helper-ы | низкий |

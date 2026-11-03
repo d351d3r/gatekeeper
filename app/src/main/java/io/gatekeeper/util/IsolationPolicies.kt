@@ -28,6 +28,14 @@ object IsolationPolicies {
     const val METHOD_NEARBY_NOTIFICATIONS = "method_nearby_notifications_off"
     const val METHOD_NEARBY_APPS = "method_nearby_apps_off"
 
+    /**
+     * Ссылки из приложений профиля не уходят в личные приложения (S5). Без политики
+     * ссылка из рабочего мессенджера открывается в личном браузере -- через личный VPN
+     * и с личными cookie, то есть сервер ссылки видит адрес VPN и личную идентичность.
+     * С политикой ссылки остаются в профиле: туда нужно склонировать браузер.
+     */
+    const val METHOD_WORK_LINKS_STAY = "method_work_links_stay_in_profile"
+
     class Policy(
         val key: String,
         val kind: Int,
@@ -57,6 +65,7 @@ object IsolationPolicies {
         Policy(METHOD_PERMISSION_AUTO_DENY, KIND_METHOD, isolated = true),
         Policy(METHOD_NEARBY_NOTIFICATIONS, KIND_METHOD, isolated = true),
         Policy(METHOD_NEARBY_APPS, KIND_METHOD, isolated = true),
+        Policy(METHOD_WORK_LINKS_STAY, KIND_METHOD, isolated = true),
         Policy(METHOD_CAMERA, KIND_METHOD, isolated = false),
         Policy(METHOD_SCREEN_CAPTURE, KIND_METHOD, isolated = false),
         Policy("no_unmute_microphone", KIND_RESTRICTION, isolated = false),

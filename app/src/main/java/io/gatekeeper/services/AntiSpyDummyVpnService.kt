@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION") // legacy version-gated paths (LocalBroadcastManager)
-
 package io.gatekeeper.services
 
 import android.content.Intent
@@ -9,7 +7,6 @@ import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.os.Process
 import android.util.Log
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.gatekeeper.R
 import java.io.IOException
 
@@ -106,9 +103,12 @@ class AntiSpyDummyVpnService : VpnService() {
         sendStatusBroadcast(BROADCAST_DISCONNECTED)
     }
 
-    /** LocalBroadcastManager for main process; package broadcast for `:vpnwatch`. */
+    /**
+     * Пакетный broadcast доходит до ожидающего [io.gatekeeper.util.AntiSpyDummyVpnDisconnector]
+     * в любом процессе приложения: и в `:vpnwatch`, и в основном. Отдельная внутрипроцессная
+     * копия события (раньше -- LocalBroadcastManager) лишь дублировала его.
+     */
     private fun sendStatusBroadcast(action: String) {
-        LocalBroadcastManager.getInstance(this).sendBroadcast(Intent(action))
         sendBroadcast(Intent(action).setPackage(packageName))
     }
 

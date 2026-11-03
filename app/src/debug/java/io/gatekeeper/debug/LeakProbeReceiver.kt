@@ -80,6 +80,7 @@ class LeakProbeReceiver : BroadcastReceiver() {
         Log.i(TAG, "$MARK активная сеть: транспорт VPN=$vpn интерфейс=${link?.interfaceName}")
         Log.i(TAG, "$MARK   DNS: ${link?.dnsServers?.joinToString(",") { it.hostAddress ?: "?" }}")
         Log.i(TAG, "$MARK   маршруты: ${link?.routes?.joinToString(" ") { it.toString() }}")
+        @Suppress("DEPRECATION") // разовый снимок для отладочного пробника, подписка не нужна
         val all = cm.allNetworks.mapNotNull { cm.getNetworkCapabilities(it) }
         Log.i(TAG, "$MARK   всего сетей видно: ${all.size}")
     }

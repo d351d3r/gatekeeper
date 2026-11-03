@@ -8,9 +8,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
-import android.os.UserManager
 import android.provider.CalendarContract
 import android.provider.Settings
+import io.gatekeeper.BuildConfig
 import io.gatekeeper.receivers.AppListRefreshReceiver
 import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.services.BatchFreezeService
@@ -65,8 +65,11 @@ private val RELAY_ACTION_FILTERS: List<Pair<String, Int>> = listOf(
     // По одному направлению на действие -- см. комментарий у REFRESH_MAIN_APP_LIST.
     DummyActivity.REMOVE_UNFREEZE_SHORTCUT to TO_WORK,
     DummyActivity.REMOVE_UNFREEZE_SHORTCUT_2 to TO_PARENT,
+    // Только заморозка: кнопка «Заморозить сейчас» в уведомлении FreezeService рабочего
+    // профиля уходит в личную DummyActivity. Обратного PUBLIC_UNFREEZE_ALL из профиля
+    // нет ни у одного отправителя, а фильтр давал любому приложению профиля
+    // разморозить весь список без подписи (S2, docs/audit_android17.md).
     DummyActivity.PUBLIC_FREEZE_ALL to TO_WORK,
-    DummyActivity.PUBLIC_UNFREEZE_ALL to TO_WORK,
     DummyActivity.FINALIZE_PROVISION to TO_WORK,
     DummyActivity.START_FILE_SHUTTLE to TO_PARENT,
     DummyActivity.START_FILE_SHUTTLE_2 to TO_WORK,
@@ -253,16 +256,23 @@ object WorkProfilePolicy {
                 TO_WORK,
             )
         }
-        manager.addCrossProfileIntentFilter(
-            adminComponent,
-            browsableFilter(withDefaultCategory = false),
-            TO_WORK
-        )
-        manager.addCrossProfileIntentFilter(
-            adminComponent,
-            browsableFilter(withDefaultCategory = true),
-            TO_WORK
-        )
+        // Ссылки из приложений профиля в личные (рабочий -> личный) -- пока пользователь
+        // не оставил их в профиле политикой изоляции (S5): иначе запрос по ссылке из
+        // рабочего мессенджера идет через личный VPN и с личными cookie.
+        val linksStayInProfile = LocalStorageManager.getInstance()
+            .getBoolean(IsolationPolicies.prefName(IsolationPolicies.METHOD_WORK_LINKS_STAY))
+        if (!linksStayInProfile) {
+            manager.addCrossProfileIntentFilter(
+                adminComponent,
+                browsableFilter(withDefaultCategory = false),
+                TO_WORK
+            )
+            manager.addCrossProfileIntentFilter(
+                adminComponent,
+                browsableFilter(withDefaultCategory = true),
+                TO_WORK
+            )
+        }
 
         // Обратное направление для ссылок -- личный -> рабочий: приложения рабочего
         // профиля обрабатывают http(s)-ссылку, нажатую в личном. Дырка в изоляции по
@@ -315,7 +325,73 @@ object WorkProfilePolicy {
         return true
     }
 
-    fun enforceWorkProfilePolicies(context: Context) {
+    /** Отпечаток последнего полностью примененного набора и момент применения (F4). */
+    private const val PREF_APPLIED_FINGERPRINT = "work_policy_fingerprint"
+    private const val PREF_APPLIED_AT = "work_policy_applied_at"
+
+    /**
+     * Применить набор политик профиля, если он изменился с прошлого раза (F4,
+     * [PolicyFingerprint]). Раньше набор пересобирался на каждом запуске реле.
+     * [force] -- применить безусловно: создание профиля, явная починка.
+     */
+    fun enforceWorkProfilePolicies(context: Context, force: Boolean = false) {
+        val storage = LocalStorageManager.getInstance()
+        val fingerprint = PolicyFingerprint.of(policyInputs(context))
+        val now = System.currentTimeMillis()
+        val fresh = PolicyFingerprint.isFresh(
+            storage.getString(PREF_APPLIED_FINGERPRINT),
+            fingerprint,
+            storage.getLong(PREF_APPLIED_AT, 0L),
+            now,
+        )
+        if (!force && fresh) return
+        // Сброс до первого изменения: если применение оборвется на середине,
+        // следующий вызов не примет недособранный набор за актуальный.
+        invalidateApplied()
+        applyWorkProfilePolicies(context)
+        storage.setStringNow(PREF_APPLIED_FINGERPRINT, fingerprint)
+        storage.setLong(PREF_APPLIED_AT, now)
+    }
+
+    /** Следующий [enforceWorkProfilePolicies] применит набор целиком. */
+    fun invalidateApplied() {
+        LocalStorageManager.getInstance().removeNow(PREF_APPLIED_FINGERPRINT)
+    }
+
+    /**
+     * Все, из чего строится набор. Настройка, влияющая на фильтры или политики, обязана
+     * попасть сюда, иначе ее смена применится только при суточной сверке. Версия
+     * приложения, версия Android и счетчик загрузок заставляют пересобрать набор после
+     * обновления, апдейта прошивки и перезагрузки.
+     */
+    private fun policyInputs(context: Context): List<String> {
+        val settings = SettingsManager.getInstance()
+        val storage = LocalStorageManager.getInstance()
+        val inputs = ArrayList<String>()
+        inputs += "version=${BuildConfig.VERSION_CODE}"
+        inputs += "sdk=${Build.VERSION.SDK_INT}"
+        inputs += "boot=${Settings.Global.getInt(context.contentResolver, Settings.Global.BOOT_COUNT, -1)}"
+        inputs += "share=${settings.getShareWorkToPersonalEnabled()}"
+        inputs += "content=${settings.getCrossProfileContentAccessEnabled()}"
+        inputs += "calendar=${settings.getCreatePersonalCalendarEventsEnabled()}"
+        inputs += "openLinks=${settings.getOpenLinksInWorkEnabled()}"
+        val interactAll = settings.getCrossProfileInteractionAllEnabled()
+        inputs += "interactAll=$interactAll"
+        if (interactAll && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Набор пакетов с INTERACT_ACROSS_PROFILES меняется вместе с установками.
+            inputs += "packages=${context.packageManager.getChangedPackages(0)?.sequenceNumber ?: -1}"
+        }
+        inputs += "blockSearch=${settings.getBlockContactsSearchingEnabled()}"
+        inputs += "blockCallerId=${settings.getBlockCallerIdEnabled()}"
+        inputs += "links=" + storage.getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES)
+            .sorted().joinToString(",")
+        for (policy in IsolationPolicies.ALL) {
+            inputs += "iso:${policy.key}=${storage.getBoolean(IsolationPolicies.prefName(policy.key))}"
+        }
+        return inputs
+    }
+
+    private fun applyWorkProfilePolicies(context: Context) {
         val manager = context.getSystemService(DevicePolicyManager::class.java)
         val adminComponent = ComponentName(
             context.applicationContext,
@@ -345,44 +421,24 @@ object WorkProfilePolicy {
             applyAllCrossProfilePackages(context, manager, adminComponent)
         }
 
-        manager.setCrossProfileContactsSearchDisabled(
-            adminComponent,
-            SettingsManager.getInstance().getBlockContactsSearchingEnabled()
-        )
+        ContactsAccessPolicy.apply(manager, adminComponent)
 
-        // Парная политика: без нее номер, сохраненный только в профиле, все равно
-        // подписывается именем в журнале личного профиля.
-        manager.setCrossProfileCallerIdDisabled(
-            adminComponent,
-            SettingsManager.getInstance().getBlockCallerIdEnabled()
-        )
+        allowUnknownSourcesBeforeOreo(manager, adminComponent)
 
-        // Политики изоляции применяются здесь, а не в enforceUserRestrictions:
-        // после смены настройки реле зовет именно этот метод (WorkRelayHandlers),
-        // и без этого пресет долетал до профиля, но не применялся.
+        // Политики изоляции -- единственный владелец ограничений установки и моста
+        // ссылок. Раньше рядом снимались «запрет установки», «неизвестные источники» и
+        // «запрет удаления», и переключатели изоляции молча не держались (F1); теперь
+        // на время собственной установки их снимает InstallRestrictionLease.
         IsolationEnforcer.apply(context)
 
         manager.setProfileEnabled(adminComponent)
     }
 
-    fun enforceUserRestrictions(context: Context) {
-        val manager = context.getSystemService(DevicePolicyManager::class.java)
-        val adminComponent = ComponentName(
-            context.applicationContext,
-            GatekeeperDeviceAdminReceiver::class.java
-        )
-        manager.clearUserRestriction(adminComponent, UserManager.DISALLOW_INSTALL_APPS)
-        manager.clearUserRestriction(adminComponent, UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES)
-        manager.clearUserRestriction(adminComponent, UserManager.DISALLOW_UNINSTALL_APPS)
-
+    /** До Android 8 неизвестные источники включались настройкой; дальше -- ограничением. */
+    @Suppress("DEPRECATION") // INSTALL_NON_MARKET_APPS имеет смысл только до API 26
+    private fun allowUnknownSourcesBeforeOreo(manager: DevicePolicyManager, adminComponent: ComponentName) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            manager.setSecureSetting(
-                adminComponent,
-                Settings.Secure.INSTALL_NON_MARKET_APPS,
-                "1"
-            )
+            manager.setSecureSetting(adminComponent, Settings.Secure.INSTALL_NON_MARKET_APPS, "1")
         }
-
-        manager.addUserRestriction(adminComponent, UserManager.ALLOW_PARENT_PROFILE_APP_LINKING)
     }
 }

@@ -52,8 +52,8 @@ object Notifications {
     )
 
     private class ChannelSpec(
-        @StringRes val nameRes: Int,
-        @StringRes val descRes: Int,
+        @param:StringRes val nameRes: Int,
+        @param:StringRes val descRes: Int,
         val importance: Int,
     )
 
@@ -168,16 +168,17 @@ object Notifications {
         return intent?.let { PendingIntent.getActivity(app, REQUEST_OPEN_MAIN, it, flags) }
     }
 
-    @Suppress("DEPRECATION")
     /** Видна соседям по пакету: свой контент-интент строится у них (FileShuttleNotice). */
     internal fun newBuilder(context: Context, channel: String): Notification.Builder {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ensureChannel(context, channel)
             return Notification.Builder(context, channel)
         }
-        val loud = isLoud(channel)
-        return Notification.Builder(context)
-            .setPriority(if (loud) Notification.PRIORITY_MAX else Notification.PRIORITY_MIN)
+        // До Android 8 каналов нет: важность задается приоритетом уведомления.
+        @Suppress("DEPRECATION") // Builder(Context) и PRIORITY_*: замена -- каналы, их нет до API 26
+        val legacy = Notification.Builder(context)
+            .setPriority(if (isLoud(channel)) Notification.PRIORITY_MAX else Notification.PRIORITY_MIN)
+        return legacy
     }
 
     private fun isLoud(channel: String): Boolean =
@@ -225,6 +226,6 @@ data class StatusNotification(
     val ticker: String,
     val title: String,
     val desc: String,
-    @DrawableRes val icon: Int,
+    @param:DrawableRes val icon: Int,
     val channel: String = Notifications.CHANNEL_STATUS,
 )

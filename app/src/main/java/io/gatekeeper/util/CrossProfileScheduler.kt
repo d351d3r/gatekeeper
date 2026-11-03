@@ -1,19 +1,12 @@
 package io.gatekeeper.util
 
 import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.Build
-import android.os.Process
-import android.os.SystemClock
-import android.os.UserHandle
-import android.os.UserManager
 import android.util.Log
 import io.gatekeeper.receivers.AntiSpyVpnFreezeReceiver
-import io.gatekeeper.services.BatchFreezeService
 import io.gatekeeper.ui.DummyActivity
 
 private const val SCHEDULER_TAG = "CrossProfileScheduler"
@@ -45,98 +38,15 @@ private fun sendVpnBatchFreezeBroadcast(context: Context) {
     }
 }
 
-private fun createContextAsUser(context: Context, user: UserHandle): Context =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        val method = Context::class.java.getMethod(
-            "createContextAsUser",
-            UserHandle::class.java,
-            Int::class.javaPrimitiveType,
-        )
-        method.invoke(context, user, 0) as Context
-    } else {
-        val method = Context::class.java.getMethod(
-            "createPackageContextAsUser",
-            String::class.java,
-            Int::class.javaPrimitiveType,
-            UserHandle::class.java,
-        )
-        method.invoke(context, context.packageName, 0, user) as Context
-    }
-
-private fun tryStartForegroundServiceAsUser(
-    context: Context,
-    intent: Intent,
-    profile: UserHandle,
-): Boolean {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-        return false
-    }
-    return try {
-        val startFgAsUser = Context::class.java.getMethod(
-            "startForegroundServiceAsUser",
-            Intent::class.java,
-            UserHandle::class.java,
-        )
-        startFgAsUser.invoke(context, intent, profile)
-        Log.i(SCHEDULER_TAG, "startForegroundServiceAsUser ok: ${intent.component}")
-        true
-    } catch (e: ReflectiveOperationException) {
-        Log.d(SCHEDULER_TAG, "startForegroundServiceAsUser unavailable, fallback", e)
-        false
-    } catch (e: SecurityException) {
-        Log.w(SCHEDULER_TAG, "startForegroundServiceAsUser denied", e)
-        false
-    }
-}
-
-private fun tryStartServiceAsUser(context: Context, intent: Intent, profile: UserHandle): Boolean =
-    try {
-        val startAsUser = Context::class.java.getMethod(
-            "startServiceAsUser",
-            Intent::class.java,
-            UserHandle::class.java,
-        )
-        startAsUser.invoke(context, intent, profile)
-        Log.i(SCHEDULER_TAG, "startServiceAsUser ok: ${intent.component}")
-        true
-    } catch (e: ReflectiveOperationException) {
-        Log.d(SCHEDULER_TAG, "startServiceAsUser unavailable, trying profile context", e)
-        false
-    } catch (e: SecurityException) {
-        Log.w(SCHEDULER_TAG, "startServiceAsUser denied", e)
-        false
-    }
-
-private fun tryStartServiceViaProfileContext(
-    context: Context,
-    intent: Intent,
-    profile: UserHandle,
-): Boolean =
-    try {
-        val profileContext = createContextAsUser(context, profile)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            profileContext.startForegroundService(intent)
-        } else {
-            profileContext.startService(intent)
-        }
-        Log.i(SCHEDULER_TAG, "startService in managed profile ok: ${intent.component}")
-        true
-    } catch (e: ReflectiveOperationException) {
-        Log.w(SCHEDULER_TAG, "profile context unavailable for $profile", e)
-        false
-    } catch (e: SecurityException) {
-        Log.w(SCHEDULER_TAG, "startService in managed profile denied for $profile", e)
-        false
-    } catch (e: IllegalStateException) {
-        Log.w(SCHEDULER_TAG, "startService in managed profile blocked for $profile", e)
-        false
-    }
-
 /**
  * Планирование кросс-профильной заморозки: запуск заморозки в рабочем
- * профиле (через релей-Activity или фоновый сервис, с reflection-созданием
- * контекста целевого юзера как фолбэком) и пробуждение исполнителей
- * VPN-заморозки. Вынесено из Utility.
+ * профиле через релей-Activity (сразу или будильником) и пробуждение
+ * исполнителей VPN-заморозки. Вынесено из Utility.
+ *
+ * Прямого запуска сервиса в соседнем профиле здесь больше нет: он шел рефлексией
+ * через скрытые startForegroundServiceAsUser / startServiceAsUser / createContextAsUser,
+ * которым нужно INTERACT_ACROSS_USERS, и для стороннего приложения всегда кончался
+ * отказом -- то есть был мертвым путем на non-SDK интерфейсах.
  */
 object CrossProfileScheduler {
     const val ACTION_VPN_BATCH_FREEZE_SESSION_COMPLETE =
@@ -170,26 +80,6 @@ object CrossProfileScheduler {
             Log.w(SCHEDULER_TAG, "launchFreezeInWorkProfile: no relay target", e)
             false
         }
-    }
-
-    /** Background delivery: start [BatchFreezeService] in the work profile (no Activity). */
-    fun startBatchFreezeInWorkProfile(context: Context, list: Array<String>): Boolean {
-        val normalized = Utility.normalizeStringList(list)
-        if (normalized.isEmpty()) {
-            return false
-        }
-        val intent = BatchFreezeService.buildIntent(context.applicationContext, normalized)
-        return startServiceInManagedProfile(context.applicationContext, intent)
-    }
-
-    /** Start a service in the managed (work) user from the parent profile. */
-    fun startServiceInManagedProfile(context: Context, intent: Intent): Boolean {
-        val um = context.getSystemService(UserManager::class.java)
-        val self = Process.myUserHandle()
-        val managed = um?.userProfiles?.firstOrNull { it != self } ?: return false
-        return tryStartForegroundServiceAsUser(context, intent, managed) ||
-            tryStartServiceAsUser(context, intent, managed) ||
-            tryStartServiceViaProfileContext(context, intent, managed)
     }
 
     /**

@@ -24,7 +24,6 @@ class AntiSpyLaunchFlow(private val activity: Activity) {
         val needsClear = AntiSpyLaunchGate.needsVpnClear(activity, storage)
         val prepare = if (needsClear) VpnService.prepare(activity) else null
         if (prepare != null) {
-            @Suppress("DEPRECATION")
             activity.startActivityForResult(prepare, DummyActivity.REQUEST_ANTI_SPY_VPN)
             return false
         }

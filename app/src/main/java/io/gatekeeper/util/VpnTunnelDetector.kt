@@ -63,17 +63,16 @@ object VpnTunnelDetector {
     internal fun isTunnelInterfaceName(name: String): Boolean =
         TUNNEL_NAME.matcher(name.lowercase(Locale.US)).matches()
 
-    // allNetworks / activeNetworkInfo are deprecated but remain the only synchronous
-    // snapshot API; this is a one-shot compatibility scan, not a subscription.
-    @Suppress("DEPRECATION")
     private fun hasVpnNetworkTransport(context: Context): Boolean {
         val cm = context.getSystemService(ConnectivityManager::class.java) ?: return false
-        return anyNetworkHasVpnTransport(cm) || legacyVpnActive(cm)
+        return anyNetworkHasVpnTransport(cm) || activeNetworkIsVpn(cm)
     }
 
+    // allNetworks устарел в пользу NetworkCallback, но синхронного снимка всех сетей
+    // другого публичного API нет: здесь разовая проверка, а не подписка (подписка --
+    // в AntiSpyVpnWatchService).
     @Suppress("DEPRECATION")
     private fun anyNetworkHasVpnTransport(cm: ConnectivityManager): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false
         return cm.allNetworks
             .mapNotNull { network -> cm.getNetworkCapabilities(network)?.let { network to it } }
             .any { (network, caps) ->
@@ -98,12 +97,12 @@ object VpnTunnelDetector {
         return transportInfo != null && "android.net.VpnTransportInfo" == transportInfo.javaClass.name
     }
 
-    @Suppress("DEPRECATION")
-    private fun legacyVpnActive(cm: ConnectivityManager): Boolean {
-        val legacy = cm.activeNetworkInfo ?: return false
-        val active = legacy.type == ConnectivityManager.TYPE_VPN
+    /** Сеть по умолчанию -- VPN. Замена устаревшим activeNetworkInfo/TYPE_VPN (API 23+). */
+    private fun activeNetworkIsVpn(cm: ConnectivityManager): Boolean {
+        val network = cm.activeNetwork ?: return false
+        val active = cm.getNetworkCapabilities(network)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true
         if (active) {
-            Log.d(TAG, "legacy TYPE_VPN active")
+            Log.d(TAG, "default network is VPN")
         }
         return active
     }
@@ -129,7 +128,6 @@ object VpnTunnelDetector {
     }
 
     private fun activeNetworkMissingNotVpnCapability(context: Context): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false
         val cm = context.getSystemService(ConnectivityManager::class.java) ?: return false
         val network = cm.activeNetwork ?: return false
         val caps = cm.getNetworkCapabilities(network) ?: return false

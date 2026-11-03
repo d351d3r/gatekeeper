@@ -1,9 +1,7 @@
 package io.gatekeeper.util
 
-import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import io.gatekeeper.ui.AntiSpyVpnPromptActivity
 import io.gatekeeper.ui.DummyActivity
@@ -68,17 +66,12 @@ object AntiSpyVpnPromptManager {
         )
 
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                val options = ActivityOptions.makeBasic()
-                // Constant deprecated in API 35, but it is still the mode this API 34+ setter takes.
-                @Suppress("DEPRECATION")
-                options.setPendingIntentBackgroundActivityStartMode(
-                    ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
-                )
-                app.startActivity(intent, options.toBundle())
-            } else {
-                app.startActivity(intent)
-            }
+            // Это прямой startActivity, а не отправка PendingIntent: опция
+            // setPendingIntentBackgroundActivityStartMode здесь ни на что не влияла и
+            // убрана. Из фона экран открывается только благодаря исключению BAL за
+            // разрешение «Поверх других окон»; без него система тихо отклонит запуск
+            // (docs/audit_android17.md, A2), и об этом предупреждает экран «Доступы».
+            app.startActivity(intent)
             Log.i(TAG, "screen dialog launched mode=$mode")
         } catch (e: Exception) {
             Log.e(TAG, "launchScreenDialog failed mode=$mode", e)
