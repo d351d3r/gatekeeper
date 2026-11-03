@@ -61,6 +61,17 @@ class can fix them:
   profile can be authorized there alone. The override cannot: a mock provider
   replaces the real one for the whole device, so the personal side sees the fake
   location too.
+- **No silent cloning.** Android installs silently only for a device owner or
+  an affiliated profile owner; a work profile on a personal phone is neither.
+  Every clone shows one system confirmation, and restoring a backup shows one per
+  app. For the same reason system apps that the firmware does not hand over
+  through `enableSystemApp` (Galaxy Store) cannot be cloned.
+- **Loopback between profiles (Android 17).** Android 17 blocks connections to
+  `127.0.0.1` across the profile boundary, so a proxy app in the personal profile
+  can no longer serve profile apps through loopback. Run it inside the profile.
+- **Links from profile apps.** A link opened from a profile app in a personal
+  browser goes through the personal VPN and personal cookies. The Isolated level
+  keeps such links inside the profile; clone a browser there.
 - **Vendor ADB restrictions.** Some firmware (HyperOS, ColorOS) blocks
   `pm ... --user <profile>` for shells, so profile cleanup via ADB is not
   portable.
@@ -76,7 +87,7 @@ class can fix them:
 
 ## Building
 
-Requires JDK 17 and the Android SDK (compileSdk 36, build-tools 36.0.0).
+Requires JDK 17 and the Android SDK (compileSdk 37, build-tools 37.0.0).
 
 ```sh
 git clone https://github.com/d351d3r/gatekeeper.git
