@@ -24,11 +24,11 @@ import io.gatekeeper.widget.FreezeWidgetProvider
 
 /** Личный вызывает действие, резолвящееся в рабочем (личный -> рабочий): поднимает
  *  ForwardIntentToManagedProfile в личном профиле. Имя флага обратно смыслу. */
-private const val TO_PARENT = DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT
+internal const val TO_PARENT = DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT
 
 /** Рабочий вызывает действие, резолвящееся в личном (рабочий -> личный): поднимает
  *  ForwardIntentToParent в рабочем профиле. Имя флага обратно смыслу. */
-private const val TO_WORK = DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED
+internal const val TO_WORK = DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED
 
 private const val ACTION_PICK_IMAGES = "android.provider.action.PICK_IMAGES"
 
@@ -36,8 +36,10 @@ private const val ACTION_PICK_IMAGES = "android.provider.action.PICK_IMAGES"
  * Служебные фильтры релея: action -> направление. Единая таблица вместо
  * ~30 повторных вызовов addCrossProfileIntentFilter. Направление не всегда
  * очевидно из имени действия — сомнительные места помечены комментариями.
+ * Инварианты таблицы (одно направление на действие DummyActivity, набор действий
+ * без подписи на каждом направлении) держит RelayFilterTableTest.
  */
-private val RELAY_ACTION_FILTERS: List<Pair<String, Int>> = listOf(
+internal val RELAY_ACTION_FILTERS: List<Pair<String, Int>> = listOf(
     DummyActivity.START_SERVICE to TO_PARENT,
     DummyActivity.REQUEST_REPAIR to TO_PARENT,
     DummyActivity.TRY_START_SERVICE to TO_PARENT,
@@ -358,29 +360,48 @@ object WorkProfilePolicy {
         LocalStorageManager.getInstance().removeNow(PREF_APPLIED_FINGERPRINT)
     }
 
+    /** Все, из чего строится набор: окружение плюс настройки. */
+    private fun policyInputs(context: Context): List<String> = environmentInputs(context) + settingsInputs()
+
     /**
-     * Все, из чего строится набор. Настройка, влияющая на фильтры или политики, обязана
-     * попасть сюда, иначе ее смена применится только при суточной сверке. Версия
-     * приложения, версия Android и счетчик загрузок заставляют пересобрать набор после
-     * обновления, апдейта прошивки и перезагрузки.
+     * Код набора и среда, в которой он применен: версия и момент установки приложения
+     * (переустановка той же версии -- сборки разработчика, стенд -- меняет только его),
+     * версия Android и счетчик загрузок. Набор пересобирается после обновления,
+     * переустановки, апдейта прошивки и перезагрузки.
      */
-    private fun policyInputs(context: Context): List<String> {
-        val settings = SettingsManager.getInstance()
-        val storage = LocalStorageManager.getInstance()
+    private fun environmentInputs(context: Context): List<String> {
+        val installed = try {
+            context.packageManager.getPackageInfo(context.packageName, 0).lastUpdateTime
+        } catch (_: PackageManager.NameNotFoundException) {
+            -1L
+        }
         val inputs = ArrayList<String>()
         inputs += "version=${BuildConfig.VERSION_CODE}"
+        inputs += "installed=$installed"
         inputs += "sdk=${Build.VERSION.SDK_INT}"
         inputs += "boot=${Settings.Global.getInt(context.contentResolver, Settings.Global.BOOT_COUNT, -1)}"
-        inputs += "share=${settings.getShareWorkToPersonalEnabled()}"
-        inputs += "content=${settings.getCrossProfileContentAccessEnabled()}"
-        inputs += "calendar=${settings.getCreatePersonalCalendarEventsEnabled()}"
-        inputs += "openLinks=${settings.getOpenLinksInWorkEnabled()}"
-        val interactAll = settings.getCrossProfileInteractionAllEnabled()
-        inputs += "interactAll=$interactAll"
+        val interactAll = SettingsManager.getInstance().getCrossProfileInteractionAllEnabled()
         if (interactAll && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Набор пакетов с INTERACT_ACROSS_PROFILES меняется вместе с установками.
             inputs += "packages=${context.packageManager.getChangedPackages(0)?.sequenceNumber ?: -1}"
         }
+        return inputs
+    }
+
+    /**
+     * Настройки, из которых собирается набор. Настройка, влияющая на фильтры или
+     * политики, обязана попасть сюда, иначе ее смена применится только при суточной
+     * сверке. Полноту держит WorkPolicyInputsTest.
+     */
+    internal fun settingsInputs(): List<String> {
+        val settings = SettingsManager.getInstance()
+        val storage = LocalStorageManager.getInstance()
+        val inputs = ArrayList<String>()
+        inputs += "share=${settings.getShareWorkToPersonalEnabled()}"
+        inputs += "content=${settings.getCrossProfileContentAccessEnabled()}"
+        inputs += "calendar=${settings.getCreatePersonalCalendarEventsEnabled()}"
+        inputs += "openLinks=${settings.getOpenLinksInWorkEnabled()}"
+        inputs += "interactAll=${settings.getCrossProfileInteractionAllEnabled()}"
         inputs += "blockSearch=${settings.getBlockContactsSearchingEnabled()}"
         inputs += "blockCallerId=${settings.getBlockCallerIdEnabled()}"
         inputs += "links=" + storage.getStringList(LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES)

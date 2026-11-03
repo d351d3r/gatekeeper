@@ -101,10 +101,11 @@ object MediaMirror {
         return copied
     }
 
-    private fun toRemoteFile(map: Map<String, Serializable>): MediaMirrorSelection.RemoteFile? {
-        val path = map[DocumentsContract.Document.COLUMN_DOCUMENT_ID] as? String ?: return null
+    /** Строка листинга шаттла (FileShuttleService.loadFileMeta) -> файл; каталоги и строки без типа -- null. */
+    internal fun toRemoteFile(map: Map<String, Serializable>): MediaMirrorSelection.RemoteFile? {
+        val path = map[DocumentsContract.Document.COLUMN_DOCUMENT_ID] as? String
         val mime = map[DocumentsContract.Document.COLUMN_MIME_TYPE] as? String
-        if (mime == null || mime == DocumentsContract.Document.MIME_TYPE_DIR) {
+        if (path == null || mime == null || mime == DocumentsContract.Document.MIME_TYPE_DIR) {
             return null
         }
         return MediaMirrorSelection.RemoteFile(

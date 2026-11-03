@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.ProfileActions
 import io.gatekeeper.util.ProfileNotifier
+import io.gatekeeper.util.RelayAuthorization
 import io.gatekeeper.util.SameProcessTokens
 import io.gatekeeper.util.SettingsManager
 import io.gatekeeper.util.Utility
@@ -39,24 +40,26 @@ class DummyActivity : Activity() {
 
     /**
      * Единственный гейт activity: свой процесс, своя подпись или публичное действие.
+     * Решение -- [RelayAuthorization] (покрыт JVM-тестами); здесь только данные интента.
      *
      * Статус установщика принимается только через неэкспортированный псевдоним
      * [INSTALLER_CALLBACK_ALIAS]: сама DummyActivity экспортирована, и раньше любое
-     * приложение могло прислать ей «установлено» без подписи (S4). Завершение создания
-     * профиля в личной копии принимается только пока идет настройка: фильтр рабочий ->
-     * личный висит постоянно, и без этой проверки любое приложение профиля открывало
-     * мастер с тостом «профиль создан».
+     * приложение могло прислать ей «установлено» без подписи (S4).
      */
-    private fun isAuthorized(intent: Intent): Boolean = when {
-        intent.action == PACKAGEINSTALLER_CALLBACK ->
-            intent.component?.className == INSTALLER_CALLBACK_ALIAS
-        intent.action == FINALIZE_PROVISION && !isProfileOwner && !isSettingUp() -> {
-            Log.w(TAG, "FINALIZE_PROVISION outside of setup ignored")
-            false
-        }
-        else -> checkSameProcessRequest(intent) ||
-            AuthenticationUtility.checkIntent(intent) ||
-            intent.action in ACTIONS_ALLOWED_WITHOUT_SIGNATURE
+    private fun isAuthorized(intent: Intent): Boolean {
+        val request = RelayAuthorization.Request(
+            action = intent.action,
+            componentClassName = intent.component?.className,
+            isProfileOwner = isProfileOwner,
+            isSettingUp = isSettingUp(),
+        )
+        val authorized = RelayAuthorization.isAuthorized(
+            request,
+            sameProcessToken = { SameProcessTokens.consume(intent.getStringExtra(EXTRA_SAME_PROCESS_NONCE)) },
+            signature = { AuthenticationUtility.checkIntent(intent) },
+        )
+        if (!authorized) Log.w(TAG, "relay action rejected: ${intent.action}")
+        return authorized
     }
 
     private fun isSettingUp(): Boolean =
@@ -324,38 +327,15 @@ class DummyActivity : Activity() {
         const val WIPE_PROFILE = ProfileActions.WIPE_PROFILE
 
         /** Неэкспортированный псевдоним DummyActivity для статуса PackageInstaller (манифест). */
-        const val INSTALLER_CALLBACK_ALIAS = "io.gatekeeper.ui.PackageInstallerCallbackAlias"
+        const val INSTALLER_CALLBACK_ALIAS = RelayAuthorization.INSTALLER_CALLBACK_ALIAS
 
         private const val TAG = "DummyActivity"
 
         /** Extra FREEZE_ALL_IN_LIST: запуск от фоновой VPN-заморозки (иначе — ручной). */
         const val EXTRA_VPN_ORIGIN = "vpn_origin"
 
-        private val ACTIONS_ALLOWED_WITHOUT_SIGNATURE = listOf(
-            FINALIZE_PROVISION,
-            // Подписать нечем: запрос на перепривязку и посылается потому, что
-            // ключи разошлись. Гейт тут -- подтверждение человеком со сверкой кода.
-            REQUEST_REPAIR,
-            TRY_START_SERVICE,
-            PUBLIC_FREEZE_ALL,
-            PUBLIC_UNFREEZE_ALL,
-            PUBLIC_UNFREEZE_AND_LAUNCH,
-            REFRESH_MAIN_APP_LIST,
-            SHOW_TOAST,
-            // Подпись живет 30 секунд, PendingIntent уведомления -- пока висит
-            // уведомление. Действие умеет ровно одно: открыть наш же главный экран.
-            OPEN_MAIN_APP,
-            // PACKAGEINSTALLER_CALLBACK здесь больше нет: подпись и nonce к нему по-прежнему
-            // неприменимы (PI живёт дольше 30-секундного окна и стреляет повторно, замер
-            // Фазы 19 на AOSP 16), поэтому он проверяется по компоненту -- неэкспортированный
-            // псевдоним INSTALLER_CALLBACK_ALIAS достижим только нашим PendingIntent.
-        )
-
-        private val ACTIONS_ALLOWED_WITHOUT_SIGNATURE_SAME_PROCESS = listOf(
-            INSTALL_PACKAGE,
-            UNINSTALL_PACKAGE,
-            UNFREEZE_AND_LAUNCH
-        )
+        /** Одноразовый токен действий своего процесса (RelayAuthorization.SAME_PROCESS_ACTIONS). */
+        private const val EXTRA_SAME_PROCESS_NONCE = "same_process_nonce"
 
         private const val REQUEST_PERMISSION_POST_NOTIFICATIONS = 3
         internal const val REQUEST_ANTI_SPY_VPN = 4
@@ -363,12 +343,7 @@ class DummyActivity : Activity() {
         private var hasRequestedPermission = false
 
         fun registerSameProcessRequest(intent: Intent) {
-            intent.putExtra("same_process_nonce", SameProcessTokens.issue())
-        }
-
-        private fun checkSameProcessRequest(intent: Intent): Boolean {
-            if (intent.action !in ACTIONS_ALLOWED_WITHOUT_SIGNATURE_SAME_PROCESS) return false
-            return SameProcessTokens.consume(intent.getStringExtra("same_process_nonce"))
+            intent.putExtra(EXTRA_SAME_PROCESS_NONCE, SameProcessTokens.issue())
         }
     }
 }

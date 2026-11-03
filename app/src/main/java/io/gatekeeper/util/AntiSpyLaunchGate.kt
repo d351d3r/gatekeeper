@@ -57,25 +57,32 @@ object AntiSpyLaunchGate {
         }
 
         AntiSpyDummyVpnDisconnector.tryClearVpnAsync(context) { result ->
-            if (result == AntiSpyDummyVpnDisconnector.RESULT_CLEARED) {
-                onProceed.run()
-                return@tryClearVpnAsync
+            val reason = blockReasonFor(result)
+            when {
+                reason == null -> onProceed.run()
+                notifiesUser(reason) -> {
+                    notifyLaunchBlocked(context, reason, packageName)
+                    onBlocked?.onBlocked(reason)
+                }
+                else -> onBlocked?.onBlocked(reason)
             }
-            val reason = when (result) {
-                AntiSpyDummyVpnDisconnector.RESULT_VPN_PERMISSION_REQUIRED ->
-                    REASON_VPN_PERMISSION_REQUIRED
-                AntiSpyDummyVpnDisconnector.RESULT_VPN_STILL_ACTIVE ->
-                    REASON_VPN_STILL_ACTIVE
-                else -> REASON_FAILED
-            }
-            if (reason == REASON_VPN_PERMISSION_REQUIRED) {
-                onBlocked?.onBlocked(reason)
-                return@tryClearVpnAsync
-            }
-            notifyLaunchBlocked(context, reason, packageName)
-            onBlocked?.onBlocked(reason)
         }
     }
+
+    /** Причина блокировки по итогу гашения VPN; null -- VPN погашен, запуск продолжается. */
+    internal fun blockReasonFor(disconnectResult: Int): Int? = when (disconnectResult) {
+        AntiSpyDummyVpnDisconnector.RESULT_CLEARED -> null
+        AntiSpyDummyVpnDisconnector.RESULT_VPN_PERMISSION_REQUIRED -> REASON_VPN_PERMISSION_REQUIRED
+        AntiSpyDummyVpnDisconnector.RESULT_VPN_STILL_ACTIVE -> REASON_VPN_STILL_ACTIVE
+        else -> REASON_FAILED
+    }
+
+    /**
+     * Тост и событие «запуск заблокирован» -- для всех причин, кроме запроса разрешения
+     * на VPN: по нему вызывающие (MainActivity, AntiSpyLaunchFlow, DummyBatchFlow) сами
+     * ведут пользователя к системному диалогу, и тост поверх него только мешает.
+     */
+    internal fun notifiesUser(reason: Int): Boolean = reason != REASON_VPN_PERMISSION_REQUIRED
 
     fun notifyLaunchBlocked(context: Context, reason: Int, packageName: String) {
         val app = context.applicationContext

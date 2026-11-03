@@ -71,6 +71,12 @@ android {
         // debug остаётся на стандартном debug-ключе Android: он у каждой машины
         // свой. Поверх релизной сборки debug не встанет, и наоборот -- это разные
         // подписи, а не сбой.
+        debug {
+            // Покрытие JVM-тестов (JaCoCo инструментирует байткод на время прогона) --
+            // по запросу, чтобы обычный testDebugUnitTest не замедлять:
+            // ./gradlew -Pcoverage :app:createDebugUnitTestCoverageReport
+            enableUnitTestCoverage = project.hasProperty('coverage')
+        }
     }
     splits {
         abi {
@@ -157,7 +163,6 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.2'
     implementation 'com.google.android.material:material:1.14.0'
-    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0'
     testImplementation 'junit:junit:4.13.2'
     // JVM-вариант org.json для unit-тестов сериализации бэкапа (на устройстве -- фреймворковый).
