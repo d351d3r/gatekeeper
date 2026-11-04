@@ -34,6 +34,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 
     <!-- For querying apps on Android R and later -->
@@ -169,6 +170,7 @@
 
         <activity android:name=".ui.SettingsActivity"
             android:label="@string/settings" />
+        <activity android:name=".ui.MediaExchangeSetupActivity" android:exported="false" />
 
         <activity android:name=".ui.AppPermissionsActivity"
             android:exported="false"
@@ -384,6 +386,13 @@
         <!-- A hack service to ensure every GatekeeperService is killed when App is removed -->
         <!-- from recent tasks -->
         <service android:name=".services.KillerService" />
+        <service android:name=".services.MediaExchangeService"
+            android:exported="false"
+            android:stopWithTask="false"
+            android:foregroundServiceType="specialUse">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Observes and exchanges user-enabled screenshots and camera images between personal and work profiles" />
+        </service>
 
         <!-- Service to freeze apps on screen lock -->
         <service android:name=".services.FreezeService"

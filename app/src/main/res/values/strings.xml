@@ -618,4 +618,19 @@
     <string name="app_list_empty_work">No apps in the work profile yet.\n\nTap \"Add\" below to install an app here from the personal profile.</string>
     <string name="app_list_empty_pick">No apps in the personal profile to clone.</string>
     <string name="app_list_empty_search">Nothing found</string>
+    <string name="media_exchange_title">Shared photos and screenshots</string>
+    <string name="media_exchange_explanation">Work screenshots appear in your personal gallery; personal camera photos appear in work apps. Enabled by default. Copies take extra space and are visible to apps with photo access. Existing photos are not imported; deleting a copy does not delete the original.</string>
+    <string name="media_exchange_screenshots">Work screenshots → personal gallery</string>
+    <string name="media_exchange_camera">Personal camera → work gallery</string>
+    <string name="media_exchange_allow">Allow photo access and resume exchange</string>
+    <string name="media_exchange_later">Later</string>
+    <string name="media_exchange_setup_desc">Grant photo access once. If the connection was interrupted, open Gatekeeper to reconnect. Full photo access is needed for automatic camera sharing.</string>
+    <string name="media_exchange_notification">Watching for new screenshots and camera photos</string>
+    <string name="media_exchange_waiting">Waiting for the other profile. Open Gatekeeper to reconnect.</string>
+    <string name="media_exchange_active">Media exchange is active</string>
+    <string name="media_exchange_permission">Photo access is missing or was revoked</string>
+    <string name="media_exchange_off">Media exchange is off</string>
+    <string name="media_exchange_retry">A photo could not be copied; it will be retried</string>
+    <string name="media_exchange_too_large">A photo exceeds the 64 MiB limit</string>
+    <string name="media_exchange_status">Exchange status</string>
 </resources>

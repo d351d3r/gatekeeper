@@ -24,9 +24,10 @@ Product direction and platform boundaries: [PRODUCT.md](PRODUCT.md).
 - **File Shuttle** — moves files between the personal and work profiles via
   Storage Access Framework: documents open in the right profile without copying
   data around.
-- **Media auto-copy** — new screenshots and camera photos/videos from the work
-  profile appear in the personal gallery whenever File Shuttle connects
-  (disabled by default).
+- **Shared photos and screenshots** — enabled by default: work screenshots copy
+  to the personal gallery, personal camera photos to the work gallery. Each
+  direction can be disabled. Needs one-time photo access; background recovery on
+  ColorOS 17 still requires [device validation](docs/test_media_exchange_coloros.md).
 - **Work-profile root CA certificates** — install a root CA into the work
   profile only, with the SHA-256 fingerprint shown before install, plus a
   one-tap removable list.

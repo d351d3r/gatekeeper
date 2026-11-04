@@ -395,6 +395,7 @@ class MainActivity : AppCompatActivity() {
         AuthenticationUtility.markPeerConfirmed()
         workBindAttempts = 0
         serviceWork = candidate
+        io.gatekeeper.util.MediaExchangeCoordinator.remember(candidate)
         registerStartActivityProxies()
         startKiller()
         window.decorView.post {
@@ -411,6 +412,7 @@ class MainActivity : AppCompatActivity() {
         val handled = askIsolationPresetIfNeeded() || showAccessesOnce()
         if (!handled && !storeCloneFlow.maybePrompt(serviceMain, serviceWork)) {
             maybeShowFileShuttleHint()
+            io.gatekeeper.util.MediaExchangeCoordinator.offer(this)
         }
     }
 
@@ -888,6 +890,14 @@ class MainActivity : AppCompatActivity() {
             return
         }
         workListPoller.start()
+        window.decorView.post {
+            val onboardingDone = storage?.getBoolean(LocalStorageManager.PREF_ACCESSES_SHOWN) == true &&
+                storage?.getBoolean(LocalStorageManager.PREF_ISOLATION_PRESET_CHOSEN) == true
+            val visible = isResumed && !isFinishing
+            if (visible && serviceWork != null && onboardingDone) {
+                io.gatekeeper.util.MediaExchangeCoordinator.offer(this)
+            }
+        }
     }
 
     override fun onStop() {

@@ -52,6 +52,12 @@ class GatekeeperService : Service() {
     private var startActivityProxy: IStartActivityProxy? = null
 
     private val binder = object : IGatekeeperService.Stub() {
+        override fun connectMediaExchange(personal: IMediaExchange): IMediaExchange {
+            check(isProfileOwner)
+            val runtime = io.gatekeeper.util.MediaExchangeRuntime.get(this@GatekeeperService)
+            runtime.endpoint.connect(personal)
+            return runtime.endpoint
+        }
         /**
          * Биндер уходит в другой профиль через extras интента, и перехватившее его
          * приложение раньше получало все методы владельца профиля. Теперь методы

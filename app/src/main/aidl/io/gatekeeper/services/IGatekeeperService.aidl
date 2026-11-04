@@ -9,6 +9,7 @@ import io.gatekeeper.services.ILoadIconCallback;
 import io.gatekeeper.services.IStartActivityProxy;
 import io.gatekeeper.util.ApplicationInfoWrapper;
 import io.gatekeeper.util.UriForwardProxy;
+import io.gatekeeper.services.IMediaExchange;
 
 interface IGatekeeperService {
     void ping();
@@ -81,4 +82,6 @@ interface IGatekeeperService {
     List<String> getImpostorPackages();
     // Заморозить приложение этого профиля по имени пакета (найденную подделку).
     boolean freezePackage(String packageName);
+    // Appended: authenticated media handshake, independent of manual File Shuttle.
+    IMediaExchange connectMediaExchange(IMediaExchange personal);
 }

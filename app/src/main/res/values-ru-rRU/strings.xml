@@ -593,4 +593,19 @@
     <string name="app_list_empty_work">В рабочем профиле пока нет приложений.\n\nНажмите «Добавить» внизу, чтобы поставить сюда приложение из личного профиля.</string>
     <string name="app_list_empty_pick">В личном профиле нет приложений для клонирования.</string>
     <string name="app_list_empty_search">Ничего не найдено</string>
+    <string name="media_exchange_title">Общие фото и скриншоты</string>
+    <string name="media_exchange_explanation">Рабочие скриншоты появляются в личной галерее, фото личной камеры — в рабочих приложениях. Включено по умолчанию. Копии занимают место и видны приложениям с доступом к фото. Старый архив не переносится; удаление копии не удаляет оригинал.</string>
+    <string name="media_exchange_screenshots">Рабочие скриншоты → личная галерея</string>
+    <string name="media_exchange_camera">Личная камера → рабочая галерея</string>
+    <string name="media_exchange_allow">Разрешить доступ к фото и возобновить обмен</string>
+    <string name="media_exchange_later">Позже</string>
+    <string name="media_exchange_setup_desc">Разрешите доступ к фото один раз. Если связь прервалась, откройте Gatekeeper для подключения. Для автокопирования камеры нужен полный доступ к фото.</string>
+    <string name="media_exchange_notification">Ожидание новых скриншотов и фото камеры</string>
+    <string name="media_exchange_waiting">Ожидание другого профиля. Откройте Gatekeeper для подключения.</string>
+    <string name="media_exchange_active">Обмен медиа работает</string>
+    <string name="media_exchange_permission">Нет доступа к фото или разрешение отозвано</string>
+    <string name="media_exchange_off">Обмен медиа выключен</string>
+    <string name="media_exchange_retry">Фото не скопировалось; попытка будет повторена</string>
+    <string name="media_exchange_too_large">Фото превышает ограничение 64 МиБ</string>
+    <string name="media_exchange_status">Состояние обмена</string>
 </resources>

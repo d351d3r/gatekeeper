@@ -56,6 +56,11 @@ class LocalStorageManager private constructor(context: Context) {
         prefs.edit().putLong(pref, value).apply()
     }
 
+    @SuppressLint("ApplySharedPref") // Epochs must survive a crash before a direction is re-enabled.
+    fun setLongNow(pref: String, value: Long) {
+        prefs.edit().putLong(pref, value).commit()
+    }
+
     fun getString(pref: String): String? = prefs.getString(pref, null)
 
     fun setString(pref: String, value: String) {

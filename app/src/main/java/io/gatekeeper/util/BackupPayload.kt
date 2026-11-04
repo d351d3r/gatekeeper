@@ -57,6 +57,9 @@ object BackupPayload {
         LocalStorageManager.PREF_ANTI_SPY_NOTIFY_ONLY,
         LocalStorageManager.PREF_ANTI_SPY_FREEZE_DELAY,
         LocalStorageManager.PREF_MEDIA_MIRROR_ENABLED,
+        MediaExchangePolicy.ENABLED,
+        MediaExchangePolicy.SCREENSHOTS,
+        MediaExchangePolicy.CAMERA,
         LocalStorageManager.PREF_CROSS_PROFILE_LINK_RULES,
     )
 

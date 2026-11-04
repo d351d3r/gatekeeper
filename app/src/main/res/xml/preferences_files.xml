@@ -30,11 +30,32 @@
         android:summary="@string/settings_cross_profile_content_access_desc" />
 
     <androidx.preference.SwitchPreferenceCompat
-        android:dependency="settings_cross_profile_file_chooser"
         android:key="settings_media_mirror"
         app:iconSpaceReserved="false"
-        android:title="@string/settings_media_mirror"
-        android:summary="@string/settings_media_mirror_desc" />
+        android:title="@string/media_exchange_title"
+        android:summary="@string/media_exchange_explanation" />
+
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="media_exchange_screenshots"
+        android:dependency="settings_media_mirror"
+        app:iconSpaceReserved="false"
+        android:title="@string/media_exchange_screenshots" />
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="media_exchange_camera"
+        android:dependency="settings_media_mirror"
+        app:iconSpaceReserved="false"
+        android:title="@string/media_exchange_camera" />
+    <androidx.preference.Preference
+        android:key="media_exchange_setup"
+        android:dependency="settings_media_mirror"
+        app:iconSpaceReserved="false"
+        android:title="@string/media_exchange_allow"
+        android:summary="@string/media_exchange_setup_desc" />
+    <androidx.preference.Preference
+        android:key="media_exchange_status"
+        android:selectable="false"
+        app:iconSpaceReserved="false"
+        android:title="@string/media_exchange_status" />
 
     <androidx.preference.SwitchPreferenceCompat
         android:key="settings_share_work_to_personal"

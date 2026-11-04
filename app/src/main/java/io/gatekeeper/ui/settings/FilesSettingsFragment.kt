@@ -12,13 +12,12 @@ import io.gatekeeper.util.Utility
 
 /** Экран «Файлы и медиа»: кросс-профильный выбор файлов и зеркало медиа. */
 class FilesSettingsFragment : SettingsSubFragment() {
-
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_files)
         bindFileChooser()
         bindExternalFileManager()
         bindCrossProfileContentAccess()
-        bindMediaMirror()
+        MediaExchangePreferences(this) { serviceWork }.bind()
         bindShareWorkToPersonal()
         applyPlatformRestrictions()
     }
@@ -113,17 +112,6 @@ class FilesSettingsFragment : SettingsSubFragment() {
         )
     }
 
-    private fun bindMediaMirror() {
-        val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_MEDIA_MIRROR) ?: return
-        pref.isChecked = LocalStorageManager.getInstance()
-            .getBoolean(LocalStorageManager.PREF_MEDIA_MIRROR_ENABLED)
-        pref.setOnPreferenceChangeListener { _, newState ->
-            LocalStorageManager.getInstance()
-                .setBoolean(LocalStorageManager.PREF_MEDIA_MIRROR_ENABLED, newState as Boolean)
-            true
-        }
-    }
-
     private fun applyPlatformRestrictions() {
         val pref = findPreference<SwitchPreferenceCompat>(SETTINGS_CROSS_PROFILE_FILE_CHOOSER)
             ?: return
@@ -138,7 +126,6 @@ class FilesSettingsFragment : SettingsSubFragment() {
         private const val SETTINGS_CROSS_PROFILE_CONTENT_ACCESS =
             "settings_cross_profile_content_access"
         private const val SETTINGS_EXTERNAL_FILE_MANAGER = "settings_external_file_manager"
-        private const val SETTINGS_MEDIA_MIRROR = "settings_media_mirror"
         private const val SETTINGS_SHARE_WORK_TO_PERSONAL = "settings_share_work_to_personal"
     }
 }

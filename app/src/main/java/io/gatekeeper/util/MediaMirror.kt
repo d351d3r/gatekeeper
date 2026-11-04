@@ -43,7 +43,7 @@ object MediaMirror {
         val enabled = isEnabled(app)
         val work = AntiSpyManager.isWorkProfile(app)
         Log.i(TAG, "shuttle alive: mirror enabled=$enabled, thisIsWork=$work")
-        if (!enabled || work) {
+        if (!enabled || work || !MediaExchangeSettings.current().enabled) {
             return
         }
         executor.execute {
@@ -63,7 +63,9 @@ object MediaMirror {
         var copied = 0
         var newWatermark = watermark
 
-        for (dir in MediaMirrorSelection.WATCHED_DIRS) {
+        for (dir in MediaMirrorSelection.WATCHED_DIRS.filterNot { it == "Pictures/Screenshots" }) {
+            // Screenshots now have a durable, continuously observed delivery queue.
+            // Retain the old camera/video import for existing users who explicitly enabled it.
             // resolvePath шаттла понимает либо абсолютный путь чужого профиля (нам не
             // известен), либо префикс DUMMY_ROOT провайдера; относительный путь он
             // молча клампит в корень. Идём через DUMMY_ROOT, как сам провайдер.
