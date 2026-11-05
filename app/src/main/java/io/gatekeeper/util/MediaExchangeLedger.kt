@@ -56,6 +56,9 @@ class MediaExchangeLedger(context: Context, name: String = "media-exchange.db") 
     } }
 
     fun setUri(token: String, uri: String?) = update(token, ContentValues().apply { put("uri", uri) })
+    fun deliveredCount(source: String): Long = readableDatabase.rawQuery(
+        "SELECT COUNT(*) FROM deliveries WHERE source=? AND done=1 AND uri IS NOT NULL", arrayOf(source),
+    ).use { it.moveToFirst(); it.getLong(0) }
     fun hasPending(source: String): Boolean = readableDatabase.rawQuery(
         "SELECT 1 FROM deliveries WHERE source=? AND done=0 LIMIT 1", arrayOf(source),
     ).use { it.moveToFirst() }

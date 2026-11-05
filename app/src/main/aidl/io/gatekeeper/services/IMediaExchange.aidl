@@ -13,4 +13,5 @@ interface IMediaExchange {
     void connect(IMediaExchange peer);
     oneway void changed();
     String status();
+    long deliveredCount();
 }

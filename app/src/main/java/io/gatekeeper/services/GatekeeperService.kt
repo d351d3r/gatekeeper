@@ -36,10 +36,9 @@ import io.gatekeeper.util.KeyProof
 import io.gatekeeper.util.InstallRestrictionLease
 import io.gatekeeper.util.LocalStorageManager
 import io.gatekeeper.util.UriForwardProxy
-import io.gatekeeper.util.Notifications
+import io.gatekeeper.util.BackgroundServiceNotification
 import io.gatekeeper.util.PackageSequence
 import io.gatekeeper.util.PermissionGroups
-import io.gatekeeper.util.StatusNotification
 import io.gatekeeper.util.Utility
 import io.gatekeeper.util.WorkProfilePolicy
 import io.gatekeeper.util.VpnTunnelDetector
@@ -743,16 +742,8 @@ class GatekeeperService : Service() {
 
     private fun setForeground() {
         startForeground(
-            NOTIFICATION_ID,
-            Notifications.buildNotification(
-                this,
-                StatusNotification(
-                    getString(R.string.app_name),
-                    getString(R.string.service_title),
-                    getString(R.string.service_desc),
-                    R.drawable.ic_notification,
-                ),
-            ),
+            BackgroundServiceNotification.ID,
+            BackgroundServiceNotification.build(this),
         )
         if (isProfileOwner) {
             AntiSpyVpnWatchService.syncState(this)
@@ -763,7 +754,6 @@ class GatekeeperService : Service() {
         private const val TAG = "GatekeeperService"
         private const val VPN_SERVICE_ACTION = "android.net.VpnService"
         private const val VPN_SUPPORTS_ALWAYS_ON = "android.net.VpnService.SUPPORTS_ALWAYS_ON"
-        private const val NOTIFICATION_ID = 0x49a11
         private const val LIST_ICON_MAX_PX = 128
 
         /** Окно подсчёта трафика приложения: последние 30 дней. */

@@ -72,7 +72,9 @@ class MediaExchangePreferences(
         fragment.findPreference<Preference>("media_exchange_status")?.summary =
             context.getString(R.string.media_exchange_screenshots) + ": " +
             MediaExchangeStatus.text(context, incoming) + "\n" +
-            context.getString(R.string.media_exchange_camera) + ": " + MediaExchangeStatus.text(context, outgoing)
+            context.getString(R.string.media_exchange_copied, runtime.deliveredCount) + "\n\n" +
+            context.getString(R.string.media_exchange_camera) + ": " + MediaExchangeStatus.text(context, outgoing) +
+            "\n" + context.getString(R.string.media_exchange_copied, runtime.remoteDeliveredCount)
     }
 
     companion object { private const val STATUS_INTERVAL_MS = 1500L }

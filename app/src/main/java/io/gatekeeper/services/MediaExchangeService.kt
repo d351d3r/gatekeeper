@@ -15,16 +15,17 @@ import android.util.Log
 import io.gatekeeper.receivers.GatekeeperDeviceAdminReceiver
 import io.gatekeeper.util.MediaExchangeRuntime
 import io.gatekeeper.util.MediaExchangeRemote
-import io.gatekeeper.util.MediaExchangeNotification
+import io.gatekeeper.util.BackgroundServiceNotification
 import io.gatekeeper.util.Utility
 
 /** Persistent media observation is a special-use FGS, not an unlimited dataSync session. */
 class MediaExchangeService : Service() {
     override fun onCreate() {
         super.onCreate()
-        // One stable foreground row per service lifetime. Live status belongs in settings:
-        // re-posting it every five seconds made ColorOS repeatedly surface the notification.
-        startForeground(NOTIFICATION_ID, MediaExchangeNotification.build(this))
+        // Share the existing core-service row; never post a separate media notification.
+        startForeground(BackgroundServiceNotification.ID, BackgroundServiceNotification.build(this))
+        getSystemService(android.app.NotificationManager::class.java)
+            .cancel(BackgroundServiceNotification.LEGACY_MEDIA_ID)
         try { grantWorkReadPermission() } catch (e: SecurityException) {
             Log.w("MediaExchange", "Work media permission was not granted", e)
         }
@@ -66,7 +67,6 @@ class MediaExchangeService : Service() {
     }
 
     companion object {
-        private const val NOTIFICATION_ID = 0x4d4544
         fun start(context: Context, peer: IMediaExchange? = null): Boolean = try {
             val intent = Intent(context, MediaExchangeService::class.java)
             if (peer != null) intent.putExtra("media", Bundle().apply { putBinder("peer", peer.asBinder()) })

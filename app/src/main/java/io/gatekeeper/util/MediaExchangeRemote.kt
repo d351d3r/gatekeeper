@@ -22,6 +22,7 @@ class MediaExchangeRemote(private val target: IMediaExchange) : IMediaExchange b
         call { target.open(id, version, configuration) }
     override fun connect(peer: IMediaExchange) = call { target.connect(peer) }
     override fun status(): String = call { target.status() }
+    override fun deliveredCount(): Long = call { target.deliveredCount() }
 
     companion object {
         private const val IPC_TIMEOUT_SECONDS = 10L

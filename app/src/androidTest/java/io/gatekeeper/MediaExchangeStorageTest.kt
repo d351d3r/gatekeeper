@@ -26,12 +26,17 @@ class MediaExchangeStorageTest {
                 db.discover(source, listOf(item(6), item(7)))
                 val entries = db.pending(source, 10000)
                 assertEquals(2, entries.size)
+                assertEquals(0L, db.deliveredCount(source))
+                db.setUri(entries.first().token, "content://test/copied/6")
                 db.complete(entries.first().token)
+                assertEquals(1L, db.deliveredCount(source))
+                assertEquals(0L, db.deliveredCount("another-source"))
                 db.retry(entries.last(), 10000)
                 assertTrue(db.pending(source, 10000).isEmpty())
             }
             MediaExchangeLedger(context, name).use { db ->
                 assertEquals(7L, db.cursor(source))
+                assertEquals(1L, db.deliveredCount(source))
                 val pending = db.pending(source, 12000)
                 assertEquals(listOf(7L), pending.map { it.id })
                 db.discover(source, listOf(item(6), item(7)))

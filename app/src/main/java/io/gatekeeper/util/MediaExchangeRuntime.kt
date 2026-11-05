@@ -34,11 +34,16 @@ class MediaExchangeRuntime private constructor(private val context: Context) {
         private set
     @Volatile var remoteStatus = "media_exchange_waiting"
         private set
+    @Volatile var deliveredCount = 0L
+        private set
+    @Volatile var remoteDeliveredCount = 0L
+        private set
 
     @Suppress("TooManyFunctions") // Implements the complete narrow wire contract.
     val endpoint: IMediaExchange = object : IMediaExchange.Stub() {
         override fun isWorkProfile(): Boolean = work
         override fun status(): String = status
+        override fun deliveredCount(): Long = deliveredCount
         override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
             BinderCallers.enforceGatekeeperCaller(code)
             return super.onTransact(code, data, reply, flags)
@@ -141,6 +146,7 @@ class MediaExchangeRuntime private constructor(private val context: Context) {
         try {
             val remote = peer ?: run { status = "media_exchange_waiting"; return }
             remoteStatus = remote.status()
+            remoteDeliveredCount = remote.deliveredCount()
             val wire = configWire()
             val config = MediaExchangeSettings.parse(wire)
             if (!config.enabled || !(if (work) config.camera else config.screenshots)) {
@@ -163,6 +169,7 @@ class MediaExchangeRuntime private constructor(private val context: Context) {
     private fun receive(remote: IMediaExchange, wire: String, config: MediaExchangeSettings.Config) {
         val epoch = if (work) config.cameraEpoch else config.screenshotEpoch
         val source = "${remote.identity()}:$epoch"
+        deliveredCount = ledger.deliveredCount(source)
         val cursor = ledger.cursor(source)
         if (cursor == null) {
             // Never export the pre-existing camera archive on first enable.
@@ -178,6 +185,7 @@ class MediaExchangeRuntime private constructor(private val context: Context) {
             if (!running || configWire() != wire) return
             deliver(remote, wire, delivery)
         }
+        deliveredCount = ledger.deliveredCount(source)
         if (status == "media_exchange_active" && ledger.hasPending(source)) status = "media_exchange_retry"
         if (ledger.pending(source, System.currentTimeMillis()).isNotEmpty()) signal()
         if (items.size == MediaExchangePolicy.PAGE_SIZE) signal()
