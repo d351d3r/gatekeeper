@@ -633,4 +633,6 @@
     <string name="media_exchange_retry">A photo could not be copied; it will be retried</string>
     <string name="media_exchange_too_large">A photo exceeds the 64 MiB limit</string>
     <string name="media_exchange_status">Exchange status</string>
+    <string name="notif_channel_media">Photo sharing (silent)</string>
+    <string name="notif_channel_media_desc">Silent background photo-sharing notification. You can mute this channel separately; exchange status is shown in Gatekeeper settings.</string>
 </resources>

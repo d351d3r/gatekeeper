@@ -38,6 +38,9 @@ object Notifications {
     /** Файлы другого профиля: связь нужно поднять, а спросить об этом больше негде. */
     const val CHANNEL_FILES = "gatekeeper.files"
 
+    /** Kept separate from other status notifications so photo sharing can be muted independently. */
+    const val CHANNEL_MEDIA = "gatekeeper.media"
+
     private const val VPN_AUTO_FREEZE_SUCCESS_NOTIFICATION_ID = 0xe49d3
     private const val REQUEST_OPEN_MAIN = 0x6d61
 
@@ -87,6 +90,11 @@ object Notifications {
             R.string.notif_channel_files,
             R.string.notif_channel_files_desc,
             NotificationManager.IMPORTANCE_HIGH,
+        ),
+        CHANNEL_MEDIA to ChannelSpec(
+            R.string.notif_channel_media,
+            R.string.notif_channel_media_desc,
+            NotificationManager.IMPORTANCE_MIN,
         ),
     )
 
@@ -217,6 +225,10 @@ object Notifications {
         chan.description = context.getString(spec.descRes)
         chan.enableVibration(isLoud(channel))
         chan.enableLights(isLoud(channel))
+        if (channel == CHANNEL_MEDIA) {
+            chan.setSound(null, null)
+            chan.setShowBadge(false)
+        }
         nm.createNotificationChannel(chan)
     }
 }

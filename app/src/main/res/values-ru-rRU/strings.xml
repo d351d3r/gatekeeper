@@ -608,4 +608,6 @@
     <string name="media_exchange_retry">Фото не скопировалось; попытка будет повторена</string>
     <string name="media_exchange_too_large">Фото превышает ограничение 64 МиБ</string>
     <string name="media_exchange_status">Состояние обмена</string>
+    <string name="notif_channel_media">Обмен фото (тихо)</string>
+    <string name="notif_channel_media_desc">Тихое уведомление фонового обмена фото. Этот канал можно отключить отдельно; состояние обмена показано в настройках Gatekeeper.</string>
 </resources>
